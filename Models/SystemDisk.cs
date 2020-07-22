@@ -1,6 +1,6 @@
 ﻿namespace SystemChecker.Models
 {
-    class SystemDisk
+    public class SystemDisk
     {
         public string Name { get; set; }
         public string Drive { get; set; }

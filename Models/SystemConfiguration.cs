@@ -2,7 +2,7 @@
 
 namespace SystemChecker.Models
 {
-    class SystemConfiguration
+    public class SystemConfiguration
     {
         public string Name { get; set; }
         public string Os { get; set; }

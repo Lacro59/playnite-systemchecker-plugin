@@ -61,6 +61,8 @@ namespace SystemChecker
                         // Add code to be execute when user invokes this menu entry.
 
                         new SystemCheckerGameView(this.GetPluginUserDataPath(), GameSelected).ShowDialog();
+
+
                     })
             };
         }
@@ -116,6 +118,23 @@ namespace SystemChecker
                     SystemApi systemApi = new SystemApi(this.GetPluginUserDataPath());
                     SystemConfiguration systemConfiguration = systemApi.GetInfo();
                     GameRequierements gameRequierements = systemApi.GetGameRequierements(GameSelected);
+
+
+                    if (gameRequierements.Minimum != null)
+                    {
+                        foreach (var item in gameRequierements.Minimum.Gpu)
+                        {
+                            Gpu gpu = new Gpu(systemConfiguration, item);
+                        }
+                    }
+                    if (gameRequierements.Recommanded != null)
+                    {
+                        foreach (var item in gameRequierements.Recommanded.Gpu)
+                        {
+                            Gpu gpu = new Gpu(systemConfiguration, item);
+                        }
+                    }
+
 
 
                     CheckMinimum = new CheckSystem();
