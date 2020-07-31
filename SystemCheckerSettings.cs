@@ -12,6 +12,8 @@ namespace SystemChecker
     {
         private readonly SystemChecker plugin;
 
+        public bool EnableCheckVersion { get; set; } = true;
+
         public bool EnableIntegrationButton { get; set; } = false;
         public bool EnableIntegrationButtonDetails { get; set; } = false;
 
@@ -36,6 +38,8 @@ namespace SystemChecker
             // LoadPluginSettings returns null if not saved data is available.
             if (savedSettings != null)
             {
+                EnableCheckVersion = savedSettings.EnableCheckVersion;
+
                 EnableIntegrationButton = savedSettings.EnableIntegrationButton;
                 EnableIntegrationButtonDetails = savedSettings.EnableIntegrationButtonDetails;
             }
