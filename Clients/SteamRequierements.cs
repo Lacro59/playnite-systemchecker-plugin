@@ -33,9 +33,13 @@ namespace SystemChecker.Clients
             return string.Format("{0:n1} {1}", adjustedSize, SizeSuffixes[mag]);
         }
 
-        public SteamRequierements(Game game)
+        public SteamRequierements(Game game, uint appId = 0)
         {
-            appId = uint.Parse(game.GameId);
+            this.appId = appId;
+            if (appId == 0)
+            {
+                this.appId = uint.Parse(game.GameId);
+            }
         }
 
         private string GetSteamData()

@@ -72,8 +72,6 @@ namespace SystemChecker
                         // Add code to be execute when user invokes this menu entry.
 
                         new SystemCheckerGameView(this.GetPluginUserDataPath(), GameSelected).ShowDialog();
-
-
                     })
             };
         }

@@ -252,7 +252,7 @@ namespace SystemChecker.Clients
                 {
                     IsOld = true;
                 }
-                if (Number >= 8000)
+                if (Number >= 7000)
                 {
                     IsOld = true;
                 }

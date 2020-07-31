@@ -153,24 +153,44 @@ namespace SystemChecker.Clients
             gameRequierements = new GameRequierements();
             string FileGameRequierements = PluginDirectory + "\\" + game.Id.ToString() + ".json";
 
+            string SourceName = "";
             if (game.SourceId != Guid.Parse("00000000-0000-0000-0000-000000000000"))
             {
-                if (File.Exists(FileGameRequierements))
-                {
-                    return JsonConvert.DeserializeObject<GameRequierements>(File.ReadAllText(FileGameRequierements));
-                }
-
-
-                switch (game.Source.Name.ToLower())
-                {
-                    case "steam":
-                        SteamRequierements steamRequierements = new SteamRequierements(game);
-                        gameRequierements = steamRequierements.GetRequirements();
-                        break;
-                }
+                SourceName = "Playnite";
+            }
+            else
+            {
+                SourceName = game.Source.Name;
             }
 
-            File.WriteAllText(FileGameRequierements, JsonConvert.SerializeObject(gameRequierements));
+            if (File.Exists(FileGameRequierements))
+            {
+                return JsonConvert.DeserializeObject<GameRequierements>(File.ReadAllText(FileGameRequierements));
+            }
+
+            SteamRequierements steamRequierements;
+            switch (SourceName.ToLower())
+            {
+                case "steam":
+                    steamRequierements = new SteamRequierements(game);
+                    gameRequierements = steamRequierements.GetRequirements();
+                    break;
+                default:
+                    SteamApi steamApi = new SteamApi(PluginUserDataPath);
+                    int SteamID = steamApi.GetSteamId(game.Name);
+                    if (SteamID != 0)
+                    {
+                        steamRequierements = new SteamRequierements(game, (uint)SteamID);
+                        gameRequierements = steamRequierements.GetRequirements();
+                    }
+                    break;
+            }
+
+            // TODO Save only if find
+            //if (gameRequierements.Minimum.Os.Count != 0 && gameRequierements.Recommanded.Os.Count != 0)
+            //{
+                File.WriteAllText(FileGameRequierements, JsonConvert.SerializeObject(gameRequierements));
+            //}
             return gameRequierements;
         }
 
