@@ -266,7 +266,7 @@ namespace SystemChecker.Clients
                             //Quad-Core CPU 3 GHz (64 Bit)
                             int index = -1;
                             string Clock = cpu.ToLower();
-                            //logger.Debug($"Clock - {Clock}");
+                            logger.Debug($"Clock - {Clock}");
 
                             // delete end string
                             index = Clock.IndexOf("ghz");

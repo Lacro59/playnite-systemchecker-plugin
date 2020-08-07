@@ -123,6 +123,7 @@ namespace SystemChecker.Clients
                         .Replace("<strong>OS:</strong>", "")
                         .Replace("Windows", "")
                         .Replace("®", "")
+                        .Replace("+", "")
                         .Replace("and above", "")
                         .Replace("x32", "")
                         .Replace("and", "")
@@ -144,11 +145,13 @@ namespace SystemChecker.Clients
                         .Replace(" equivalent or better", "")
                         .Replace(" or equivalent.", "")
                         .Replace(" or equivalent", "")
+                        .Replace(" or newer", "")
+                        .Replace("or newer", "")
                         .Replace("()", "")
                         .Replace("<br>", "")
                         .Trim();
                     logger.Debug($"os: {os}");
-                    foreach (string sTemp in os.Replace(",", "/").Split('/'))
+                    foreach (string sTemp in os.Replace(",", "¤").Replace(" or ", "¤").Split('¤'))
                     {
                         requirement.Os.Add(sTemp.Trim());
                     }
@@ -160,6 +163,7 @@ namespace SystemChecker.Clients
                     string cpu = ElementRequirement.InnerHtml
                             .Replace("<strong>Processor:</strong>", "")
                             .Replace("&nbsp;", "")
+                            .Replace("- Low budget CPUs such as Celeron or Duron needs to be at about twice the CPU speed", "")
                             .Replace(" equivalent or faster processor", "")
                             .Replace(" equivalent or better", "")
                             .Replace("above", "")
@@ -176,7 +180,12 @@ namespace SystemChecker.Clients
                             .Replace("<br>", "")
                             .Trim();
                     logger.Debug($"cpu: {cpu}");
-                    foreach (string sTemp in cpu.Replace(",", "/").Replace(" or ", "/").Split('/'))
+                    cpu = Regex.Replace(cpu, "([0-9]),([0-9] GHz)", "$1.$2");
+                    cpu = Regex.Replace(cpu, "([0-9]) GHz", "$1GHz");
+                    cpu = Regex.Replace(cpu, "([0-9]) Ghz", "$1GHz");
+                    cpu = Regex.Replace(cpu, "([0-9999])k", "$1K");
+                    cpu = cpu.Replace(",", "¤").Replace(" or ", "¤").Replace(" OR ", "¤").Replace(" and ", "¤").Replace(" AND ", "¤");
+                    foreach (string sTemp in cpu.Split('¤'))
                     {
                         requirement.Cpu.Add(sTemp.Trim());
                     }
@@ -213,6 +222,7 @@ namespace SystemChecker.Clients
                             .Replace("(not recommended for Intel HD Graphics cards)", ", not recommended for Intel HD Graphics cards")
                             .Replace("or similar (no support for onboard cards)", "")
                             .Replace("level Graphics Card (requires support for SSE)", "")
+                            .Replace("- Integrated graphics and very low budget cards might not work.", "")
 
                             .Replace("ATI or NVidia card", "Card")
                             .Replace("w/", "with")
@@ -223,6 +233,8 @@ namespace SystemChecker.Clients
                             .Replace(" or better.", "")
                             .Replace("or better.", "")
                             .Replace(" or better", "")
+                            .Replace(" or newer", "")
+                            .Replace("or newer", "")
                             .Replace("or better", "")
                             .Replace("or equivalent", "")
                             .Replace("Mid-range", "")
@@ -248,7 +260,10 @@ namespace SystemChecker.Clients
                             .Replace(". Integrated Intel HD Graphics should work but is not supported; problems are generally solved with a driver update.", "")
                             .Trim();
                     logger.Debug($"gpu: {gpu}");
-                    foreach (string sTemp in gpu.Replace(",", "/").Replace(" or ", "/").Split('/'))
+                    //gpu = Regex.Replace(gpu, " ([0-9])GB", "($1 GB)");
+                    //gpu = Regex.Replace(gpu, "([0-9])Gb", "($1 GB)");
+                    gpu = gpu.Replace(",", "¤").Replace(" or ", "¤").Replace(" OR ", "¤").Replace(" / ", "¤");
+                    foreach (string sTemp in gpu.Split('¤'))
                     {
                         requirement.Gpu.Add(sTemp.Trim());
                     }
