@@ -57,11 +57,13 @@ namespace SystemChecker.Clients
                 string data = GetSteamData();
                 var parsedData = JsonConvert.DeserializeObject<Dictionary<string, StoreAppDetailsResult>>(data);
 
-                if (parsedData[appId.ToString()].data != null)
+                if (parsedData[appId.ToString()].data != null && JsonConvert.SerializeObject(parsedData[appId.ToString()].data.pc_requirements) != "[]")
                 {
+                    logger.Debug(JsonConvert.SerializeObject(parsedData[appId.ToString()].data.pc_requirements));
+
                     JObject pc_requirements = JObject.FromObject(parsedData[appId.ToString()].data.pc_requirements);
 
-                    logger.Debug($"SystemChecker - {appId} - " + JsonConvert.SerializeObject(pc_requirements));
+                    //logger.Debug($"SystemChecker - {appId} - " + JsonConvert.SerializeObject(pc_requirements));
 
                     if (pc_requirements["minimum"] != null)
                     {
@@ -121,6 +123,7 @@ namespace SystemChecker.Clients
                 {
                     string os = ElementRequirement.InnerHtml
                         .Replace("<strong>OS:</strong>", "")
+                        .Replace("with Platform Update for  7 ( versions only)", "")
                         .Replace("Win ", "")
                         .Replace("Windows", "")
                         .Replace(", 32-bit", "")
@@ -176,8 +179,10 @@ namespace SystemChecker.Clients
                             .Replace(" equivalent or better", "")
                             .Replace("above", "")
                             .Replace("and up", "")
+                            .Replace("(or higher)", "")
                             .Replace(" or equivalent.", "")
                             .Replace(" over", "")
+                            .Replace(" or faster", "")
                             .Replace(" or better", "")
                             .Replace(" or equivalent", "")
                             .Replace("4 CPUs", "")
@@ -231,6 +236,12 @@ namespace SystemChecker.Clients
                             .Replace("<strong>Graphics:</strong>", "")
 
                             .Replace("ATI or NVidia card w/ 1024 MB RAM (NVIDIA GeForce GTX 260 or ATI HD 4890)", "NVIDIA GeForce GTX 260 or ATI HD 4890")
+                            .Replace("Video card must be 128 MB or more and should be a DirectX 9-compatible with support for Pixel Shader 2.0b (", "")
+                            .Replace("- *NOT* an Express graphics card).", "")
+                            .Replace("DirectX 11 class GPU with 1GB VRAM (", "")
+                            .Replace(")<br>", "")
+                            .Replace("/320M 512MB VRAM", "")
+                            .Replace(" 512MB VRAM (Intel integrated GPUs are not supported!)", " / Intel integrated GPUs are not supported!")
                             .Replace("(not recommended for Intel HD Graphics cards)", ", not recommended for Intel HD Graphics cards")
                             .Replace("or similar (no support for onboard cards)", "")
                             .Replace("level Graphics Card (requires support for SSE)", "")
@@ -248,6 +259,7 @@ namespace SystemChecker.Clients
                             .Replace(" or better", "")
                             .Replace(" or newer", "")
                             .Replace("or newer", "")
+                            .Replace("or higher", "")
                             .Replace("or better", "")
                             .Replace("or equivalent", "")
                             .Replace("Mid-range", "")
@@ -304,13 +316,13 @@ namespace SystemChecker.Clients
                         .Replace("<br>", "")
                         .Trim();
                     logger.Debug($"storage: {storage}");
-                    if (storage.IndexOf("MB") > -1)
+                    if (storage.IndexOf("mb") > -1)
                     {
-                        requirement.Storage = 1024 * 1024 * long.Parse(storage.Replace("MB", "").Trim());
+                        requirement.Storage = 1024 * 1024 * long.Parse(storage.Replace("mb", "").Trim());
                     }
-                    if (storage.IndexOf("GB") > -1)
+                    if (storage.IndexOf("gb") > -1)
                     {
-                        requirement.Storage = 1024 * 1024 * 1024 * long.Parse(storage.Replace("GB", "").Trim());
+                        requirement.Storage = 1024 * 1024 * 1024 * long.Parse(storage.Replace("gb", "").Trim());
                     }
                     requirement.StorageUsage = SizeSuffix(requirement.Storage);
                 }

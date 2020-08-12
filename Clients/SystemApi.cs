@@ -305,7 +305,15 @@ namespace SystemChecker.Clients
                         }
 
                         // Recent
-                        CheckCpu = CheckCpuBetter(cpu, systemConfiguration.Cpu);
+                        try
+                        {
+                            CheckCpu = CheckCpuBetter(cpu, systemConfiguration.Cpu);
+                        }
+                        catch (Exception ex)
+                        {
+                            Common.LogError(ex, "SystemChecker", $"Error on CheckCpuBetter()");
+                        }
+
                         if (CheckCpu)
                         {
                             break;
@@ -405,7 +413,8 @@ namespace SystemChecker.Clients
             }
             CpuRequirementReference = CpuRequirementReference.Trim();
             int.TryParse(Regex.Replace(CpuRequirementReference.Replace("i3", "").Replace("i5", "").Replace("i7", "").Replace("i9", ""), "[^.0-9]", "").Trim(), out CpuRequirementNumber);
-            CpuRequirementReference = CpuRequirementReference.Substring(0, 2);
+            //logger.Debug($"CpuRequirementReference: {CpuRequirementReference}");
+            //CpuRequirementReference = CpuRequirementReference.Substring(0, 2);
 
             // AMD
 

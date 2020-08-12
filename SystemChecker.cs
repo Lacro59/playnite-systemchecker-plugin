@@ -135,41 +135,46 @@ namespace SystemChecker
                     }
                     else
                     {
-                        SystemApi systemApi = new SystemApi(this.GetPluginUserDataPath());
-                        SystemConfiguration systemConfiguration = systemApi.GetInfo();
-                        GameRequierements gameRequierements = systemApi.GetGameRequierements(GameSelected);
-
-
-                        if (gameRequierements.Minimum != null)
+                        var taskSystem = Task.Run(() =>
                         {
-                            foreach (var item in gameRequierements.Minimum.Gpu)
+                            SystemApi systemApi = new SystemApi(this.GetPluginUserDataPath());
+                            SystemConfiguration systemConfiguration = systemApi.GetInfo();
+                            GameRequierements gameRequierements = systemApi.GetGameRequierements(GameSelected);
+
+
+                            if (gameRequierements.Minimum != null)
                             {
-                                Gpu gpu = new Gpu(systemConfiguration, item);
+                                foreach (var item in gameRequierements.Minimum.Gpu)
+                                {
+                                    Gpu gpu = new Gpu(systemConfiguration, item);
+                                }
                             }
-                        }
-                        if (gameRequierements.Recommanded != null)
-                        {
-                            foreach (var item in gameRequierements.Recommanded.Gpu)
+                            if (gameRequierements.Recommanded != null)
                             {
-                                Gpu gpu = new Gpu(systemConfiguration, item);
+                                foreach (var item in gameRequierements.Recommanded.Gpu)
+                                {
+                                    Gpu gpu = new Gpu(systemConfiguration, item);
+                                }
                             }
-                        }
 
 
-
-                        CheckMinimum = new CheckSystem();
-                        CheckRecommanded = new CheckSystem();
-                        if (gameRequierements.Minimum != null && gameRequierements.Minimum.Ram != 0)
+                            CheckMinimum = new CheckSystem();
+                            CheckRecommanded = new CheckSystem();
+                            if (gameRequierements.Minimum != null && gameRequierements.Minimum.Ram != 0)
+                            {
+                                CheckMinimum = SystemApi.CheckConfig(gameRequierements.Minimum, systemConfiguration);
+                            }
+                            if (gameRequierements.Recommanded != null && gameRequierements.Recommanded.Ram != 0)
+                            {
+                                CheckRecommanded = SystemApi.CheckConfig(gameRequierements.Recommanded, systemConfiguration);
+                            }
+                        })
+                        .ContinueWith(antecedent =>
                         {
-                            CheckMinimum = SystemApi.CheckConfig(gameRequierements.Minimum, systemConfiguration);
-                        }
-                        if (gameRequierements.Recommanded != null && gameRequierements.Recommanded.Ram != 0)
-                        {
-                            CheckRecommanded = SystemApi.CheckConfig(gameRequierements.Recommanded, systemConfiguration);
-                        }
-
-
-                        Integration();
+                            Application.Current.Dispatcher.Invoke(new Action(() => {
+                                Integration();
+                            }));
+                        });
                     }
                 }
             }
