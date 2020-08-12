@@ -7,8 +7,23 @@
 
     <StackPanel Margin="20">
 
-        <StackPanel Margin="0,20,0,0">
-            <Label Content="{DynamicResource LOCSystemCheckerIntegration}" FontSize="18" />
+        <StackPanel>
+            <Label Content="{DynamicResource LOCSystemChecker}" FontSize="18" />
+            <Separator Margin="0,0,0,10" />
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="35"/>
+                </Grid.RowDefinitions>
+
+                <Button Grid.Column="0" Grid.Row="0" Content="{DynamicResource LOCClearAll}" Click="Button_Click" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center" />
+            </Grid>
+
+
+            <Label Content="{DynamicResource LOCSystemCheckerIntegration}" FontSize="18" Margin="0,20,0,0" />
             <Separator Margin="0,0,0,10" />
 
             <Grid>

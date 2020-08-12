@@ -254,7 +254,7 @@ namespace SystemChecker
 
         public override UserControl GetSettingsView(bool firstRunSettings)
         {
-            return new SystemCheckerSettingsView();
+            return new SystemCheckerSettingsView(this.GetPluginUserDataPath());
         }
     }
 }
