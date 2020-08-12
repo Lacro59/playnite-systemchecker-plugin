@@ -4,6 +4,8 @@ using Playnite.SDK;
 using Playnite.SDK.Models;
 using PluginCommon;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Windows.Controls;
 using SystemChecker.Clients;
 using SystemChecker.Models;
 
@@ -155,6 +157,13 @@ namespace SystemChecker.Views
                 }
             }
 
+            btLink.Visibility = System.Windows.Visibility.Hidden;
+            if (gameRequierements.Minimum != null || gameRequierements.Recommanded != null) 
+            {
+                btLink.Visibility = System.Windows.Visibility.Visible;
+                btLink.Tag = gameRequierements.Link;
+            }
+
             logger.Debug("CheckMinimum" + JsonConvert.SerializeObject(CheckMinimum));
             logger.Debug("CheckRecommanded" + JsonConvert.SerializeObject(CheckRecommanded));
 
@@ -164,6 +173,16 @@ namespace SystemChecker.Views
         private void Grid_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
             Tools.DesactivePlayniteWindowControl(this);
+        }
+
+        private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            Button bt = (Button)sender;
+
+            if (!((string)bt.Tag).IsNullOrEmpty())
+            {
+                Process.Start((string)bt.Tag);
+            }
         }
     }
 }

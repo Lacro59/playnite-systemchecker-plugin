@@ -174,6 +174,7 @@ namespace SystemChecker.Clients
                 case "steam":
                     steamRequierements = new SteamRequierements(game);
                     gameRequierements = steamRequierements.GetRequirements();
+                    gameRequierements.Link = "https://store.steampowered.com/app/" + game.GameId;
                     break;
                 default:
                     SteamApi steamApi = new SteamApi(PluginUserDataPath);
@@ -182,6 +183,7 @@ namespace SystemChecker.Clients
                     {
                         steamRequierements = new SteamRequierements(game, (uint)SteamID);
                         gameRequierements = steamRequierements.GetRequirements();
+                        gameRequierements.Link = "https://store.steampowered.com/app/" + SteamID;
                     }
                     break;
             }

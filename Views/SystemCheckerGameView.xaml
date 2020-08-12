@@ -10,16 +10,21 @@
              ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None" Height="400" MaxWidth="1260">
 
     <Grid Loaded="Grid_Loaded" Margin="10">
-
-        <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="10" />
+            <RowDefinition Height="30" />
+        </Grid.RowDefinitions>
+        
+        <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto" SharedSizeGroup="A"/>
                 <ColumnDefinition Width="auto" MinWidth="10" SharedSizeGroup="B"/>
-                <ColumnDefinition Width="auto" SharedSizeGroup="C"/>
+                <ColumnDefinition Width="*" SharedSizeGroup="C"/>
                 <ColumnDefinition Width="auto" MinWidth="10" SharedSizeGroup="D"/>
-                <ColumnDefinition Width="auto" SharedSizeGroup="E"/>
+                <ColumnDefinition Width="*" SharedSizeGroup="E"/>
                 <ColumnDefinition Width="auto" MinWidth="10" SharedSizeGroup="F"/>
-                <ColumnDefinition Width="auto" SharedSizeGroup="G"/>
+                <ColumnDefinition Width="*" SharedSizeGroup="G"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" MinHeight="30" />
@@ -48,10 +53,10 @@
             <Label Grid.Column="0" Grid.Row="10" Content="{DynamicResource LOCSystemCheckerDisk}" VerticalAlignment="Center" FontWeight="Bold" FontSize="20" />
 
             <!-- Local -->
-            <Label Grid.Column="2" Grid.Row="2" Content="{Binding LocalOs}" VerticalAlignment="Center" FontSize="16" />
-            <Label Grid.Column="2" Grid.Row="4" Content="{Binding LocalCpu}" VerticalAlignment="Center" FontSize="16" />
-            <Label Grid.Column="2" Grid.Row="6" Content="{Binding LocalRamUsage}" VerticalAlignment="Center" FontSize="16" />
-            <Label Grid.Column="2" Grid.Row="8" Content="{Binding LocalGpu}" VerticalAlignment="Center" FontSize="16" />
+            <Label Grid.Column="2" Grid.Row="2" Content="{Binding LocalOs}" VerticalAlignment="Center" FontSize="14" />
+            <Label Grid.Column="2" Grid.Row="4" Content="{Binding LocalCpu}" VerticalAlignment="Center" FontSize="14" />
+            <Label Grid.Column="2" Grid.Row="6" Content="{Binding LocalRamUsage}" VerticalAlignment="Center" FontSize="14" />
+            <Label Grid.Column="2" Grid.Row="8" Content="{Binding LocalGpu}" VerticalAlignment="Center" FontSize="14" />
             <ListBox Grid.Column="2" Grid.Row="10" Name="LocalDisks" BorderThickness="0" Margin="-5,0,0,0"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <ListBox.ItemTemplate>
@@ -65,51 +70,51 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
-                            <Label Grid.Column="0" Content="{Binding Drive}" FontSize="16"/>
-                            <Label Grid.Column="2" Content="{Binding Name}" FontSize="16"/>
-                            <Label Grid.Column="4" Content="{Binding FreeSpaceUsage}" FontSize="16"/>
+                            <Label Grid.Column="0" Content="{Binding Drive}" FontSize="14"/>
+                            <Label Grid.Column="2" Content="{Binding Name}" FontSize="14"/>
+                            <Label Grid.Column="4" Content="{Binding FreeSpaceUsage}" FontSize="14"/>
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
 
             <!-- Minimum -->
-            <Label Grid.Column="4" Grid.Row="2" Content="{Binding MinimumOs}" VerticalAlignment="Center" FontSize="16" />
-            <ListBox Grid.Column="4" Grid.Row="4" BorderThickness="0" ItemsSource="{Binding MinimumCpu}" FontSize="16" Margin="-5,0,0,0">
+            <Label Grid.Column="4" Grid.Row="2" Content="{Binding MinimumOs}" VerticalAlignment="Center" FontSize="14" />
+            <ListBox Grid.Column="4" Grid.Row="4" BorderThickness="0" ItemsSource="{Binding MinimumCpu}" FontSize="14" Margin="-5,0,0,0">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Label Content="{Binding}" FontSize="16"/>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <Label Grid.Column="4" Grid.Row="6" Content="{Binding MinimumRamUsage}" VerticalAlignment="Center" FontSize="16" />
-            <ListBox Grid.Column="4" Grid.Row="8" BorderThickness="0" ItemsSource="{Binding MinimumGpu}" FontSize="16" Margin="-5,0,0,0">
+            <Label Grid.Column="4" Grid.Row="6" Content="{Binding MinimumRamUsage}" VerticalAlignment="Center" FontSize="14" />
+            <ListBox Grid.Column="4" Grid.Row="8" BorderThickness="0" ItemsSource="{Binding MinimumGpu}" FontSize="14" Margin="-5,0,0,0">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Label Content="{Binding}" FontSize="16"/>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <Label Grid.Column="4" Grid.Row="10" Content="{Binding MinimumStorage}" VerticalAlignment="Center" FontSize="16" />
+            <Label Grid.Column="4" Grid.Row="10" Content="{Binding MinimumStorage}" VerticalAlignment="Center" FontSize="14" />
 
             <!-- Recommanded -->
-            <Label Grid.Column="6" Grid.Row="2" Content="{Binding RecommandedOs}" VerticalAlignment="Center" FontSize="16" />
-            <ListBox Grid.Column="6" Grid.Row="4" BorderThickness="0" ItemsSource="{Binding RecommandedCpu}" FontSize="16" Margin="-5,0,0,0">
+            <Label Grid.Column="6" Grid.Row="2" Content="{Binding RecommandedOs}" VerticalAlignment="Center" FontSize="14" />
+            <ListBox Grid.Column="6" Grid.Row="4" BorderThickness="0" ItemsSource="{Binding RecommandedCpu}" FontSize="14" Margin="-5,0,0,0">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Label Content="{Binding}" FontSize="16"/>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <Label Grid.Column="6" Grid.Row="6" Content="{Binding RecommandedRamUsage}" VerticalAlignment="Center" FontSize="16" />
-            <ListBox Grid.Column="6" Grid.Row="8" BorderThickness="0" ItemsSource="{Binding RecommandedGpu}" FontSize="16" Margin="-5,0,0,0">
+            <Label Grid.Column="6" Grid.Row="6" Content="{Binding RecommandedRamUsage}" VerticalAlignment="Center" FontSize="14" />
+            <ListBox Grid.Column="6" Grid.Row="8" BorderThickness="0" ItemsSource="{Binding RecommandedGpu}" FontSize="14" Margin="-5,0,0,0">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Label Content="{Binding}" FontSize="16"/>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <Label Grid.Column="6" Grid.Row="10" Content="{Binding RecommandedStorage}" VerticalAlignment="Center" FontSize="16" />
+            <Label Grid.Column="6" Grid.Row="10" Content="{Binding RecommandedStorage}" VerticalAlignment="Center" FontSize="14" />
             
             <!-- Check config -->
             <Label Grid.Column="3" Grid.Row="2" Content="{Binding MinimumCheckOs}" VerticalAlignment="Center" FontSize="16" Margin="5,0" HorizontalAlignment="Center" FontFamily="Wingdings" />
@@ -125,5 +130,6 @@
             <Label Grid.Column="5" Grid.Row="10" Content="{Binding RecommandedCheckStorage}" VerticalAlignment="Center" FontSize="16" Margin="5,0" HorizontalAlignment="Center" FontFamily="Wingdings" />
         </Grid>
 
+        <Button Name="btLink" Grid.Row="2" Content="{DynamicResource LOCWebsiteLabel}" Width="200" HorizontalAlignment="Right" Click="Button_Click" />
     </Grid>
 </controls:WindowBase>
