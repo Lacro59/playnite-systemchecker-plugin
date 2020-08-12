@@ -121,7 +121,12 @@ namespace SystemChecker.Clients
                 {
                     string os = ElementRequirement.InnerHtml
                         .Replace("<strong>OS:</strong>", "")
+                        .Replace("Win ", "")
                         .Replace("Windows", "")
+                        .Replace(", 32-bit", "")
+                        .Replace(", 32bit", "")
+                        .Replace(", 64-bit", "")
+                        .Replace(", 64bit", "")
                         .Replace("®", "")
                         .Replace("+", "")
                         .Replace("and above", "")
@@ -145,13 +150,16 @@ namespace SystemChecker.Clients
                         .Replace(" equivalent or better", "")
                         .Replace(" or equivalent.", "")
                         .Replace(" or equivalent", "")
+                        .Replace(" or Newer", "")
                         .Replace(" or newer", "")
+                        .Replace("or Newer", "")
                         .Replace("or newer", "")
+                        .Replace("or later", "")
                         .Replace("()", "")
                         .Replace("<br>", "")
                         .Trim();
                     logger.Debug($"os: {os}");
-                    foreach (string sTemp in os.Replace(",", "¤").Replace(" or ", "¤").Split('¤'))
+                    foreach (string sTemp in os.Replace(",", "¤").Replace(" or ", "¤").Replace("/", "¤").Split('¤'))
                     {
                         requirement.Os.Add(sTemp.Trim());
                     }
@@ -175,16 +183,19 @@ namespace SystemChecker.Clients
                             .Replace("4 CPUs", "")
                             .Replace(", ~2.4GHz", "")
                             .Replace(", ~3.1GHz", "")
+                            .Replace("ghz", "GHz")
+                            .Replace("Ghz", "GHz")
                             .Replace("(not recommended for Intel HD Graphics cards)", ", not recommended for Intel HD Graphics cards")
                             .Replace("()", "")
                             .Replace("<br>", "")
                             .Trim();
                     logger.Debug($"cpu: {cpu}");
+                    cpu = Regex.Replace(cpu, ", ([0-9])", " $1");
                     cpu = Regex.Replace(cpu, "([0-9]),([0-9] GHz)", "$1.$2");
                     cpu = Regex.Replace(cpu, "([0-9]) GHz", "$1GHz");
-                    cpu = Regex.Replace(cpu, "([0-9]) Ghz", "$1GHz");
                     cpu = Regex.Replace(cpu, "([0-9999])k", "$1K");
-                    cpu = cpu.Replace(",", "¤").Replace(" or ", "¤").Replace(" OR ", "¤").Replace(" and ", "¤").Replace(" AND ", "¤");
+                    cpu = cpu.Replace(",", "¤").Replace(" / ", "¤").Replace(" or ", "¤").Replace(" OR ", "¤")
+                        .Replace(" and ", "¤").Replace(" AND ", "¤").Replace(" | ", "¤");
                     foreach (string sTemp in cpu.Split('¤'))
                     {
                         requirement.Cpu.Add(sTemp.Trim());
@@ -194,20 +205,21 @@ namespace SystemChecker.Clients
                 //< li >< strong > Memory:</ strong > 2048 MB RAM<br></ li >
                 if (ElementRequirement.InnerHtml.IndexOf("<strong>Memory") > -1)
                 {
-                    string ram = ElementRequirement.InnerHtml
-                            .Replace("<strong>Memory:</strong>", "")
-                            .Replace("RAM", "")
+                    string ram = ElementRequirement.InnerHtml.ToLower()
+                            .Replace("<strong>memory:</strong>", "")
+                            .Replace("ram", "")
                             .Replace("of system", "")
                             .Replace("<br>", "")
                             .Trim();
+                    ram = ram.Split('/')[ram.Split('/').Length - 1];
                     logger.Debug($"ram: {ram}");
-                    if (ram.IndexOf("MB") > -1)
+                    if (ram.ToLower().IndexOf("mb") > -1)
                     {
-                        requirement.Ram = 1024 * 1024 * long.Parse(ram.Replace("MB", "").Trim());
+                        requirement.Ram = 1024 * 1024 * long.Parse(ram.ToLower().Replace("mb", "").Trim());
                     }
-                    if (ram.IndexOf("GB") > -1)
+                    if (ram.ToLower().IndexOf("gb") > -1)
                     {
-                        requirement.Ram = 1024 * 1024 * 1024 * long.Parse(ram.Replace("GB", "").Trim());
+                        requirement.Ram = 1024 * 1024 * 1024 * long.Parse(ram.ToLower().Replace("gb", "").Trim());
                     }
                     requirement.RamUsage = SizeSuffix(requirement.Ram);
                 }
@@ -226,6 +238,7 @@ namespace SystemChecker.Clients
 
                             .Replace("ATI or NVidia card", "Card")
                             .Replace("w/", "with")
+                            .Replace("Graphics: ", "")
                             .Replace(" equivalent or better", "")
                             .Replace(" or equivalent.", "")
                             .Replace("or equivalent.", "")
@@ -238,6 +251,10 @@ namespace SystemChecker.Clients
                             .Replace("or better", "")
                             .Replace("or equivalent", "")
                             .Replace("Mid-range", "")
+                            .Replace(" Memory Minimum", "")
+                            .Replace(" memory minimum", "")
+                            .Replace(" Memory Recommended", "")
+                            .Replace(" memory recommended", "")
                             .Replace("e.g.", "")
                             .Replace("Laptop integrated ", "")
                             .Replace("GPU 1GB VRAM", "GPU 1 GB VRAM")
@@ -254,15 +271,16 @@ namespace SystemChecker.Clients
                             .Replace(" 4GB", " (4 GB)")
                             .Replace("8GB Memory 8 GB RAM", "(8 GB)")
                             .Replace(" or more and should be a DirectX 9-compatible with support for Pixel Shader 3.0", "")
+                            .Replace(", or ", "")
                             .Replace("()", "")
                             .Replace("<br>", "")
                             .Replace("  ", " ")
                             .Replace(". Integrated Intel HD Graphics should work but is not supported; problems are generally solved with a driver update.", "")
                             .Trim();
                     logger.Debug($"gpu: {gpu}");
-                    //gpu = Regex.Replace(gpu, " ([0-9])GB", "($1 GB)");
+                    gpu = Regex.Replace(gpu, " - ([0-9]) GB", " ($1 GB)");
                     //gpu = Regex.Replace(gpu, "([0-9])Gb", "($1 GB)");
-                    gpu = gpu.Replace(",", "¤").Replace(" or ", "¤").Replace(" OR ", "¤").Replace(" / ", "¤");
+                    gpu = gpu.Replace(",", "¤").Replace(" or ", "¤").Replace(" OR ", "¤").Replace(" / ", "¤").Replace(" | ", "¤");
                     foreach (string sTemp in gpu.Split('¤'))
                     {
                         requirement.Gpu.Add(sTemp.Trim());
@@ -275,13 +293,14 @@ namespace SystemChecker.Clients
                 //< li >< strong > Storage:</ strong > 350 MB available space </ li >
                 if (ElementRequirement.InnerHtml.IndexOf("<strong>Storage") > -1 || ElementRequirement.InnerHtml.IndexOf("<strong>Hard Drive") > -1)
                 {
-                    string storage = ElementRequirement.InnerHtml
-                        .Replace("<strong>Storage:</strong>", "")
-                        .Replace("<strong>Hard Drive:</strong>", "")
-                        .Replace(" available space", "")
-                        .Replace(" equivalent or better", "")
-                        .Replace(" or equivalent", "")
-                        .Replace(" HD space", "")
+                    string storage = ElementRequirement.InnerHtml.ToLower()
+                        .Replace("<strong>storage:</strong>", "")
+                        .Replace("<strong>hard drive:</strong>", "")
+                        .Replace("available space", "")
+                        .Replace("equivalent or better", "")
+                        .Replace("or equivalent", "")
+                        .Replace("hd space", "")
+                        .Replace("free space", "")
                         .Replace("<br>", "")
                         .Trim();
                     logger.Debug($"storage: {storage}");

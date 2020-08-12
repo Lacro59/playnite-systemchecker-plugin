@@ -126,6 +126,19 @@ namespace SystemChecker.Clients
                 {
                     return true;
                 }
+
+                if (CardRequierement.Number > 999 && CardPc.Number < 1000)
+                {
+                    return true;
+                }
+                if (CardRequierement.Number > 999 && CardPc.Number > 999)
+                {
+                    return (CardRequierement.Number < CardPc.Number);
+                }
+                if (CardRequierement.Number < 1000 && CardPc.Number < 1000)
+                {
+                    return (CardRequierement.Number < CardPc.Number);
+                }
             }
 
             // Nvidia vs Nvidia
