@@ -80,37 +80,65 @@ namespace SystemChecker.Clients
             long Ram = 0;
 
 
-            ManagementObjectSearcher myOperativeSystemObject = new ManagementObjectSearcher("select * from Win32_OperatingSystem");
-            foreach (ManagementObject obj in myOperativeSystemObject.Get())
+            try
             {
-                Os = (string)obj["Caption"];
+                ManagementObjectSearcher myOperativeSystemObject = new ManagementObjectSearcher("select * from Win32_OperatingSystem");
+                foreach (ManagementObject obj in myOperativeSystemObject.Get())
+                {
+                    Os = (string)obj["Caption"];
+                }
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, "SystemChecker", "Error on Win32_OperatingSystem");
             }
 
 
-            ManagementObjectSearcher myProcessorObject = new ManagementObjectSearcher("select * from Win32_Processor");
-            foreach (ManagementObject obj in myProcessorObject.Get())
+            try
             {
-                Cpu = (string)obj["Name"];
-                CpuMaxClockSpeed = (uint)obj["MaxClockSpeed"];
+                ManagementObjectSearcher myProcessorObject = new ManagementObjectSearcher("select * from Win32_Processor");
+                foreach (ManagementObject obj in myProcessorObject.Get())
+                {
+                    Cpu = (string)obj["Name"];
+                    CpuMaxClockSpeed = (uint)obj["MaxClockSpeed"];
+                }
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, "SystemChecker", "Error on Win32_Processor");
             }
 
 
-            ManagementObjectSearcher myVideoObject = new ManagementObjectSearcher("select * from Win32_VideoController");
-            foreach (ManagementObject obj in myVideoObject.Get())
+            try
             {
-                GpuName = (string)obj["Name"];
-                GpuRam = (long)Convert.ToDouble(obj["AdapterRAM"]);
-                CurrentHorizontalResolution = (uint)obj["CurrentHorizontalResolution"];
-                CurrentVerticalResolution = (uint)obj["CurrentVerticalResolution"];
+                ManagementObjectSearcher myVideoObject = new ManagementObjectSearcher("select * from Win32_VideoController");
+                foreach (ManagementObject obj in myVideoObject.Get())
+                {
+                    GpuName = (string)obj["Name"];
+                    GpuRam = (long)Convert.ToDouble(obj["AdapterRAM"]);
+                    CurrentHorizontalResolution = (uint)obj["CurrentHorizontalResolution"];
+                    CurrentVerticalResolution = (uint)obj["CurrentVerticalResolution"];
+                }
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, "SystemChecker", "Error on Win32_VideoController");
             }
 
 
-            ManagementObjectSearcher myComputerSystemObject = new ManagementObjectSearcher("select * from Win32_ComputerSystem");
-
-            foreach (ManagementObject obj in myComputerSystemObject.Get())
+            try
             {
-                Ram = (long)Convert.ToDouble(obj["TotalPhysicalMemory"]);
+                ManagementObjectSearcher myComputerSystemObject = new ManagementObjectSearcher("select * from Win32_ComputerSystem");
+                foreach (ManagementObject obj in myComputerSystemObject.Get())
+                {
+                    Ram = (long)Convert.ToDouble(obj["TotalPhysicalMemory"]);
+                }
             }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, "SystemChecker", "Error on Win32_ComputerSystem");
+            }
+
 
 
             systemConfiguration.Name = Name;
