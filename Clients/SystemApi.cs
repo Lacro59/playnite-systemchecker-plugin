@@ -164,12 +164,52 @@ namespace SystemChecker.Clients
             DriveInfo[] allDrives = DriveInfo.GetDrives();
             foreach (DriveInfo d in allDrives)
             {
+                string VolumeLabel = "";
+                try
+                {
+                    VolumeLabel = d.VolumeLabel;
+                }
+                catch (Exception ex)
+                {
+                    Common.LogError(ex, "SystemChecker", "Error on VolumeLabel");
+                }
+
+                string Name = "";
+                try
+                {
+                    Name = d.Name;
+                }
+                catch (Exception ex)
+                {
+                    Common.LogError(ex, "SystemChecker", "Error on Name");
+                }
+
+                long FreeSpace = 0;
+                try
+                {
+                    FreeSpace = d.TotalFreeSpace;
+                }
+                catch (Exception ex)
+                {
+                    Common.LogError(ex, "SystemChecker", "Error on TotalFreeSpace");
+                }
+
+                string FreeSpaceUsage = "";
+                try
+                {
+                    FreeSpaceUsage = SizeSuffix(d.TotalFreeSpace);
+                }
+                catch (Exception ex)
+                {
+                    Common.LogError(ex, "SystemChecker", "Error on FreeSpaceUsage");
+                }
+
                 Disks.Add(new SystemDisk
                 {
-                    Name = d.VolumeLabel,
-                    Drive = d.Name,
-                    FreeSpace = d.TotalFreeSpace,
-                    FreeSpaceUsage = SizeSuffix(d.TotalFreeSpace)
+                    Name = VolumeLabel,
+                    Drive = Name,
+                    FreeSpace = FreeSpace,
+                    FreeSpaceUsage = FreeSpaceUsage
                 });
             }
             return Disks;
