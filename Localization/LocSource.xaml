@@ -11,7 +11,7 @@
     SystemCheckerGameDettingsView
     -->
 
-    <sys:String x:Key="LOCSystemCheckerIntegration">Interface integration (experimental)</sys:String>
+    <sys:String x:Key="LOCSystemCheckerIntegration">Interface integration</sys:String>
     <sys:String x:Key="LOCSystemCheckerIntegrationButton">Add button</sys:String>
     <sys:String x:Key="LOCSystemCheckerIntegrationButtonDetails">Add button with details</sys:String>
 
