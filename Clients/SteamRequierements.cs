@@ -122,6 +122,7 @@ namespace SystemChecker.Clients
                 if (ElementRequirement.InnerHtml.IndexOf("<strong>OS") > -1)
                 {
                     string os = ElementRequirement.InnerHtml
+                        .Replace("\t", " ")
                         .Replace("<strong>OS:</strong>", "")
                         .Replace("with Platform Update for  7 ( versions only)", "")
                         .Replace("Win ", "")
@@ -172,6 +173,7 @@ namespace SystemChecker.Clients
                 if (ElementRequirement.InnerHtml.IndexOf("<strong>Processor") > -1)
                 {
                     string cpu = ElementRequirement.InnerHtml
+                            .Replace("\t", " ")
                             .Replace("<strong>Processor:</strong>", "")
                             .Replace("&nbsp;", "")
                             .Replace("- Low budget CPUs such as Celeron or Duron needs to be at about twice the CPU speed", "")
@@ -180,6 +182,7 @@ namespace SystemChecker.Clients
                             .Replace("above", "")
                             .Replace("and up", "")
                             .Replace("(or higher)", "")
+                            .Replace("or higher", "")
                             .Replace(" or equivalent.", "")
                             .Replace(" over", "")
                             .Replace(" or faster", "")
@@ -211,6 +214,7 @@ namespace SystemChecker.Clients
                 if (ElementRequirement.InnerHtml.IndexOf("<strong>Memory") > -1)
                 {
                     string ram = ElementRequirement.InnerHtml.ToLower()
+                            .Replace("\t", " ")
                             .Replace("<strong>memory:</strong>", "")
                             .Replace("ram", "")
                             .Replace("of system", "")
@@ -233,13 +237,13 @@ namespace SystemChecker.Clients
                 if (ElementRequirement.InnerHtml.IndexOf("<strong>Graphics") > -1)
                 {
                     string gpu = ElementRequirement.InnerHtml
+                            .Replace("\t", " ")
                             .Replace("<strong>Graphics:</strong>", "")
-
                             .Replace("ATI or NVidia card w/ 1024 MB RAM (NVIDIA GeForce GTX 260 or ATI HD 4890)", "NVIDIA GeForce GTX 260 or ATI HD 4890")
                             .Replace("Video card must be 128 MB or more and should be a DirectX 9-compatible with support for Pixel Shader 2.0b (", "")
                             .Replace("- *NOT* an Express graphics card).", "")
                             .Replace("DirectX 11 class GPU with 1GB VRAM (", "")
-                            .Replace(")<br>", "")
+                            //.Replace(")<br>", "")
                             .Replace("/320M 512MB VRAM", "")
                             .Replace(" 512MB VRAM (Intel integrated GPUs are not supported!)", " / Intel integrated GPUs are not supported!")
                             .Replace("(not recommended for Intel HD Graphics cards)", ", not recommended for Intel HD Graphics cards")
@@ -306,6 +310,7 @@ namespace SystemChecker.Clients
                 if (ElementRequirement.InnerHtml.IndexOf("<strong>Storage") > -1 || ElementRequirement.InnerHtml.IndexOf("<strong>Hard Drive") > -1)
                 {
                     string storage = ElementRequirement.InnerHtml.ToLower()
+                        .Replace("\t", " ")
                         .Replace("<strong>storage:</strong>", "")
                         .Replace("<strong>hard drive:</strong>", "")
                         .Replace("available space", "")

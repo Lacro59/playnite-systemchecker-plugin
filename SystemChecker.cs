@@ -124,58 +124,7 @@ namespace SystemChecker
                 {
                     GameSelected = args.NewValue[0];
 
-                    List<Guid> ListEmulators = new List<Guid>();
-                    foreach (var item in PlayniteApi.Database.Emulators)
-                    {
-                        ListEmulators.Add(item.Id);
-                    }
-                    if (GameSelected.PlayAction != null && GameSelected.PlayAction.EmulatorId != null && ListEmulators.Contains(GameSelected.PlayAction.EmulatorId))
-                    {
-                        // Emulator
-                    }
-                    else
-                    {
-                        var taskSystem = Task.Run(() =>
-                        {
-                            SystemApi systemApi = new SystemApi(this.GetPluginUserDataPath());
-                            SystemConfiguration systemConfiguration = systemApi.GetInfo();
-                            GameRequierements gameRequierements = systemApi.GetGameRequierements(GameSelected);
-
-
-                            if (gameRequierements.Minimum != null)
-                            {
-                                foreach (var item in gameRequierements.Minimum.Gpu)
-                                {
-                                    Gpu gpu = new Gpu(systemConfiguration, item);
-                                }
-                            }
-                            if (gameRequierements.Recommanded != null)
-                            {
-                                foreach (var item in gameRequierements.Recommanded.Gpu)
-                                {
-                                    Gpu gpu = new Gpu(systemConfiguration, item);
-                                }
-                            }
-
-
-                            CheckMinimum = new CheckSystem();
-                            CheckRecommanded = new CheckSystem();
-                            if (gameRequierements.Minimum != null && gameRequierements.Minimum.Ram != 0)
-                            {
-                                CheckMinimum = SystemApi.CheckConfig(gameRequierements.Minimum, systemConfiguration);
-                            }
-                            if (gameRequierements.Recommanded != null && gameRequierements.Recommanded.Ram != 0)
-                            {
-                                CheckRecommanded = SystemApi.CheckConfig(gameRequierements.Recommanded, systemConfiguration);
-                            }
-                        })
-                        .ContinueWith(antecedent =>
-                        {
-                            Application.Current.Dispatcher.Invoke(new Action(() => {
-                                Integration();
-                            }));
-                        });
-                    }
+                    Integration();
                 }
             }
             catch (Exception ex)
@@ -192,52 +141,108 @@ namespace SystemChecker
                 logger.Info("SystemChecker - Delete");
                 ui.RemoveButtonInGameSelectedActionBarButtonOrToggleButton("PART_ScheckButton");
 
-                // Auto adding button
-                if (settings.EnableIntegrationButton || settings.EnableIntegrationButtonDetails)
+
+                List<Guid> ListEmulators = new List<Guid>();
+                foreach (var item in PlayniteApi.Database.Emulators)
                 {
-                    Button bt = new Button();
-                    bt.Content = "";
-                    bt.FontFamily = new FontFamily("Wingdings");
-
-                    if (settings.EnableIntegrationButtonDetails)
-                    {
-                        logger.Debug("CheckMinimum - " + JsonConvert.SerializeObject(CheckMinimum));
-                        logger.Debug("CheckRecommanded - " + JsonConvert.SerializeObject(CheckRecommanded));
-
-                        if (CheckMinimum.AllOk != null)
-                        {
-                            if (!(bool)CheckMinimum.AllOk)
-                            {
-                                bt.Foreground = Brushes.Red;
-                            }
-
-                            if ((bool)CheckMinimum.AllOk)
-                            {
-                                bt.Foreground = Brushes.Orange;
-                                if (CheckRecommanded.AllOk == null)
-                                {
-                                    bt.Foreground = Brushes.Green;
-                                }
-                            }
-                        }
-                        if (CheckRecommanded.AllOk != null)
-                        {
-                            if ((bool)CheckRecommanded.AllOk)
-                            {
-                                bt.Foreground = Brushes.Green;
-                            }
-                        }
-                    }
-
-                    bt.Name = "PART_ScheckButton";
-                    bt.HorizontalAlignment = HorizontalAlignment.Right;
-                    bt.VerticalAlignment = VerticalAlignment.Stretch;
-                    bt.Margin = new Thickness(10, 0, 0, 0);
-                    bt.Click += OnBtGameSelectedActionBarClick;
-
-                    ui.AddButtonInGameSelectedActionBarButtonOrToggleButton(bt);
+                    ListEmulators.Add(item.Id);
                 }
+                if (GameSelected.PlayAction != null && GameSelected.PlayAction.EmulatorId != null && ListEmulators.Contains(GameSelected.PlayAction.EmulatorId))
+                {
+                    // Emulator
+                }
+                else
+                {
+                    var taskSystem = Task.Run(() =>
+                    {
+                        SystemApi systemApi = new SystemApi(this.GetPluginUserDataPath());
+                        SystemConfiguration systemConfiguration = systemApi.GetInfo();
+                        GameRequierements gameRequierements = systemApi.GetGameRequierements(GameSelected);
 
+
+                        if (gameRequierements.Minimum != null)
+                        {
+                            foreach (var item in gameRequierements.Minimum.Gpu)
+                            {
+                                Gpu gpu = new Gpu(systemConfiguration, item);
+                            }
+                        }
+                        if (gameRequierements.Recommanded != null)
+                        {
+                            foreach (var item in gameRequierements.Recommanded.Gpu)
+                            {
+                                Gpu gpu = new Gpu(systemConfiguration, item);
+                            }
+                        }
+
+
+                        CheckMinimum = new CheckSystem();
+                        CheckRecommanded = new CheckSystem();
+                        if (gameRequierements.Minimum != null && gameRequierements.Minimum.Ram != 0)
+                        {
+                            CheckMinimum = SystemApi.CheckConfig(gameRequierements.Minimum, systemConfiguration);
+                        }
+                        if (gameRequierements.Recommanded != null && gameRequierements.Recommanded.Ram != 0)
+                        {
+                            CheckRecommanded = SystemApi.CheckConfig(gameRequierements.Recommanded, systemConfiguration);
+                        }
+                    })
+                    .ContinueWith(antecedent =>
+                    {
+                        Application.Current.Dispatcher.Invoke(new Action(() => {
+                            // Auto adding button
+                            if (settings.EnableIntegrationButton || settings.EnableIntegrationButtonDetails)
+                            {
+                                Button bt = new Button();
+                                bt.Content = "";
+                                bt.FontFamily = new FontFamily("Wingdings");
+
+                                if (settings.EnableIntegrationButtonDetails)
+                                {
+                                    logger.Debug("CheckMinimum - " + JsonConvert.SerializeObject(CheckMinimum));
+                                    logger.Debug("CheckRecommanded - " + JsonConvert.SerializeObject(CheckRecommanded));
+
+                                    if (CheckMinimum.AllOk != null)
+                                    {
+                                        if (!(bool)CheckMinimum.AllOk)
+                                        {
+                                            logger.Debug("Red");
+                                            bt.Foreground = Brushes.Red;
+                                        }
+
+                                        if ((bool)CheckMinimum.AllOk)
+                                        {
+                                            logger.Debug("Orange");
+                                            bt.Foreground = Brushes.Orange;
+                                            if (CheckRecommanded.AllOk == null)
+                                            {
+                                                logger.Debug("Green");
+                                                bt.Foreground = Brushes.Green;
+                                            }
+                                        }
+                                    }
+                                    if (CheckRecommanded.AllOk != null)
+                                    {
+                                        if ((bool)CheckRecommanded.AllOk)
+                                        {
+                                            logger.Debug("Green");
+                                            bt.Foreground = Brushes.Green;
+                                        }
+                                    }
+                                }
+
+                                bt.Name = "PART_ScheckButton";
+                                bt.HorizontalAlignment = HorizontalAlignment.Right;
+                                bt.VerticalAlignment = VerticalAlignment.Stretch;
+                                bt.Margin = new Thickness(10, 0, 0, 0);
+                                bt.Click += OnBtGameSelectedActionBarClick;
+
+                                ui.AddButtonInGameSelectedActionBarButtonOrToggleButton(bt);
+                            }
+
+                        }));
+                    });
+                }
             }
             catch (Exception ex)
             {
