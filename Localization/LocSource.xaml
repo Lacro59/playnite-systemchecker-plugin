@@ -21,7 +21,7 @@
 
     <sys:String x:Key="LOCSystemCheckerConfigLocal">Configuration</sys:String>
     <sys:String x:Key="LOCSystemCheckerConfigMinimum">Minimum</sys:String>
-    <sys:String x:Key="LOCSystemCheckerConfigRecommanded">Recommanded</sys:String>
+    <sys:String x:Key="LOCSystemCheckerConfigRecommanded">Recommended</sys:String>
 
     <sys:String x:Key="LOCSystemCheckerOS">Operating system</sys:String>
     <sys:String x:Key="LOCSystemCheckerCpu">Processor</sys:String>
