@@ -71,7 +71,7 @@ namespace SystemChecker
                     {
                         // Add code to be execute when user invokes this menu entry.
 
-                        new SystemCheckerGameView(this.GetPluginUserDataPath(), GameSelected).ShowDialog();
+                        new SystemCheckerGameView(this.GetPluginUserDataPath(), GameSelected, PlayniteApi).ShowDialog();
                     })
             };
         }
@@ -155,7 +155,7 @@ namespace SystemChecker
                 {
                     var taskSystem = Task.Run(() =>
                     {
-                        SystemApi systemApi = new SystemApi(this.GetPluginUserDataPath());
+                        SystemApi systemApi = new SystemApi(this.GetPluginUserDataPath(), PlayniteApi);
                         SystemConfiguration systemConfiguration = systemApi.GetInfo();
                         GameRequierements gameRequierements = systemApi.GetGameRequierements(GameSelected);
 
@@ -253,7 +253,7 @@ namespace SystemChecker
         private void OnBtGameSelectedActionBarClick(object sender, RoutedEventArgs e)
         {
             // Show SystemChecker
-            new SystemCheckerGameView(this.GetPluginUserDataPath(), GameSelected).ShowDialog();
+            new SystemCheckerGameView(this.GetPluginUserDataPath(), GameSelected, PlayniteApi).ShowDialog();
         }
 
 

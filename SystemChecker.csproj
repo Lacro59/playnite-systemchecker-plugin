@@ -70,7 +70,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Clients\Cpu.cs" />
     <Compile Include="Clients\Gpu.cs" />
+    <Compile Include="Clients\PCGamingWikiRequierements.cs" />
     <Compile Include="Clients\SteamRequierements.cs" />
     <Compile Include="Clients\SystemApi.cs" />
     <Compile Include="Models\GameRequierements.cs" />

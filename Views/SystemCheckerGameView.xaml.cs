@@ -18,6 +18,7 @@ namespace SystemChecker.Views
     public partial class SystemCheckerGameView : WindowBase
     {
         private static readonly ILogger logger = LogManager.GetLogger();
+        private IPlayniteAPI PlayniteApi;
 
 
         public string LocalOs { get; set; }
@@ -49,13 +50,15 @@ namespace SystemChecker.Views
         public string RecommandedCheckGpu { get; set; }
         public string RecommandedCheckStorage { get; set; }
 
-        public SystemCheckerGameView(string PluginUserDataPath, Game GameSelected)
+        public SystemCheckerGameView(string PluginUserDataPath, Game GameSelected, IPlayniteAPI PlayniteApi)
         {
+            this.PlayniteApi = PlayniteApi;
+
             InitializeComponent();
 
 
             // Local
-            SystemApi systemApi = new SystemApi(PluginUserDataPath);
+            SystemApi systemApi = new SystemApi(PluginUserDataPath, PlayniteApi);
             SystemConfiguration systemConfiguration = systemApi.GetInfo();
 
             LocalOs = systemConfiguration.Os;
@@ -68,7 +71,7 @@ namespace SystemChecker.Views
             // Minimum & Recommanded
             GameRequierements gameRequierements = systemApi.GetGameRequierements(GameSelected);
 
-            if (gameRequierements.Minimum != null && gameRequierements.Minimum.Ram != 0)
+            if (gameRequierements.Minimum != null && gameRequierements.Minimum.Ram != 0 && gameRequierements.Minimum.Storage != 0)
             {
                 MinimumOs = "Windows " + string.Join(" / ", gameRequierements.Minimum.Os);
                 MinimumCpu = gameRequierements.Minimum.Cpu;
@@ -76,7 +79,7 @@ namespace SystemChecker.Views
                 MinimumGpu = gameRequierements.Minimum.Gpu;
                 MinimumStorage = gameRequierements.Minimum.StorageUsage;
             }
-            if (gameRequierements.Recommanded != null && gameRequierements.Recommanded.Ram != 0)
+            if (gameRequierements.Recommanded != null && gameRequierements.Recommanded.Ram != 0 && gameRequierements.Recommanded.Storage != 0)
             {
                 RecommandedOs = "Windows " + string.Join(" / ", gameRequierements.Recommanded.Os);
                 RecommandedCpu = gameRequierements.Recommanded.Cpu;

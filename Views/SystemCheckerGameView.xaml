@@ -7,7 +7,7 @@
              Title="SystemChecker"              
              d:DesignStyle="{StaticResource WindowDesignStyle}"
              Style="{DynamicResource StandardWindowStyle}"
-             ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None" Height="400" MaxWidth="1260">
+             ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None" Height="400" Width="1200">
 
     <Grid Loaded="Grid_Loaded" Margin="10">
         <Grid.RowDefinitions>

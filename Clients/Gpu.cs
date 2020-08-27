@@ -97,6 +97,22 @@ namespace SystemChecker.Clients
                 return true;
             }
 
+            // DirectX
+            if (CardRequierement.IsDx)
+            {
+                if (CardPc.IsIntegrate)
+                {
+                    if (CardRequierement.DxVersion < 10)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    return true;
+                }
+            }
+
             // No card defined
             if (!CardRequierement.IsIntegrate && !CardRequierement.IsNvidia && !CardRequierement.IsAmd)
             {
@@ -209,7 +225,6 @@ namespace SystemChecker.Clients
             return (GpuName.ToLower().IndexOf("amd") > -1 || GpuName.ToLower().IndexOf("radeon") > -1 || GpuName.ToLower().IndexOf("ati ") > -1);
         }
 
-
         private GpuObject SetCard(string GpuName)
         {
             bool IsIntegrate = false;
@@ -217,6 +232,9 @@ namespace SystemChecker.Clients
             bool IsAmd = false;
             bool IsOld = false;
             bool IsM = false;
+
+            bool IsDx = false;
+            int DxVersion = 0;
 
             string Type = "";
             int Number = 0;
@@ -228,7 +246,7 @@ namespace SystemChecker.Clients
             int.TryParse(Regex.Replace(GpuName.Replace("R5", "").Replace("R7", "").Replace("R9", ""), "[^.0-9]", "").Trim(), out Number);
 
 
-            #region Check is mobil version
+            #region Check is mobile version
             if (Regex.IsMatch("[0-9]M", GpuName.ToLower()))
             {
                 IsM = true;
@@ -242,17 +260,13 @@ namespace SystemChecker.Clients
 
             #region Check old
             // Other
-            if (GpuName.ToLower().IndexOf("directx") > -1)
+            if (GpuName.ToLower().IndexOf("directx") > -1 || Regex.IsMatch(GpuName.ToLower(), "dx[0-9]*"))
             {
-                IsOld = true;
-            }
-            if (GpuName.ToLower().IndexOf("dx8") > -1)
-            {
-                IsOld = true;
-            }
-            if (GpuName.ToLower().IndexOf("dx9") > -1)
-            {
-                IsOld = true;
+                int.TryParse(Regex.Replace(GpuName, @"[^\d]", "").Trim(), out DxVersion);
+                if (DxVersion > 0)
+                {
+                    IsDx = true;
+                }
             }
             if (GpuName.ToLower().IndexOf("pretty much any 3d graphics card") > -1)
             {
@@ -356,13 +370,15 @@ namespace SystemChecker.Clients
                 IsOld = IsOld,
                 IsM = IsM,
 
+                IsDx = IsDx,
+                DxVersion = DxVersion,
+
                 Type = Type,
                 Number = Number,
                 Vram = 0,
                 ResolutionHorizontal = 0,
             };
         }
-
     }
 
 
@@ -373,6 +389,9 @@ namespace SystemChecker.Clients
         public bool IsAmd { get; set; }
         public bool IsOld { get; set; }
         public bool IsM { get; set; }
+
+        public bool IsDx { get; set; }
+        public int DxVersion { get; set; }
 
         public string Type { get; set; }
         public int Number { get; set; }

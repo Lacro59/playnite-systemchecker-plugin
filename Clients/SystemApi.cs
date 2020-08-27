@@ -16,6 +16,7 @@ namespace SystemChecker.Clients
     class SystemApi
     {
         private static readonly ILogger logger = LogManager.GetLogger();
+        private IPlayniteAPI PlayniteApi;
 
         private readonly string[] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
         private string PluginUserDataPath { get; set; }
@@ -37,8 +38,9 @@ namespace SystemChecker.Clients
         }
 
 
-        public SystemApi(string PluginUserDataPath)
+        public SystemApi(string PluginUserDataPath, IPlayniteAPI PlayniteApi)
         {
+            this.PlayniteApi = PlayniteApi;
             this.PluginUserDataPath = PluginUserDataPath;
             PluginDirectory = PluginUserDataPath + "\\SystemChecker\\";
             FilePlugin = PluginDirectory + "\\pc.json";
@@ -236,30 +238,34 @@ namespace SystemChecker.Clients
                 return JsonConvert.DeserializeObject<GameRequierements>(File.ReadAllText(FileGameRequierements));
             }
 
-            SteamRequierements steamRequierements;
-            switch (SourceName.ToLower())
-            {
-                case "steam":
-                    steamRequierements = new SteamRequierements(game);
-                    gameRequierements = steamRequierements.GetRequirements();
-                    gameRequierements.Link = "https://store.steampowered.com/app/" + game.GameId;
-                    break;
-                default:
-                    SteamApi steamApi = new SteamApi(PluginUserDataPath);
-                    int SteamID = steamApi.GetSteamId(game.Name);
-                    if (SteamID != 0)
-                    {
-                        steamRequierements = new SteamRequierements(game, (uint)SteamID);
-                        gameRequierements = steamRequierements.GetRequirements();
-                        gameRequierements.Link = "https://store.steampowered.com/app/" + SteamID;
-                    }
-                    break;
-            }
+            //SteamRequierements steamRequierements;
+            //switch (SourceName.ToLower())
+            //{
+            //    case "steam":
+            //        steamRequierements = new SteamRequierements(game);
+            //        gameRequierements = steamRequierements.GetRequirements();
+            //        gameRequierements.Link = "https://store.steampowered.com/app/" + game.GameId;
+            //        break;
+            //    default:
+            //        SteamApi steamApi = new SteamApi(PluginUserDataPath);
+            //        int SteamID = steamApi.GetSteamId(game.Name);
+            //        if (SteamID != 0)
+            //        {
+            //            steamRequierements = new SteamRequierements(game, (uint)SteamID);
+            //            gameRequierements = steamRequierements.GetRequirements();
+            //            gameRequierements.Link = "https://store.steampowered.com/app/" + SteamID;
+            //        }
+            //        break;
+            //}
+
+            PCGamingWikiRequierements pCGamingWikiRequierements = new PCGamingWikiRequierements(game, PluginUserDataPath, PlayniteApi);
+            gameRequierements = pCGamingWikiRequierements.GetRequirements();
+
 
             // TODO Save only if find
             //if (gameRequierements.Minimum.Os.Count != 0 && gameRequierements.Recommanded.Os.Count != 0)
             //{
-                File.WriteAllText(FileGameRequierements, JsonConvert.SerializeObject(gameRequierements));
+            File.WriteAllText(FileGameRequierements, JsonConvert.SerializeObject(gameRequierements));
             //}
             return gameRequierements;
         }
@@ -269,38 +275,71 @@ namespace SystemChecker.Clients
         {
             if (requirement != null)
             {
-                bool CheckOs = false;
-                foreach (string Os in requirement.Os)
-                {
-                    //logger.Debug($"CheckOs - {systemConfiguration.Os} - {Os}");
+                bool isCheckOs = CheckOS(systemConfiguration.Os, requirement.Os);
+                bool isCheckCpu = CheckCpu(systemConfiguration.Cpu, systemConfiguration.CpuMaxClockSpeed, requirement.Cpu);
+                bool isCheckRam = CheckRam(systemConfiguration.Ram, requirement.Ram);
+                bool isCheckGpu = CheckGpu(systemConfiguration, requirement.Gpu);
+                bool isCheckStorage = CheckStorage(systemConfiguration.Disks, requirement.Storage); ;
 
-                    if (systemConfiguration.Os.ToLower().IndexOf("10") > -1)
+                bool AllOk = (isCheckOs && isCheckCpu && isCheckRam && isCheckGpu && isCheckStorage);
+
+                return new CheckSystem
+                {
+                    CheckOs = isCheckOs,
+                    CheckCpu = isCheckCpu,
+                    CheckRam = isCheckRam,
+                    CheckGpu = isCheckGpu,
+                    CheckStorage = isCheckStorage,
+                    AllOk = AllOk
+                };
+            }
+
+            return new CheckSystem();
+        }
+
+
+
+        private static bool CheckOS(string systemOs, List<string> requierementOs)
+        {
+            try
+            {
+                foreach (string Os in requierementOs)
+                {
+                    if (systemOs.ToLower().IndexOf("10") > -1)
                     {
-                        CheckOs = true;
-                        break;
+                        return true;
                     }
 
-                    if (systemConfiguration.Os.ToLower().IndexOf(Os.ToLower()) > -1)
+                    if (systemOs.ToLower().IndexOf(Os.ToLower()) > -1)
                     {
-                        CheckOs = true;
-                        break;
+                        return true;
                     }
 
                     int numberOsRequirement = 0;
                     int numberOsPc = 0;
                     Int32.TryParse(Os, out numberOsRequirement);
-                    Int32.TryParse(Regex.Replace(systemConfiguration.Os, "[^.0-9]", "").Trim(), out numberOsPc);
+                    Int32.TryParse(Regex.Replace(systemOs, "[^.0-9]", "").Trim(), out numberOsPc);
                     if (numberOsRequirement != 0 && numberOsPc != 0 && numberOsPc >= numberOsRequirement)
                     {
-                        CheckOs = true;
-                        break;
+                        return true;
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, "SystemChecker", $"Error on CheckOs() with {systemOs} & {JsonConvert.SerializeObject(requierementOs)}");
+            }
 
-                bool CheckCpu = false;
-                if (requirement.Cpu.Count > 0)
+            return false;
+        }
+
+        private static bool CheckCpu(string systemCpu, uint CpuMaxClockSpeed, List<string> requierementCpu)
+        {
+            try
+            {
+                if (requierementCpu.Count > 0)
                 {
-                    foreach (var cpu in requirement.Cpu)
+                    foreach (var cpu in requierementCpu)
                     {
                         // Intel familly
                         if (cpu.ToLower().IndexOf("intel") > -1)
@@ -310,8 +349,7 @@ namespace SystemChecker.Clients
                             // Old processor
                             if (cpu.ToLower().IndexOf("i3") == -1 & cpu.ToLower().IndexOf("i5") == -1 && cpu.ToLower().IndexOf("i7") == -1 && cpu.ToLower().IndexOf("i9") == -1)
                             {
-                                CheckCpu = true;
-                                break;
+                                return true;
                             }
                         }
 
@@ -323,8 +361,7 @@ namespace SystemChecker.Clients
                             // Old processor
                             if (cpu.ToLower().IndexOf("ryzen") == -1)
                             {
-                                CheckCpu = true;
-                                break;
+                                return true;
                             }
                         }
 
@@ -362,10 +399,9 @@ namespace SystemChecker.Clients
                             {
                                 char a = Convert.ToChar(Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator);
                                 Clock = Clock.Replace('.', a).Replace(',', a).Replace("+", "").Trim();
-                                if (double.Parse(Clock) * 1000 < (systemConfiguration.CpuMaxClockSpeed * 2))
+                                if (double.Parse(Clock) * 1000 < (CpuMaxClockSpeed * 2))
                                 {
-                                    CheckCpu = true;
-                                    break;
+                                    return true;
                                 }
                             }
                             catch (Exception ex)
@@ -375,201 +411,225 @@ namespace SystemChecker.Clients
                         }
 
                         // Recent
-                        try
+                        if (CheckCpuBetter(cpu, systemCpu))
                         {
-                            CheckCpu = CheckCpuBetter(cpu, systemConfiguration.Cpu);
-                        }
-                        catch (Exception ex)
-                        {
-                            Common.LogError(ex, "SystemChecker", $"Error on CheckCpuBetter()");
+                            return true;
                         }
 
-                        if (CheckCpu)
-                        {
-                            break;
-                        }
                     }
                 }
                 else
                 {
-                    CheckCpu = true;
+                    return true;
                 }
-
-                bool CheckRam = false;
-                //logger.Debug($"CheckRam - {systemConfiguration.Ram} - {requirement.Ram}");
-                if (systemConfiguration.Ram >= requirement.Ram)
-                {
-                    CheckRam = true;
-                }
-
-                bool CheckGpu = false;
-                if (requirement.Gpu.Count > 0)
-                {
-                    foreach (var gpu in requirement.Gpu)
-                    {
-                        Gpu gpuCheck = new Gpu(systemConfiguration, gpu);
-                        CheckGpu = gpuCheck.IsBetter();
-                        if (CheckGpu)
-                        {
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    CheckGpu = true;
-                }
-
-                bool CheckStorage = false;
-                foreach (SystemDisk Disk in systemConfiguration.Disks)
-                {
-                    //logger.Debug($"CheckStorage - {Disk.FreeSpace} - {requirement.Storage}");
-                    if (Disk.FreeSpace >= requirement.Storage)
-                    {
-                        CheckStorage = true;
-                        break;
-                    }
-                }
-
-                bool AllOk = (CheckOs && CheckCpu && CheckRam && CheckGpu && CheckStorage);
-
-                return new CheckSystem
-                {
-                    CheckOs = CheckOs,
-                    CheckCpu = CheckCpu,
-                    CheckRam = CheckRam,
-                    CheckGpu = CheckGpu,
-                    CheckStorage = CheckStorage,
-                    AllOk = AllOk
-                };
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, "SystemChecker", $"Error on CheckCpu() with {systemCpu} & {JsonConvert.SerializeObject(requierementCpu)}");
             }
 
-            return new CheckSystem();
+            return false;
         }
+
+        private static bool CheckRam(long systemRam, long requierementRam)
+        {
+            try
+            {
+                //logger.Debug($"CheckRam - {systemRam} - {requierementRam}");
+                return systemRam >= requierementRam;
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, "SystemChecker", $"Error on CheckRam() with {systemRam} & {requierementRam}");
+            }
+
+            return false;
+        }
+
+        private static bool CheckGpu(SystemConfiguration systemConfiguration, List<string> requierementGpu)
+        {
+            try
+            {
+                if (requierementGpu.Count > 0)
+                {
+                    foreach (var gpu in requierementGpu)
+                    {
+                        Gpu gpuCheck = new Gpu(systemConfiguration, gpu);
+                        if (gpuCheck.IsBetter())
+                        {
+                            return true;
+                        }
+                    }
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, "SystemChecker", $"Error on CheckGpu() with {systemConfiguration.GpuName} & {JsonConvert.SerializeObject(requierementGpu)}");
+            }
+
+            return false;
+        }
+
+        private static bool CheckStorage(List<SystemDisk> systemDisks, long Storage)
+        {
+            try
+            {
+                foreach (SystemDisk Disk in systemDisks)
+                {
+                    //logger.Debug($"CheckStorage - {Disk.FreeSpace} - {requirement.Storage}");
+                    if (Disk.FreeSpace >= Storage)
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, "SystemChecker", $"Error on CheckStorage() with {Storage} & {JsonConvert.SerializeObject(systemDisks)}");
+            }
+
+            return false;
+        }
+
+
+
+
+
+
 
         private static bool CheckCpuBetter(string cpuRequirement, string cpuPc)
         {
             bool Result = false;
 
-            cpuRequirement = cpuRequirement.ToLower();
-            cpuPc = cpuPc.ToLower();
-
-            int index = 0;
-
-            string CpuRequirementReference = "";
-            int CpuRequirementNumber = 0;
-
-            // Intel
-            if (cpuRequirement.IndexOf("i3") > -1)
+            try
             {
-                CpuRequirementReference = cpuRequirement.Substring(cpuRequirement.IndexOf("i3")).Trim();
-            }
-            if (cpuRequirement.IndexOf("i5") > -1)
-            {
-                CpuRequirementReference = cpuRequirement.Substring(cpuRequirement.IndexOf("i5")).Trim();
-            }
-            if (cpuRequirement.IndexOf("i7") > -1)
-            {
-                CpuRequirementReference = cpuRequirement.Substring(cpuRequirement.IndexOf("i7")).Trim();
-            }
-            if (cpuRequirement.IndexOf("i9") > -1)
-            {
-                CpuRequirementReference = cpuRequirement.Substring(cpuRequirement.IndexOf("i9")).Trim();
-            }
-            index = CpuRequirementReference.IndexOf(" ");
-            if (index > -1)
-            {
-                CpuRequirementReference = CpuRequirementReference.Substring(0, index);
-            }
-            CpuRequirementReference = CpuRequirementReference.Trim();
-            int.TryParse(Regex.Replace(CpuRequirementReference.Replace("i3", "").Replace("i5", "").Replace("i7", "").Replace("i9", ""), "[^.0-9]", "").Trim(), out CpuRequirementNumber);
-            //logger.Debug($"CpuRequirementReference: {CpuRequirementReference}");
-            //CpuRequirementReference = CpuRequirementReference.Substring(0, 2);
+                cpuRequirement = cpuRequirement.ToLower();
+                cpuPc = cpuPc.ToLower();
 
-            // AMD
+                int index = 0;
 
+                string CpuRequirementReference = "";
+                int CpuRequirementNumber = 0;
 
-
-            //logger.Debug($"CpuRequirementReference - {CpuRequirementReference}");
-            //logger.Debug($"CpuRequirementNumber - {CpuRequirementNumber}");
-
-
-            string CpuPcReference = "";
-            int CpuPcNumber = 0;
-
-            //Intel(R) Core(TM) i5-4590 CPU @ 3.30GHz
-            if (cpuPc.IndexOf("intel") > -1)
-            {
-                if (cpuPc.IndexOf("i3") > -1)
+                // Intel
+                if (cpuRequirement.IndexOf("i3") > -1)
                 {
-                    CpuPcReference = cpuPc.Substring(cpuPc.IndexOf("i3"), (cpuPc.Length - cpuPc.IndexOf("i3"))).Trim();
+                    CpuRequirementReference = cpuRequirement.Substring(cpuRequirement.IndexOf("i3")).Trim();
                 }
-                if (cpuPc.IndexOf("i5") > -1)
+                if (cpuRequirement.IndexOf("i5") > -1)
                 {
-                    CpuPcReference = cpuPc.Substring(cpuPc.IndexOf("i5"), (cpuPc.Length - cpuPc.IndexOf("i5"))).Trim();
+                    CpuRequirementReference = cpuRequirement.Substring(cpuRequirement.IndexOf("i5")).Trim();
                 }
-                if (cpuPc.IndexOf("i7") > -1)
+                if (cpuRequirement.IndexOf("i7") > -1)
                 {
-                    CpuPcReference = cpuPc.Substring(cpuPc.IndexOf("i7"), (cpuPc.Length - cpuPc.IndexOf("i7"))).Trim();
+                    CpuRequirementReference = cpuRequirement.Substring(cpuRequirement.IndexOf("i7")).Trim();
                 }
-                if (cpuPc.IndexOf("i9") > -1)
+                if (cpuRequirement.IndexOf("i9") > -1)
                 {
-                    CpuPcReference = cpuPc.Substring(cpuPc.IndexOf("i9"), (cpuPc.Length - cpuPc.IndexOf("i9"))).Trim();
+                    CpuRequirementReference = cpuRequirement.Substring(cpuRequirement.IndexOf("i9")).Trim();
                 }
-                index = CpuPcReference.IndexOf(" ");
+                index = CpuRequirementReference.IndexOf(" ");
                 if (index > -1)
                 {
-                    CpuPcReference = CpuPcReference.Substring(0, index);
+                    CpuRequirementReference = CpuRequirementReference.Substring(0, index);
                 }
-                CpuPcReference = CpuPcReference.Trim();
-                int.TryParse(Regex.Replace(CpuPcReference.Replace("i3", "").Replace("i5", "").Replace("i7", "").Replace("i9", ""), "[^.0-9]", "").Trim(), out CpuPcNumber);
-                CpuPcReference = CpuPcReference.Substring(0, 2);
+                CpuRequirementReference = CpuRequirementReference.Trim();
+                int.TryParse(Regex.Replace(CpuRequirementReference.Replace("i3", "").Replace("i5", "").Replace("i7", "").Replace("i9", ""), "[^.0-9]", "").Trim(), out CpuRequirementNumber);
+                //logger.Debug($"CpuRequirementReference: {CpuRequirementReference}");
+                //CpuRequirementReference = CpuRequirementReference.Substring(0, 2);
 
-                if (int.Parse(CpuPcReference.Replace("i","")) == int.Parse(CpuRequirementReference.Replace("i", "")))
+                // AMD
+
+
+
+                //logger.Debug($"CpuRequirementReference - {CpuRequirementReference}");
+                //logger.Debug($"CpuRequirementNumber - {CpuRequirementNumber}");
+
+
+                string CpuPcReference = "";
+                int CpuPcNumber = 0;
+
+                //Intel(R) Core(TM) i5-4590 CPU @ 3.30GHz
+                if (cpuPc.IndexOf("intel") > -1)
                 {
-                    if (CpuPcNumber >= CpuRequirementNumber)
+                    if (cpuPc.IndexOf("i3") > -1)
+                    {
+                        CpuPcReference = cpuPc.Substring(cpuPc.IndexOf("i3"), (cpuPc.Length - cpuPc.IndexOf("i3"))).Trim();
+                    }
+                    if (cpuPc.IndexOf("i5") > -1)
+                    {
+                        CpuPcReference = cpuPc.Substring(cpuPc.IndexOf("i5"), (cpuPc.Length - cpuPc.IndexOf("i5"))).Trim();
+                    }
+                    if (cpuPc.IndexOf("i7") > -1)
+                    {
+                        CpuPcReference = cpuPc.Substring(cpuPc.IndexOf("i7"), (cpuPc.Length - cpuPc.IndexOf("i7"))).Trim();
+                    }
+                    if (cpuPc.IndexOf("i9") > -1)
+                    {
+                        CpuPcReference = cpuPc.Substring(cpuPc.IndexOf("i9"), (cpuPc.Length - cpuPc.IndexOf("i9"))).Trim();
+                    }
+                    index = CpuPcReference.IndexOf(" ");
+                    if (index > -1)
+                    {
+                        CpuPcReference = CpuPcReference.Substring(0, index);
+                    }
+                    CpuPcReference = CpuPcReference.Trim();
+                    int.TryParse(Regex.Replace(CpuPcReference.Replace("i3", "").Replace("i5", "").Replace("i7", "").Replace("i9", ""), "[^.0-9]", "").Trim(), out CpuPcNumber);
+                    CpuPcReference = CpuPcReference.Substring(0, 2);
+
+                    if (int.Parse(CpuPcReference.Replace("i", "")) == int.Parse(CpuRequirementReference.Replace("i", "")))
+                    {
+                        if (CpuPcNumber >= CpuRequirementNumber)
+                        {
+                            Result = true;
+                        }
+                    }
+
+                    if (int.Parse(CpuPcReference.Replace("i", "")) > int.Parse(CpuRequirementReference.Replace("i", "")))
                     {
                         Result = true;
                     }
+
+                    if (CpuPcReference == "i3" && CpuRequirementReference == "i5")
+                    {
+                        if (CpuPcNumber >= (CpuRequirementNumber * 2))
+                        {
+                            Result = true;
+                        }
+                    }
+                    if (CpuPcReference == "i3" && CpuRequirementReference == "i7")
+                    {
+                        if (CpuPcNumber >= (CpuRequirementNumber * 3))
+                        {
+                            Result = true;
+                        }
+                    }
+                    if (CpuPcReference == "i5" && CpuRequirementReference == "i7")
+                    {
+                        if (CpuPcNumber >= (CpuRequirementNumber * 2))
+                        {
+                            Result = true;
+                        }
+                    }
+                }
+                // AMD
+                else
+                {
+
                 }
 
-                if (int.Parse(CpuPcReference.Replace("i", "")) > int.Parse(CpuRequirementReference.Replace("i", "")))
-                {
-                    Result = true;
-                }
 
-                if (CpuPcReference == "i3" && CpuRequirementReference == "i5")
-                {
-                    if (CpuPcNumber >= (CpuRequirementNumber * 2))
-                    {
-                        Result = true;
-                    }
-                }
-                if (CpuPcReference == "i3" && CpuRequirementReference == "i7")
-                {
-                    if (CpuPcNumber >= (CpuRequirementNumber * 3))
-                    {
-                        Result = true;
-                    }
-                }
-                if (CpuPcReference == "i5" && CpuRequirementReference == "i7")
-                {
-                    if (CpuPcNumber >= (CpuRequirementNumber * 2))
-                    {
-                        Result = true;
-                    }
-                }
+                //logger.Debug($"CpuPcReference - {CpuPcReference}");
+                //logger.Debug($"CpuPcNumber - {CpuPcNumber}");
             }
-            // AMD
-            else
+            catch (Exception ex)
             {
-
+                Common.LogError(ex, "SystemChecker", $"Error on CheckCpuBetter()");
             }
-
-
-            //logger.Debug($"CpuPcReference - {CpuPcReference}");
-            //logger.Debug($"CpuPcNumber - {CpuPcNumber}");
-
 
             return Result;
         }

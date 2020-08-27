@@ -102,7 +102,7 @@ namespace SystemChecker.Clients
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "SystemChecker", "Error on GetRequirements()");
+                Common.LogError(ex, "SystemChecker", "Error on SteamRequierements.GetRequirements()");
             }
 
             return gameRequierements;
@@ -318,6 +318,7 @@ namespace SystemChecker.Clients
                         .Replace("or equivalent", "")
                         .Replace("hd space", "")
                         .Replace("free space", "")
+                        .Replace("free hard drive space", "")
                         .Replace("<br>", "")
                         .Trim();
                     logger.Debug($"storage: {storage}");
