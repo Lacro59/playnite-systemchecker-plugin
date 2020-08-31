@@ -26,6 +26,7 @@ namespace SystemChecker.Clients
         private SystemConfiguration systemConfiguration = new SystemConfiguration();
         private GameRequierements gameRequierements = new GameRequierements();
 
+
         private string SizeSuffix(Int64 value)
         {
             if (value < 0) { return "-" + SizeSuffix(-value); }
@@ -224,7 +225,7 @@ namespace SystemChecker.Clients
             string FileGameRequierements = PluginDirectory + "\\" + game.Id.ToString() + ".json";
 
             string SourceName = "";
-            if (game.SourceId != Guid.Parse("00000000-0000-0000-0000-000000000000"))
+            if (game.SourceId == Guid.Parse("00000000-0000-0000-0000-000000000000"))
             {
                 SourceName = "Playnite";
             }
@@ -235,38 +236,42 @@ namespace SystemChecker.Clients
 
             if (File.Exists(FileGameRequierements))
             {
+                logger.Info($"SystemChecker - Find from cache for {game.Name}");
                 return JsonConvert.DeserializeObject<GameRequierements>(File.ReadAllText(FileGameRequierements));
             }
 
-            //SteamRequierements steamRequierements;
-            //switch (SourceName.ToLower())
-            //{
-            //    case "steam":
-            //        steamRequierements = new SteamRequierements(game);
-            //        gameRequierements = steamRequierements.GetRequirements();
-            //        gameRequierements.Link = "https://store.steampowered.com/app/" + game.GameId;
-            //        break;
-            //    default:
-            //        SteamApi steamApi = new SteamApi(PluginUserDataPath);
-            //        int SteamID = steamApi.GetSteamId(game.Name);
-            //        if (SteamID != 0)
-            //        {
-            //            steamRequierements = new SteamRequierements(game, (uint)SteamID);
-            //            gameRequierements = steamRequierements.GetRequirements();
-            //            gameRequierements.Link = "https://store.steampowered.com/app/" + SteamID;
-            //        }
-            //        break;
-            //}
-
+            // Search datas
+            logger.Info($"SystemChecker - Try find with PCGamingWikiRequierements for {game.Name}");
             PCGamingWikiRequierements pCGamingWikiRequierements = new PCGamingWikiRequierements(game, PluginUserDataPath, PlayniteApi);
             gameRequierements = pCGamingWikiRequierements.GetRequirements();
 
+            if (!pCGamingWikiRequierements.isFind())
+            {
+                logger.Info($"SystemChecker - Try find with SteamRequierements for {game.Name}");
+                SteamRequierements steamRequierements;
+                switch (SourceName.ToLower())
+                {
+                    case "steam":
+                        steamRequierements = new SteamRequierements(game);
+                        gameRequierements = steamRequierements.GetRequirements();
+                        gameRequierements.Link = "https://store.steampowered.com/app/" + game.GameId;
+                        break;
+                    default:
+                        SteamApi steamApi = new SteamApi(PluginUserDataPath);
+                        int SteamID = steamApi.GetSteamId(game.Name);
+                        if (SteamID != 0)
+                        {
+                            steamRequierements = new SteamRequierements(game, (uint)SteamID);
+                            gameRequierements = steamRequierements.GetRequirements();
+                            gameRequierements.Link = "https://store.steampowered.com/app/" + SteamID;
+                        }
+                        break;
+                }
+            }
 
-            // TODO Save only if find
-            //if (gameRequierements.Minimum.Os.Count != 0 && gameRequierements.Recommanded.Os.Count != 0)
-            //{
+            // Save datas
             File.WriteAllText(FileGameRequierements, JsonConvert.SerializeObject(gameRequierements));
-            //}
+
             return gameRequierements;
         }
 
@@ -277,7 +282,7 @@ namespace SystemChecker.Clients
             {
                 bool isCheckOs = CheckOS(systemConfiguration.Os, requirement.Os);
                 bool isCheckCpu = CheckCpu(systemConfiguration.Cpu, systemConfiguration.CpuMaxClockSpeed, requirement.Cpu);
-                bool isCheckRam = CheckRam(systemConfiguration.Ram, requirement.Ram);
+                bool isCheckRam = CheckRam(systemConfiguration.Ram, systemConfiguration.RamUsage, requirement.Ram, requirement.RamUsage);
                 bool isCheckGpu = CheckGpu(systemConfiguration, requirement.Gpu);
                 bool isCheckStorage = CheckStorage(systemConfiguration.Disks, requirement.Storage); ;
 
@@ -431,11 +436,25 @@ namespace SystemChecker.Clients
             return false;
         }
 
-        private static bool CheckRam(long systemRam, long requierementRam)
+        private static bool CheckRam(long systemRam, string systemRamUsage, long requierementRam, string requierementRamUsage)
         {
+            if (requierementRam == 0)
+            {
+                return true;
+            }
+
             try
             {
-                //logger.Debug($"CheckRam - {systemRam} - {requierementRam}");
+                double _systemRamUsage = 0;
+                double _requierementRamUsage = 0;
+
+                double.TryParse(systemRamUsage.Replace("GB", "").Replace("MB", ""), out _systemRamUsage);
+                double.TryParse(requierementRamUsage.Replace("GB", "").Replace("MB", ""), out _requierementRamUsage);
+
+                if (_systemRamUsage != 0 && _requierementRamUsage != 0)
+                {
+                    return _systemRamUsage >= _requierementRamUsage;
+                }
                 return systemRam >= requierementRam;
             }
             catch (Exception ex)
@@ -476,6 +495,11 @@ namespace SystemChecker.Clients
 
         private static bool CheckStorage(List<SystemDisk> systemDisks, long Storage)
         {
+            if (Storage == 0)
+            {
+                return true;
+            }
+
             try
             {
                 foreach (SystemDisk Disk in systemDisks)

@@ -76,6 +76,7 @@
     <Compile Include="Clients\SteamRequierements.cs" />
     <Compile Include="Clients\SystemApi.cs" />
     <Compile Include="Models\GameRequierements.cs" />
+    <Compile Include="Models\RequierementMetadata.cs" />
     <Compile Include="Models\Requirement.cs" />
     <Compile Include="Models\SystemConfiguration.cs" />
     <Compile Include="Models\SystemDisk.cs" />

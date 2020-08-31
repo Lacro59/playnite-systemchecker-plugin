@@ -85,8 +85,8 @@ namespace SystemChecker.Clients
             CardRequierement.ResolutionHorizontal = ResolutionHorizontal;
 
 
-            logger.Debug($"Pc({DeleteInfo(systemConfiguration.GpuName)}) " + JsonConvert.SerializeObject(CardPc));
-            logger.Debug($"Requierement({DeleteInfo(GpuRequierement)}) " + JsonConvert.SerializeObject(CardRequierement));
+            //logger.Debug($"Pc({DeleteInfo(systemConfiguration.GpuName)}) " + JsonConvert.SerializeObject(CardPc));
+            //logger.Debug($"Requierement({DeleteInfo(GpuRequierement)}) " + JsonConvert.SerializeObject(CardRequierement));
         }
 
         public bool IsBetter()
@@ -194,6 +194,7 @@ namespace SystemChecker.Clients
             }
 
 
+            logger.Warn($"SystemChecker - No GPU treatment for {JsonConvert.SerializeObject(CardPc)} & {JsonConvert.SerializeObject(CardRequierement)}");
             return false;
         }
 
@@ -258,7 +259,7 @@ namespace SystemChecker.Clients
             #endregion
 
 
-            #region Check old
+            #region Check old & other
             // Other
             if (GpuName.ToLower().IndexOf("directx") > -1 || Regex.IsMatch(GpuName.ToLower(), "dx[0-9]*"))
             {
@@ -283,7 +284,6 @@ namespace SystemChecker.Clients
                 {
                     IsOld = true;
                 }
-
                 if (Number < 450)
                 {
                     IsOld = true;
@@ -380,7 +380,6 @@ namespace SystemChecker.Clients
             };
         }
     }
-
 
     public class GpuObject
     {

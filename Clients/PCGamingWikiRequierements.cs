@@ -1,20 +1,15 @@
 ﻿using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
-using Newtonsoft.Json;
-using Playnite.Common.Web;
 using Playnite.SDK;
 using Playnite.SDK.Models;
 using PluginCommon;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SystemChecker.Models;
 
 namespace SystemChecker.Clients
 {
-    class PCGamingWikiRequierements
+    class PCGamingWikiRequierements: RequierementMetadata
     {
         private static readonly ILogger logger = LogManager.GetLogger();
         private IPlayniteAPI PlayniteApi;
@@ -22,24 +17,6 @@ namespace SystemChecker.Clients
         private readonly string urlSteamId = "https://pcgamingwiki.com/api/appid.php?appid={0}";
         private string urlPCGamingWiki = "";
         private int SteamId = 0;
-        private Game game;
-
-
-
-        private readonly string[] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
-
-        private string SizeSuffix(Int64 value)
-        {
-            if (value < 0) { return "-" + SizeSuffix(-value); }
-            if (value == 0) { return "0.0 bytes"; }
-
-            int mag = (int)Math.Log(value, 1024);
-            decimal adjustedSize = (decimal)value / (1L << (mag * 10));
-
-            return string.Format("{0:n1} {1}", adjustedSize, SizeSuffixes[mag]);
-        }
-
-
 
 
         public PCGamingWikiRequierements(Game game, string PluginUserDataPath, IPlayniteAPI PlayniteApi)
@@ -47,63 +24,65 @@ namespace SystemChecker.Clients
             this.PlayniteApi = PlayniteApi;
             this.game = game;
 
-            SteamApi steamApi = new SteamApi(PluginUserDataPath);
-            SteamId = steamApi.GetSteamId(game.Name);
+            if (game.SourceId != Guid.Parse("00000000-0000-0000-0000-000000000000"))
+            {
+                if (game.Source.Name.ToLower() == "steam")
+                {
+                    SteamId = int.Parse(game.GameId);
+                }
+            }
+            if (SteamId == 0)
+            {
+                SteamApi steamApi = new SteamApi(PluginUserDataPath);
+                SteamId = steamApi.GetSteamId(game.Name);
+            }
 
             foreach (Link link in game.Links)
             {
-                if (link.Name.ToLower() == "pcgamingwiki")
+                if (link.Url.ToLower().Contains("pcgamingwiki"))
                 {
                     urlPCGamingWiki = link.Url;
                 }
             }
+
+            logger.Debug($"SystemChecker - PCGamingWikiRequierements - {game.Name} - SteamId: {SteamId} - urlPCGamingWiki: {urlPCGamingWiki}");
         }
 
-        public GameRequierements GetRequirements(string url = "")
+        public override GameRequierements GetRequirements()
         {
-            if (string.IsNullOrEmpty(url))
+            // Search data with SteamId (is find) or game url (if defined)
+            if (SteamId != 0)
             {
-                if (SteamId != 0)
+                gameRequierements = GetRequirements(string.Format(urlSteamId, SteamId));
+                if (isFind())
                 {
-                    var result = GetRequirements(string.Format(urlSteamId, SteamId));
-                    if (result.Minimum != new Requirement())
-                    {
-                        return result;
-                    }
+                    return gameRequierements;
                 }
-                if (!urlPCGamingWiki.IsNullOrEmpty())
+            }
+            if (!urlPCGamingWiki.IsNullOrEmpty())
+            {
+                gameRequierements = GetRequirements(urlPCGamingWiki);
+                if (isFind())
                 {
-                    var result = GetRequirements(urlPCGamingWiki);
-                    if (result.Minimum != new Requirement())
-                    {
-                        return result;
-                    }
-                }
-                if (url.IsNullOrEmpty())
-                {
-                    logger.Warn($"SystemChecker - Url not find for {game.Name}");
+                    return gameRequierements;
                 }
             }
 
+            logger.Warn($"SystemChecker - Not find for {game.Name}");
 
+            return gameRequierements; 
+        }
 
-
-
-
-            GameRequierements gameRequierements = new GameRequierements();
-            gameRequierements.Minimum = new Requirement();
-            gameRequierements.Recommanded = new Requirement();
-
+        public override GameRequierements GetRequirements(string url)
+        {
             try
             {
                 logger.Debug($"SystemChecker - url {url}");
 
                 // Get data & parse
-                var webView = PlayniteApi.WebViews.CreateOffscreenView();
-                webView.NavigateAndWait(url);
-
+                string ResultWeb = DonwloadStringData(url).GetAwaiter().GetResult(); ;
                 HtmlParser parser = new HtmlParser();
-                IHtmlDocument HtmlRequirement = parser.Parse(webView.GetPageSource());
+                IHtmlDocument HtmlRequirement = parser.Parse(ResultWeb);
 
                 var systemRequierement = HtmlRequirement.QuerySelector("div.sysreq_Windows");
                 if (systemRequierement != null)
@@ -116,8 +95,8 @@ namespace SystemChecker.Clients
                         string dataMinimum = row.QuerySelector(".table-sysreqs-body-minimum").InnerHtml.Trim();
                         string dataRecommended = row.QuerySelector(".table-sysreqs-body-recommended").InnerHtml.Trim();
 
-                        logger.Debug($"SystemChecker - dataMinimum: {dataMinimum}");
-                        logger.Debug($"SystemChecker - dataRecommended: {dataRecommended}");
+                        logger.Debug($"SystemChecker - PCGamingWikiRequierements - dataMinimum: {dataMinimum}");
+                        logger.Debug($"SystemChecker - PCGamingWikiRequierements - dataRecommended: {dataRecommended}");
 
                         switch (dataTitle)
                         {
@@ -139,14 +118,6 @@ namespace SystemChecker.Clients
                                     dataMinimum = dataMinimum.Replace("or equivalent", "")
                                         .Replace(" / ", "¤").Replace("<br>", "¤");
                                     gameRequierements.Minimum.Cpu = dataMinimum.Split('¤').Select(x => x.Trim()).ToList();
-
-                                    foreach(var CPU in gameRequierements.Minimum.Cpu)
-                                    {
-                                        Cpu cpu = new Cpu(null, null);
-                                        logger.Debug(JsonConvert.SerializeObject(cpu.SetProcessor(CPU)));
-                                    }
-
-
                                 }
                                 if (!dataRecommended.IsNullOrEmpty())
                                 {

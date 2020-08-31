@@ -14,24 +14,12 @@ using SystemChecker.Models;
 
 namespace SystemChecker.Clients
 {
-    class SteamRequierements
+    class SteamRequierements : RequierementMetadata
     {
         private static readonly ILogger logger = LogManager.GetLogger();
 
         private uint appId { get; set; }
 
-        private readonly string[] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
-
-        private string SizeSuffix(Int64 value)
-        {
-            if (value < 0) { return "-" + SizeSuffix(-value); }
-            if (value == 0) { return "0.0 bytes"; }
-
-            int mag = (int)Math.Log(value, 1024);
-            decimal adjustedSize = (decimal)value / (1L << (mag * 10));
-
-            return string.Format("{0:n1} {1}", adjustedSize, SizeSuffixes[mag]);
-        }
 
         public SteamRequierements(Game game, uint appId = 0)
         {
@@ -48,10 +36,8 @@ namespace SystemChecker.Clients
             return HttpDownloader.DownloadString(url);
         }
 
-        public GameRequierements GetRequirements()
+        public override GameRequierements GetRequirements()
         {
-            GameRequierements gameRequierements = new GameRequierements();
-
             try
             {
                 string data = GetSteamData();
@@ -106,6 +92,11 @@ namespace SystemChecker.Clients
             }
 
             return gameRequierements;
+        }
+
+        public override GameRequierements GetRequirements(string url)
+        {
+            throw new NotImplementedException();
         }
 
         private Requirement ParseRequirement(string pc_requirement)

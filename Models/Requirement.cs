@@ -2,7 +2,7 @@
 
 namespace SystemChecker.Models
 {
-    class Requirement
+    public class Requirement
     {
         public List<string> Os { get; set; } = new List<string>();
         public List<string> Cpu { get; set; } = new List<string>();

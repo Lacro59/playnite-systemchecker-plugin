@@ -71,7 +71,7 @@ namespace SystemChecker.Views
             // Minimum & Recommanded
             GameRequierements gameRequierements = systemApi.GetGameRequierements(GameSelected);
 
-            if (gameRequierements.Minimum != null && gameRequierements.Minimum.Ram != 0 && gameRequierements.Minimum.Storage != 0)
+            if (gameRequierements.Minimum != null && gameRequierements.Minimum.Os.Count != 0)
             {
                 MinimumOs = "Windows " + string.Join(" / ", gameRequierements.Minimum.Os);
                 MinimumCpu = gameRequierements.Minimum.Cpu;
@@ -79,7 +79,7 @@ namespace SystemChecker.Views
                 MinimumGpu = gameRequierements.Minimum.Gpu;
                 MinimumStorage = gameRequierements.Minimum.StorageUsage;
             }
-            if (gameRequierements.Recommanded != null && gameRequierements.Recommanded.Ram != 0 && gameRequierements.Recommanded.Storage != 0)
+            if (gameRequierements.Recommanded != null && gameRequierements.Recommanded.Os.Count != 0)
             {
                 RecommandedOs = "Windows " + string.Join(" / ", gameRequierements.Recommanded.Os);
                 RecommandedCpu = gameRequierements.Recommanded.Cpu;
@@ -94,7 +94,7 @@ namespace SystemChecker.Views
             string IsKo = "";
 
             CheckSystem CheckMinimum = SystemApi.CheckConfig(gameRequierements.Minimum, systemConfiguration);
-            if (gameRequierements.Minimum != null)
+            if (gameRequierements.Minimum != null && gameRequierements.Minimum.Os.Count != 0)
             {
                 MinimumCheckOs = IsKo;
                 if (CheckMinimum.CheckOs)
@@ -128,7 +128,7 @@ namespace SystemChecker.Views
             }
 
             CheckSystem CheckRecommanded = SystemApi.CheckConfig(gameRequierements.Recommanded, systemConfiguration);
-            if (gameRequierements.Recommanded != null)
+            if (gameRequierements.Recommanded != null && gameRequierements.Recommanded.Os.Count != 0)
             {
                 RecommandedCheckOs = IsKo;
                 if (CheckRecommanded.CheckOs)

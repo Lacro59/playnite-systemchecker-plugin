@@ -178,11 +178,11 @@ namespace SystemChecker
 
                         CheckMinimum = new CheckSystem();
                         CheckRecommanded = new CheckSystem();
-                        if (gameRequierements.Minimum != null && gameRequierements.Minimum.Ram != 0)
+                        if (gameRequierements.Minimum != null && gameRequierements.Minimum.Os.Count != 0)
                         {
                             CheckMinimum = SystemApi.CheckConfig(gameRequierements.Minimum, systemConfiguration);
                         }
-                        if (gameRequierements.Recommanded != null && gameRequierements.Recommanded.Ram != 0)
+                        if (gameRequierements.Recommanded != null && gameRequierements.Recommanded.Os.Count != 0)
                         {
                             CheckRecommanded = SystemApi.CheckConfig(gameRequierements.Recommanded, systemConfiguration);
                         }
@@ -199,24 +199,24 @@ namespace SystemChecker
 
                                 if (settings.EnableIntegrationButtonDetails)
                                 {
-                                    logger.Debug("CheckMinimum - " + JsonConvert.SerializeObject(CheckMinimum));
-                                    logger.Debug("CheckRecommanded - " + JsonConvert.SerializeObject(CheckRecommanded));
+                                    //logger.Debug("CheckMinimum - " + JsonConvert.SerializeObject(CheckMinimum));
+                                    //logger.Debug("CheckRecommanded - " + JsonConvert.SerializeObject(CheckRecommanded));
 
                                     if (CheckMinimum.AllOk != null)
                                     {
                                         if (!(bool)CheckMinimum.AllOk)
                                         {
-                                            logger.Debug("Red");
+                                            //logger.Debug("Red");
                                             bt.Foreground = Brushes.Red;
                                         }
 
                                         if ((bool)CheckMinimum.AllOk)
                                         {
-                                            logger.Debug("Orange");
+                                            //logger.Debug("Orange");
                                             bt.Foreground = Brushes.Orange;
                                             if (CheckRecommanded.AllOk == null)
                                             {
-                                                logger.Debug("Green");
+                                                //logger.Debug("Green");
                                                 bt.Foreground = Brushes.Green;
                                             }
                                         }
@@ -225,7 +225,7 @@ namespace SystemChecker
                                     {
                                         if ((bool)CheckRecommanded.AllOk)
                                         {
-                                            logger.Debug("Green");
+                                            //logger.Debug("Green");
                                             bt.Foreground = Brushes.Green;
                                         }
                                     }
