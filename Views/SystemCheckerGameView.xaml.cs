@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Controls;
+using System.Windows.Input;
 using SystemChecker.Clients;
 using SystemChecker.Models;
 
@@ -18,8 +19,11 @@ namespace SystemChecker.Views
     public partial class SystemCheckerGameView : WindowBase
     {
         private static readonly ILogger logger = LogManager.GetLogger();
+        private static IResourceProvider resources = new ResourceProvider();
         private IPlayniteAPI PlayniteApi;
 
+
+        public string ScSourceName { get; set; }
 
         public string LocalOs { get; set; }
         public string LocalCpu { get; set; }
@@ -56,6 +60,7 @@ namespace SystemChecker.Views
 
             InitializeComponent();
 
+            this.PreviewKeyDown += new KeyEventHandler(HandleEsc);
 
             // Local
             SystemApi systemApi = new SystemApi(PluginUserDataPath, PlayniteApi);
@@ -101,11 +106,19 @@ namespace SystemChecker.Views
                 {
                     MinimumCheckOs = IsOk;
                 }
+                if (gameRequierements.Minimum.Os.Count == 0)
+                {
+                    MinimumCheckOs = string.Empty;
+                }
 
                 MinimumCheckCpu = IsKo;
                 if (CheckMinimum.CheckCpu)
                 {
                     MinimumCheckCpu = IsOk;
+                }
+                if (gameRequierements.Minimum.Cpu.Count == 0)
+                {
+                    MinimumCheckCpu = string.Empty;
                 }
 
                 MinimumCheckRam = IsKo;
@@ -113,17 +126,29 @@ namespace SystemChecker.Views
                 {
                     MinimumCheckRam = IsOk;
                 }
+                if (gameRequierements.Minimum.Ram == 0)
+                {
+                    MinimumCheckRam = string.Empty;
+                }
 
                 MinimumCheckGpu = IsKo;
                 if (CheckMinimum.CheckGpu)
                 {
                     MinimumCheckGpu = IsOk;
                 }
+                if (gameRequierements.Minimum.Gpu.Count == 0)
+                {
+                    MinimumCheckGpu = string.Empty;
+                }
 
                 MinimumCheckStorage = IsKo;
                 if (CheckMinimum.CheckStorage)
                 {
                     MinimumCheckStorage = IsOk;
+                }
+                if (gameRequierements.Minimum.Storage == 0)
+                {
+                    MinimumCheckStorage = string.Empty;
                 }
             }
 
@@ -135,11 +160,19 @@ namespace SystemChecker.Views
                 {
                     RecommandedCheckOs = IsOk;
                 }
+                if (gameRequierements.Recommanded.Os.Count == 0)
+                {
+                    RecommandedCheckOs = string.Empty;
+                }
 
                 RecommandedCheckCpu = IsKo;
                 if (CheckRecommanded.CheckCpu)
                 {
                     RecommandedCheckCpu = IsOk;
+                }
+                if (gameRequierements.Recommanded.Cpu.Count == 0)
+                {
+                    RecommandedCheckCpu = string.Empty;
                 }
 
                 RecommandedCheckRam = IsKo;
@@ -147,17 +180,29 @@ namespace SystemChecker.Views
                 {
                     RecommandedCheckRam = IsOk;
                 }
+                if (gameRequierements.Recommanded.Ram == 0)
+                {
+                    RecommandedCheckRam = string.Empty;
+                }
 
                 RecommandedCheckGpu = IsKo;
                 if (CheckRecommanded.CheckGpu)
                 {
                     RecommandedCheckGpu = IsOk;
                 }
+                if (gameRequierements.Recommanded.Gpu.Count == 0)
+                {
+                    RecommandedCheckGpu = string.Empty;
+                }
 
                 RecommandedCheckStorage = IsKo;
                 if (CheckRecommanded.CheckStorage)
                 {
                     RecommandedCheckStorage = IsOk;
+                }
+                if (gameRequierements.Recommanded.Storage == 0)
+                {
+                    RecommandedCheckStorage = string.Empty;
                 }
             }
 
@@ -168,8 +213,12 @@ namespace SystemChecker.Views
                 btLink.Tag = gameRequierements.Link;
             }
 
+#if DEBUG
             logger.Debug("CheckMinimum" + JsonConvert.SerializeObject(CheckMinimum));
             logger.Debug("CheckRecommanded" + JsonConvert.SerializeObject(CheckRecommanded));
+#endif
+
+            ScSourceName = resources.GetString("LOCSourceLabel") + ": " + GameSelected.Name;
 
             DataContext = this;
         }
@@ -177,6 +226,14 @@ namespace SystemChecker.Views
         private void Grid_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
             Tools.DesactivePlayniteWindowControl(this);
+        }
+
+        private void HandleEsc(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                Close();
+            }
         }
 
         private void Button_Click(object sender, System.Windows.RoutedEventArgs e)

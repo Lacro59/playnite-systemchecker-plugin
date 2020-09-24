@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using Playnite.SDK;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -6,12 +7,16 @@ namespace SystemChecker.Views
 {
     public partial class SystemCheckerSettingsView : UserControl
     {
-        private string PluginUserDataPath { get; set; }
+        private readonly IPlayniteAPI _PlayniteAPI;
+        private static IResourceProvider resources = new ResourceProvider();
+
+        private string _PluginUserDataPath { get; set; }
 
 
-        public SystemCheckerSettingsView(string PluginUserDataPath)
+        public SystemCheckerSettingsView(IPlayniteAPI PlayniteAPI, string PluginUserDataPath)
         {
-            this.PluginUserDataPath = PluginUserDataPath;
+            _PlayniteAPI = PlayniteAPI;
+            _PluginUserDataPath = PluginUserDataPath;
 
             InitializeComponent();
         }
@@ -32,11 +37,18 @@ namespace SystemChecker.Views
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            string PluginDirectory = PluginUserDataPath + "\\SystemChecker\\";
+            string PluginDirectory = _PluginUserDataPath + "\\SystemChecker\\";
             if (Directory.Exists(PluginDirectory))
             {
-                Directory.Delete(PluginDirectory, true);
-                Directory.CreateDirectory(PluginDirectory);
+                try
+                {
+                    Directory.Delete(PluginDirectory, true);
+                    Directory.CreateDirectory(PluginDirectory);
+                }
+                catch
+                {
+                    _PlayniteAPI.Dialogs.ShowErrorMessage(resources.GetString("LOCSystemCheckerErrorRemove"), "SystemChecker error");
+                }
             }
         }
     }

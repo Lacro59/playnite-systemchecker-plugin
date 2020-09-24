@@ -7,36 +7,21 @@ using System.Collections.Generic;
 using System.IO;
 using System.Management;
 using System.Text.RegularExpressions;
-using System.Threading;
 using SystemChecker.Models;
 
 namespace SystemChecker.Clients
 {
-    // https://ourcodeworld.com/articles/read/294/how-to-retrieve-basic-and-advanced-hardware-and-software-information-gpu-hard-drive-processor-os-printers-in-winforms-with-c-sharp
     class SystemApi
     {
         private static readonly ILogger logger = LogManager.GetLogger();
         private IPlayniteAPI PlayniteApi;
 
-        private readonly string[] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
         private string PluginUserDataPath { get; set; }
         private string PluginDirectory { get; set; }
         private string FilePlugin { get; set; }
 
         private SystemConfiguration systemConfiguration = new SystemConfiguration();
         private GameRequierements gameRequierements = new GameRequierements();
-
-
-        private string SizeSuffix(Int64 value)
-        {
-            if (value < 0) { return "-" + SizeSuffix(-value); }
-            if (value == 0) { return "0.0 bytes"; }
-
-            int mag = (int)Math.Log(value, 1024);
-            decimal adjustedSize = (decimal)value / (1L << (mag * 10));
-
-            return string.Format("{0:n1} {1}", adjustedSize, SizeSuffixes[mag]);
-        }
 
 
         public SystemApi(string PluginUserDataPath, IPlayniteAPI PlayniteApi)
@@ -73,10 +58,10 @@ namespace SystemChecker.Clients
             }
 
             string Name = Environment.MachineName;
-            string Os = "";
-            string Cpu = "";
+            string Os = string.Empty;
+            string Cpu = string.Empty;
             uint CpuMaxClockSpeed = 0;
-            string GpuName = "";
+            string GpuName = string.Empty;
             long GpuRam = 0;
             uint CurrentHorizontalResolution = 0;
             uint CurrentVerticalResolution = 0;
@@ -153,7 +138,7 @@ namespace SystemChecker.Clients
             systemConfiguration.CurrentHorizontalResolution = CurrentHorizontalResolution;
             systemConfiguration.CurrentVerticalResolution = CurrentVerticalResolution;
             systemConfiguration.Ram = Ram;
-            systemConfiguration.RamUsage = SizeSuffix(Ram);
+            systemConfiguration.RamUsage = RequierementMetadata.SizeSuffix(Ram);
             systemConfiguration.Disks = Disks;
 
 
@@ -167,24 +152,24 @@ namespace SystemChecker.Clients
             DriveInfo[] allDrives = DriveInfo.GetDrives();
             foreach (DriveInfo d in allDrives)
             {
-                string VolumeLabel = "";
+                string VolumeLabel = string.Empty;
                 try
                 {
                     VolumeLabel = d.VolumeLabel;
                 }
                 catch (Exception ex)
                 {
-                    Common.LogError(ex, "SystemChecker", "Error on VolumeLabel");
+                    logger.Warn($"SystemChecker - Error on VolumeLabel - {ex.Message.Trim()}");
                 }
 
-                string Name = "";
+                string Name = string.Empty;
                 try
                 {
                     Name = d.Name;
                 }
                 catch (Exception ex)
                 {
-                    Common.LogError(ex, "SystemChecker", "Error on Name");
+                    logger.Warn($"SystemChecker - Error on Name - {ex.Message.Trim()}");
                 }
 
                 long FreeSpace = 0;
@@ -194,17 +179,17 @@ namespace SystemChecker.Clients
                 }
                 catch (Exception ex)
                 {
-                    Common.LogError(ex, "SystemChecker", "Error on TotalFreeSpace");
+                    logger.Warn($"SystemChecker - Error on TotalFreeSpace - {ex.Message.Trim()}");
                 }
 
-                string FreeSpaceUsage = "";
+                string FreeSpaceUsage = string.Empty;
                 try
                 {
-                    FreeSpaceUsage = SizeSuffix(d.TotalFreeSpace);
+                    FreeSpaceUsage = RequierementMetadata.SizeSuffix(d.TotalFreeSpace);
                 }
                 catch (Exception ex)
                 {
-                    Common.LogError(ex, "SystemChecker", "Error on FreeSpaceUsage");
+                    logger.Warn($"SystemChecker - Error on FreeSpaceUsage - {ex.Message.Trim()}");
                 }
 
                 Disks.Add(new SystemDisk
@@ -223,56 +208,96 @@ namespace SystemChecker.Clients
         {
             gameRequierements = new GameRequierements();
             string FileGameRequierements = PluginDirectory + "\\" + game.Id.ToString() + ".json";
+            string SourceName = string.Empty;
 
-            string SourceName = "";
-            if (game.SourceId == Guid.Parse("00000000-0000-0000-0000-000000000000"))
+            try
             {
-                SourceName = "Playnite";
-            }
-            else
-            {
-                SourceName = game.Source.Name;
-            }
-
-            if (File.Exists(FileGameRequierements))
-            {
-                logger.Info($"SystemChecker - Find from cache for {game.Name}");
-                return JsonConvert.DeserializeObject<GameRequierements>(File.ReadAllText(FileGameRequierements));
-            }
-
-            // Search datas
-            logger.Info($"SystemChecker - Try find with PCGamingWikiRequierements for {game.Name}");
-            PCGamingWikiRequierements pCGamingWikiRequierements = new PCGamingWikiRequierements(game, PluginUserDataPath, PlayniteApi);
-            gameRequierements = pCGamingWikiRequierements.GetRequirements();
-
-            if (!pCGamingWikiRequierements.isFind())
-            {
-                logger.Info($"SystemChecker - Try find with SteamRequierements for {game.Name}");
-                SteamRequierements steamRequierements;
-                switch (SourceName.ToLower())
+                if (game.SourceId == Guid.Parse("00000000-0000-0000-0000-000000000000"))
                 {
-                    case "steam":
-                        steamRequierements = new SteamRequierements(game);
-                        gameRequierements = steamRequierements.GetRequirements();
-                        gameRequierements.Link = "https://store.steampowered.com/app/" + game.GameId;
-                        break;
-                    default:
-                        SteamApi steamApi = new SteamApi(PluginUserDataPath);
-                        int SteamID = steamApi.GetSteamId(game.Name);
-                        if (SteamID != 0)
-                        {
-                            steamRequierements = new SteamRequierements(game, (uint)SteamID);
-                            gameRequierements = steamRequierements.GetRequirements();
-                            gameRequierements.Link = "https://store.steampowered.com/app/" + SteamID;
-                        }
-                        break;
+                    SourceName = "Playnite";
                 }
-            }
+                else
+                {
+                    SourceName = game.Source.Name;
+                }
 
-            // Save datas
-            File.WriteAllText(FileGameRequierements, JsonConvert.SerializeObject(gameRequierements));
+                if (File.Exists(FileGameRequierements))
+                {
+                    logger.Info($"SystemChecker - Find from cache for {game.Name}");
+                    return JsonConvert.DeserializeObject<GameRequierements>(File.ReadAllText(FileGameRequierements));
+                }
+
+                // Search datas
+                logger.Info($"SystemChecker - Try find with PCGamingWikiRequierements for {game.Name}");
+                PCGamingWikiRequierements pCGamingWikiRequierements = new PCGamingWikiRequierements(game, PluginUserDataPath, PlayniteApi);
+                gameRequierements = pCGamingWikiRequierements.GetRequirements();
+
+                if (!pCGamingWikiRequierements.IsFind())
+                {
+                    logger.Info($"SystemChecker - Try find with SteamRequierements for {game.Name}");
+                    SteamRequierements steamRequierements;
+                    switch (SourceName.ToLower())
+                    {
+                        case "steam":
+                            steamRequierements = new SteamRequierements(game);
+                            gameRequierements = steamRequierements.GetRequirements();
+                            gameRequierements.Link = "https://store.steampowered.com/app/" + game.GameId;
+                            break;
+                        default:
+                            SteamApi steamApi = new SteamApi(PluginUserDataPath);
+                            int SteamID = steamApi.GetSteamId(game.Name);
+                            if (SteamID != 0)
+                            {
+                                steamRequierements = new SteamRequierements(game, (uint)SteamID);
+                                gameRequierements = steamRequierements.GetRequirements();
+                                gameRequierements.Link = "https://store.steampowered.com/app/" + SteamID;
+                            }
+                            break;
+                    }
+                }
+
+
+                NormalizeRecommanded();
+
+
+                // Save datas
+                File.WriteAllText(FileGameRequierements, JsonConvert.SerializeObject(gameRequierements));
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, "SystemChecker", $"Error on GetGameRequierements()");
+            }
 
             return gameRequierements;
+        }
+
+
+        private void NormalizeRecommanded()
+        {
+            if (gameRequierements.Recommanded.Os.Count > 1 || gameRequierements.Recommanded.Cpu.Count > 1 || gameRequierements.Recommanded.Gpu.Count > 1 
+                || gameRequierements.Recommanded.Ram > 0 || gameRequierements.Recommanded.Storage > 0)
+            {
+                if (gameRequierements.Recommanded.Os.Count == 0)
+                {
+                    gameRequierements.Recommanded.Os = gameRequierements.Minimum.Os;
+                }
+                if (gameRequierements.Recommanded.Cpu.Count == 0)
+                {
+                    gameRequierements.Recommanded.Cpu = gameRequierements.Minimum.Cpu;
+                }
+                if (gameRequierements.Recommanded.Gpu.Count == 0)
+                {
+                    gameRequierements.Recommanded.Gpu = gameRequierements.Minimum.Gpu;
+                }
+                if (gameRequierements.Recommanded.Ram == 0)
+                {
+                    gameRequierements.Recommanded.Ram = gameRequierements.Minimum.Ram;
+                }
+                if (gameRequierements.Recommanded.Storage == 0)
+                {
+                    gameRequierements.Recommanded.Storage = gameRequierements.Minimum.Storage;
+                }
+            }
         }
 
 
@@ -281,7 +306,7 @@ namespace SystemChecker.Clients
             if (requirement != null)
             {
                 bool isCheckOs = CheckOS(systemConfiguration.Os, requirement.Os);
-                bool isCheckCpu = CheckCpu(systemConfiguration.Cpu, systemConfiguration.CpuMaxClockSpeed, requirement.Cpu);
+                bool isCheckCpu = CheckCpu(systemConfiguration, requirement.Cpu);
                 bool isCheckRam = CheckRam(systemConfiguration.Ram, systemConfiguration.RamUsage, requirement.Ram, requirement.RamUsage);
                 bool isCheckGpu = CheckGpu(systemConfiguration, requirement.Gpu);
                 bool isCheckStorage = CheckStorage(systemConfiguration.Disks, requirement.Storage); ;
@@ -298,11 +323,13 @@ namespace SystemChecker.Clients
                     AllOk = AllOk
                 };
             }
+            else
+            {
+                logger.Warn($"SystemChecker - CheckConfig() with null requirement");
+            }
 
             return new CheckSystem();
         }
-
-
 
         private static bool CheckOS(string systemOs, List<string> requierementOs)
         {
@@ -323,7 +350,7 @@ namespace SystemChecker.Clients
                     int numberOsRequirement = 0;
                     int numberOsPc = 0;
                     Int32.TryParse(Os, out numberOsRequirement);
-                    Int32.TryParse(Regex.Replace(systemOs, "[^.0-9]", "").Trim(), out numberOsPc);
+                    Int32.TryParse(Regex.Replace(systemOs, "[^.0-9]", string.Empty).Trim(), out numberOsPc);
                     if (numberOsRequirement != 0 && numberOsPc != 0 && numberOsPc >= numberOsRequirement)
                     {
                         return true;
@@ -338,7 +365,7 @@ namespace SystemChecker.Clients
             return false;
         }
 
-        private static bool CheckCpu(string systemCpu, uint CpuMaxClockSpeed, List<string> requierementCpu)
+        private static bool CheckCpu(SystemConfiguration systemConfiguration, List<string> requierementCpu)
         {
             try
             {
@@ -346,81 +373,11 @@ namespace SystemChecker.Clients
                 {
                     foreach (var cpu in requierementCpu)
                     {
-                        // Intel familly
-                        if (cpu.ToLower().IndexOf("intel") > -1)
-                        {
-                            //logger.Debug($"cpu intel - {cpu}");
-
-                            // Old processor
-                            if (cpu.ToLower().IndexOf("i3") == -1 & cpu.ToLower().IndexOf("i5") == -1 && cpu.ToLower().IndexOf("i7") == -1 && cpu.ToLower().IndexOf("i9") == -1)
-                            {
-                                return true;
-                            }
-                        }
-
-                        // AMD familly
-                        if (cpu.ToLower().IndexOf("amd") > -1)
-                        {
-                            //logger.Debug($"cpu amd - {cpu}");
-
-                            // Old processor
-                            if (cpu.ToLower().IndexOf("ryzen") == -1)
-                            {
-                                return true;
-                            }
-                        }
-
-                        // Only frequency
-                        if ((cpu.ToLower().IndexOf("intel") == -1 || cpu.ToLower().IndexOf("core") == -1) && cpu.ToLower().IndexOf("amd") == -1)
-                        {
-                            //logger.Debug($"cpu frequency - {cpu}");
-
-                            //Quad-Core CPU 3 GHz (64 Bit)
-                            int index = -1;
-                            string Clock = cpu.ToLower();
-                            logger.Debug($"Clock - {Clock}");
-
-                            // delete end string
-                            index = Clock.IndexOf("ghz");
-                            if (index > -1)
-                            {
-                                Clock = Clock.Substring(0, index).Trim();
-                            }
-                            //logger.Debug($"Clock - {Clock}");
-
-                            // delete start string
-                            string ClockTemp = Clock;
-                            for (int i = 0; i < Clock.Length; i++)
-                            {
-                                if (Clock[i] == ' ')
-                                {
-                                    ClockTemp = Clock.Substring(i).Trim();
-                                }
-                            }
-                            Clock = ClockTemp;
-                            //logger.Debug($"Clock - {Clock}");
-
-                            try
-                            {
-                                char a = Convert.ToChar(Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator);
-                                Clock = Clock.Replace('.', a).Replace(',', a).Replace("+", "").Trim();
-                                if (double.Parse(Clock) * 1000 < (CpuMaxClockSpeed * 2))
-                                {
-                                    return true;
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Common.LogError(ex, "SystemChecker", $"Error on find clock control - {Clock}");
-                            }
-                        }
-
-                        // Recent
-                        if (CheckCpuBetter(cpu, systemCpu))
+                        Cpu cpuCheck = new Cpu(systemConfiguration, cpu);
+                        if (cpuCheck.IsBetter())
                         {
                             return true;
                         }
-
                     }
                 }
                 else
@@ -430,7 +387,7 @@ namespace SystemChecker.Clients
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "SystemChecker", $"Error on CheckCpu() with {systemCpu} & {JsonConvert.SerializeObject(requierementCpu)}");
+                Common.LogError(ex, "SystemChecker", $"Error on CheckGpu() with {systemConfiguration.Cpu} & {JsonConvert.SerializeObject(requierementCpu)}");
             }
 
             return false;
@@ -438,23 +395,13 @@ namespace SystemChecker.Clients
 
         private static bool CheckRam(long systemRam, string systemRamUsage, long requierementRam, string requierementRamUsage)
         {
-            if (requierementRam == 0)
-            {
-                return true;
-            }
-
             try
             {
-                double _systemRamUsage = 0;
-                double _requierementRamUsage = 0;
-
-                double.TryParse(systemRamUsage.Replace("GB", "").Replace("MB", ""), out _systemRamUsage);
-                double.TryParse(requierementRamUsage.Replace("GB", "").Replace("MB", ""), out _requierementRamUsage);
-
-                if (_systemRamUsage != 0 && _requierementRamUsage != 0)
+                if (systemRamUsage == requierementRamUsage)
                 {
-                    return _systemRamUsage >= _requierementRamUsage;
+                    return true;
                 }
+
                 return systemRam >= requierementRam;
             }
             catch (Exception ex)
@@ -471,12 +418,21 @@ namespace SystemChecker.Clients
             {
                 if (requierementGpu.Count > 0)
                 {
-                    foreach (var gpu in requierementGpu)
+                    for(int i = 0; i < requierementGpu.Count; i++)
                     {
+                        var gpu = requierementGpu[i];
+
                         Gpu gpuCheck = new Gpu(systemConfiguration, gpu);
                         if (gpuCheck.IsBetter())
                         {
-                            return true;
+                            if (gpuCheck.IsWithNoCard && i > 0)
+                            {
+                                return false;
+                            }
+                            else
+                            {
+                                return true;
+                            }
                         }
                     }
                 }
@@ -518,146 +474,6 @@ namespace SystemChecker.Clients
 
             return false;
         }
-
-
-
-
-
-
-
-        private static bool CheckCpuBetter(string cpuRequirement, string cpuPc)
-        {
-            bool Result = false;
-
-            try
-            {
-                cpuRequirement = cpuRequirement.ToLower();
-                cpuPc = cpuPc.ToLower();
-
-                int index = 0;
-
-                string CpuRequirementReference = "";
-                int CpuRequirementNumber = 0;
-
-                // Intel
-                if (cpuRequirement.IndexOf("i3") > -1)
-                {
-                    CpuRequirementReference = cpuRequirement.Substring(cpuRequirement.IndexOf("i3")).Trim();
-                }
-                if (cpuRequirement.IndexOf("i5") > -1)
-                {
-                    CpuRequirementReference = cpuRequirement.Substring(cpuRequirement.IndexOf("i5")).Trim();
-                }
-                if (cpuRequirement.IndexOf("i7") > -1)
-                {
-                    CpuRequirementReference = cpuRequirement.Substring(cpuRequirement.IndexOf("i7")).Trim();
-                }
-                if (cpuRequirement.IndexOf("i9") > -1)
-                {
-                    CpuRequirementReference = cpuRequirement.Substring(cpuRequirement.IndexOf("i9")).Trim();
-                }
-                index = CpuRequirementReference.IndexOf(" ");
-                if (index > -1)
-                {
-                    CpuRequirementReference = CpuRequirementReference.Substring(0, index);
-                }
-                CpuRequirementReference = CpuRequirementReference.Trim();
-                int.TryParse(Regex.Replace(CpuRequirementReference.Replace("i3", "").Replace("i5", "").Replace("i7", "").Replace("i9", ""), "[^.0-9]", "").Trim(), out CpuRequirementNumber);
-                //logger.Debug($"CpuRequirementReference: {CpuRequirementReference}");
-                //CpuRequirementReference = CpuRequirementReference.Substring(0, 2);
-
-                // AMD
-
-
-
-                //logger.Debug($"CpuRequirementReference - {CpuRequirementReference}");
-                //logger.Debug($"CpuRequirementNumber - {CpuRequirementNumber}");
-
-
-                string CpuPcReference = "";
-                int CpuPcNumber = 0;
-
-                //Intel(R) Core(TM) i5-4590 CPU @ 3.30GHz
-                if (cpuPc.IndexOf("intel") > -1)
-                {
-                    if (cpuPc.IndexOf("i3") > -1)
-                    {
-                        CpuPcReference = cpuPc.Substring(cpuPc.IndexOf("i3"), (cpuPc.Length - cpuPc.IndexOf("i3"))).Trim();
-                    }
-                    if (cpuPc.IndexOf("i5") > -1)
-                    {
-                        CpuPcReference = cpuPc.Substring(cpuPc.IndexOf("i5"), (cpuPc.Length - cpuPc.IndexOf("i5"))).Trim();
-                    }
-                    if (cpuPc.IndexOf("i7") > -1)
-                    {
-                        CpuPcReference = cpuPc.Substring(cpuPc.IndexOf("i7"), (cpuPc.Length - cpuPc.IndexOf("i7"))).Trim();
-                    }
-                    if (cpuPc.IndexOf("i9") > -1)
-                    {
-                        CpuPcReference = cpuPc.Substring(cpuPc.IndexOf("i9"), (cpuPc.Length - cpuPc.IndexOf("i9"))).Trim();
-                    }
-                    index = CpuPcReference.IndexOf(" ");
-                    if (index > -1)
-                    {
-                        CpuPcReference = CpuPcReference.Substring(0, index);
-                    }
-                    CpuPcReference = CpuPcReference.Trim();
-                    int.TryParse(Regex.Replace(CpuPcReference.Replace("i3", "").Replace("i5", "").Replace("i7", "").Replace("i9", ""), "[^.0-9]", "").Trim(), out CpuPcNumber);
-                    CpuPcReference = CpuPcReference.Substring(0, 2);
-
-                    if (int.Parse(CpuPcReference.Replace("i", "")) == int.Parse(CpuRequirementReference.Replace("i", "")))
-                    {
-                        if (CpuPcNumber >= CpuRequirementNumber)
-                        {
-                            Result = true;
-                        }
-                    }
-
-                    if (int.Parse(CpuPcReference.Replace("i", "")) > int.Parse(CpuRequirementReference.Replace("i", "")))
-                    {
-                        Result = true;
-                    }
-
-                    if (CpuPcReference == "i3" && CpuRequirementReference == "i5")
-                    {
-                        if (CpuPcNumber >= (CpuRequirementNumber * 2))
-                        {
-                            Result = true;
-                        }
-                    }
-                    if (CpuPcReference == "i3" && CpuRequirementReference == "i7")
-                    {
-                        if (CpuPcNumber >= (CpuRequirementNumber * 3))
-                        {
-                            Result = true;
-                        }
-                    }
-                    if (CpuPcReference == "i5" && CpuRequirementReference == "i7")
-                    {
-                        if (CpuPcNumber >= (CpuRequirementNumber * 2))
-                        {
-                            Result = true;
-                        }
-                    }
-                }
-                // AMD
-                else
-                {
-
-                }
-
-
-                //logger.Debug($"CpuPcReference - {CpuPcReference}");
-                //logger.Debug($"CpuPcNumber - {CpuPcNumber}");
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, "SystemChecker", $"Error on CheckCpuBetter()");
-            }
-
-            return Result;
-        }
-
     }
 
     public class CheckSystem

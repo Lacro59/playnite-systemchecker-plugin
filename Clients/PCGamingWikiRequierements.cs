@@ -5,6 +5,7 @@ using Playnite.SDK.Models;
 using PluginCommon;
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using SystemChecker.Models;
 
 namespace SystemChecker.Clients
@@ -12,40 +13,50 @@ namespace SystemChecker.Clients
     class PCGamingWikiRequierements: RequierementMetadata
     {
         private static readonly ILogger logger = LogManager.GetLogger();
-        private IPlayniteAPI PlayniteApi;
+        private readonly IPlayniteAPI _PlayniteApi;
 
-        private readonly string urlSteamId = "https://pcgamingwiki.com/api/appid.php?appid={0}";
-        private string urlPCGamingWiki = "";
-        private int SteamId = 0;
+        private readonly string UrlSteamId = "https://pcgamingwiki.com/api/appid.php?appid={0}";
+        private string UrlPCGamingWiki { get; set; } = string.Empty;
+        private int SteamId { get; set; } = 0;
 
 
         public PCGamingWikiRequierements(Game game, string PluginUserDataPath, IPlayniteAPI PlayniteApi)
         {
-            this.PlayniteApi = PlayniteApi;
-            this.game = game;
+            _PlayniteApi = PlayniteApi;
+            _game = game;
 
-            if (game.SourceId != Guid.Parse("00000000-0000-0000-0000-000000000000"))
+            if (_game.SourceId != Guid.Parse("00000000-0000-0000-0000-000000000000"))
             {
-                if (game.Source.Name.ToLower() == "steam")
+                if (_game.Source.Name.ToLower() == "steam")
                 {
-                    SteamId = int.Parse(game.GameId);
+                    SteamId = int.Parse(_game.GameId);
                 }
             }
             if (SteamId == 0)
             {
                 SteamApi steamApi = new SteamApi(PluginUserDataPath);
-                SteamId = steamApi.GetSteamId(game.Name);
+                SteamId = steamApi.GetSteamId(_game.Name);
             }
 
-            foreach (Link link in game.Links)
+            if (_game.Links != null)
             {
-                if (link.Url.ToLower().Contains("pcgamingwiki"))
+                foreach (Link link in _game.Links)
                 {
-                    urlPCGamingWiki = link.Url;
+                    if (link.Url.ToLower().Contains("pcgamingwiki"))
+                    {
+                        UrlPCGamingWiki = link.Url;
+                    }
                 }
             }
 
-            logger.Debug($"SystemChecker - PCGamingWikiRequierements - {game.Name} - SteamId: {SteamId} - urlPCGamingWiki: {urlPCGamingWiki}");
+            if (UrlPCGamingWiki.IsNullOrEmpty() && _game.ReleaseDate != null)
+            {
+                UrlPCGamingWiki = @"https://pcgamingwiki.com/w/index.php?search=" + _game.Name + $"+%28{((DateTime)_game.ReleaseDate).ToString("yyyy")}%29";
+            }
+
+#if DEBUG
+            logger.Debug($"SystemChecker - PCGamingWikiRequierements - {_game.Name} - SteamId: {SteamId} - UrlPCGamingWiki: {UrlPCGamingWiki}");
+#endif
         }
 
         public override GameRequierements GetRequirements()
@@ -53,22 +64,30 @@ namespace SystemChecker.Clients
             // Search data with SteamId (is find) or game url (if defined)
             if (SteamId != 0)
             {
-                gameRequierements = GetRequirements(string.Format(urlSteamId, SteamId));
-                if (isFind())
+                gameRequierements = GetRequirements(string.Format(UrlSteamId, SteamId));
+                if (IsFind())
                 {
+#if DEBUG
+                    logger.Debug($"SystemChecker - PCGamingWikiRequierements.IsFind - SteamId: {SteamId}");
+#endif
+
                     return gameRequierements;
                 }
             }
-            if (!urlPCGamingWiki.IsNullOrEmpty())
+            if (!UrlPCGamingWiki.IsNullOrEmpty())
             {
-                gameRequierements = GetRequirements(urlPCGamingWiki);
-                if (isFind())
+                gameRequierements = GetRequirements(UrlPCGamingWiki);
+                if (IsFind())
                 {
+#if DEBUG
+                    logger.Debug($"SystemChecker - PCGamingWikiRequierements.IsFind - UrlPCGamingWiki: {UrlPCGamingWiki}");
+#endif
+
                     return gameRequierements;
                 }
             }
 
-            logger.Warn($"SystemChecker - Not find for {game.Name}");
+            logger.Warn($"SystemChecker - PCGamingWikiRequierements - Not find for {_game.Name}");
 
             return gameRequierements; 
         }
@@ -77,10 +96,12 @@ namespace SystemChecker.Clients
         {
             try
             {
-                logger.Debug($"SystemChecker - url {url}");
+#if DEBUG
+                logger.Debug($"SystemChecker PCGamingWikiRequierements.GetRequirements - - url {url}");
+#endif
 
                 // Get data & parse
-                string ResultWeb = DonwloadStringData(url).GetAwaiter().GetResult(); ;
+                string ResultWeb = DownloadStringData(url).GetAwaiter().GetResult(); ;
                 HtmlParser parser = new HtmlParser();
                 IHtmlDocument HtmlRequirement = parser.Parse(ResultWeb);
 
@@ -93,10 +114,17 @@ namespace SystemChecker.Clients
                     {
                         string dataTitle = row.QuerySelector(".table-sysreqs-body-parameter").InnerHtml.ToLower();
                         string dataMinimum = row.QuerySelector(".table-sysreqs-body-minimum").InnerHtml.Trim();
-                        string dataRecommended = row.QuerySelector(".table-sysreqs-body-recommended").InnerHtml.Trim();
 
+                        string dataRecommended = string.Empty;
+                        if (row.QuerySelector(".table-sysreqs-body-recommended") != null)
+                        {
+                            dataRecommended = row.QuerySelector(".table-sysreqs-body-recommended").InnerHtml.Trim();
+                        }
+
+#if DEBUG
                         logger.Debug($"SystemChecker - PCGamingWikiRequierements - dataMinimum: {dataMinimum}");
                         logger.Debug($"SystemChecker - PCGamingWikiRequierements - dataRecommended: {dataRecommended}");
+#endif
 
                         switch (dataTitle)
                         {
@@ -104,7 +132,6 @@ namespace SystemChecker.Clients
                                 if (!dataMinimum.IsNullOrEmpty())
                                 {
                                     gameRequierements.Minimum.Os = dataMinimum.Split(',').Select(x => x.Trim()).ToList();
-                                    gameRequierements.Recommanded.Os = gameRequierements.Minimum.Os;
                                 }
                                 if (!dataRecommended.IsNullOrEmpty())
                                 {
@@ -115,13 +142,13 @@ namespace SystemChecker.Clients
                             case "processor (cpu)":
                                 if (!dataMinimum.IsNullOrEmpty())
                                 {
-                                    dataMinimum = dataMinimum.Replace("or equivalent", "")
+                                    dataMinimum = dataMinimum.Replace("or equivalent", string.Empty)
                                         .Replace(" / ", "¤").Replace("<br>", "¤");
                                     gameRequierements.Minimum.Cpu = dataMinimum.Split('¤').Select(x => x.Trim()).ToList();
                                 }
                                 if (!dataRecommended.IsNullOrEmpty())
                                 {
-                                    dataRecommended = dataRecommended.Replace("or equivalent", "")
+                                    dataRecommended = dataRecommended.Replace("or equivalent", string.Empty)
                                         .Replace(" / ", "¤").Replace("<br>", "¤");
                                     gameRequierements.Recommanded.Cpu = dataMinimum.Split('¤').Select(x => x.Trim()).ToList();
                                 }
@@ -132,11 +159,11 @@ namespace SystemChecker.Clients
                                 {
                                     if (dataMinimum.ToLower().IndexOf("mb") > -1)
                                     {
-                                        gameRequierements.Minimum.Ram = 1024 * 1024 * long.Parse(dataMinimum.ToLower().Replace("mb", "").Trim());
+                                        gameRequierements.Minimum.Ram = 1024 * 1024 * long.Parse(dataMinimum.ToLower().Replace("mb", string.Empty).Trim());
                                     }
                                     if (dataMinimum.ToLower().IndexOf("gb") > -1)
                                     {
-                                        gameRequierements.Minimum.Ram = 1024 * 1024 * 1024 * long.Parse(dataMinimum.ToLower().Replace("gb", "").Trim());
+                                        gameRequierements.Minimum.Ram = 1024 * 1024 * 1024 * long.Parse(dataMinimum.ToLower().Replace("gb", string.Empty).Trim());
                                     }
                                     gameRequierements.Minimum.RamUsage = SizeSuffix(gameRequierements.Minimum.Ram);
                                 }
@@ -144,11 +171,11 @@ namespace SystemChecker.Clients
                                 {
                                     if (dataRecommended.ToLower().IndexOf("mb") > -1)
                                     {
-                                        gameRequierements.Recommanded.Ram = 1024 * 1024 * long.Parse(dataRecommended.ToLower().Replace("mb", "").Trim());
+                                        gameRequierements.Recommanded.Ram = 1024 * 1024 * long.Parse(dataRecommended.ToLower().Replace("mb", string.Empty).Trim());
                                     }
                                     if (dataRecommended.ToLower().IndexOf("gb") > -1)
                                     {
-                                        gameRequierements.Recommanded.Ram = 1024 * 1024 * 1024 * long.Parse(dataRecommended.ToLower().Replace("gb", "").Trim());
+                                        gameRequierements.Recommanded.Ram = 1024 * 1024 * 1024 * long.Parse(dataRecommended.ToLower().Replace("gb", string.Empty).Trim());
                                     }
                                     gameRequierements.Recommanded.RamUsage = SizeSuffix(gameRequierements.Recommanded.Ram);
                                 }
@@ -159,26 +186,23 @@ namespace SystemChecker.Clients
                                 {
                                     if (dataMinimum.ToLower().IndexOf("mb") > -1)
                                     {
-                                        gameRequierements.Minimum.Storage = 1024 * 1024 * long.Parse(dataMinimum.ToLower().Replace("mb", "").Trim());
-                                        gameRequierements.Recommanded.Storage = 1024 * 1024 * long.Parse(dataMinimum.ToLower().Replace("mb", "").Trim());
+                                        gameRequierements.Minimum.Storage = 1024 * 1024 * long.Parse(dataMinimum.ToLower().Replace("mb", string.Empty).Trim());
                                     }
                                     if (dataMinimum.ToLower().IndexOf("gb") > -1)
                                     {
-                                        gameRequierements.Minimum.Storage = 1024 * 1024 * 1024 * long.Parse(dataMinimum.ToLower().Replace("gb", "").Trim());
-                                        gameRequierements.Recommanded.Storage = 1024 * 1024 * 1024 * long.Parse(dataMinimum.ToLower().Replace("gb", "").Trim());
+                                        gameRequierements.Minimum.Storage = 1024 * 1024 * 1024 * long.Parse(dataMinimum.ToLower().Replace("gb", string.Empty).Trim());
                                     }
                                     gameRequierements.Minimum.StorageUsage = SizeSuffix(gameRequierements.Minimum.Storage);
-                                    gameRequierements.Recommanded.StorageUsage = SizeSuffix(gameRequierements.Recommanded.Storage);
                                 }
                                 if (!dataRecommended.IsNullOrEmpty())
                                 {
                                     if (dataRecommended.ToLower().IndexOf("mb") > -1)
                                     {
-                                        gameRequierements.Minimum.Storage = 1024 * 1024 * long.Parse(dataRecommended.ToLower().Replace("mb", "").Trim());
+                                        gameRequierements.Minimum.Storage = 1024 * 1024 * long.Parse(dataRecommended.ToLower().Replace("mb", string.Empty).Trim());
                                     }
                                     if (dataRecommended.ToLower().IndexOf("gb") > -1)
                                     {
-                                        gameRequierements.Minimum.Storage = 1024 * 1024 * 1024 * long.Parse(dataRecommended.ToLower().Replace("gb", "").Trim());
+                                        gameRequierements.Minimum.Storage = 1024 * 1024 * 1024 * long.Parse(dataRecommended.ToLower().Replace("gb", string.Empty).Trim());
                                     }
                                     gameRequierements.Recommanded.StorageUsage = SizeSuffix(gameRequierements.Recommanded.Storage);
                                 }
@@ -187,16 +211,24 @@ namespace SystemChecker.Clients
                             case "video card (gpu)":
                                 if (!dataMinimum.IsNullOrEmpty())
                                 {
-                                    dataMinimum = dataMinimum.Replace("or equivalent", "")
+                                    dataMinimum = dataMinimum.Replace("or equivalent", string.Empty)
                                         .Replace(" / ", "¤").Replace("<br>", "¤");
+
+                                    dataMinimum = Regex.Replace(dataMinimum, "(</[^>]*>)", "");
+                                    dataMinimum = Regex.Replace(dataMinimum, "(<[^>]*>)", "");
+
                                     gameRequierements.Minimum.Gpu = dataMinimum.Split('¤').Select(x => x.Trim()).ToList()
                                         .Where(x => x.ToLower().IndexOf("shader") == -1).ToList();
                                 }
                                 if (!dataRecommended.IsNullOrEmpty())
                                 {
-                                    dataRecommended = dataRecommended.Replace("or equivalent", "")
+                                    dataRecommended = dataRecommended.Replace("or equivalent", string.Empty)
                                         .Replace(" / ", "¤").Replace("<br>", "¤");
-                                    gameRequierements.Recommanded.Gpu = dataMinimum.Split('¤').Select(x => x.Trim()).ToList()
+
+                                    dataRecommended = Regex.Replace(dataRecommended, "(</[^>]*>)", "");
+                                    dataRecommended = Regex.Replace(dataRecommended, "(<[^>]*>)", "");
+
+                                    gameRequierements.Recommanded.Gpu = dataRecommended.Split('¤').Select(x => x.Trim()).ToList()
                                         .Where(x => x.ToLower().IndexOf("shader") == -1).ToList();
                                 }
                                 break;
@@ -209,7 +241,7 @@ namespace SystemChecker.Clients
                 }
                 else
                 {
-                    logger.Warn($"SystemChecker - No data find for {game.Name} in {url}");
+                    logger.Warn($"SystemChecker - No data find for {_game.Name} in {url}");
                 }
 
             }

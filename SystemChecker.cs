@@ -11,6 +11,7 @@ using System.Linq;
 using System.Management;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -199,24 +200,19 @@ namespace SystemChecker
 
                                 if (settings.EnableIntegrationButtonDetails)
                                 {
-                                    //logger.Debug("CheckMinimum - " + JsonConvert.SerializeObject(CheckMinimum));
-                                    //logger.Debug("CheckRecommanded - " + JsonConvert.SerializeObject(CheckRecommanded));
 
                                     if (CheckMinimum.AllOk != null)
                                     {
                                         if (!(bool)CheckMinimum.AllOk)
                                         {
-                                            //logger.Debug("Red");
                                             bt.Foreground = Brushes.Red;
                                         }
 
                                         if ((bool)CheckMinimum.AllOk)
                                         {
-                                            //logger.Debug("Orange");
                                             bt.Foreground = Brushes.Orange;
                                             if (CheckRecommanded.AllOk == null)
                                             {
-                                                //logger.Debug("Green");
                                                 bt.Foreground = Brushes.Green;
                                             }
                                         }
@@ -225,7 +221,6 @@ namespace SystemChecker
                                     {
                                         if ((bool)CheckRecommanded.AllOk)
                                         {
-                                            //logger.Debug("Green");
                                             bt.Foreground = Brushes.Green;
                                         }
                                     }
@@ -239,14 +234,13 @@ namespace SystemChecker
 
                                 ui.AddButtonInGameSelectedActionBarButtonOrToggleButton(bt);
                             }
-
                         }));
                     });
                 }
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "GameActivity", $"Impossible integration");
+                Common.LogError(ex, "SystemChecker", $"Impossible integration");
             }
         }
 
@@ -264,7 +258,7 @@ namespace SystemChecker
 
         public override UserControl GetSettingsView(bool firstRunSettings)
         {
-            return new SystemCheckerSettingsView(this.GetPluginUserDataPath());
+            return new SystemCheckerSettingsView(PlayniteApi, this.GetPluginUserDataPath());
         }
     }
 }

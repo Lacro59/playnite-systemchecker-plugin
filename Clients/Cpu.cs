@@ -14,7 +14,7 @@ namespace SystemChecker.Clients
 
         private List<CpuEquivalence> Equivalence = new List<CpuEquivalence>
             {
-                new CpuEquivalence {Intel="", Amd=""}
+                new CpuEquivalence {Intel=string.Empty, Amd=string.Empty}
             };
 
         private CpuObject ProcessorPc { get; set; }
@@ -29,6 +29,11 @@ namespace SystemChecker.Clients
 
         public bool IsBetter()
         {
+#if DEBUG
+            logger.Debug($"SystemChecker - Cpu.IsBetter - ProcessorPc: {JsonConvert.SerializeObject(ProcessorPc)}");
+            logger.Debug($"SystemChecker - Cpu.IsBetter - ProcessorRequierement: {JsonConvert.SerializeObject(ProcessorRequierement)}");
+#endif
+
             // Old Processor
             if (!ProcessorPc.IsOld && ProcessorRequierement.IsOld)
             {
@@ -45,7 +50,7 @@ namespace SystemChecker.Clients
                 return false;
             }
 
-            if (!ProcessorRequierement.IsIntel && ProcessorRequierement.IsAmd)
+            if (!ProcessorRequierement.IsIntel && !ProcessorRequierement.IsAmd)
             {
                 // Clock
                 if (ProcessorRequierement.Clock == 0)
@@ -59,13 +64,13 @@ namespace SystemChecker.Clients
             }
 
             // Intel vs Intel
-            if (ProcessorPc.IsIntel && !ProcessorRequierement.IsIntel)
+            if (ProcessorPc.IsIntel && ProcessorRequierement.IsIntel)
             {
                 if (ProcessorPc.Type == ProcessorRequierement.Type)
                 {
                     return ProcessorPc.Version >= ProcessorRequierement.Version;
                 }
-                if (int.Parse(ProcessorPc.Type.Replace("i", "")) > int.Parse(ProcessorRequierement.Type.Replace("i", "")))
+                if (int.Parse(ProcessorPc.Type.Replace("i", string.Empty)) > int.Parse(ProcessorRequierement.Type.Replace("i", string.Empty)))
                 {
                     return true;
                 }
@@ -118,7 +123,7 @@ namespace SystemChecker.Clients
             bool IsAmd = CallIsAmd(CpuName);
             bool IsOld = false;
 
-            string Type = "";
+            string Type = string.Empty;
             int Version = 0;
             double Clock = 0;
 
@@ -126,17 +131,15 @@ namespace SystemChecker.Clients
             // Type & Version & IsOld
             if (IsIntel)
             {
-                Type = Regex.Match(CpuName, "i[0-9]*", RegexOptions.IgnoreCase).Value.Trim();
-
-                int.TryParse(Regex.Match(CpuName, "i[0-9]*-[0-9]*").Value.Replace(Type + "-", "").Trim(), out Version);
-
-                IsOld = !Regex.IsMatch(CpuName, "i[0-9]*", RegexOptions.IgnoreCase);
+                Type = Regex.Match(CpuName, "i[0-9]", RegexOptions.IgnoreCase).Value.Trim();   
+                int.TryParse(Regex.Match(CpuName, "i[0-9]-[0-9]*", RegexOptions.IgnoreCase).Value.Replace(Type + "-", string.Empty).Trim(), out Version);
+                IsOld = !Regex.IsMatch(CpuName, "i[0-9]", RegexOptions.IgnoreCase);
             }
             if (IsAmd)
             {
                 if (CpuName.ToLower().IndexOf("ryzen") > -1)
                 {
-                    Type = Regex.Match(CpuName, "Ryzen[ ][0-9]*", RegexOptions.IgnoreCase).Value.Trim();
+                    Type = Regex.Match(CpuName, "Ryzen[ ][0-9]", RegexOptions.IgnoreCase).Value.Trim();
 
                     if (CpuName.ToLower().IndexOf("g") > -1)
                     {
@@ -179,17 +182,45 @@ namespace SystemChecker.Clients
             }
 
 
-            // Clock
-            Double.TryParse(Regex.Match(CpuName, "[0-9]*[.][0-9]*[ GHz]*").Value.Replace("GHz", "")
+            // Clock GHz
+            Double.TryParse(Regex.Match(CpuName, "[0-9]*[.][0-9]*[ GHz]*").Value.Replace("GHz", string.Empty)
                 .Replace(".", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim()
                 .Replace(",", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim(), out Clock);
             if (Clock == 0)
             {
-                Double.TryParse(Regex.Match(CpuName, "[0-9]*[.][0-9]*[GHz]*").Value.Replace("GHz", "")
+                Double.TryParse(Regex.Match(CpuName, "[0-9]*[.][0-9]*[GHz]*").Value.Replace("GHz", string.Empty)
                     .Replace(".", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim()
                     .Replace(",", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim(), out Clock);
             }
 
+            // Clock MHz
+            if (Clock == 0)
+            {
+                Double.TryParse(Regex.Match(CpuName, "[0-9]*[.][0-9]*[ MHz]*").Value.Replace("MHz", string.Empty)
+                    .Replace(".", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim()
+                    .Replace(",", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim(), out Clock);
+
+                if (Clock == 0)
+                {
+                    Double.TryParse(Regex.Match(CpuName, "[0-9]*[.][0-9]*[MHz]*").Value.Replace("MHz", string.Empty)
+                        .Replace(".", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim()
+                        .Replace(",", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim(), out Clock);
+                }
+
+                if (Clock != 0)
+                {
+                    Clock = Clock / 1000;
+                }
+            }
+
+            if (CpuName.ToLower().IndexOf("dual core") > -1)
+            {
+                IsOld = true;
+            }
+            if (CpuName.ToLower().IndexOf("quad core") > -1)
+            {
+                IsOld = true;
+            }
 
             return new CpuObject
             {

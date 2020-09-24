@@ -5,6 +5,7 @@
     <!--  
     MainView
     -->
+    
     <sys:String x:Key="LOCSystemChecker">System Checker</sys:String>
 
     <!--  
@@ -14,6 +15,8 @@
     <sys:String x:Key="LOCSystemCheckerIntegration">Intégration dans l'interface</sys:String>
     <sys:String x:Key="LOCSystemCheckerIntegrationButton">Ajouter un bouton</sys:String>
     <sys:String x:Key="LOCSystemCheckerIntegrationButtonDetails">Ajouter un bouton avec détails</sys:String>
+
+    <sys:String x:Key="LOCSystemCheckerErrorRemove">Impossible de supprimer les données. Merci de réessayer.</sys:String>
 
     <!--  
     SystemCheckerGameView

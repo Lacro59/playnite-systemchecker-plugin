@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Playnite.SDK;
 using Playnite.SDK.Models;
+using PluginCommon;
 using System;
+using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -12,60 +14,68 @@ namespace SystemChecker.Models
     {
         private static readonly ILogger logger = LogManager.GetLogger();
 
-        internal Game game;
+        internal Game _game;
         internal GameRequierements gameRequierements = new GameRequierements
         {
             Minimum = new Requirement(),
             Recommanded = new Requirement()
         };
-        internal readonly string[] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
 
 
-        public bool isFind()
+        public bool IsFind()
         {
             return gameRequierements.Minimum.Os.Count > 0;
         }
 
-        internal string SizeSuffix(Int64 value)
+        public static string SizeSuffix(Int64 value)
         {
+            string[] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
+
             if (value < 0) { return "-" + SizeSuffix(-value); }
-            if (value == 0) { return "0.0 bytes"; }
+            if (value == 0) { return "0" + CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator + "0 bytes"; }
 
             int mag = (int)Math.Log(value, 1024);
             decimal adjustedSize = (decimal)value / (1L << (mag * 10));
 
-            return string.Format("{0:n1} {1}", adjustedSize, SizeSuffixes[mag]);
+            return string.Format("{0} {1}", adjustedSize.ToString("0.0", CultureInfo.CurrentUICulture), SizeSuffixes[mag]);
         }
 
-        internal async Task<string> DonwloadStringData(string Url)
+        internal async Task<string> DownloadStringData(string url)
         {
-            string result = "";
+            string result = string.Empty;
             var client = new HttpClient();
 
-            var request = new HttpRequestMessage()
+            try
             {
-                RequestUri = new Uri(Url),
-                Method = HttpMethod.Get
-            };
-
-            HttpResponseMessage response = client.SendAsync(request).Result;
-            var statusCode = (int)response.StatusCode;
-
-            // We want to handle redirects ourselves so that we can determine the final redirect Location (via header)
-            if (statusCode >= 300 && statusCode <= 399)
-            {
-                var redirectUri = response.Headers.Location;
-                if (!redirectUri.IsAbsoluteUri)
+                var request = new HttpRequestMessage()
                 {
-                    redirectUri = new Uri(request.RequestUri.GetLeftPart(UriPartial.Authority) + redirectUri);
-                }
-                logger.Debug(string.Format("SystemChecker - Redirecting to {0}", redirectUri));
+                    RequestUri = new Uri(url),
+                    Method = HttpMethod.Get
+                };
 
-                result = await DonwloadStringData(redirectUri.ToString());
+                HttpResponseMessage response = client.SendAsync(request).Result;
+                var statusCode = (int)response.StatusCode;
+
+                // We want to handle redirects ourselves so that we can determine the final redirect Location (via header)
+                if (statusCode >= 300 && statusCode <= 399)
+                {
+                    var redirectUri = response.Headers.Location;
+                    if (!redirectUri.IsAbsoluteUri)
+                    {
+                        redirectUri = new Uri(request.RequestUri.GetLeftPart(UriPartial.Authority) + redirectUri);
+                    }
+                    logger.Debug(string.Format("SystemChecker - Redirecting to {0}", redirectUri));
+
+                    result = await DownloadStringData(redirectUri.ToString());
+                }
+                else
+                {
+                    result = await response.Content.ReadAsStringAsync();
+                }
             }
-            else
+            catch (Exception ex)
             {
-                result = await response.Content.ReadAsStringAsync();
+                Common.LogError(ex, "SystemChecker", $"Failed to load from {url}");
             }
 
             return result;

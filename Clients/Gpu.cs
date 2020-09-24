@@ -12,19 +12,26 @@ namespace SystemChecker.Clients
 
         private List<GpuEquivalence> Equivalence = new List<GpuEquivalence>
             {
-                new GpuEquivalence {Nvidia="", Amd=""}
+                new GpuEquivalence {Nvidia=string.Empty, Amd=string.Empty}
             };
+        private string CardPcName { get; set; } 
         private GpuObject CardPc { get; set; } 
+        private string CardRequierementName { get; set; } 
         private GpuObject CardRequierement { get; set; } 
 
+        public bool IsWithNoCard = false;
 
         public Gpu(SystemConfiguration systemConfiguration, string GpuRequierement)
         {
+            CardPcName = DeleteInfo(systemConfiguration.GpuName);
+            CardRequierementName = DeleteInfo(GpuRequierement);
+
+
             // VRAM only
             int Vram = 0;
             if (GpuRequierement.ToLower().IndexOf("vram") > -1 && !CallIsNvidia(GpuRequierement) && !CallIsAmd(GpuRequierement))
             {
-                int.TryParse(Regex.Replace(GpuRequierement, "[^.0-9]", "").Trim(), out Vram);
+                int.TryParse(Regex.Replace(GpuRequierement, "[^.0-9]", string.Empty).Trim(), out Vram);
                 if (Vram > 0)
                 {
                     if (GpuRequierement.ToLower().IndexOf("g") > -1)
@@ -39,7 +46,7 @@ namespace SystemChecker.Clients
             }
             if (GpuRequierement.ToLower().IndexOf("mb") > -1 && !CallIsNvidia(GpuRequierement) && !CallIsAmd(GpuRequierement))
             {
-                int.TryParse(Regex.Replace(GpuRequierement, "[^.0-9]", "").Trim(), out Vram);
+                int.TryParse(Regex.Replace(GpuRequierement, "[^.0-9]", string.Empty).Trim(), out Vram);
                 if (Vram > 0)
                 {
                     Vram = Vram * 1024;
@@ -47,7 +54,7 @@ namespace SystemChecker.Clients
             }
             if (GpuRequierement.ToLower().IndexOf("gb") > -1 && !CallIsNvidia(GpuRequierement) && !CallIsAmd(GpuRequierement))
             {
-                int.TryParse(Regex.Replace(GpuRequierement, "[^.0-9]", "").Trim(), out Vram);
+                int.TryParse(Regex.Replace(GpuRequierement, "[^.0-9]", string.Empty).Trim(), out Vram);
                 if (Vram > 0)
                 {
                     Vram = Vram * 1024 * 1024;
@@ -91,6 +98,11 @@ namespace SystemChecker.Clients
 
         public bool IsBetter()
         {
+#if DEBUG
+            logger.Debug($"SystemChecker - Gpu.IsBetter - CardPc({CardPcName}): {JsonConvert.SerializeObject(CardPc)}");
+            logger.Debug($"SystemChecker - Gpu.IsBetter - CardRequierement({CardRequierementName}): {JsonConvert.SerializeObject(CardRequierement)}");
+#endif
+
             // Old card requiered
             if (CardRequierement.IsOld || CardPc.IsOld)
             {
@@ -104,11 +116,13 @@ namespace SystemChecker.Clients
                 {
                     if (CardRequierement.DxVersion < 10)
                     {
+                        IsWithNoCard = true;
                         return true;
                     }
                 }
                 else
                 {
+                    IsWithNoCard = true;
                     return true;
                 }
             }
@@ -118,10 +132,12 @@ namespace SystemChecker.Clients
             {
                 if (CardRequierement.Vram != 0 && CardRequierement.Vram <= CardPc.Vram)
                 {
+                    IsWithNoCard = true;
                     return true;
                 }
                 if (CardRequierement.ResolutionHorizontal != 0 && CardRequierement.ResolutionHorizontal <= CardPc.ResolutionHorizontal)
                 {
+                    IsWithNoCard = true;
                     return true;
                 }
             }
@@ -200,17 +216,17 @@ namespace SystemChecker.Clients
 
         private string DeleteInfo(string GpuName)
         {
-            return GpuName.Replace("™", "")
-                .Replace("(1024 MB)", "")
-                .Replace("(256 MB)", "")
-                .Replace("(512 MB)", "")
-                .Replace("(1792 MB)", "")
-                .Replace("(1 GB)", "")
-                .Replace("(2 GB)", "")
-                .Replace("(3 GB)", "")
-                .Replace("(4 GB)", "")
-                .Replace("(6 GB)", "")
-                .Replace("(8 GB)", "")
+            return GpuName.Replace("™", string.Empty)
+                .Replace("(1024 MB)", string.Empty)
+                .Replace("(256 MB)", string.Empty)
+                .Replace("(512 MB)", string.Empty)
+                .Replace("(1792 MB)", string.Empty)
+                .Replace("(1 GB)", string.Empty)
+                .Replace("(2 GB)", string.Empty)
+                .Replace("(3 GB)", string.Empty)
+                .Replace("(4 GB)", string.Empty)
+                .Replace("(6 GB)", string.Empty)
+                .Replace("(8 GB)", string.Empty)
                 .Trim();
         }
 
@@ -237,22 +253,22 @@ namespace SystemChecker.Clients
             bool IsDx = false;
             int DxVersion = 0;
 
-            string Type = "";
+            string Type = string.Empty;
             int Number = 0;
 
             IsIntegrate = (GpuName.ToLower().IndexOf("intel") > -1);
             IsNvidia = CallIsNvidia(GpuName);
             IsAmd = CallIsAmd(GpuName);
 
-            int.TryParse(Regex.Replace(GpuName.Replace("R5", "").Replace("R7", "").Replace("R9", ""), "[^.0-9]", "").Trim(), out Number);
+            int.TryParse(Regex.Replace(GpuName.Replace("R5", string.Empty).Replace("R7", string.Empty).Replace("R9", string.Empty), "[^.0-9]", string.Empty).Trim(), out Number);
 
 
             #region Check is mobile version
-            if (Regex.IsMatch("[0-9]M", GpuName.ToLower()))
+            if (Regex.IsMatch("[0-9]m", GpuName.ToLower(), RegexOptions.IgnoreCase))
             {
                 IsM = true;
             }
-            if (Regex.IsMatch("M[0-9]", GpuName.ToLower()))
+            if (Regex.IsMatch("m[0-9]", GpuName.ToLower(), RegexOptions.IgnoreCase))
             {
                 IsM = true;
             }
@@ -263,13 +279,13 @@ namespace SystemChecker.Clients
             // Other
             if (GpuName.ToLower().IndexOf("directx") > -1 || Regex.IsMatch(GpuName.ToLower(), "dx[0-9]*"))
             {
-                int.TryParse(Regex.Replace(GpuName, @"[^\d]", "").Trim(), out DxVersion);
+                int.TryParse(Regex.Replace(GpuName, @"[^\d]", string.Empty).Trim(), out DxVersion);
                 if (DxVersion > 0)
                 {
                     IsDx = true;
                 }
             }
-            if (GpuName.ToLower().IndexOf("pretty much any 3d graphics card") > -1)
+            if (GpuName.ToLower().IndexOf("pretty much any 3d graphics card") > -1 || GpuName.ToLower().IndexOf("integrat") > -1)
             {
                 IsOld = true;
             }

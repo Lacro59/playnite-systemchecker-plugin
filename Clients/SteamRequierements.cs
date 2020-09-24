@@ -60,29 +60,29 @@ namespace SystemChecker.Clients
                     {
                         gameRequierements.Recommanded = ParseRequirement((string)pc_requirements["recommended"]);
 
-                        // Add missing
-                        if (gameRequierements.Recommanded.Os.Count == 0)
-                        {
-                            gameRequierements.Recommanded.Os = gameRequierements.Minimum.Os;
-                        }
-                        if (gameRequierements.Recommanded.Cpu.Count == 0)
-                        {
-                            gameRequierements.Recommanded.Cpu = gameRequierements.Minimum.Cpu;
-                        }
-                        if (gameRequierements.Recommanded.Gpu.Count == 0)
-                        {
-                            gameRequierements.Recommanded.Gpu = gameRequierements.Minimum.Gpu;
-                        }
-                        if (gameRequierements.Recommanded.Ram == 0)
-                        {
-                            gameRequierements.Recommanded.Ram = gameRequierements.Minimum.Ram;
-                            gameRequierements.Recommanded.RamUsage = gameRequierements.Minimum.RamUsage;
-                        }
-                        if (gameRequierements.Recommanded.Storage == 0)
-                        {
-                            gameRequierements.Recommanded.Storage = gameRequierements.Minimum.Storage;
-                            gameRequierements.Recommanded.StorageUsage = gameRequierements.Minimum.StorageUsage;
-                        }
+                        //// Add missing
+                        //if (gameRequierements.Recommanded.Os.Count == 0)
+                        //{
+                        //    gameRequierements.Recommanded.Os = gameRequierements.Minimum.Os;
+                        //}
+                        //if (gameRequierements.Recommanded.Cpu.Count == 0)
+                        //{
+                        //    gameRequierements.Recommanded.Cpu = gameRequierements.Minimum.Cpu;
+                        //}
+                        //if (gameRequierements.Recommanded.Gpu.Count == 0)
+                        //{
+                        //    gameRequierements.Recommanded.Gpu = gameRequierements.Minimum.Gpu;
+                        //}
+                        //if (gameRequierements.Recommanded.Ram == 0)
+                        //{
+                        //    gameRequierements.Recommanded.Ram = gameRequierements.Minimum.Ram;
+                        //    gameRequierements.Recommanded.RamUsage = gameRequierements.Minimum.RamUsage;
+                        //}
+                        //if (gameRequierements.Recommanded.Storage == 0)
+                        //{
+                        //    gameRequierements.Recommanded.Storage = gameRequierements.Minimum.Storage;
+                        //    gameRequierements.Recommanded.StorageUsage = gameRequierements.Minimum.StorageUsage;
+                        //}
                     }
                 }
             }
@@ -109,49 +109,53 @@ namespace SystemChecker.Clients
             // Only recent game
             foreach (var ElementRequirement in HtmlRequirement.QuerySelectorAll("li"))
             {
+#if DEBUG
+                logger.Debug($"SteamRequierements - {ElementRequirement.InnerHtml}");
+#endif
+
                 //<strong>OS:</strong> Windows XP / 7 / 8 / 8.1 / 10 x32 and x64<br> </ li >
                 if (ElementRequirement.InnerHtml.IndexOf("<strong>OS") > -1)
                 {
                     string os = ElementRequirement.InnerHtml
                         .Replace("\t", " ")
-                        .Replace("<strong>OS:</strong>", "")
-                        .Replace("with Platform Update for  7 ( versions only)", "")
-                        .Replace("Win ", "")
-                        .Replace("Windows", "")
-                        .Replace(", 32-bit", "")
-                        .Replace(", 32bit", "")
-                        .Replace(", 64-bit", "")
-                        .Replace(", 64bit", "")
-                        .Replace("®", "")
-                        .Replace("+", "")
-                        .Replace("and above", "")
-                        .Replace("x32", "")
-                        .Replace("and", "")
-                        .Replace("x64", "")
-                        .Replace("32-bit", "")
-                        .Replace("32Bit", "")
-                        .Replace("32 Bit", "")
-                        .Replace("64-bit", "")
-                        .Replace("64Bit", "")
-                        .Replace("64 Bit", "")
-                        .Replace("latest Service Pack", "")
-                        .Replace("latest service pack", "")
-                        .Replace("32-bit/64-bit", "")
-                        .Replace("32bit/64bit", "")
-                        .Replace("64-bit Operating System Required", "")
-                        .Replace("32-bit Operating System Required", "")
-                        .Replace(" Operating System Required", "")
-                        .Replace("Operating System Required", "")
-                        .Replace(" equivalent or better", "")
-                        .Replace(" or equivalent.", "")
-                        .Replace(" or equivalent", "")
-                        .Replace(" or Newer", "")
-                        .Replace(" or newer", "")
-                        .Replace("or Newer", "")
-                        .Replace("or newer", "")
-                        .Replace("or later", "")
-                        .Replace("()", "")
-                        .Replace("<br>", "")
+                        .Replace("<strong>OS:</strong>", string.Empty)
+                        .Replace("with Platform Update for  7 ( versions only)", string.Empty)
+                        .Replace("Win ", string.Empty)
+                        .Replace("Windows", string.Empty)
+                        .Replace(", 32-bit", string.Empty)
+                        .Replace(", 32bit", string.Empty)
+                        .Replace(", 64-bit", string.Empty)
+                        .Replace(", 64bit", string.Empty)
+                        .Replace("®", string.Empty)
+                        .Replace("+", string.Empty)
+                        .Replace("and above", string.Empty)
+                        .Replace("x32", string.Empty)
+                        .Replace("and", string.Empty)
+                        .Replace("x64", string.Empty)
+                        .Replace("32-bit", string.Empty)
+                        .Replace("32Bit", string.Empty)
+                        .Replace("32 Bit", string.Empty)
+                        .Replace("64-bit", string.Empty)
+                        .Replace("64Bit", string.Empty)
+                        .Replace("64 Bit", string.Empty)
+                        .Replace("latest Service Pack", string.Empty)
+                        .Replace("latest service pack", string.Empty)
+                        .Replace("32-bit/64-bit", string.Empty)
+                        .Replace("32bit/64bit", string.Empty)
+                        .Replace("64-bit Operating System Required", string.Empty)
+                        .Replace("32-bit Operating System Required", string.Empty)
+                        .Replace(" Operating System Required", string.Empty)
+                        .Replace("Operating System Required", string.Empty)
+                        .Replace(" equivalent or better", string.Empty)
+                        .Replace(" or equivalent.", string.Empty)
+                        .Replace(" or equivalent", string.Empty)
+                        .Replace(" or Newer", string.Empty)
+                        .Replace(" or newer", string.Empty)
+                        .Replace("or Newer", string.Empty)
+                        .Replace("or newer", string.Empty)
+                        .Replace("or later", string.Empty)
+                        .Replace("()", string.Empty)
+                        .Replace("<br>", string.Empty)
                         .Trim();
                     logger.Debug($"os: {os}");
                     foreach (string sTemp in os.Replace(",", "¤").Replace(" or ", "¤").Replace("/", "¤").Split('¤'))
@@ -165,28 +169,28 @@ namespace SystemChecker.Clients
                 {
                     string cpu = ElementRequirement.InnerHtml
                             .Replace("\t", " ")
-                            .Replace("<strong>Processor:</strong>", "")
-                            .Replace("&nbsp;", "")
-                            .Replace("- Low budget CPUs such as Celeron or Duron needs to be at about twice the CPU speed", "")
-                            .Replace(" equivalent or faster processor", "")
-                            .Replace(" equivalent or better", "")
-                            .Replace("above", "")
-                            .Replace("and up", "")
-                            .Replace("(or higher)", "")
-                            .Replace("or higher", "")
-                            .Replace(" or equivalent.", "")
-                            .Replace(" over", "")
-                            .Replace(" or faster", "")
-                            .Replace(" or better", "")
-                            .Replace(" or equivalent", "")
-                            .Replace("4 CPUs", "")
-                            .Replace(", ~2.4GHz", "")
-                            .Replace(", ~3.1GHz", "")
+                            .Replace("<strong>Processor:</strong>", string.Empty)
+                            .Replace("&nbsp;", string.Empty)
+                            .Replace("- Low budget CPUs such as Celeron or Duron needs to be at about twice the CPU speed", string.Empty)
+                            .Replace(" equivalent or faster processor", string.Empty)
+                            .Replace(" equivalent or better", string.Empty)
+                            .Replace("above", string.Empty)
+                            .Replace("and up", string.Empty)
+                            .Replace("(or higher)", string.Empty)
+                            .Replace("or higher", string.Empty)
+                            .Replace(" or equivalent.", string.Empty)
+                            .Replace(" over", string.Empty)
+                            .Replace(" or faster", string.Empty)
+                            .Replace(" or better", string.Empty)
+                            .Replace(" or equivalent", string.Empty)
+                            .Replace("4 CPUs", string.Empty)
+                            .Replace(", ~2.4GHz", string.Empty)
+                            .Replace(", ~3.1GHz", string.Empty)
                             .Replace("ghz", "GHz")
                             .Replace("Ghz", "GHz")
                             .Replace("(not recommended for Intel HD Graphics cards)", ", not recommended for Intel HD Graphics cards")
-                            .Replace("()", "")
-                            .Replace("<br>", "")
+                            .Replace("()", string.Empty)
+                            .Replace("<br>", string.Empty)
                             .Trim();
                     logger.Debug($"cpu: {cpu}");
                     cpu = Regex.Replace(cpu, ", ([0-9])", " $1");
@@ -206,20 +210,20 @@ namespace SystemChecker.Clients
                 {
                     string ram = ElementRequirement.InnerHtml.ToLower()
                             .Replace("\t", " ")
-                            .Replace("<strong>memory:</strong>", "")
-                            .Replace("ram", "")
-                            .Replace("of system", "")
-                            .Replace("<br>", "")
+                            .Replace("<strong>memory:</strong>", string.Empty)
+                            .Replace("ram", string.Empty)
+                            .Replace("of system", string.Empty)
+                            .Replace("<br>", string.Empty)
                             .Trim();
                     ram = ram.Split('/')[ram.Split('/').Length - 1];
                     logger.Debug($"ram: {ram}");
                     if (ram.ToLower().IndexOf("mb") > -1)
                     {
-                        requirement.Ram = 1024 * 1024 * long.Parse(ram.ToLower().Replace("mb", "").Trim());
+                        requirement.Ram = 1024 * 1024 * long.Parse(ram.ToLower().Replace("mb", string.Empty).Trim());
                     }
                     if (ram.ToLower().IndexOf("gb") > -1)
                     {
-                        requirement.Ram = 1024 * 1024 * 1024 * long.Parse(ram.ToLower().Replace("gb", "").Trim());
+                        requirement.Ram = 1024 * 1024 * 1024 * long.Parse(ram.ToLower().Replace("gb", string.Empty).Trim());
                     }
                     requirement.RamUsage = SizeSuffix(requirement.Ram);
                 }
@@ -229,41 +233,41 @@ namespace SystemChecker.Clients
                 {
                     string gpu = ElementRequirement.InnerHtml
                             .Replace("\t", " ")
-                            .Replace("<strong>Graphics:</strong>", "")
+                            .Replace("<strong>Graphics:</strong>", string.Empty)
                             .Replace("ATI or NVidia card w/ 1024 MB RAM (NVIDIA GeForce GTX 260 or ATI HD 4890)", "NVIDIA GeForce GTX 260 or ATI HD 4890")
-                            .Replace("Video card must be 128 MB or more and should be a DirectX 9-compatible with support for Pixel Shader 2.0b (", "")
-                            .Replace("- *NOT* an Express graphics card).", "")
-                            .Replace("DirectX 11 class GPU with 1GB VRAM (", "")
-                            //.Replace(")<br>", "")
-                            .Replace("/320M 512MB VRAM", "")
+                            .Replace("Video card must be 128 MB or more and should be a DirectX 9-compatible with support for Pixel Shader 2.0b (", string.Empty)
+                            .Replace("- *NOT* an Express graphics card).", string.Empty)
+                            .Replace("DirectX 11 class GPU with 1GB VRAM (", string.Empty)
+                            //.Replace(")<br>", string.Empty)
+                            .Replace("/320M 512MB VRAM", string.Empty)
                             .Replace(" 512MB VRAM (Intel integrated GPUs are not supported!)", " / Intel integrated GPUs are not supported!")
                             .Replace("(not recommended for Intel HD Graphics cards)", ", not recommended for Intel HD Graphics cards")
-                            .Replace("or similar (no support for onboard cards)", "")
-                            .Replace("level Graphics Card (requires support for SSE)", "")
-                            .Replace("- Integrated graphics and very low budget cards might not work.", "")
+                            .Replace("or similar (no support for onboard cards)", string.Empty)
+                            .Replace("level Graphics Card (requires support for SSE)", string.Empty)
+                            .Replace("- Integrated graphics and very low budget cards might not work.", string.Empty)
 
                             .Replace("ATI or NVidia card", "Card")
                             .Replace("w/", "with")
-                            .Replace("Graphics: ", "")
-                            .Replace(" equivalent or better", "")
-                            .Replace(" or equivalent.", "")
-                            .Replace("or equivalent.", "")
-                            .Replace(" or equivalent", "")
-                            .Replace(" or better.", "")
-                            .Replace("or better.", "")
-                            .Replace(" or better", "")
-                            .Replace(" or newer", "")
-                            .Replace("or newer", "")
-                            .Replace("or higher", "")
-                            .Replace("or better", "")
-                            .Replace("or equivalent", "")
-                            .Replace("Mid-range", "")
-                            .Replace(" Memory Minimum", "")
-                            .Replace(" memory minimum", "")
-                            .Replace(" Memory Recommended", "")
-                            .Replace(" memory recommended", "")
-                            .Replace("e.g.", "")
-                            .Replace("Laptop integrated ", "")
+                            .Replace("Graphics: ", string.Empty)
+                            .Replace(" equivalent or better", string.Empty)
+                            .Replace(" or equivalent.", string.Empty)
+                            .Replace("or equivalent.", string.Empty)
+                            .Replace(" or equivalent", string.Empty)
+                            .Replace(" or better.", string.Empty)
+                            .Replace("or better.", string.Empty)
+                            .Replace(" or better", string.Empty)
+                            .Replace(" or newer", string.Empty)
+                            .Replace("or newer", string.Empty)
+                            .Replace("or higher", string.Empty)
+                            .Replace("or better", string.Empty)
+                            .Replace("or equivalent", string.Empty)
+                            .Replace("Mid-range", string.Empty)
+                            .Replace(" Memory Minimum", string.Empty)
+                            .Replace(" memory minimum", string.Empty)
+                            .Replace(" Memory Recommended", string.Empty)
+                            .Replace(" memory recommended", string.Empty)
+                            .Replace("e.g.", string.Empty)
+                            .Replace("Laptop integrated ", string.Empty)
                             .Replace("GPU 1GB VRAM", "GPU 1 GB VRAM")
                             .Replace("with 3GB system ram", "(3 GB)")
                             .Replace("with 512MB", "(512 MB)")
@@ -277,12 +281,12 @@ namespace SystemChecker.Clients
                             .Replace(" 6GB", " (6 GB)")
                             .Replace(" 4GB", " (4 GB)")
                             .Replace("8GB Memory 8 GB RAM", "(8 GB)")
-                            .Replace(" or more and should be a DirectX 9-compatible with support for Pixel Shader 3.0", "")
-                            .Replace(", or ", "")
-                            .Replace("()", "")
-                            .Replace("<br>", "")
+                            .Replace(" or more and should be a DirectX 9-compatible with support for Pixel Shader 3.0", string.Empty)
+                            .Replace(", or ", string.Empty)
+                            .Replace("()", string.Empty)
+                            .Replace("<br>", string.Empty)
                             .Replace("  ", " ")
-                            .Replace(". Integrated Intel HD Graphics should work but is not supported; problems are generally solved with a driver update.", "")
+                            .Replace(". Integrated Intel HD Graphics should work but is not supported; problems are generally solved with a driver update.", string.Empty)
                             .Trim();
                     logger.Debug($"gpu: {gpu}");
                     gpu = Regex.Replace(gpu, " - ([0-9]) GB", " ($1 GB)");
@@ -293,6 +297,23 @@ namespace SystemChecker.Clients
                         requirement.Gpu.Add(sTemp.Trim());
                     }
                 }
+                if (ElementRequirement.InnerHtml.IndexOf("<strong>DirectX") > -1 && ElementRequirement.InnerHtml.IndexOf("8") > -1)
+                {
+                    requirement.Gpu.Add("DirectX 8");
+                }
+                if (ElementRequirement.InnerHtml.IndexOf("<strong>DirectX") > -1 && ElementRequirement.InnerHtml.IndexOf("9") > -1)
+                {
+                    requirement.Gpu.Add("DirectX 9");
+                }
+                if (ElementRequirement.InnerHtml.IndexOf("<strong>DirectX") > -1 && ElementRequirement.InnerHtml.IndexOf("10") > -1)
+                {
+                    requirement.Gpu.Add("DirectX 10");
+                }
+                if (ElementRequirement.InnerHtml.IndexOf("<strong>DirectX") > -1 && ElementRequirement.InnerHtml.IndexOf("11") > -1)
+                {
+                    requirement.Gpu.Add("DirectX 11");
+                }
+
 
                 //< li >< strong > DirectX:</ strong > Version 10 < br ></ li >
                 //< li >< strong > Network:</ strong > Broadband Internet connection<br></ li >
@@ -302,24 +323,24 @@ namespace SystemChecker.Clients
                 {
                     string storage = ElementRequirement.InnerHtml.ToLower()
                         .Replace("\t", " ")
-                        .Replace("<strong>storage:</strong>", "")
-                        .Replace("<strong>hard drive:</strong>", "")
-                        .Replace("available space", "")
-                        .Replace("equivalent or better", "")
-                        .Replace("or equivalent", "")
-                        .Replace("hd space", "")
-                        .Replace("free space", "")
-                        .Replace("free hard drive space", "")
-                        .Replace("<br>", "")
+                        .Replace("<strong>storage:</strong>", string.Empty)
+                        .Replace("<strong>hard drive:</strong>", string.Empty)
+                        .Replace("available space", string.Empty)
+                        .Replace("equivalent or better", string.Empty)
+                        .Replace("or equivalent", string.Empty)
+                        .Replace("hd space", string.Empty)
+                        .Replace("free space", string.Empty)
+                        .Replace("free hard drive space", string.Empty)
+                        .Replace("<br>", string.Empty)
                         .Trim();
                     logger.Debug($"storage: {storage}");
                     if (storage.IndexOf("mb") > -1)
                     {
-                        requirement.Storage = 1024 * 1024 * long.Parse(storage.Replace("mb", "").Trim());
+                        requirement.Storage = 1024 * 1024 * long.Parse(storage.Replace("mb", string.Empty).Trim());
                     }
                     if (storage.IndexOf("gb") > -1)
                     {
-                        requirement.Storage = 1024 * 1024 * 1024 * long.Parse(storage.Replace("gb", "").Trim());
+                        requirement.Storage = 1024 * 1024 * 1024 * long.Parse(storage.Replace("gb", string.Empty).Trim());
                     }
                     requirement.StorageUsage = SizeSuffix(requirement.Storage);
                 }
