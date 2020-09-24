@@ -37,22 +37,15 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Playnite">
       <HintPath>Resources\PlayniteResources\Playnite.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Playnite.Common">
-      <HintPath>Resources\PlayniteResources\Playnite.Common.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Playnite.SDK, Version=5.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\PlayniteSDK.5.2.0\lib\net462\Playnite.SDK.dll</HintPath>
       <Private>False</Private>
-    </Reference>
-    <Reference Include="PluginCommon, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Resources\PluginCommon.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -285,7 +278,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\PluginCommon.dll" />
+    <Content Include="Resources\PlayniteResources\Playnite.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="playnite-plugincommon\PluginCommon.csproj">
+      <Project>{e05ac297-6067-4270-a572-1df926bb3635}</Project>
+      <Name>PluginCommon</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
