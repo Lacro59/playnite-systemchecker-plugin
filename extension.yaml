@@ -4,3 +4,8 @@ Version: 0.4
 Module: SystemChecker.dll
 Type: GenericPlugin
 Icon: icon.png
+Links:
+  - Name: Plugin forum
+    Url: https://playnite.link/forum/thread-339.html
+  - Name: Plugin Github
+    Url: https://github.com/Lacro59/playnite-systemchecker-plugin
