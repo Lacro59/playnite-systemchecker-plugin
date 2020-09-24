@@ -292,10 +292,12 @@ namespace SystemChecker.Clients
                 if (gameRequierements.Recommanded.Ram == 0)
                 {
                     gameRequierements.Recommanded.Ram = gameRequierements.Minimum.Ram;
+                    gameRequierements.Recommanded.RamUsage = gameRequierements.Minimum.RamUsage;
                 }
                 if (gameRequierements.Recommanded.Storage == 0)
                 {
                     gameRequierements.Recommanded.Storage = gameRequierements.Minimum.Storage;
+                    gameRequierements.Recommanded.StorageUsage = gameRequierements.Minimum.StorageUsage;
                 }
             }
         }

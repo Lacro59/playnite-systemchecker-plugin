@@ -127,6 +127,14 @@ namespace SystemChecker.Clients
                 }
             }
 
+            // OpenGL
+            // TODO See for best
+            if (CardRequierement.IsOGL)
+            {
+                IsWithNoCard = true;
+                return true;
+            }
+
             // No card defined
             if (!CardRequierement.IsIntegrate && !CardRequierement.IsNvidia && !CardRequierement.IsAmd)
             {
@@ -250,6 +258,7 @@ namespace SystemChecker.Clients
             bool IsOld = false;
             bool IsM = false;
 
+            bool IsOGL = false;
             bool IsDx = false;
             int DxVersion = 0;
 
@@ -288,6 +297,10 @@ namespace SystemChecker.Clients
             if (GpuName.ToLower().IndexOf("pretty much any 3d graphics card") > -1 || GpuName.ToLower().IndexOf("integrat") > -1)
             {
                 IsOld = true;
+            }
+            if (GpuName.ToLower().IndexOf("opengl") > -1)
+            {
+                IsOGL = true;
             }
 
             if (IsNvidia)
@@ -386,6 +399,7 @@ namespace SystemChecker.Clients
                 IsOld = IsOld,
                 IsM = IsM,
 
+                IsOGL = IsOGL,
                 IsDx = IsDx,
                 DxVersion = DxVersion,
 
@@ -405,6 +419,7 @@ namespace SystemChecker.Clients
         public bool IsOld { get; set; }
         public bool IsM { get; set; }
 
+        public bool IsOGL { get; set; }
         public bool IsDx { get; set; }
         public int DxVersion { get; set; }
 

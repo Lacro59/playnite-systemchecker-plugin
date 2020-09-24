@@ -159,10 +159,12 @@ namespace SystemChecker.Clients
                                 {
                                     if (dataMinimum.ToLower().IndexOf("mb") > -1)
                                     {
+                                        dataMinimum = dataMinimum.Substring(0, dataMinimum.ToLower().IndexOf("mb")) + "mb";
                                         gameRequierements.Minimum.Ram = 1024 * 1024 * long.Parse(dataMinimum.ToLower().Replace("mb", string.Empty).Trim());
                                     }
                                     if (dataMinimum.ToLower().IndexOf("gb") > -1)
                                     {
+                                        dataMinimum = dataMinimum.Substring(0, dataMinimum.ToLower().IndexOf("gb")) + "gb";
                                         gameRequierements.Minimum.Ram = 1024 * 1024 * 1024 * long.Parse(dataMinimum.ToLower().Replace("gb", string.Empty).Trim());
                                     }
                                     gameRequierements.Minimum.RamUsage = SizeSuffix(gameRequierements.Minimum.Ram);
@@ -171,10 +173,12 @@ namespace SystemChecker.Clients
                                 {
                                     if (dataRecommended.ToLower().IndexOf("mb") > -1)
                                     {
+                                        dataRecommended = dataRecommended.Substring(0, dataRecommended.ToLower().IndexOf("mb")) + "mb";
                                         gameRequierements.Recommanded.Ram = 1024 * 1024 * long.Parse(dataRecommended.ToLower().Replace("mb", string.Empty).Trim());
                                     }
                                     if (dataRecommended.ToLower().IndexOf("gb") > -1)
                                     {
+                                        dataRecommended = dataRecommended.Substring(0, dataRecommended.ToLower().IndexOf("gb")) + "gb";
                                         gameRequierements.Recommanded.Ram = 1024 * 1024 * 1024 * long.Parse(dataRecommended.ToLower().Replace("gb", string.Empty).Trim());
                                     }
                                     gameRequierements.Recommanded.RamUsage = SizeSuffix(gameRequierements.Recommanded.Ram);
@@ -186,10 +190,12 @@ namespace SystemChecker.Clients
                                 {
                                     if (dataMinimum.ToLower().IndexOf("mb") > -1)
                                     {
+                                        dataMinimum = dataMinimum.Substring(0, dataMinimum.ToLower().IndexOf("mb")) + "mb";
                                         gameRequierements.Minimum.Storage = 1024 * 1024 * long.Parse(dataMinimum.ToLower().Replace("mb", string.Empty).Trim());
                                     }
                                     if (dataMinimum.ToLower().IndexOf("gb") > -1)
                                     {
+                                        dataMinimum = dataMinimum.Substring(0, dataMinimum.ToLower().IndexOf("gb")) + "gb";
                                         gameRequierements.Minimum.Storage = 1024 * 1024 * 1024 * long.Parse(dataMinimum.ToLower().Replace("gb", string.Empty).Trim());
                                     }
                                     gameRequierements.Minimum.StorageUsage = SizeSuffix(gameRequierements.Minimum.Storage);
@@ -198,10 +204,12 @@ namespace SystemChecker.Clients
                                 {
                                     if (dataRecommended.ToLower().IndexOf("mb") > -1)
                                     {
+                                        dataRecommended = dataRecommended.Substring(0, dataRecommended.ToLower().IndexOf("mb")) + "mb";
                                         gameRequierements.Minimum.Storage = 1024 * 1024 * long.Parse(dataRecommended.ToLower().Replace("mb", string.Empty).Trim());
                                     }
                                     if (dataRecommended.ToLower().IndexOf("gb") > -1)
                                     {
+                                        dataRecommended = dataRecommended.Substring(0, dataRecommended.ToLower().IndexOf("gb")) + "gb";
                                         gameRequierements.Minimum.Storage = 1024 * 1024 * 1024 * long.Parse(dataRecommended.ToLower().Replace("gb", string.Empty).Trim());
                                     }
                                     gameRequierements.Recommanded.StorageUsage = SizeSuffix(gameRequierements.Recommanded.Storage);
