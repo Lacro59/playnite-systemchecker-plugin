@@ -33,6 +33,7 @@ namespace SystemChecker
 
         private Game GameSelected { get; set; }
         private readonly IntegrationUI ui = new IntegrationUI();
+        private readonly TaskHelper taskHelper = new TaskHelper();
 
         private CheckSystem CheckMinimum { get; set; }
         private CheckSystem CheckRecommanded { get; set; }
@@ -148,12 +149,18 @@ namespace SystemChecker
                 {
                     ListEmulators.Add(item.Id);
                 }
+
                 if (GameSelected.PlayAction != null && GameSelected.PlayAction.EmulatorId != null && ListEmulators.Contains(GameSelected.PlayAction.EmulatorId))
                 {
                     // Emulator
                 }
                 else
                 {
+                    taskHelper.Check();
+
+                    CancellationTokenSource tokenSource = new CancellationTokenSource();
+                    CancellationToken ct = tokenSource.Token;
+
                     var taskSystem = Task.Run(() =>
                     {
                         SystemApi systemApi = new SystemApi(this.GetPluginUserDataPath(), PlayniteApi);
@@ -187,7 +194,14 @@ namespace SystemChecker
                         {
                             CheckRecommanded = SystemApi.CheckConfig(gameRequierements.Recommanded, systemConfiguration);
                         }
-                    })
+
+
+                        if (ct.IsCancellationRequested)
+                        {
+                            ct.ThrowIfCancellationRequested();
+                        }
+
+                    }, tokenSource.Token)
                     .ContinueWith(antecedent =>
                     {
                         Application.Current.Dispatcher.Invoke(new Action(() => {
@@ -232,10 +246,15 @@ namespace SystemChecker
                                 bt.Margin = new Thickness(10, 0, 0, 0);
                                 bt.Click += OnBtGameSelectedActionBarClick;
 
-                                ui.AddButtonInGameSelectedActionBarButtonOrToggleButton(bt);
+                                if (!ct.IsCancellationRequested)
+                                {
+                                    ui.AddButtonInGameSelectedActionBarButtonOrToggleButton(bt);
+                                }
                             }
                         }));
                     });
+
+                    taskHelper.Add(taskSystem, tokenSource);
                 }
             }
             catch (Exception ex)
