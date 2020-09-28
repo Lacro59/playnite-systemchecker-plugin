@@ -153,13 +153,13 @@ namespace SystemChecker.Clients
                             case "processor (cpu)":
                                 if (!dataMinimum.IsNullOrEmpty())
                                 {
-                                    dataMinimum = dataMinimum.Replace("or equivalent", string.Empty)
+                                    dataMinimum = dataMinimum.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
                                         .Replace(" / ", "¤").Replace("<br>", "¤");
                                     gameRequierements.Minimum.Cpu = dataMinimum.Split('¤').Select(x => x.Trim()).ToList();
                                 }
                                 if (!dataRecommended.IsNullOrEmpty())
                                 {
-                                    dataRecommended = dataRecommended.Replace("or equivalent", string.Empty)
+                                    dataRecommended = dataRecommended.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
                                         .Replace(" / ", "¤").Replace("<br>", "¤");
                                     gameRequierements.Recommanded.Cpu = dataMinimum.Split('¤').Select(x => x.Trim()).ToList();
                                 }
@@ -251,7 +251,7 @@ namespace SystemChecker.Clients
                             case "video card (gpu)":
                                 if (!dataMinimum.IsNullOrEmpty())
                                 {
-                                    dataMinimum = dataMinimum.Replace("or equivalent", string.Empty)
+                                    dataMinimum = dataMinimum.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
                                         .Replace(" / ", "¤").Replace("<br>", "¤");
 
                                     dataMinimum = Regex.Replace(dataMinimum, "(</[^>]*>)", "");
@@ -262,7 +262,7 @@ namespace SystemChecker.Clients
                                 }
                                 if (!dataRecommended.IsNullOrEmpty())
                                 {
-                                    dataRecommended = dataRecommended.Replace("or equivalent", string.Empty)
+                                    dataRecommended = dataRecommended.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
                                         .Replace(" / ", "¤").Replace("<br>", "¤");
 
                                     dataRecommended = Regex.Replace(dataRecommended, "(</[^>]*>)", "");
