@@ -95,8 +95,8 @@ namespace SystemChecker.Views
 
 
             // Check config
-            string IsOk = "";
-            string IsKo = "";
+            string IsOk = "";
+            string IsKo = "";
 
             CheckSystem CheckMinimum = SystemApi.CheckConfig(gameRequierements.Minimum, systemConfiguration);
             if (gameRequierements.Minimum != null && gameRequierements.Minimum.Os.Count != 0)

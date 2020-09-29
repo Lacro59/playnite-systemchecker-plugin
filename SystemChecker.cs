@@ -161,7 +161,7 @@ namespace SystemChecker
                     CancellationTokenSource tokenSource = new CancellationTokenSource();
                     CancellationToken ct = tokenSource.Token;
 
-                    var taskSystem = Task.Run(() =>
+                    var taskIntegration = Task.Run(() =>
                     {
                         SystemApi systemApi = new SystemApi(this.GetPluginUserDataPath(), PlayniteApi);
                         SystemConfiguration systemConfiguration = systemApi.GetInfo();
@@ -194,13 +194,6 @@ namespace SystemChecker
                         {
                             CheckRecommanded = SystemApi.CheckConfig(gameRequierements.Recommanded, systemConfiguration);
                         }
-
-
-                        if (ct.IsCancellationRequested)
-                        {
-                            ct.ThrowIfCancellationRequested();
-                        }
-
                     }, tokenSource.Token)
                     .ContinueWith(antecedent =>
                     {
@@ -254,7 +247,7 @@ namespace SystemChecker
                         }));
                     });
 
-                    taskHelper.Add(taskSystem, tokenSource);
+                    taskHelper.Add(taskIntegration, tokenSource);
                 }
             }
             catch (Exception ex)

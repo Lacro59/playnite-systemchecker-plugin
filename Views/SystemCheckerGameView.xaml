@@ -10,6 +10,10 @@
                      ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None" 
                      Height="500" Width="1200">
 
+    <WindowBase.Resources>
+        <FontFamily x:Key="font">pack://application:,,,/PluginCommon;component/Resources/font.ttf#font</FontFamily>
+    </WindowBase.Resources>
+
     <Grid Loaded="Grid_Loaded" Margin="20" Name="gScData">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -121,17 +125,17 @@
             <Label Grid.Column="6" Grid.Row="10" Content="{Binding RecommandedStorage}" VerticalAlignment="Center" FontSize="14" />
             
             <!-- Check config -->
-            <Label Grid.Column="3" Grid.Row="2" Content="{Binding MinimumCheckOs}" VerticalAlignment="Center" FontSize="16" Margin="5,0" HorizontalAlignment="Center" FontFamily="Wingdings" />
-            <Label Grid.Column="3" Grid.Row="4" Content="{Binding MinimumCheckCpu}" VerticalAlignment="Center" FontSize="16" Margin="5,0" HorizontalAlignment="Center" FontFamily="Wingdings" />
-            <Label Grid.Column="3" Grid.Row="6" Content="{Binding MinimumCheckRam}" VerticalAlignment="Center" FontSize="16" Margin="5,0" HorizontalAlignment="Center" FontFamily="Wingdings" />
-            <Label Grid.Column="3" Grid.Row="8" Content="{Binding MinimumCheckGpu}" VerticalAlignment="Center" FontSize="16" Margin="5,0" HorizontalAlignment="Center" FontFamily="Wingdings" />
-            <Label Grid.Column="3" Grid.Row="10" Content="{Binding MinimumCheckStorage}" VerticalAlignment="Center" FontSize="16" Margin="5,0" HorizontalAlignment="Center" FontFamily="Wingdings" />
+            <Label Grid.Column="3" Grid.Row="2" Content="{Binding MinimumCheckOs}" VerticalAlignment="Center" FontSize="16" Margin="5,0" HorizontalAlignment="Center" FontFamily="{StaticResource font}" />
+            <Label Grid.Column="3" Grid.Row="4" Content="{Binding MinimumCheckCpu}" VerticalAlignment="Center" FontSize="16" Margin="5,0" HorizontalAlignment="Center" FontFamily="{StaticResource font}" />
+            <Label Grid.Column="3" Grid.Row="6" Content="{Binding MinimumCheckRam}" VerticalAlignment="Center" FontSize="16" Margin="5,0" HorizontalAlignment="Center" FontFamily="{StaticResource font}" />
+            <Label Grid.Column="3" Grid.Row="8" Content="{Binding MinimumCheckGpu}" VerticalAlignment="Center" FontSize="16" Margin="5,0" HorizontalAlignment="Center" FontFamily="{StaticResource font}" />
+            <Label Grid.Column="3" Grid.Row="10" Content="{Binding MinimumCheckStorage}" VerticalAlignment="Center" FontSize="16" Margin="5,0" HorizontalAlignment="Center" FontFamily="{StaticResource font}" />
 
-            <Label Grid.Column="5" Grid.Row="2" Content="{Binding RecommandedCheckOs}" VerticalAlignment="Center" FontSize="16" Margin="5,0" HorizontalAlignment="Center" FontFamily="Wingdings" />
-            <Label Grid.Column="5" Grid.Row="4" Content="{Binding RecommandedCheckCpu}" VerticalAlignment="Center" FontSize="16" Margin="5,0" HorizontalAlignment="Center" FontFamily="Wingdings" />
-            <Label Grid.Column="5" Grid.Row="6" Content="{Binding RecommandedCheckRam}" VerticalAlignment="Center" FontSize="16" Margin="5,0" HorizontalAlignment="Center" FontFamily="Wingdings" />
-            <Label Grid.Column="5" Grid.Row="8" Content="{Binding RecommandedCheckGpu}" VerticalAlignment="Center" FontSize="16" Margin="5,0" HorizontalAlignment="Center" FontFamily="Wingdings" />
-            <Label Grid.Column="5" Grid.Row="10" Content="{Binding RecommandedCheckStorage}" VerticalAlignment="Center" FontSize="16" Margin="5,0" HorizontalAlignment="Center" FontFamily="Wingdings" />
+            <Label Grid.Column="5" Grid.Row="2" Content="{Binding RecommandedCheckOs}" VerticalAlignment="Center" FontSize="16" Margin="5,0" HorizontalAlignment="Center" FontFamily="{StaticResource font}" />
+            <Label Grid.Column="5" Grid.Row="4" Content="{Binding RecommandedCheckCpu}" VerticalAlignment="Center" FontSize="16" Margin="5,0" HorizontalAlignment="Center" FontFamily="{StaticResource font}" />
+            <Label Grid.Column="5" Grid.Row="6" Content="{Binding RecommandedCheckRam}" VerticalAlignment="Center" FontSize="16" Margin="5,0" HorizontalAlignment="Center" FontFamily="{StaticResource font}" />
+            <Label Grid.Column="5" Grid.Row="8" Content="{Binding RecommandedCheckGpu}" VerticalAlignment="Center" FontSize="16" Margin="5,0" HorizontalAlignment="Center" FontFamily="{StaticResource font}" />
+            <Label Grid.Column="5" Grid.Row="10" Content="{Binding RecommandedCheckStorage}" VerticalAlignment="Center" FontSize="16" Margin="5,0" HorizontalAlignment="Center" FontFamily="{StaticResource font}" />
         </Grid>
 
         <DockPanel Grid.Row="2">
