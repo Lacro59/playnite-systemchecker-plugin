@@ -47,7 +47,7 @@ namespace SystemChecker.Views
                 }
                 catch
                 {
-                    _PlayniteAPI.Dialogs.ShowErrorMessage(resources.GetString("LOCSystemCheckerErrorRemove"), "SystemChecker error");
+                    _PlayniteAPI.Dialogs.ShowErrorMessage(resources.GetString("LOCSystemCheckerErrorRemove"), "SystemChecker");
                 }
             }
         }
