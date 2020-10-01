@@ -252,24 +252,30 @@ namespace SystemChecker.Clients
                                 if (!dataMinimum.IsNullOrEmpty())
                                 {
                                     dataMinimum = dataMinimum.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
+                                        .Replace("Integrated", string.Empty).Replace("Dedicated", string.Empty)
                                         .Replace(" / ", "¤").Replace("<br>", "¤");
 
                                     dataMinimum = Regex.Replace(dataMinimum, "(</[^>]*>)", "");
                                     dataMinimum = Regex.Replace(dataMinimum, "(<[^>]*>)", "");
 
-                                    gameRequierements.Minimum.Gpu = dataMinimum.Split('¤').Select(x => x.Trim()).ToList()
-                                        .Where(x => x.ToLower().IndexOf("shader") == -1).ToList();
+                                    gameRequierements.Minimum.Gpu = dataMinimum.Split('¤')
+                                        .Select(x => x.Trim()).ToList()
+                                        .Where(x => x.ToLower().IndexOf("shader") == -1)
+                                        .Where(x => x.Trim() != string.Empty).ToList();
                                 }
                                 if (!dataRecommended.IsNullOrEmpty())
                                 {
                                     dataRecommended = dataRecommended.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
+                                        .Replace("Integrated", string.Empty).Replace("Dedicated", string.Empty)
                                         .Replace(" / ", "¤").Replace("<br>", "¤");
 
                                     dataRecommended = Regex.Replace(dataRecommended, "(</[^>]*>)", "");
                                     dataRecommended = Regex.Replace(dataRecommended, "(<[^>]*>)", "");
 
-                                    gameRequierements.Recommanded.Gpu = dataRecommended.Split('¤').Select(x => x.Trim()).ToList()
-                                        .Where(x => x.ToLower().IndexOf("shader") == -1).ToList();
+                                    gameRequierements.Recommanded.Gpu = dataRecommended.Split('¤')
+                                        .Select(x => x.Trim()).ToList()
+                                        .Where(x => x.ToLower().IndexOf("shader") == -1).ToList()
+                                        .Where(x => x.Trim() != string.Empty).ToList();
                                 }
                                 break;
 
