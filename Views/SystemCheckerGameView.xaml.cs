@@ -1,11 +1,11 @@
 ﻿using Newtonsoft.Json;
-using Playnite.Controls;
 using Playnite.SDK;
 using Playnite.SDK.Models;
 using PluginCommon;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using SystemChecker.Clients;
@@ -16,7 +16,7 @@ namespace SystemChecker.Views
     /// <summary>
     /// Logique d'interaction pour SystemCheckerGameView.xaml
     /// </summary>
-    public partial class SystemCheckerGameView : WindowBase
+    public partial class SystemCheckerGameView : Window
     {
         private static readonly ILogger logger = LogManager.GetLogger();
         private static IResourceProvider resources = new ResourceProvider();
@@ -95,8 +95,8 @@ namespace SystemChecker.Views
 
 
             // Check config
-            string IsOk = "";
-            string IsKo = "";
+            string IsOk = "";
+            string IsKo = "";
 
             CheckSystem CheckMinimum = SystemApi.CheckConfig(gameRequierements.Minimum, systemConfiguration);
             if (gameRequierements.Minimum != null && gameRequierements.Minimum.Os.Count != 0)

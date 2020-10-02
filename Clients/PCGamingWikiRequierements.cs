@@ -4,6 +4,7 @@ using Playnite.SDK;
 using Playnite.SDK.Models;
 using PluginCommon;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using SystemChecker.Models;
@@ -101,7 +102,17 @@ namespace SystemChecker.Clients
 #endif
 
                 // Get data & parse
-                string ResultWeb = DownloadStringData(url).GetAwaiter().GetResult(); ;
+                string ResultWeb = string.Empty;
+                try
+                {
+                    ResultWeb =  Web.DownloadStringData(url).GetAwaiter().GetResult();
+                }
+                catch (Exception ex)
+                {
+                    Common.LogError(ex, "SystemChecker", $"Failed to download {url}");
+                }
+
+
                 HtmlParser parser = new HtmlParser();
                 IHtmlDocument HtmlRequirement = parser.Parse(ResultWeb);
 
@@ -142,13 +153,13 @@ namespace SystemChecker.Clients
                             case "processor (cpu)":
                                 if (!dataMinimum.IsNullOrEmpty())
                                 {
-                                    dataMinimum = dataMinimum.Replace("or equivalent", string.Empty)
+                                    dataMinimum = dataMinimum.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
                                         .Replace(" / ", "¤").Replace("<br>", "¤");
                                     gameRequierements.Minimum.Cpu = dataMinimum.Split('¤').Select(x => x.Trim()).ToList();
                                 }
                                 if (!dataRecommended.IsNullOrEmpty())
                                 {
-                                    dataRecommended = dataRecommended.Replace("or equivalent", string.Empty)
+                                    dataRecommended = dataRecommended.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
                                         .Replace(" / ", "¤").Replace("<br>", "¤");
                                     gameRequierements.Recommanded.Cpu = dataMinimum.Split('¤').Select(x => x.Trim()).ToList();
                                 }
@@ -159,12 +170,12 @@ namespace SystemChecker.Clients
                                 {
                                     if (dataMinimum.ToLower().IndexOf("mb") > -1)
                                     {
-                                        dataMinimum = dataMinimum.Substring(0, dataMinimum.ToLower().IndexOf("mb")) + "mb";
+                                        dataMinimum = dataMinimum.Substring(0, dataMinimum.ToLower().IndexOf("mb"));
                                         gameRequierements.Minimum.Ram = 1024 * 1024 * long.Parse(dataMinimum.ToLower().Replace("mb", string.Empty).Trim());
                                     }
                                     if (dataMinimum.ToLower().IndexOf("gb") > -1)
                                     {
-                                        dataMinimum = dataMinimum.Substring(0, dataMinimum.ToLower().IndexOf("gb")) + "gb";
+                                        dataMinimum = dataMinimum.Substring(0, dataMinimum.ToLower().IndexOf("gb"));
                                         gameRequierements.Minimum.Ram = 1024 * 1024 * 1024 * long.Parse(dataMinimum.ToLower().Replace("gb", string.Empty).Trim());
                                     }
                                     gameRequierements.Minimum.RamUsage = SizeSuffix(gameRequierements.Minimum.Ram);
@@ -173,12 +184,12 @@ namespace SystemChecker.Clients
                                 {
                                     if (dataRecommended.ToLower().IndexOf("mb") > -1)
                                     {
-                                        dataRecommended = dataRecommended.Substring(0, dataRecommended.ToLower().IndexOf("mb")) + "mb";
+                                        dataRecommended = dataRecommended.Substring(0, dataRecommended.ToLower().IndexOf("mb"));
                                         gameRequierements.Recommanded.Ram = 1024 * 1024 * long.Parse(dataRecommended.ToLower().Replace("mb", string.Empty).Trim());
                                     }
                                     if (dataRecommended.ToLower().IndexOf("gb") > -1)
                                     {
-                                        dataRecommended = dataRecommended.Substring(0, dataRecommended.ToLower().IndexOf("gb")) + "gb";
+                                        dataRecommended = dataRecommended.Substring(0, dataRecommended.ToLower().IndexOf("gb"));
                                         gameRequierements.Recommanded.Ram = 1024 * 1024 * 1024 * long.Parse(dataRecommended.ToLower().Replace("gb", string.Empty).Trim());
                                     }
                                     gameRequierements.Recommanded.RamUsage = SizeSuffix(gameRequierements.Recommanded.Ram);
@@ -186,17 +197,28 @@ namespace SystemChecker.Clients
                                 break;
 
                             case "hard disk drive (hdd)":
+                                double hdd = 0;
                                 if (!dataMinimum.IsNullOrEmpty())
                                 {
                                     if (dataMinimum.ToLower().IndexOf("mb") > -1)
                                     {
-                                        dataMinimum = dataMinimum.Substring(0, dataMinimum.ToLower().IndexOf("mb")) + "mb";
-                                        gameRequierements.Minimum.Storage = 1024 * 1024 * long.Parse(dataMinimum.ToLower().Replace("mb", string.Empty).Trim());
+                                        dataMinimum = dataMinimum.Substring(0, dataMinimum.ToLower().IndexOf("mb"));
+
+                                        Double.TryParse(dataMinimum.ToLower().Replace("mb", string.Empty).Trim()
+                                            .Replace(".", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim()
+                                            .Replace(",", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim(), out hdd);
+
+                                        gameRequierements.Minimum.Storage = (long)(1024 * 1024 * hdd);
                                     }
                                     if (dataMinimum.ToLower().IndexOf("gb") > -1)
                                     {
-                                        dataMinimum = dataMinimum.Substring(0, dataMinimum.ToLower().IndexOf("gb")) + "gb";
-                                        gameRequierements.Minimum.Storage = 1024 * 1024 * 1024 * long.Parse(dataMinimum.ToLower().Replace("gb", string.Empty).Trim());
+                                        dataMinimum = dataMinimum.Substring(0, dataMinimum.ToLower().IndexOf("gb"));
+
+                                        Double.TryParse(dataMinimum.ToLower().Replace("mb", string.Empty).Trim()
+                                            .Replace(".", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim()
+                                            .Replace(",", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim(), out hdd);
+
+                                        gameRequierements.Minimum.Storage = (long)(1024 * 1024 * 1024 * hdd);
                                     }
                                     gameRequierements.Minimum.StorageUsage = SizeSuffix(gameRequierements.Minimum.Storage);
                                 }
@@ -204,13 +226,23 @@ namespace SystemChecker.Clients
                                 {
                                     if (dataRecommended.ToLower().IndexOf("mb") > -1)
                                     {
-                                        dataRecommended = dataRecommended.Substring(0, dataRecommended.ToLower().IndexOf("mb")) + "mb";
-                                        gameRequierements.Minimum.Storage = 1024 * 1024 * long.Parse(dataRecommended.ToLower().Replace("mb", string.Empty).Trim());
+                                        dataRecommended = dataRecommended.Substring(0, dataRecommended.ToLower().IndexOf("mb"));
+
+                                        Double.TryParse(dataMinimum.ToLower().Replace("mb", string.Empty).Trim()
+                                           .Replace(".", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim()
+                                           .Replace(",", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim(), out hdd);
+
+                                        gameRequierements.Minimum.Storage = (long)(1024 * 1024 * hdd);
                                     }
                                     if (dataRecommended.ToLower().IndexOf("gb") > -1)
                                     {
-                                        dataRecommended = dataRecommended.Substring(0, dataRecommended.ToLower().IndexOf("gb")) + "gb";
-                                        gameRequierements.Minimum.Storage = 1024 * 1024 * 1024 * long.Parse(dataRecommended.ToLower().Replace("gb", string.Empty).Trim());
+                                        dataRecommended = dataRecommended.Substring(0, dataRecommended.ToLower().IndexOf("gb"));
+
+                                        Double.TryParse(dataMinimum.ToLower().Replace("mb", string.Empty).Trim()
+                                           .Replace(".", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim()
+                                           .Replace(",", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim(), out hdd);
+
+                                        gameRequierements.Minimum.Storage = (long)(1024 * 1024 * 1024 * hdd);
                                     }
                                     gameRequierements.Recommanded.StorageUsage = SizeSuffix(gameRequierements.Recommanded.Storage);
                                 }
@@ -219,25 +251,31 @@ namespace SystemChecker.Clients
                             case "video card (gpu)":
                                 if (!dataMinimum.IsNullOrEmpty())
                                 {
-                                    dataMinimum = dataMinimum.Replace("or equivalent", string.Empty)
+                                    dataMinimum = dataMinimum.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
+                                        .Replace("Integrated", string.Empty).Replace("Dedicated", string.Empty)
                                         .Replace(" / ", "¤").Replace("<br>", "¤");
 
                                     dataMinimum = Regex.Replace(dataMinimum, "(</[^>]*>)", "");
                                     dataMinimum = Regex.Replace(dataMinimum, "(<[^>]*>)", "");
 
-                                    gameRequierements.Minimum.Gpu = dataMinimum.Split('¤').Select(x => x.Trim()).ToList()
-                                        .Where(x => x.ToLower().IndexOf("shader") == -1).ToList();
+                                    gameRequierements.Minimum.Gpu = dataMinimum.Split('¤')
+                                        .Select(x => x.Trim()).ToList()
+                                        .Where(x => x.ToLower().IndexOf("shader") == -1)
+                                        .Where(x => x.Trim() != string.Empty).ToList();
                                 }
                                 if (!dataRecommended.IsNullOrEmpty())
                                 {
-                                    dataRecommended = dataRecommended.Replace("or equivalent", string.Empty)
+                                    dataRecommended = dataRecommended.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
+                                        .Replace("Integrated", string.Empty).Replace("Dedicated", string.Empty)
                                         .Replace(" / ", "¤").Replace("<br>", "¤");
 
                                     dataRecommended = Regex.Replace(dataRecommended, "(</[^>]*>)", "");
                                     dataRecommended = Regex.Replace(dataRecommended, "(<[^>]*>)", "");
 
-                                    gameRequierements.Recommanded.Gpu = dataRecommended.Split('¤').Select(x => x.Trim()).ToList()
-                                        .Where(x => x.ToLower().IndexOf("shader") == -1).ToList();
+                                    gameRequierements.Recommanded.Gpu = dataRecommended.Split('¤')
+                                        .Select(x => x.Trim()).ToList()
+                                        .Where(x => x.ToLower().IndexOf("shader") == -1).ToList()
+                                        .Where(x => x.Trim() != string.Empty).ToList();
                                 }
                                 break;
 

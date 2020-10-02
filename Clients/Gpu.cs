@@ -317,6 +317,14 @@ namespace SystemChecker.Clients
                 {
                     IsOld = true;
                 }
+                if (Regex.IsMatch(GpuName.ToLower(), "geforce[0-9]"))
+                {
+                    IsOld = true;
+                }
+                if (GpuName.ToLower().IndexOf("geforce fx") > -1)
+                {
+                    IsOld = true;
+                }
             }
 
             if (IsAmd)
@@ -326,6 +334,10 @@ namespace SystemChecker.Clients
                     IsOld = true;
                 }
                 if (GpuName.ToLower().IndexOf("radeon hd") > -1 && Number < 7000)
+                {
+                    IsOld = true;
+                }
+                if (Regex.IsMatch(GpuName.ToLower(), "radeon [0-9]"))
                 {
                     IsOld = true;
                 }

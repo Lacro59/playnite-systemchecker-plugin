@@ -33,6 +33,7 @@ namespace SystemChecker
 
         private Game GameSelected { get; set; }
         private readonly IntegrationUI ui = new IntegrationUI();
+        private readonly TaskHelper taskHelper = new TaskHelper();
 
         private CheckSystem CheckMinimum { get; set; }
         private CheckSystem CheckRecommanded { get; set; }
@@ -46,7 +47,7 @@ namespace SystemChecker
             string pluginFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             // Add plugin localization in application ressource.
-            PluginCommon.Localization.SetPluginLanguage(pluginFolder, api.Paths.ConfigurationPath);
+            PluginCommon.Localization.SetPluginLanguage(pluginFolder, api.ApplicationSettings.Language);
             // Add common in application ressource.
             PluginCommon.Common.Load(pluginFolder);
 
@@ -148,13 +149,19 @@ namespace SystemChecker
                 {
                     ListEmulators.Add(item.Id);
                 }
+
                 if (GameSelected.PlayAction != null && GameSelected.PlayAction.EmulatorId != null && ListEmulators.Contains(GameSelected.PlayAction.EmulatorId))
                 {
                     // Emulator
                 }
                 else
                 {
-                    var taskSystem = Task.Run(() =>
+                    taskHelper.Check();
+
+                    CancellationTokenSource tokenSource = new CancellationTokenSource();
+                    CancellationToken ct = tokenSource.Token;
+
+                    var taskIntegration = Task.Run(() =>
                     {
                         SystemApi systemApi = new SystemApi(this.GetPluginUserDataPath(), PlayniteApi);
                         SystemConfiguration systemConfiguration = systemApi.GetInfo();
@@ -187,7 +194,7 @@ namespace SystemChecker
                         {
                             CheckRecommanded = SystemApi.CheckConfig(gameRequierements.Recommanded, systemConfiguration);
                         }
-                    })
+                    }, tokenSource.Token)
                     .ContinueWith(antecedent =>
                     {
                         Application.Current.Dispatcher.Invoke(new Action(() => {
@@ -232,10 +239,15 @@ namespace SystemChecker
                                 bt.Margin = new Thickness(10, 0, 0, 0);
                                 bt.Click += OnBtGameSelectedActionBarClick;
 
-                                ui.AddButtonInGameSelectedActionBarButtonOrToggleButton(bt);
+                                if (!ct.IsCancellationRequested)
+                                {
+                                    ui.AddButtonInGameSelectedActionBarButtonOrToggleButton(bt);
+                                }
                             }
                         }));
                     });
+
+                    taskHelper.Add(taskIntegration, tokenSource);
                 }
             }
             catch (Exception ex)

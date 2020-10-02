@@ -2,10 +2,13 @@
 using AngleSharp.Parser.Html;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Playnite.Common.Web;
 using Playnite.SDK;
 using Playnite.SDK.Models;
 using PluginCommon;
+using PluginCommon.PlayniteResources;
+using PluginCommon.PlayniteResources.API;
+using PluginCommon.PlayniteResources.Common;
+using PluginCommon.PlayniteResources.Converters;
 using Steam.Models;
 using System;
 using System.Collections.Generic;
@@ -32,8 +35,17 @@ namespace SystemChecker.Clients
 
         private string GetSteamData()
         {
-            var url = $"https://store.steampowered.com/api/appdetails?appids={appId}&l=english";
-            return HttpDownloader.DownloadString(url);
+            string url = string.Empty;
+            try
+            {
+                url = $"https://store.steampowered.com/api/appdetails?appids={appId}&l=english";
+                return Web.DownloadStringData(url).GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, "SystemChecker", $"Failed to download {url}");
+                return string.Empty;
+            }
         }
 
         public override GameRequierements GetRequirements()
@@ -59,30 +71,6 @@ namespace SystemChecker.Clients
                     if (pc_requirements["recommended"] != null)
                     {
                         gameRequierements.Recommanded = ParseRequirement((string)pc_requirements["recommended"]);
-
-                        //// Add missing
-                        //if (gameRequierements.Recommanded.Os.Count == 0)
-                        //{
-                        //    gameRequierements.Recommanded.Os = gameRequierements.Minimum.Os;
-                        //}
-                        //if (gameRequierements.Recommanded.Cpu.Count == 0)
-                        //{
-                        //    gameRequierements.Recommanded.Cpu = gameRequierements.Minimum.Cpu;
-                        //}
-                        //if (gameRequierements.Recommanded.Gpu.Count == 0)
-                        //{
-                        //    gameRequierements.Recommanded.Gpu = gameRequierements.Minimum.Gpu;
-                        //}
-                        //if (gameRequierements.Recommanded.Ram == 0)
-                        //{
-                        //    gameRequierements.Recommanded.Ram = gameRequierements.Minimum.Ram;
-                        //    gameRequierements.Recommanded.RamUsage = gameRequierements.Minimum.RamUsage;
-                        //}
-                        //if (gameRequierements.Recommanded.Storage == 0)
-                        //{
-                        //    gameRequierements.Recommanded.Storage = gameRequierements.Minimum.Storage;
-                        //    gameRequierements.Recommanded.StorageUsage = gameRequierements.Minimum.StorageUsage;
-                        //}
                     }
                 }
             }

@@ -1,12 +1,7 @@
-﻿using Newtonsoft.Json;
-using Playnite.SDK;
+﻿using Playnite.SDK;
 using Playnite.SDK.Models;
-using PluginCommon;
 using System;
 using System.Globalization;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace SystemChecker.Models
 {
@@ -38,47 +33,6 @@ namespace SystemChecker.Models
             decimal adjustedSize = (decimal)value / (1L << (mag * 10));
 
             return string.Format("{0} {1}", adjustedSize.ToString("0.0", CultureInfo.CurrentUICulture), SizeSuffixes[mag]);
-        }
-
-        internal async Task<string> DownloadStringData(string url)
-        {
-            string result = string.Empty;
-            var client = new HttpClient();
-
-            try
-            {
-                var request = new HttpRequestMessage()
-                {
-                    RequestUri = new Uri(url),
-                    Method = HttpMethod.Get
-                };
-
-                HttpResponseMessage response = client.SendAsync(request).Result;
-                var statusCode = (int)response.StatusCode;
-
-                // We want to handle redirects ourselves so that we can determine the final redirect Location (via header)
-                if (statusCode >= 300 && statusCode <= 399)
-                {
-                    var redirectUri = response.Headers.Location;
-                    if (!redirectUri.IsAbsoluteUri)
-                    {
-                        redirectUri = new Uri(request.RequestUri.GetLeftPart(UriPartial.Authority) + redirectUri);
-                    }
-                    logger.Debug(string.Format("SystemChecker - Redirecting to {0}", redirectUri));
-
-                    result = await DownloadStringData(redirectUri.ToString());
-                }
-                else
-                {
-                    result = await response.Content.ReadAsStringAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, "SystemChecker", $"Failed to load from {url}");
-            }
-
-            return result;
         }
 
 
