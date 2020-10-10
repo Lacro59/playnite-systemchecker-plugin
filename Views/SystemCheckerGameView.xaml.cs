@@ -5,9 +5,7 @@ using PluginCommon;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using SystemChecker.Clients;
 using SystemChecker.Models;
 
@@ -16,7 +14,7 @@ namespace SystemChecker.Views
     /// <summary>
     /// Logique d'interaction pour SystemCheckerGameView.xaml
     /// </summary>
-    public partial class SystemCheckerGameView : Window
+    public partial class SystemCheckerGameView : UserControl
     {
         private static readonly ILogger logger = LogManager.GetLogger();
         private static IResourceProvider resources = new ResourceProvider();
@@ -54,13 +52,12 @@ namespace SystemChecker.Views
         public string RecommandedCheckGpu { get; set; }
         public string RecommandedCheckStorage { get; set; }
 
+
         public SystemCheckerGameView(string PluginUserDataPath, Game GameSelected, IPlayniteAPI PlayniteApi)
         {
             this.PlayniteApi = PlayniteApi;
 
             InitializeComponent();
-
-            this.PreviewKeyDown += new KeyEventHandler(HandleEsc);
 
             // Local
             SystemApi systemApi = new SystemApi(PluginUserDataPath, PlayniteApi);
@@ -221,19 +218,6 @@ namespace SystemChecker.Views
             ScSourceName = resources.GetString("LOCSourceLabel") + ": " + GameSelected.Name;
 
             DataContext = this;
-        }
-
-        private void Grid_Loaded(object sender, System.Windows.RoutedEventArgs e)
-        {
-            Tools.DesactivePlayniteWindowControl(this);
-        }
-
-        private void HandleEsc(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Escape)
-            {
-                Close();
-            }
         }
 
         private void Button_Click(object sender, System.Windows.RoutedEventArgs e)

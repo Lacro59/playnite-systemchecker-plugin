@@ -69,6 +69,7 @@
     <Compile Include="Models\SystemConfiguration.cs" />
     <Compile Include="Models\SystemDisk.cs" />
     <Compile Include="PlayniteLibrary\StoreAppDetailsResult.cs" />
+    <Compile Include="Services\SystemCheckerUI.cs" />
     <Compile Include="SystemChecker.cs" />
     <Compile Include="SystemCheckerSettings.cs" />
     <Compile Include="Views\Interfaces\SystemCheckerButtonDetails.xaml.cs">
@@ -129,13 +130,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Resources\" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="playnite-plugincommon\PluginCommon.csproj">
       <Project>{e05ac297-6067-4270-a572-1df926bb3635}</Project>
       <Name>PluginCommon</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

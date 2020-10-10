@@ -8,16 +8,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Management;
 using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
+using System.Windows.Input;
 using SystemChecker.Clients;
-using SystemChecker.Models;
+using SystemChecker.Services;
 using SystemChecker.Views;
 
 namespace SystemChecker
@@ -31,9 +27,10 @@ namespace SystemChecker
 
         public override Guid Id { get; } = Guid.Parse("e248b230-6edf-41ea-a3c3-7861fa267263");
 
-        private Game GameSelected { get; set; }
-        private readonly IntegrationUI ui = new IntegrationUI();
-        private readonly TaskHelper taskHelper = new TaskHelper();
+        public static Game GameSelected { get; set; }
+        //private readonly IntegrationUI ui = new IntegrationUI();
+        public static SystemCheckerUI systemCheckerUI;
+        //private readonly TaskHelper taskHelper = new TaskHelper();
 
         private CheckSystem CheckMinimum { get; set; }
         private CheckSystem CheckRecommanded { get; set; }
@@ -61,6 +58,9 @@ namespace SystemChecker
                     cv.ShowNotification(api, "SystemChecker - " + resources.GetString("LOCUpdaterWindowTitle"));
                 }
             }
+
+            // Init ui interagration
+            systemCheckerUI = new SystemCheckerUI(PlayniteApi, settings, this.GetPluginUserDataPath());
         }
 
         public override IEnumerable<ExtensionFunction> GetFunctions()
@@ -71,9 +71,9 @@ namespace SystemChecker
                     "SystemChecker",
                     () =>
                     {
-                        // Add code to be execute when user invokes this menu entry.
-
-                        new SystemCheckerGameView(this.GetPluginUserDataPath(), GameSelected, PlayniteApi).ShowDialog();
+                        var ViewExtension = new SystemCheckerGameView(this.GetPluginUserDataPath(), SystemChecker.GameSelected, PlayniteApi);
+                        Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PlayniteApi, "SystemChecker", ViewExtension);
+                        windowExtension.ShowDialog();
                     })
             };
         }
@@ -125,7 +125,6 @@ namespace SystemChecker
                 if (args.NewValue != null && args.NewValue.Count == 1)
                 {
                     GameSelected = args.NewValue[0];
-
                     Integration();
                 }
             }
@@ -139,115 +138,21 @@ namespace SystemChecker
         {
             try
             {
-                // Delete
-                logger.Info("SystemChecker - Delete");
-                ui.RemoveButtonInGameSelectedActionBarButtonOrToggleButton("PART_ScheckButton");
-
+                systemCheckerUI.AddBtActionBar();
 
                 List<Guid> ListEmulators = new List<Guid>();
                 foreach (var item in PlayniteApi.Database.Emulators)
                 {
                     ListEmulators.Add(item.Id);
                 }
-
+                
                 if (GameSelected.PlayAction != null && GameSelected.PlayAction.EmulatorId != null && ListEmulators.Contains(GameSelected.PlayAction.EmulatorId))
                 {
                     // Emulator
                 }
                 else
                 {
-                    taskHelper.Check();
-
-                    CancellationTokenSource tokenSource = new CancellationTokenSource();
-                    CancellationToken ct = tokenSource.Token;
-
-                    var taskIntegration = Task.Run(() =>
-                    {
-                        SystemApi systemApi = new SystemApi(this.GetPluginUserDataPath(), PlayniteApi);
-                        SystemConfiguration systemConfiguration = systemApi.GetInfo();
-                        GameRequierements gameRequierements = systemApi.GetGameRequierements(GameSelected);
-
-
-                        if (gameRequierements.Minimum != null)
-                        {
-                            foreach (var item in gameRequierements.Minimum.Gpu)
-                            {
-                                Gpu gpu = new Gpu(systemConfiguration, item);
-                            }
-                        }
-                        if (gameRequierements.Recommanded != null)
-                        {
-                            foreach (var item in gameRequierements.Recommanded.Gpu)
-                            {
-                                Gpu gpu = new Gpu(systemConfiguration, item);
-                            }
-                        }
-
-
-                        CheckMinimum = new CheckSystem();
-                        CheckRecommanded = new CheckSystem();
-                        if (gameRequierements.Minimum != null && gameRequierements.Minimum.Os.Count != 0)
-                        {
-                            CheckMinimum = SystemApi.CheckConfig(gameRequierements.Minimum, systemConfiguration);
-                        }
-                        if (gameRequierements.Recommanded != null && gameRequierements.Recommanded.Os.Count != 0)
-                        {
-                            CheckRecommanded = SystemApi.CheckConfig(gameRequierements.Recommanded, systemConfiguration);
-                        }
-                    }, tokenSource.Token)
-                    .ContinueWith(antecedent =>
-                    {
-                        Application.Current.Dispatcher.Invoke(new Action(() => {
-                            // Auto adding button
-                            if (settings.EnableIntegrationButton || settings.EnableIntegrationButtonDetails)
-                            {
-                                Button bt = new Button();
-                                bt.Content = "";
-                                bt.FontFamily = new FontFamily("Wingdings");
-
-                                if (settings.EnableIntegrationButtonDetails)
-                                {
-
-                                    if (CheckMinimum.AllOk != null)
-                                    {
-                                        if (!(bool)CheckMinimum.AllOk)
-                                        {
-                                            bt.Foreground = Brushes.Red;
-                                        }
-
-                                        if ((bool)CheckMinimum.AllOk)
-                                        {
-                                            bt.Foreground = Brushes.Orange;
-                                            if (CheckRecommanded.AllOk == null)
-                                            {
-                                                bt.Foreground = Brushes.Green;
-                                            }
-                                        }
-                                    }
-                                    if (CheckRecommanded.AllOk != null)
-                                    {
-                                        if ((bool)CheckRecommanded.AllOk)
-                                        {
-                                            bt.Foreground = Brushes.Green;
-                                        }
-                                    }
-                                }
-
-                                bt.Name = "PART_ScheckButton";
-                                bt.HorizontalAlignment = HorizontalAlignment.Right;
-                                bt.VerticalAlignment = VerticalAlignment.Stretch;
-                                bt.Margin = new Thickness(10, 0, 0, 0);
-                                bt.Click += OnBtGameSelectedActionBarClick;
-
-                                if (!ct.IsCancellationRequested)
-                                {
-                                    ui.AddButtonInGameSelectedActionBarButtonOrToggleButton(bt);
-                                }
-                            }
-                        }));
-                    });
-
-                    taskHelper.Add(taskIntegration, tokenSource);
+                    systemCheckerUI.RefreshBtActionBar(GameSelected);
                 }
             }
             catch (Exception ex)
@@ -255,13 +160,6 @@ namespace SystemChecker
                 Common.LogError(ex, "SystemChecker", $"Impossible integration");
             }
         }
-
-        private void OnBtGameSelectedActionBarClick(object sender, RoutedEventArgs e)
-        {
-            // Show SystemChecker
-            new SystemCheckerGameView(this.GetPluginUserDataPath(), GameSelected, PlayniteApi).ShowDialog();
-        }
-
 
         public override ISettings GetSettings(bool firstRunSettings)
         {
