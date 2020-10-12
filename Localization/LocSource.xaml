@@ -16,6 +16,8 @@
     <sys:String x:Key="LOCSystemCheckerIntegrationButton">Add button</sys:String>
     <sys:String x:Key="LOCSystemCheckerIntegrationButtonDetails">Add button with details</sys:String>
 
+    <sys:String x:Key="LOCSystemCheckerIntegrationInCustomTheme">Custom theme integration (if integrated)</sys:String>
+
     <sys:String x:Key="LOCSystemCheckerErrorRemove">Cannot remove data. Please try again.</sys:String>
 
     <!--  

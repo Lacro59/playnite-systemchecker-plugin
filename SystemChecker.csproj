@@ -72,6 +72,9 @@
     <Compile Include="Services\SystemCheckerUI.cs" />
     <Compile Include="SystemChecker.cs" />
     <Compile Include="SystemCheckerSettings.cs" />
+    <Compile Include="Views\Interfaces\SystemCheckerButton.xaml.cs">
+      <DependentUpon>SystemCheckerButton.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Interfaces\SystemCheckerButtonDetails.xaml.cs">
       <DependentUpon>SystemCheckerButtonDetails.xaml</DependentUpon>
     </Compile>
@@ -111,6 +114,10 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Include="Views\Interfaces\SystemCheckerButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Interfaces\SystemCheckerButtonDetails.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

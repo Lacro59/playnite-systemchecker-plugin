@@ -28,10 +28,18 @@ namespace SystemChecker.Views
             if ((cb.Name == "Scheck_IntegrationInButton") && (bool)cb.IsChecked)
             {
                 Scheck_IntegrationInButtonDetails.IsChecked = false;
+                Scheck_IntegrationInCustomTheme.IsChecked = false;
             }
             if ((cb.Name == "Scheck_IntegrationInButtonDetails") && (bool)cb.IsChecked)
             {
                 Scheck_IntegrationInButton.IsChecked = false;
+                Scheck_IntegrationInCustomTheme.IsChecked = false;
+            }
+
+            if ((cb.Name == "Scheck_IntegrationInCustomTheme") && (bool)cb.IsChecked)
+            {
+                Scheck_IntegrationInButton.IsChecked = false;
+                Scheck_IntegrationInButtonDetails.IsChecked = false;
             }
         }
 

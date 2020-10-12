@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -28,12 +29,8 @@ namespace SystemChecker
         public override Guid Id { get; } = Guid.Parse("e248b230-6edf-41ea-a3c3-7861fa267263");
 
         public static Game GameSelected { get; set; }
-        //private readonly IntegrationUI ui = new IntegrationUI();
         public static SystemCheckerUI systemCheckerUI;
-        //private readonly TaskHelper taskHelper = new TaskHelper();
 
-        private CheckSystem CheckMinimum { get; set; }
-        private CheckSystem CheckRecommanded { get; set; }
 
         public SystemChecker(IPlayniteAPI api) : base(api)
         {
@@ -60,22 +57,39 @@ namespace SystemChecker
             }
 
             // Init ui interagration
-            systemCheckerUI = new SystemCheckerUI(PlayniteApi, settings, this.GetPluginUserDataPath());
+            systemCheckerUI = new SystemCheckerUI(api, settings, this.GetPluginUserDataPath());
+
+            // Custom theme button
+            EventManager.RegisterClassHandler(typeof(Button), Button.ClickEvent, new RoutedEventHandler(systemCheckerUI.OnCustomThemeButtonClick));
         }
 
         public override IEnumerable<ExtensionFunction> GetFunctions()
         {
-            return new List<ExtensionFunction>
-            {
+            List<ExtensionFunction> listFunctions = new List<ExtensionFunction>();
+
+            listFunctions.Add(
                 new ExtensionFunction(
-                    "SystemChecker",
+                    resources.GetString("LOCSystemChecker"),
                     () =>
                     {
                         var ViewExtension = new SystemCheckerGameView(this.GetPluginUserDataPath(), SystemChecker.GameSelected, PlayniteApi);
                         Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PlayniteApi, "SystemChecker", ViewExtension);
                         windowExtension.ShowDialog();
                     })
-            };
+                );
+
+#if DEBUG
+            listFunctions.Add(
+                new ExtensionFunction(
+                    "SystemChecker Test",
+                    () =>
+                    {
+
+                    })
+                );
+#endif
+
+            return listFunctions;
         }
 
         public override void OnGameInstalled(Game game)
@@ -125,39 +139,17 @@ namespace SystemChecker
                 if (args.NewValue != null && args.NewValue.Count == 1)
                 {
                     GameSelected = args.NewValue[0];
-                    Integration();
+
+                    var TaskIntegrationUI = Task.Run(() =>
+                    {
+                        systemCheckerUI.AddElements();
+                        systemCheckerUI.RefreshElements(GameSelected);
+                    });
                 }
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "SystemChecker", $"OnGameSelected()");
-            }
-        }
-
-        private void Integration()
-        {
-            try
-            {
-                systemCheckerUI.AddBtActionBar();
-
-                List<Guid> ListEmulators = new List<Guid>();
-                foreach (var item in PlayniteApi.Database.Emulators)
-                {
-                    ListEmulators.Add(item.Id);
-                }
-                
-                if (GameSelected.PlayAction != null && GameSelected.PlayAction.EmulatorId != null && ListEmulators.Contains(GameSelected.PlayAction.EmulatorId))
-                {
-                    // Emulator
-                }
-                else
-                {
-                    systemCheckerUI.RefreshBtActionBar(GameSelected);
-                }
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, "SystemChecker", $"Impossible integration");
+                Common.LogError(ex, "CheckLocalizations", $"OnGameSelected()");
             }
         }
 

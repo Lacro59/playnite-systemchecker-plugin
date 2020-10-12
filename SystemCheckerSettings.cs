@@ -17,6 +17,8 @@ namespace SystemChecker
         public bool EnableIntegrationButton { get; set; } = false;
         public bool EnableIntegrationButtonDetails { get; set; } = false;
 
+        public bool EnableIntegrationInCustomTheme { get; set; } = false;
+
         // Playnite serializes settings object to a JSON object and saves it as text file.
         // If you want to exclude some property from being saved then use `JsonIgnore` ignore attribute.
         [JsonIgnore]
@@ -42,6 +44,8 @@ namespace SystemChecker
 
                 EnableIntegrationButton = savedSettings.EnableIntegrationButton;
                 EnableIntegrationButtonDetails = savedSettings.EnableIntegrationButtonDetails;
+
+                EnableIntegrationInCustomTheme = savedSettings.EnableIntegrationInCustomTheme;
             }
         }
 
@@ -62,9 +66,12 @@ namespace SystemChecker
             // This method should save settings made to Option1 and Option2.
             plugin.SavePluginSettings(this);
 
-            SystemChecker.systemCheckerUI.RemoveBtActionBar();
-            SystemChecker.systemCheckerUI.AddBtActionBar();
-            SystemChecker.systemCheckerUI.RefreshBtActionBar(SystemChecker.GameSelected);
+            SystemChecker.systemCheckerUI.RemoveElements();
+            var TaskIntegrationUI = Task.Run(() =>
+            { 
+                SystemChecker.systemCheckerUI.AddElements();
+                SystemChecker.systemCheckerUI.RefreshElements(SystemChecker.GameSelected);
+            });
         }
 
         public bool VerifySettings(out List<string> errors)
