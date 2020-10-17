@@ -129,7 +129,7 @@ namespace SystemChecker.Clients
 
             // OpenGL
             // TODO See for best
-            if (CardRequierement.IsOGL)
+            if (CardRequierement.IsOGL && CardRequierement.OglVersion < 4)
             {
                 IsWithNoCard = true;
                 return true;
@@ -258,9 +258,10 @@ namespace SystemChecker.Clients
             bool IsOld = false;
             bool IsM = false;
 
-            bool IsOGL = false;
+            bool IsOgl = false;
             bool IsDx = false;
             int DxVersion = 0;
+            int OglVersion = 0;
 
             string Type = string.Empty;
             int Number = 0;
@@ -298,9 +299,14 @@ namespace SystemChecker.Clients
             {
                 IsOld = true;
             }
-            if (GpuName.ToLower().IndexOf("opengl") > -1)
+            if (GpuName.ToLower().IndexOf("opengl") > -1 || GpuName.ToLower().IndexOf("open gl") > -1)
             {
-                IsOGL = true;
+                IsOgl = true;
+                int.TryParse(
+                    GpuName.ToLower().Replace("opengl", string.Empty).Replace("open gl", string.Empty)
+                    .Replace(".0", string.Empty).Trim(), 
+                    out OglVersion
+                );
             }
 
             if (IsNvidia)
@@ -411,9 +417,10 @@ namespace SystemChecker.Clients
                 IsOld = IsOld,
                 IsM = IsM,
 
-                IsOGL = IsOGL,
+                IsOGL = IsOgl,
                 IsDx = IsDx,
                 DxVersion = DxVersion,
+                OglVersion = OglVersion,
 
                 Type = Type,
                 Number = Number,
@@ -434,6 +441,7 @@ namespace SystemChecker.Clients
         public bool IsOGL { get; set; }
         public bool IsDx { get; set; }
         public int DxVersion { get; set; }
+        public int OglVersion { get; set; }
 
         public string Type { get; set; }
         public int Number { get; set; }

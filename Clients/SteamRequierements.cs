@@ -61,8 +61,6 @@ namespace SystemChecker.Clients
 
                     JObject pc_requirements = JObject.FromObject(parsedData[appId.ToString()].data.pc_requirements);
 
-                    //logger.Debug($"SystemChecker - {appId} - " + JsonConvert.SerializeObject(pc_requirements));
-
                     if (pc_requirements["minimum"] != null)
                     {
                         gameRequierements.Minimum = ParseRequirement((string)pc_requirements["minimum"]);
@@ -142,6 +140,7 @@ namespace SystemChecker.Clients
                         .Replace("or Newer", string.Empty)
                         .Replace("or newer", string.Empty)
                         .Replace("or later", string.Empty)
+                        .Replace("or higher", string.Empty)
                         .Replace("()", string.Empty)
                         .Replace("<br>", string.Empty)
                         .Trim();
@@ -233,6 +232,11 @@ namespace SystemChecker.Clients
                             .Replace("or similar (no support for onboard cards)", string.Empty)
                             .Replace("level Graphics Card (requires support for SSE)", string.Empty)
                             .Replace("- Integrated graphics and very low budget cards might not work.", string.Empty)
+                            .Replace("Shader Model 3.0", string.Empty)
+                            .Replace("shader model 3.0", string.Empty)
+                            .Replace(" compatible", string.Empty)
+                            .Replace("Any", string.Empty)
+                            .Replace("any", string.Empty)
 
                             .Replace("ATI or NVidia card", "Card")
                             .Replace("w/", "with")
@@ -248,6 +252,7 @@ namespace SystemChecker.Clients
                             .Replace("or newer", string.Empty)
                             .Replace("or higher", string.Empty)
                             .Replace("or better", string.Empty)
+                            .Replace("or greater graphics card", string.Empty)
                             .Replace("or equivalent", string.Empty)
                             .Replace("Mid-range", string.Empty)
                             .Replace(" Memory Minimum", string.Empty)
@@ -282,7 +287,10 @@ namespace SystemChecker.Clients
                     gpu = gpu.Replace(",", "¤").Replace(" or ", "¤").Replace(" OR ", "¤").Replace(" / ", "¤").Replace(" | ", "¤");
                     foreach (string sTemp in gpu.Split('¤'))
                     {
-                        requirement.Gpu.Add(sTemp.Trim());
+                        if (sTemp.Trim() != string.Empty)
+                        {
+                            requirement.Gpu.Add(sTemp.Trim());
+                        }
                     }
                 }
                 if (ElementRequirement.InnerHtml.IndexOf("<strong>DirectX") > -1 && ElementRequirement.InnerHtml.IndexOf("8") > -1)
