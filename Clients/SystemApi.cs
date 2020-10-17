@@ -106,6 +106,15 @@ namespace SystemChecker.Clients
                     GpuRam = (long)Convert.ToDouble(obj["AdapterRAM"]);
                     CurrentHorizontalResolution = (uint)obj["CurrentHorizontalResolution"];
                     CurrentVerticalResolution = (uint)obj["CurrentVerticalResolution"];
+
+                    if (Gpu.CallIsNvidia(GpuName))
+                    {
+                        break;
+                    }
+                    if (Gpu.CallIsAmd(GpuName))
+                    {
+                        break;
+                    }
                 }
             }
             catch (Exception ex)
@@ -119,7 +128,8 @@ namespace SystemChecker.Clients
                 ManagementObjectSearcher myComputerSystemObject = new ManagementObjectSearcher("select * from Win32_ComputerSystem");
                 foreach (ManagementObject obj in myComputerSystemObject.Get())
                 {
-                    Ram = (long)Convert.ToDouble(obj["TotalPhysicalMemory"]);
+                    double TempRam = Math.Ceiling(Convert.ToDouble(obj["TotalPhysicalMemory"]) / 1024 / 1024 / 1024);
+                    Ram = (long)(TempRam * 1024 * 1024 * 1024);
                 }
             }
             catch (Exception ex)
@@ -138,7 +148,7 @@ namespace SystemChecker.Clients
             systemConfiguration.CurrentHorizontalResolution = CurrentHorizontalResolution;
             systemConfiguration.CurrentVerticalResolution = CurrentVerticalResolution;
             systemConfiguration.Ram = Ram;
-            systemConfiguration.RamUsage = RequierementMetadata.SizeSuffix(Ram);
+            systemConfiguration.RamUsage = RequierementMetadata.SizeSuffix(Ram, true);
             systemConfiguration.Disks = Disks;
 
 

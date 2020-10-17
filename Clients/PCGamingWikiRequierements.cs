@@ -178,7 +178,7 @@ namespace SystemChecker.Clients
                                         dataMinimum = dataMinimum.Substring(0, dataMinimum.ToLower().IndexOf("gb"));
                                         gameRequierements.Minimum.Ram = 1024 * 1024 * 1024 * long.Parse(dataMinimum.ToLower().Replace("gb", string.Empty).Trim());
                                     }
-                                    gameRequierements.Minimum.RamUsage = SizeSuffix(gameRequierements.Minimum.Ram);
+                                    gameRequierements.Minimum.RamUsage = SizeSuffix(gameRequierements.Minimum.Ram, true);
                                 }
                                 if (!dataRecommended.IsNullOrEmpty())
                                 {
@@ -192,7 +192,7 @@ namespace SystemChecker.Clients
                                         dataRecommended = dataRecommended.Substring(0, dataRecommended.ToLower().IndexOf("gb"));
                                         gameRequierements.Recommanded.Ram = 1024 * 1024 * 1024 * long.Parse(dataRecommended.ToLower().Replace("gb", string.Empty).Trim());
                                     }
-                                    gameRequierements.Recommanded.RamUsage = SizeSuffix(gameRequierements.Recommanded.Ram);
+                                    gameRequierements.Recommanded.RamUsage = SizeSuffix(gameRequierements.Recommanded.Ram, true);
                                 }
                                 break;
 

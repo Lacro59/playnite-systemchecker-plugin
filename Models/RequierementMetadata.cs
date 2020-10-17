@@ -22,7 +22,7 @@ namespace SystemChecker.Models
             return gameRequierements.Minimum.Os.Count > 0;
         }
 
-        public static string SizeSuffix(Int64 value)
+        public static string SizeSuffix(Int64 value, bool WithoutDouble = false)
         {
             string[] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
 
@@ -32,6 +32,10 @@ namespace SystemChecker.Models
             int mag = (int)Math.Log(value, 1024);
             decimal adjustedSize = (decimal)value / (1L << (mag * 10));
 
+            if (WithoutDouble)
+            {
+                return string.Format("{0} {1}", adjustedSize.ToString("0", CultureInfo.CurrentUICulture), SizeSuffixes[mag]);
+            }
             return string.Format("{0} {1}", adjustedSize.ToString("0.0", CultureInfo.CurrentUICulture), SizeSuffixes[mag]);
         }
 

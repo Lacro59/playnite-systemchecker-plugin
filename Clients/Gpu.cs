@@ -238,14 +238,14 @@ namespace SystemChecker.Clients
                 .Trim();
         }
 
-        private bool CallIsNvidia(string GpuName)
+        public static bool CallIsNvidia(string GpuName)
         {
             return (
                 GpuName.ToLower().IndexOf("nvidia") > -1 || GpuName.ToLower().IndexOf("geforce") > -1
                 || GpuName.ToLower().IndexOf("gtx") > -1 || GpuName.ToLower().IndexOf("rtx") > -1
                 );
         }
-        private bool CallIsAmd(string GpuName)
+        public static bool CallIsAmd(string GpuName)
         {
             return (GpuName.ToLower().IndexOf("amd") > -1 || GpuName.ToLower().IndexOf("radeon") > -1 || GpuName.ToLower().IndexOf("ati ") > -1);
         }
