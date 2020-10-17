@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         mc:Ignorable="d" Background="{DynamicResource WindowBackgourndBrush}"
-        Height="350" Width="1200">
+        Height="450" Width="1240">
 
     <UserControl.Resources>
         <FontFamily x:Key="font">pack://application:,,,/PluginCommon;component/Resources/font.ttf#font</FontFamily>
@@ -12,11 +12,11 @@
 
     <Grid Margin="20" Name="gScData">
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="10" />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="10" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        
+
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto" />
@@ -28,24 +28,24 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="10" />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="10" />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="10" />
-                <RowDefinition Height="auto" />
+                <RowDefinition Height="*" />
                 <RowDefinition Height="10" />
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="10" />
                 <RowDefinition Height="*" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
 
             <!-- Titles Column -->
             <Label Grid.Column="2" Grid.Row="0" Content="{DynamicResource LOCSystemCheckerConfigLocal}" VerticalAlignment="Center" FontWeight="Bold" FontSize="20" HorizontalAlignment="Center" />
             <Label Grid.Column="4" Grid.Row="0" Content="{DynamicResource LOCSystemCheckerConfigMinimum}" VerticalAlignment="Center" FontWeight="Bold" FontSize="20" HorizontalAlignment="Center" />
             <Label Grid.Column="6" Grid.Row="0" Content="{DynamicResource LOCSystemCheckerConfigRecommanded}" VerticalAlignment="Center" FontWeight="Bold" FontSize="20" HorizontalAlignment="Center" />
-            
+
             <!-- Titles Row -->
             <Label Grid.Column="0" Grid.Row="2" Content="{DynamicResource LOCSystemCheckerOS}" VerticalAlignment="Center" FontWeight="Bold" FontSize="20" />
             <Label Grid.Column="0" Grid.Row="4" Content="{DynamicResource LOCSystemCheckerCpu}" VerticalAlignment="Center" FontWeight="Bold" FontSize="20" />
@@ -58,28 +58,26 @@
             <Label Grid.Column="2" Grid.Row="4" Content="{Binding LocalCpu}" VerticalAlignment="Center" FontSize="14" />
             <Label Grid.Column="2" Grid.Row="6" Content="{Binding LocalRamUsage}" VerticalAlignment="Center" FontSize="14" />
             <Label Grid.Column="2" Grid.Row="8" Content="{Binding LocalGpu}" VerticalAlignment="Center" FontSize="14" />
-            <ScrollViewer Grid.Column="2" Grid.Row="10" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                <ListBox Name="LocalDisks" BorderThickness="0" Margin="-5,0,0,0"
-                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="auto" />
-                                    <ColumnDefinition Width="10" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="10" />
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
+            <ListBox Name="LocalDisks" BorderThickness="0" Height="90" Grid.Column="2" Grid.Row="10" 
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
 
-                                <Label Grid.Column="0" Content="{Binding Drive}" FontSize="14"/>
-                                <Label Grid.Column="2" Content="{Binding Name}" FontSize="14"/>
-                                <Label Grid.Column="4" Content="{Binding FreeSpaceUsage}" FontSize="14"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </ScrollViewer>
+                            <Label Grid.Column="0" Content="{Binding Drive}" FontSize="14"/>
+                            <Label Grid.Column="2" Content="{Binding Name}" FontSize="14"/>
+                            <Label Grid.Column="4" Content="{Binding FreeSpaceUsage}" FontSize="14"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
 
 
             <!-- Minimum -->
@@ -119,7 +117,7 @@
                 </ListBox.ItemTemplate>
             </ListBox>
             <Label Grid.Column="6" Grid.Row="10" Content="{Binding RecommandedStorage}" VerticalAlignment="Center" FontSize="14" />
-            
+
             <!-- Check config -->
             <Label Grid.Column="3" Grid.Row="2" Content="{Binding MinimumCheckOs}" VerticalAlignment="Center" FontSize="16" Margin="5,0" HorizontalAlignment="Center" FontFamily="{StaticResource font}" />
             <Label Grid.Column="3" Grid.Row="4" Content="{Binding MinimumCheckCpu}" VerticalAlignment="Center" FontSize="16" Margin="5,0" HorizontalAlignment="Center" FontFamily="{StaticResource font}" />

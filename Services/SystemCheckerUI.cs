@@ -189,7 +189,7 @@ namespace SystemChecker.Services
             if (PART_BtActionBar != null)
             { 
 #if DEBUG
-                logger.Debug($"SystemChecker - PART_BtActionBar allready insert - {BtActionBarParentType}");
+                logger.Debug($"SystemChecker - PART_BtActionBar allready insert");
 #endif
                 return;
             }
@@ -274,6 +274,21 @@ namespace SystemChecker.Services
             }
         }
         #endregion
+
+
+        #region SpDescription
+        public override void InitialSpDescription()
+        {
+        }
+
+        public override void AddSpDescription()
+        {
+        }
+
+        public override void RefreshSpDescription()
+        {
+        }
+        #endregion  
 
 
         #region CustomElements

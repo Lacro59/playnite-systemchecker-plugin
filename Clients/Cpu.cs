@@ -110,7 +110,7 @@ namespace SystemChecker.Clients
 
         private bool CallIsIntel(string CpuName)
         {
-            return CpuName.ToLower().IndexOf("intel") > -1 || Regex.IsMatch(CpuName, "i[0-9]*");
+            return CpuName.ToLower().IndexOf("intel") > -1 || Regex.IsMatch(CpuName, "i[0-9]");
         }
         private bool CallIsAmd(string CpuName)
         {
