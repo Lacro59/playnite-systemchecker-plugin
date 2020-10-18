@@ -70,7 +70,7 @@ namespace SystemChecker.Clients
                 {
                     return ProcessorPc.Version >= ProcessorRequierement.Version;
                 }
-                if (int.Parse(ProcessorPc.Type.Replace("i", string.Empty)) > int.Parse(ProcessorRequierement.Type.Replace("i", string.Empty)))
+                if (int.Parse(Regex.Match(ProcessorPc.Type, @"\d").Value) > int.Parse(Regex.Match(ProcessorRequierement.Type, @"\d").Value))
                 {
                     return true;
                 }
@@ -81,9 +81,9 @@ namespace SystemChecker.Clients
             }
 
             // Amd vs Amd
-            if (ProcessorPc.IsAmd && !ProcessorRequierement.IsAmd)
+            if (ProcessorPc.IsAmd && ProcessorRequierement.IsAmd)
             {
-                if (ProcessorPc.Type == ProcessorRequierement.Type)
+                if (Regex.Match(ProcessorPc.Type, @"Ryzen[ ][0-9]", RegexOptions.IgnoreCase).Value == Regex.Match(ProcessorRequierement.Type, @"Ryzen[ ][0-9]", RegexOptions.IgnoreCase).Value)
                 {
                     return ProcessorPc.Version >= ProcessorRequierement.Version;
                 }
@@ -91,8 +91,9 @@ namespace SystemChecker.Clients
                 {
                     return true;
                 }
-                if (ProcessorPc.Type.ToLower().IndexOf("ryzen") > -1 && ProcessorRequierement.Type.ToLower().IndexOf("ryzen") > -1) {
-                    if ((int.Parse(Regex.Match(ProcessorPc.Type, "\\d{4}").Value) > int.Parse(Regex.Match(ProcessorRequierement.Type, "\\d{4}").Value)))
+                if (ProcessorPc.Type.ToLower().IndexOf("ryzen") > -1 && ProcessorRequierement.Type.ToLower().IndexOf("ryzen") > -1)
+                {
+                    if (int.Parse(Regex.Match(ProcessorPc.Type, @"\d").Value) > int.Parse(Regex.Match(ProcessorRequierement.Type, @"\d").Value))
                     {
                         return true;
                     }
@@ -141,17 +142,21 @@ namespace SystemChecker.Clients
                 {
                     Type = Regex.Match(CpuName, "Ryzen[ ][0-9]", RegexOptions.IgnoreCase).Value.Trim();
 
-                    if (CpuName.ToLower().IndexOf("g") > -1)
+                    if (Regex.IsMatch(CpuName, "[0-9]+G", RegexOptions.IgnoreCase))
                     {
                         Type += " G";
                     }
-                    if (CpuName.ToLower().IndexOf("xt") > -1)
+                    if (Regex.IsMatch(CpuName, "[0-9]+XT", RegexOptions.IgnoreCase))
                     {
                         Type += " XT";
                     }
-                    else if (CpuName.ToLower().IndexOf("x") > -1)
+                    if (Regex.IsMatch(CpuName, "[0-9]+X", RegexOptions.IgnoreCase))
                     {
                         Type += " X";
+                    }
+                    if (Regex.IsMatch(CpuName, "[0-9]+U", RegexOptions.IgnoreCase))
+                    {
+                        Type += " U";
                     }
                 }
                 if (CpuName.ToLower().IndexOf("athlon") > -1)
@@ -213,6 +218,10 @@ namespace SystemChecker.Clients
                 }
             }
 
+            if (CpuName.ToLower().IndexOf("single core") > -1)
+            {
+                IsOld = true;
+            }
             if (CpuName.ToLower().IndexOf("dual core") > -1)
             {
                 IsOld = true;

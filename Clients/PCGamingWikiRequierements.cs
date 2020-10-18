@@ -142,10 +142,14 @@ namespace SystemChecker.Clients
                             case "operating system (os)":
                                 if (!dataMinimum.IsNullOrEmpty())
                                 {
+                                    dataMinimum = dataMinimum.Replace("(1803 or later)", string.Empty)
+                                        .Replace(" (Only inclusive until patch 1.16.1. Patch 1.17+ Needs XP and greater.)", string.Empty);
                                     gameRequierements.Minimum.Os = dataMinimum.Split(',').Select(x => x.Trim()).ToList();
                                 }
                                 if (!dataRecommended.IsNullOrEmpty())
                                 {
+                                    dataRecommended = dataRecommended.Replace("(1803 or later)", string.Empty)
+                                        .Replace(" (Only inclusive until patch 1.16.1. Patch 1.17+ Needs XP and greater.)", string.Empty);
                                     gameRequierements.Recommanded.Os = dataRecommended.Split(',').Select(x => x.Trim()).ToList();
                                 }
                                 break;
@@ -154,12 +158,14 @@ namespace SystemChecker.Clients
                                 if (!dataMinimum.IsNullOrEmpty())
                                 {
                                     dataMinimum = dataMinimum.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
+                                        .Replace("or AMD equivalent", string.Empty)
                                         .Replace(" / ", "¤").Replace("<br>", "¤");
                                     gameRequierements.Minimum.Cpu = dataMinimum.Split('¤').Select(x => x.Trim()).ToList();
                                 }
                                 if (!dataRecommended.IsNullOrEmpty())
                                 {
                                     dataRecommended = dataRecommended.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
+                                        .Replace("or AMD equivalent", string.Empty)
                                         .Replace(" / ", "¤").Replace("<br>", "¤");
                                     gameRequierements.Recommanded.Cpu = dataMinimum.Split('¤').Select(x => x.Trim()).ToList();
                                 }
@@ -253,6 +259,8 @@ namespace SystemChecker.Clients
                                 {
                                     dataMinimum = dataMinimum.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
                                         .Replace("Integrated", string.Empty).Replace("Dedicated", string.Empty)
+                                        .Replace("+ compatible", string.Empty).Replace("compatible", string.Empty)
+                                        .Replace("that supports DirectDraw at 640x480 resolution, 256 colors", string.Empty)
                                         .Replace(" / ", "¤").Replace("<br>", "¤");
 
                                     dataMinimum = Regex.Replace(dataMinimum, "(</[^>]*>)", "");
@@ -267,6 +275,8 @@ namespace SystemChecker.Clients
                                 {
                                     dataRecommended = dataRecommended.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
                                         .Replace("Integrated", string.Empty).Replace("Dedicated", string.Empty)
+                                        .Replace("+ compatible", string.Empty).Replace("compatible", string.Empty)
+                                        .Replace("that supports DirectDraw at 640x480 resolution, 256 colors", string.Empty)
                                         .Replace(" / ", "¤").Replace("<br>", "¤");
 
                                     dataRecommended = Regex.Replace(dataRecommended, "(</[^>]*>)", "");

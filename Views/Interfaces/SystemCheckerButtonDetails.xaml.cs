@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Playnite.SDK;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,9 @@ namespace SystemChecker.Views.Interfaces
     /// </summary>
     public partial class SystemCheckerButtonDetails : Button
     {
+        private static readonly ILogger logger = LogManager.GetLogger();
+
+
         public SystemCheckerButtonDetails()
         {
             InitializeComponent();
@@ -33,9 +37,10 @@ namespace SystemChecker.Views.Interfaces
 
                 if ((bool)CheckMinimum.AllOk)
                 {
-                    this.Foreground = Brushes.Orange;
+                    OnlyIcon.Foreground = Brushes.Orange;
                     if (CheckRecommanded.AllOk == null)
                     {
+                        logger.Debug("Green");
                         OnlyIcon.Foreground = Brushes.Green;
                     }
                 }

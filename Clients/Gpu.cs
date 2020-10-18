@@ -128,7 +128,6 @@ namespace SystemChecker.Clients
             }
 
             // OpenGL
-            // TODO See for best
             if (CardRequierement.IsOGL && CardRequierement.OglVersion < 4)
             {
                 IsWithNoCard = true;
@@ -217,7 +216,6 @@ namespace SystemChecker.Clients
                 }
             }
 
-
             logger.Warn($"SystemChecker - No GPU treatment for {JsonConvert.SerializeObject(CardPc)} & {JsonConvert.SerializeObject(CardRequierement)}");
             return false;
         }
@@ -296,6 +294,10 @@ namespace SystemChecker.Clients
                 }
             }
             if (GpuName.ToLower().IndexOf("pretty much any 3d graphics card") > -1 || GpuName.ToLower().IndexOf("integrat") > -1)
+            {
+                IsOld = true;
+            }
+            if (GpuName.ToLower().IndexOf("svga") > -1)
             {
                 IsOld = true;
             }

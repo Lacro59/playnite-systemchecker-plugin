@@ -142,11 +142,11 @@ namespace SystemChecker.Clients
 
 
 
-            systemConfiguration.Name = Name;
-            systemConfiguration.Os = Os;
-            systemConfiguration.Cpu = Cpu;
+            systemConfiguration.Name = Name.Trim();
+            systemConfiguration.Os = Os.Trim(); 
+            systemConfiguration.Cpu = Cpu.Trim(); 
             systemConfiguration.CpuMaxClockSpeed = CpuMaxClockSpeed;
-            systemConfiguration.GpuName = GpuName;
+            systemConfiguration.GpuName = GpuName.Trim(); 
             systemConfiguration.GpuRam = GpuRam;
             systemConfiguration.CurrentHorizontalResolution = CurrentHorizontalResolution;
             systemConfiguration.CurrentVerticalResolution = CurrentVerticalResolution;

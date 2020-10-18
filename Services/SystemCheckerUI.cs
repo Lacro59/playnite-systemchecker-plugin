@@ -1,4 +1,5 @@
-﻿using Playnite.SDK;
+﻿using Newtonsoft.Json;
+using Playnite.SDK;
 using Playnite.SDK.Models;
 using PluginCommon;
 using System;
@@ -115,7 +116,9 @@ namespace SystemChecker.Services
                         if (gameRequierements.Minimum != null && gameRequierements.Minimum.Os.Count != 0)
                         {
                             CheckMinimum = SystemApi.CheckConfig(gameRequierements.Minimum, systemConfiguration);
-
+#if DEBUG
+                            logger.Debug($"SystemChecker - CheckMinimum: {JsonConvert.SerializeObject(CheckMinimum)}");
+#endif
                             resourcesLists.Add(new ResourcesList { Key = "Scheck_HasData", Value = true });
                             resourcesLists.Add(new ResourcesList { Key = "Scheck_IsMinimumOK", Value = CheckMinimum.AllOk });
                             resourcesLists.Add(new ResourcesList { Key = "Scheck_IsAllOK", Value = CheckMinimum.AllOk });
@@ -123,7 +126,9 @@ namespace SystemChecker.Services
                         if (gameRequierements.Recommanded != null && gameRequierements.Recommanded.Os.Count != 0)
                         {
                             CheckRecommanded = SystemApi.CheckConfig(gameRequierements.Recommanded, systemConfiguration);
-
+#if DEBUG
+                            logger.Debug($"SystemChecker - CheckRecommanded: {JsonConvert.SerializeObject(CheckRecommanded)}");
+#endif
                             resourcesLists.Add(new ResourcesList { Key = "Scheck_HasData", Value = true });
                             resourcesLists.Add(new ResourcesList { Key = "Scheck_IsRecommandedOK", Value = CheckRecommanded.AllOk });
                             resourcesLists.Add(new ResourcesList { Key = "Scheck_IsAllOK", Value = CheckRecommanded.AllOk });

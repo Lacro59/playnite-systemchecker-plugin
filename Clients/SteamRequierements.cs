@@ -170,6 +170,7 @@ namespace SystemChecker.Clients
                             .Replace(" or faster", string.Empty)
                             .Replace(" or better", string.Empty)
                             .Replace(" or equivalent", string.Empty)
+                            .Replace(" or Equivalent", string.Empty)
                             .Replace("4 CPUs", string.Empty)
                             .Replace(", ~2.4GHz", string.Empty)
                             .Replace(", ~3.1GHz", string.Empty)
@@ -237,6 +238,9 @@ namespace SystemChecker.Clients
                             .Replace(" compatible", string.Empty)
                             .Replace("Any", string.Empty)
                             .Replace("any", string.Empty)
+                            .Replace("or AMD equivalent", string.Empty)
+                            .Replace("DX9 Compliant with PS3.0 support", string.Empty)
+                            .Replace("DX9 Compliant", string.Empty)
 
                             .Replace("ATI or NVidia card", "Card")
                             .Replace("w/", "with")
