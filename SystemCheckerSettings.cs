@@ -13,6 +13,7 @@ namespace SystemChecker
         private readonly SystemChecker plugin;
 
         public bool EnableCheckVersion { get; set; } = true;
+        public bool MenuInExtensions { get; set; } = false;
 
         public bool EnableIntegrationButton { get; set; } = false;
         public bool EnableIntegrationButtonDetails { get; set; } = false;
@@ -41,6 +42,7 @@ namespace SystemChecker
             if (savedSettings != null)
             {
                 EnableCheckVersion = savedSettings.EnableCheckVersion;
+                MenuInExtensions = savedSettings.MenuInExtensions;
 
                 EnableIntegrationButton = savedSettings.EnableIntegrationButton;
                 EnableIntegrationButtonDetails = savedSettings.EnableIntegrationButtonDetails;

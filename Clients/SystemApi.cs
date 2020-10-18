@@ -3,20 +3,23 @@ using Playnite.SDK;
 using Playnite.SDK.Models;
 using PluginCommon;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Management;
 using System.Text.RegularExpressions;
 using SystemChecker.Models;
+using System.Diagnostics;
 
 namespace SystemChecker.Clients
 {
     class SystemApi
     {
         private static readonly ILogger logger = LogManager.GetLogger();
-        private IPlayniteAPI PlayniteApi;
+        private static IResourceProvider resources = new ResourceProvider();
+        private IPlayniteAPI _PlayniteApi;
 
-        private string PluginUserDataPath { get; set; }
+        private string _PluginUserDataPath { get; set; }
         private string PluginDirectory { get; set; }
         private string FilePlugin { get; set; }
 
@@ -26,8 +29,8 @@ namespace SystemChecker.Clients
 
         public SystemApi(string PluginUserDataPath, IPlayniteAPI PlayniteApi)
         {
-            this.PlayniteApi = PlayniteApi;
-            this.PluginUserDataPath = PluginUserDataPath;
+            _PlayniteApi = PlayniteApi;
+            _PluginUserDataPath = PluginUserDataPath;
             PluginDirectory = PluginUserDataPath + "\\SystemChecker\\";
             FilePlugin = PluginDirectory + "\\pc.json";
         }
@@ -214,7 +217,7 @@ namespace SystemChecker.Clients
         }
 
 
-        public GameRequierements GetGameRequierements(Game game)
+        public GameRequierements GetGameRequierements(Game game, bool force = false)
         {
             gameRequierements = new GameRequierements();
             string FileGameRequierements = PluginDirectory + "\\" + game.Id.ToString() + ".json";
@@ -222,24 +225,32 @@ namespace SystemChecker.Clients
 
             try
             {
-                if (game.SourceId == Guid.Parse("00000000-0000-0000-0000-000000000000"))
-                {
-                    SourceName = "Playnite";
-                }
-                else
-                {
-                    SourceName = game.Source.Name;
-                }
+                SourceName = PlayniteTools.GetSourceName(game, _PlayniteApi);
 
                 if (File.Exists(FileGameRequierements))
                 {
-                    logger.Info($"SystemChecker - Find from cache for {game.Name}");
-                    return JsonConvert.DeserializeObject<GameRequierements>(File.ReadAllText(FileGameRequierements));
+                    if (force)
+                    {
+                        logger.Info($"SystemChecker - Delete cache for {game.Name}");
+                        try
+                        {
+                            File.Delete(FileGameRequierements);
+                        }
+                        catch (Exception ex)
+                        {
+                            Common.LogError(ex, "SystemChecker", $"Error on delete file: {FileGameRequierements}");
+                        }
+                    }
+                    else
+                    {
+                        logger.Info($"SystemChecker - Find from cache for {game.Name}");
+                        return JsonConvert.DeserializeObject<GameRequierements>(File.ReadAllText(FileGameRequierements));
+                    }
                 }
 
                 // Search datas
                 logger.Info($"SystemChecker - Try find with PCGamingWikiRequierements for {game.Name}");
-                PCGamingWikiRequierements pCGamingWikiRequierements = new PCGamingWikiRequierements(game, PluginUserDataPath, PlayniteApi);
+                PCGamingWikiRequierements pCGamingWikiRequierements = new PCGamingWikiRequierements(game, _PluginUserDataPath, _PlayniteApi);
                 gameRequierements = pCGamingWikiRequierements.GetRequirements();
 
                 if (!pCGamingWikiRequierements.IsFind())
@@ -254,7 +265,7 @@ namespace SystemChecker.Clients
                             gameRequierements.Link = "https://store.steampowered.com/app/" + game.GameId;
                             break;
                         default:
-                            SteamApi steamApi = new SteamApi(PluginUserDataPath);
+                            SteamApi steamApi = new SteamApi(_PluginUserDataPath);
                             int SteamID = steamApi.GetSteamId(game.Name);
                             if (SteamID != 0)
                             {
@@ -308,6 +319,73 @@ namespace SystemChecker.Clients
                 {
                     gameRequierements.Recommanded.Storage = gameRequierements.Minimum.Storage;
                     gameRequierements.Recommanded.StorageUsage = gameRequierements.Minimum.StorageUsage;
+                }
+            }
+        }
+
+
+        public void GetDataGetAll()
+        {
+            GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(
+                resources.GetString("LOCSystemCheckerDataDownload"), 
+                true
+            );
+            globalProgressOptions.IsIndeterminate = false;
+
+            _PlayniteApi.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
+            {
+                Stopwatch stopWatch = new Stopwatch();
+                stopWatch.Start();
+
+                var db = _PlayniteApi.Database.Games.Where(x => x.Hidden == false);
+                activateGlobalProgress.ProgressMaxValue = (double)db.Count();
+
+                string CancelText = string.Empty;
+
+                foreach (Game game in db)
+                {
+                    if (activateGlobalProgress.CancelToken.IsCancellationRequested)
+                    {
+                        CancelText = " canceled";
+                        break;
+                    }
+
+                    try
+                    {
+                        if (!PlayniteTools.IsGameEmulated(_PlayniteApi, game))
+                        {
+                            GetGameRequierements(game);
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                        Common.LogError(ex, "SystemChecker", "Error on GetDataGetAll()");
+                    }
+
+                    activateGlobalProgress.CurrentProgressValue++;
+                }
+
+                stopWatch.Stop();
+                TimeSpan ts = stopWatch.Elapsed;
+                logger.Warn($"SystemChecker - Task GetDataGetAll(){CancelText} - {String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10)}");
+            }, globalProgressOptions);
+        }
+
+        public static void DataDeleteAll(IPlayniteAPI PlayniteApi, string PluginUserDataPath)
+        {
+            string PluginDirectory = PluginUserDataPath + "\\SystemChecker\\";
+            if (Directory.Exists(PluginDirectory))
+            {
+                try
+                {
+                    Directory.Delete(PluginDirectory, true);
+                    Directory.CreateDirectory(PluginDirectory);
+
+                    PlayniteApi.Dialogs.ShowMessage(resources.GetString("LOCSystemCheckerOkRemove"), "SystemChecker");
+                }
+                catch
+                {
+                    PlayniteApi.Dialogs.ShowErrorMessage(resources.GetString("LOCSystemCheckerErrorRemove"), "SystemChecker");
                 }
             }
         }

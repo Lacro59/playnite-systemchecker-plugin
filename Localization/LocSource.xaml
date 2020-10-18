@@ -2,27 +2,25 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-    <!--  
-    MainView
-    -->
+    <!-- MainView -->
     
-    <sys:String x:Key="LOCSystemChecker">System Checker</sys:String>
+    <sys:String x:Key="LOCSystemChecker">SystemChecker</sys:String>
+    <sys:String x:Key="LOCSystemCheckerDatabaseDownload">Download data for all games</sys:String>
+    <sys:String x:Key="LOCSystemCheckerDatabaseDelete">Delete data for all games</sys:String>
+    
+    <sys:String x:Key="LOCSystemCheckerCheckConfig">Check configuration</sys:String>
+    <sys:String x:Key="LOCSystemCheckerReload">Reload the data</sys:String>
 
-    <!--  
-    SystemCheckerGameDettingsView
-    -->
+    <!-- SystemCheckerSettingsView -->
 
+    <sys:String x:Key="LOCSystemCheckerMenuInExtensions">Plugin menus in extensions menu *</sys:String>
     <sys:String x:Key="LOCSystemCheckerIntegration">Interface integration</sys:String>
     <sys:String x:Key="LOCSystemCheckerIntegrationButton">Add button</sys:String>
     <sys:String x:Key="LOCSystemCheckerIntegrationButtonDetails">Add button with details</sys:String>
 
     <sys:String x:Key="LOCSystemCheckerIntegrationInCustomTheme">Custom theme integration (if integrated)</sys:String>
 
-    <sys:String x:Key="LOCSystemCheckerErrorRemove">Cannot remove data. Please try again.</sys:String>
-
-    <!--  
-    SystemCheckerGameView
-    -->
+    <!-- SystemCheckerGameView -->
 
     <sys:String x:Key="LOCSystemCheckerConfigLocal">Configuration</sys:String>
     <sys:String x:Key="LOCSystemCheckerConfigMinimum">Minimum</sys:String>
@@ -33,5 +31,11 @@
     <sys:String x:Key="LOCSystemCheckerRam">Memory</sys:String>
     <sys:String x:Key="LOCSystemCheckerGpu">Graphics</sys:String>
     <sys:String x:Key="LOCSystemCheckerDisk">Storage</sys:String>
+    
+    <!-- SystemCheckerNotifications -->
+
+    <sys:String x:Key="LOCSystemCheckerDataDownload">Downloading data for System Checker</sys:String>
+    <sys:String x:Key="LOCSystemCheckerOkRemove">Data is removed.</sys:String>
+    <sys:String x:Key="LOCSystemCheckerErrorRemove">Cannot remove data. Please try again.</sys:String>
 
 </ResourceDictionary>

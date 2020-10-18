@@ -30,6 +30,7 @@ namespace SystemChecker
 
         public static Game GameSelected { get; set; }
         public static SystemCheckerUI systemCheckerUI;
+        public static string pluginFolder;
 
 
         public SystemChecker(IPlayniteAPI api) : base(api)
@@ -38,7 +39,7 @@ namespace SystemChecker
 
 
             // Get plugin's location 
-            string pluginFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            pluginFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             // Add plugin localization in application ressource.
             PluginCommon.Localization.SetPluginLanguage(pluginFolder, api.ApplicationSettings.Language);
@@ -63,33 +64,89 @@ namespace SystemChecker
             EventManager.RegisterClassHandler(typeof(Button), Button.ClickEvent, new RoutedEventHandler(systemCheckerUI.OnCustomThemeButtonClick));
         }
 
-        public override IEnumerable<ExtensionFunction> GetFunctions()
+        // To add new game menu items override GetGameMenuItems
+        public override List<GameMenuItem> GetGameMenuItems(GetGameMenuItemsArgs args)
         {
-            List<ExtensionFunction> listFunctions = new List<ExtensionFunction>();
-
-            listFunctions.Add(
-                new ExtensionFunction(
-                    resources.GetString("LOCSystemChecker"),
-                    () =>
+            List<GameMenuItem> gameMenuItems = new List<GameMenuItem>
+            {
+                new GameMenuItem {
+                    MenuSection = resources.GetString("LOCSystemChecker"),
+                    Description = resources.GetString("LOCSystemCheckerCheckConfig"),
+                    Action = (gameMenuItem) =>
                     {
                         var ViewExtension = new SystemCheckerGameView(this.GetPluginUserDataPath(), SystemChecker.GameSelected, PlayniteApi);
                         Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PlayniteApi, "SystemChecker", ViewExtension);
                         windowExtension.ShowDialog();
-                    })
-                );
+                    }
+                },
+                new GameMenuItem {
+                    MenuSection = resources.GetString("LOCSystemChecker"),
+                    Description = resources.GetString("LOCSystemCheckerReload"),
+                    Action = (gameMenuItem) =>
+                    {
+                        var TaskIntegrationUI = Task.Run(() =>
+                        {
+                            SystemChecker.systemCheckerUI.Initial();
+                            SystemChecker.systemCheckerUI.RefreshElements(args.Games.First(), true);
+                        });
+                    }
+                }
+            };
 
 #if DEBUG
-            listFunctions.Add(
-                new ExtensionFunction(
-                    "SystemChecker Test",
-                    () =>
-                    {
-
-                    })
-                );
+            gameMenuItems.Add(new GameMenuItem
+            {
+                MenuSection = resources.GetString("LOCSystemChecker"),
+                Description = "Test",
+                Action = (mainMenuItem) => { }
+            });
 #endif
 
-            return listFunctions;
+            return gameMenuItems;
+        }
+
+        // To add new main menu items override GetMainMenuItems
+        public override List<MainMenuItem> GetMainMenuItems(GetMainMenuItemsArgs args)
+        {
+            string MenuInExtensions = string.Empty;
+            if (settings.MenuInExtensions)
+            {
+                MenuInExtensions = "@";
+            }
+
+            List<MainMenuItem> mainMenuItems = new List<MainMenuItem>
+            {
+                new MainMenuItem
+                {
+                    MenuSection = MenuInExtensions + resources.GetString("LOCSystemChecker"),
+                    Description = resources.GetString("LOCSystemCheckerDatabaseDownload"),
+                    Action = (mainMenuItem) => 
+                    {
+                        SystemApi systemApi = new SystemApi(this.GetPluginUserDataPath(), PlayniteApi);
+                        systemApi.GetDataGetAll();
+                    }
+                },
+                new MainMenuItem
+                {
+                    MenuSection = MenuInExtensions + resources.GetString("LOCSystemChecker"),
+                    Description = resources.GetString("LOCSystemCheckerDatabaseDelete"),
+                    Action = (mainMenuItem) => 
+                    {
+                        SystemApi.DataDeleteAll(PlayniteApi, this.GetPluginUserDataPath());
+                    }
+                }
+            };
+
+#if DEBUG
+            mainMenuItems.Add(new MainMenuItem
+            {
+                MenuSection = MenuInExtensions + resources.GetString("LOCSystemChecker"),
+                Description = "Test",
+                Action = (mainMenuItem) => { }
+            });
+#endif
+
+            return mainMenuItems;
         }
 
         public override void OnGameInstalled(Game game)

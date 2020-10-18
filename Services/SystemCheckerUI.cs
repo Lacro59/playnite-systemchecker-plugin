@@ -36,7 +36,7 @@ namespace SystemChecker.Services
 
         public override void Initial()
         {
-            if (_Settings.EnableIntegrationButton)
+            if (_Settings.EnableIntegrationButton || _Settings.EnableIntegrationButtonDetails)
             {
 #if DEBUG
                 logger.Debug($"SystemChecker - InitialBtActionBar()");
@@ -84,7 +84,7 @@ namespace SystemChecker.Services
             }));
         }
 
-        public override void RefreshElements(Game GameSelected)
+        public override void RefreshElements(Game GameSelected, bool force = false)
         {
             taskHelper.Check();
             CancellationTokenSource tokenSource = new CancellationTokenSource();
@@ -108,7 +108,7 @@ namespace SystemChecker.Services
                         // Load data
                         SystemApi systemApi = new SystemApi(_PluginUserDataPath, _PlayniteApi);
                         SystemConfiguration systemConfiguration = systemApi.GetInfo();
-                        GameRequierements gameRequierements = systemApi.GetGameRequierements(GameSelected);
+                        GameRequierements gameRequierements = systemApi.GetGameRequierements(GameSelected, force);
 
                         CheckMinimum = new CheckSystem();
                         CheckRecommanded = new CheckSystem();
@@ -176,6 +176,9 @@ namespace SystemChecker.Services
             {
                 if (PART_BtActionBar != null)
                 {
+#if DEBUG
+                    logger.Debug("SystemChecker  - InitialBtActionBar()");
+#endif
                     PART_BtActionBar.Visibility = Visibility.Collapsed;
                     ((Button)PART_BtActionBar).Foreground = DefaultBtForeground;
                 }
