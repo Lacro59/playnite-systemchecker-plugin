@@ -329,8 +329,8 @@ namespace SystemChecker.Services
             FrameworkElement PART_ScheckButtonWithJustIconAndDetails = null;
             try
             {
-                PART_ScheckButtonWithJustIcon = IntegrationUI.SearchElementByName("PART_ScheckButtonWithJustIcon");
-                PART_ScheckButtonWithJustIconAndDetails = IntegrationUI.SearchElementByName("PART_ScheckButtonWithJustIconAndDetails");
+                PART_ScheckButtonWithJustIcon = IntegrationUI.SearchElementByName("PART_ScheckButtonWithJustIcon", false, true);
+                PART_ScheckButtonWithJustIconAndDetails = IntegrationUI.SearchElementByName("PART_ScheckButtonWithJustIconAndDetails", false, true);
             }
             catch (Exception ex)
             {
