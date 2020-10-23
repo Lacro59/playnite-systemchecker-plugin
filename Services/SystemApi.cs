@@ -10,8 +10,9 @@ using System.Management;
 using System.Text.RegularExpressions;
 using SystemChecker.Models;
 using System.Diagnostics;
+using SystemChecker.Clients;
 
-namespace SystemChecker.Clients
+namespace SystemChecker.Services
 {
     class SystemApi
     {
