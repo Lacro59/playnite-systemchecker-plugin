@@ -81,7 +81,7 @@ namespace SystemChecker
                 },
                 new GameMenuItem {
                     MenuSection = resources.GetString("LOCSystemChecker"),
-                    Description = resources.GetString("LOCSystemCheckerReload"),
+                    Description = resources.GetString("LOCCommonRefreshGameData"),
                     Action = (gameMenuItem) =>
                     {
                         var TaskIntegrationUI = Task.Run(() =>
@@ -119,7 +119,7 @@ namespace SystemChecker
                 new MainMenuItem
                 {
                     MenuSection = MenuInExtensions + resources.GetString("LOCSystemChecker"),
-                    Description = resources.GetString("LOCSystemCheckerDatabaseDownload"),
+                    Description = resources.GetString("LOCCommonGettingAllDatas"),
                     Action = (mainMenuItem) => 
                     {
                         SystemApi systemApi = new SystemApi(this.GetPluginUserDataPath(), PlayniteApi);
@@ -129,7 +129,7 @@ namespace SystemChecker
                 new MainMenuItem
                 {
                     MenuSection = MenuInExtensions + resources.GetString("LOCSystemChecker"),
-                    Description = resources.GetString("LOCSystemCheckerDatabaseDelete"),
+                    Description = resources.GetString("LOCCommonClearAllDatas"),
                     Action = (mainMenuItem) => 
                     {
                         SystemApi.DataDeleteAll(PlayniteApi, this.GetPluginUserDataPath());

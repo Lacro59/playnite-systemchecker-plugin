@@ -328,7 +328,7 @@ namespace SystemChecker.Services
         public void GetDataGetAll()
         {
             GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(
-                resources.GetString("LOCSystemCheckerDataDownload"), 
+                resources.GetString("LOCCommonGettingAllDatas"), 
                 true
             );
             globalProgressOptions.IsIndeterminate = false;
@@ -382,11 +382,11 @@ namespace SystemChecker.Services
                     Directory.Delete(PluginDirectory, true);
                     Directory.CreateDirectory(PluginDirectory);
 
-                    PlayniteApi.Dialogs.ShowMessage(resources.GetString("LOCSystemCheckerOkRemove"), "SystemChecker");
+                    PlayniteApi.Dialogs.ShowMessage(resources.GetString("LOCCommonDataRemove"), "SystemChecker");
                 }
                 catch
                 {
-                    PlayniteApi.Dialogs.ShowErrorMessage(resources.GetString("LOCSystemCheckerErrorRemove"), "SystemChecker");
+                    PlayniteApi.Dialogs.ShowErrorMessage(resources.GetString("LOCCommonDataErrorRemove"), "SystemChecker");
                 }
             }
         }

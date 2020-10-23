@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Windows.Controls;
 using SystemChecker.Clients;
 using SystemChecker.Models;
+using SystemChecker.Services;
 
 namespace SystemChecker.Views
 {
