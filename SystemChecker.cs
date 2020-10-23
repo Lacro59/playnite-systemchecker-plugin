@@ -74,7 +74,7 @@ namespace SystemChecker
                     Description = resources.GetString("LOCSystemCheckerCheckConfig"),
                     Action = (gameMenuItem) =>
                     {
-                        var ViewExtension = new SystemCheckerGameView(this.GetPluginUserDataPath(), GameSelected, PlayniteApi);
+                        var ViewExtension = new SystemCheckerGameView(this.GetPluginUserDataPath(), args.Games.First(), PlayniteApi);
                         Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PlayniteApi, "SystemChecker", ViewExtension);
                         windowExtension.ShowDialog();
                     }
