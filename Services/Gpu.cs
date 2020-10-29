@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using SystemChecker.Models;
 
-namespace SystemChecker.Clients
+namespace SystemChecker.Services
 {
     public class Gpu
     {

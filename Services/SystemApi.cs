@@ -10,8 +10,9 @@ using System.Management;
 using System.Text.RegularExpressions;
 using SystemChecker.Models;
 using System.Diagnostics;
+using SystemChecker.Clients;
 
-namespace SystemChecker.Clients
+namespace SystemChecker.Services
 {
     class SystemApi
     {
@@ -165,53 +166,56 @@ namespace SystemChecker.Clients
             DriveInfo[] allDrives = DriveInfo.GetDrives();
             foreach (DriveInfo d in allDrives)
             {
-                string VolumeLabel = string.Empty;
-                try
+                if (d.DriveType == DriveType.Fixed)
                 {
-                    VolumeLabel = d.VolumeLabel;
-                }
-                catch (Exception ex)
-                {
-                    logger.Warn($"SystemChecker - Error on VolumeLabel - {ex.Message.Trim()}");
-                }
+                    string VolumeLabel = string.Empty;
+                    try
+                    {
+                        VolumeLabel = d.VolumeLabel;
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Warn($"SystemChecker - Error on VolumeLabel - {ex.Message.Trim()}");
+                    }
 
-                string Name = string.Empty;
-                try
-                {
-                    Name = d.Name;
-                }
-                catch (Exception ex)
-                {
-                    logger.Warn($"SystemChecker - Error on Name - {ex.Message.Trim()}");
-                }
+                    string Name = string.Empty;
+                    try
+                    {
+                        Name = d.Name;
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Warn($"SystemChecker - Error on Name - {ex.Message.Trim()}");
+                    }
 
-                long FreeSpace = 0;
-                try
-                {
-                    FreeSpace = d.TotalFreeSpace;
-                }
-                catch (Exception ex)
-                {
-                    logger.Warn($"SystemChecker - Error on TotalFreeSpace - {ex.Message.Trim()}");
-                }
+                    long FreeSpace = 0;
+                    try
+                    {
+                        FreeSpace = d.TotalFreeSpace;
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Warn($"SystemChecker - Error on TotalFreeSpace - {ex.Message.Trim()}");
+                    }
 
-                string FreeSpaceUsage = string.Empty;
-                try
-                {
-                    FreeSpaceUsage = RequierementMetadata.SizeSuffix(d.TotalFreeSpace);
-                }
-                catch (Exception ex)
-                {
-                    logger.Warn($"SystemChecker - Error on FreeSpaceUsage - {ex.Message.Trim()}");
-                }
+                    string FreeSpaceUsage = string.Empty;
+                    try
+                    {
+                        FreeSpaceUsage = RequierementMetadata.SizeSuffix(d.TotalFreeSpace);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Warn($"SystemChecker - Error on FreeSpaceUsage - {ex.Message.Trim()}");
+                    }
 
-                Disks.Add(new SystemDisk
-                {
-                    Name = VolumeLabel,
-                    Drive = Name,
-                    FreeSpace = FreeSpace,
-                    FreeSpaceUsage = FreeSpaceUsage
-                });
+                    Disks.Add(new SystemDisk
+                    {
+                        Name = VolumeLabel,
+                        Drive = Name,
+                        FreeSpace = FreeSpace,
+                        FreeSpaceUsage = FreeSpaceUsage
+                    });
+                }
             }
             return Disks;
         }

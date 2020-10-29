@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using SystemChecker.Clients;
+using SystemChecker.Services;
 
 namespace SystemChecker.Views.Interfaces
 {

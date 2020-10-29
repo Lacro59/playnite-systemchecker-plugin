@@ -13,7 +13,7 @@ namespace SystemChecker
         private readonly SystemChecker plugin;
 
         public bool EnableCheckVersion { get; set; } = true;
-        public bool MenuInExtensions { get; set; } = false;
+        public bool MenuInExtensions { get; set; } = true;
 
         public bool EnableIntegrationButton { get; set; } = false;
         public bool EnableIntegrationButtonDetails { get; set; } = false;

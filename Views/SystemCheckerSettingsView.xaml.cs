@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using SystemChecker.Clients;
+using SystemChecker.Services;
 
 namespace SystemChecker.Views
 {

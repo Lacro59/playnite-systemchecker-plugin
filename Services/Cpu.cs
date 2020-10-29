@@ -6,7 +6,7 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using SystemChecker.Models;
 
-namespace SystemChecker.Clients
+namespace SystemChecker.Services
 {
     public class Cpu
     {
