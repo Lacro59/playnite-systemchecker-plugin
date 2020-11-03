@@ -197,8 +197,10 @@ namespace SystemChecker
                 {
                     GameSelected = args.NewValue[0];
 
+                    //PlayniteUiHelper.ResetToggle();
                     var TaskIntegrationUI = Task.Run(() =>
                     {
+                        systemCheckerUI.taskHelper.Check();
                         systemCheckerUI.AddElements();
                         systemCheckerUI.RefreshElements(GameSelected);
                     });

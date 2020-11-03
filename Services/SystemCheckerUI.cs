@@ -22,6 +22,18 @@ namespace SystemChecker.Services
     {
         private readonly SystemCheckerSettings _Settings;
 
+        public override string _PluginUserDataPath { get; set; } = string.Empty;
+
+        public override bool IsFirstLoad { get; set; } = true;
+
+        public override string BtActionBarName { get; set; } = string.Empty;
+        public override FrameworkElement PART_BtActionBar { get; set; }
+
+        public override string SpDescriptionName { get; set; } = string.Empty;
+        public override FrameworkElement PART_SpDescription { get; set; }
+
+        public override List<CustomElement> ListCustomElements { get; set; } = new List<CustomElement>();
+
         private Brush DefaultBtForeground;
 
         CheckSystem CheckMinimum = new CheckSystem();
@@ -31,6 +43,8 @@ namespace SystemChecker.Services
         public SystemCheckerUI(IPlayniteAPI PlayniteApi, SystemCheckerSettings Settings, string PluginUserDataPath) : base(PlayniteApi, PluginUserDataPath)
         {
             _Settings = Settings;
+            _PluginUserDataPath = PluginUserDataPath;
+
             BtActionBarName = "PART_BtActionBar";
         }
 
@@ -65,7 +79,7 @@ namespace SystemChecker.Services
                 IsFirstLoad = false;
             }
 
-            Application.Current.Dispatcher.Invoke(new Action(() =>
+            Application.Current.Dispatcher.BeginInvoke((Action)delegate
             {
                 if (_Settings.EnableIntegrationButton || _Settings.EnableIntegrationButtonDetails)
                 {
@@ -82,16 +96,16 @@ namespace SystemChecker.Services
 #endif
                     AddCustomElements();
                 }
-            }));
+            });
         }
 
         public override void RefreshElements(Game GameSelected, bool force = false)
         {
-            taskHelper.Check();
             CancellationTokenSource tokenSource = new CancellationTokenSource();
             CancellationToken ct = tokenSource.Token;
 
-            Task TaskRefreshBtActionBar = Task.Run(() => {
+            Task TaskRefresh = Task.Run(() => 
+            {
                 try
                 {
                     Initial();
@@ -139,7 +153,7 @@ namespace SystemChecker.Services
                         {
                             ui.AddResources(resourcesLists);
 
-                            Application.Current.Dispatcher.Invoke(new Action(() =>
+                            Application.Current.Dispatcher.BeginInvoke((Action)delegate
                             {
                                 if (_Settings.EnableIntegrationButton || _Settings.EnableIntegrationButtonDetails)
                                 {
@@ -156,7 +170,7 @@ namespace SystemChecker.Services
 #endif
                                     RefreshCustomElements();
                                 }
-                            }));
+                            });
                         }
                     }
                     else
@@ -168,16 +182,16 @@ namespace SystemChecker.Services
                 {
                     Common.LogError(ex, "CheckLocalizations", $"Error on TaskRefreshBtActionBar()");
                 }
-            });
+            }, ct);
 
-            taskHelper.Add(TaskRefreshBtActionBar, tokenSource);
+            taskHelper.Add(TaskRefresh, tokenSource);
         }
 
 
         #region BtActionBar
         public override void InitialBtActionBar()
         {
-            Application.Current.Dispatcher.Invoke(new Action(() =>
+            Application.Current.Dispatcher.BeginInvoke((Action)delegate
             {
                 if (PART_BtActionBar != null)
                 {
@@ -187,7 +201,7 @@ namespace SystemChecker.Services
                     PART_BtActionBar.Visibility = Visibility.Collapsed;
                     ((Button)PART_BtActionBar).Foreground = DefaultBtForeground;
                 }
-            }));
+            });
         }
 
         public override void AddBtActionBar()
@@ -302,7 +316,7 @@ namespace SystemChecker.Services
         #region CustomElements
         public override void InitialCustomElements()
         {
-            Application.Current.Dispatcher.Invoke(new Action(() =>
+            Application.Current.Dispatcher.BeginInvoke((Action)delegate
             {
                 foreach (CustomElement customElement in ListCustomElements)
                 {
@@ -312,7 +326,7 @@ namespace SystemChecker.Services
                         ((Button)customElement.Element).Foreground = DefaultBtForeground;
                     }
                 }
-            }));
+            });
         }
 
         public override void AddCustomElements()
