@@ -1,28 +1,16 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+﻿<?xml version="1.0"?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-    <!--  
-    MainView
-    -->
-    
-    <sys:String x:Key="LOCSystemChecker">Sprawdzacz systemu</sys:String>
+    <!-- MainView -->
 
-    <!--  
-    SystemCheckerGameDettingsView
-    -->
+    <sys:String x:Key="LOCSystemChecker">SystemChecker</sys:String>
 
-    <sys:String x:Key="LOCCommonIntegration">Integracja interfejsu</sys:String>
-    <sys:String x:Key="LOCCommonIntegrationButton">Dodaj przycisk</sys:String>
-    <sys:String x:Key="LOCCommonIntegrationButtonDetails">Dodaj przycisk ze szczegółami</sys:String>
+    <sys:String x:Key="LOCSystemCheckerCheckConfig">Check configuration</sys:String>
 
-    <sys:String x:Key="LOCCommonDataErrorRemove">Cannot remove data. Please try again.</sys:String>
+    <!-- SystemCheckerSettingsView -->
 
-    <!--  
-    SystemCheckerGameView
-    -->
+    <!-- SystemCheckerGameView -->
 
-    <sys:String x:Key="LOCMenuConfigurationTitle">Konfiguracja</sys:String>
     <sys:String x:Key="LOCSystemCheckerConfigMinimum">Minimum</sys:String>
     <sys:String x:Key="LOCSystemCheckerConfigRecommanded">Zalecane</sys:String>
 
@@ -31,5 +19,7 @@
     <sys:String x:Key="LOCSystemCheckerRam">Pamięć</sys:String>
     <sys:String x:Key="LOCSystemCheckerGpu">Karta graficzna</sys:String>
     <sys:String x:Key="LOCSystemCheckerDisk">Miejsce na dysku</sys:String>
+    
+    <!-- SystemCheckerNotifications -->
 
 </ResourceDictionary>
