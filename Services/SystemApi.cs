@@ -286,7 +286,13 @@ namespace SystemChecker.Services
 
 
                 // Save datas
-                File.WriteAllText(FileGameRequierements, JsonConvert.SerializeObject(gameRequierements));
+                try
+                {
+                    File.WriteAllText(FileGameRequierements, JsonConvert.SerializeObject(gameRequierements));
+                }
+                catch
+                {
+                }
             }
             catch (Exception ex)
             {
