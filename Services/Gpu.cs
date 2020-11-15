@@ -1,5 +1,8 @@
 ﻿using Newtonsoft.Json;
 using Playnite.SDK;
+using PluginCommon;
+using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using SystemChecker.Models;
@@ -12,7 +15,26 @@ namespace SystemChecker.Services
 
         private List<GpuEquivalence> Equivalence = new List<GpuEquivalence>
             {
-                new GpuEquivalence {Nvidia=string.Empty, Amd=string.Empty}
+                new GpuEquivalence {Nvidia = "Nvidia GTX 960", Amd = "Amd R9 380"},
+                new GpuEquivalence {Nvidia = "Nvidia GTX 760", Amd = "Amd Radeo HD 7870"},
+                new GpuEquivalence {Nvidia = "Nvidia GTX 1030", Amd = "Amd RX 550"},
+                new GpuEquivalence {Nvidia = "Nvidia GTX 1050", Amd = "Amd RX 560"},
+                new GpuEquivalence {Nvidia = "Nvidia GTX 1060", Amd = "Amd RX 580"},
+                new GpuEquivalence {Nvidia = "Nvidia GTX 1660", Amd = "Amd RX 590"},
+                new GpuEquivalence {Nvidia = "Nvidia GTX 970", Amd = "Amd RX 570"},
+                new GpuEquivalence {Nvidia = "Nvidia GTX 970", Amd = "Amd R9 390"},
+                new GpuEquivalence {Nvidia = "Nvidia GTX 660", Amd = "Amd Radeon HD 7850"},
+                new GpuEquivalence {Nvidia = "Nvidia GTX 670", Amd = "Amd Radep HD 7870"},
+                new GpuEquivalence {Nvidia = "Nvidia GTX 780", Amd = "Amd Radeon R9 290"},
+                new GpuEquivalence {Nvidia = "Nvidia GTX 1070", Amd = "Amd Radeon RX Vega 56"},
+                new GpuEquivalence {Nvidia = "Nvidia GTX 1070", Amd = "Amd Radeon 5600 XT"},
+                new GpuEquivalence {Nvidia = "Nvidia RTX 2060", Amd = "Amd Radeon RX Vega 56"},
+                new GpuEquivalence {Nvidia = "Nvidia RTX 2060", Amd = "Amd Radeon 5600 XT"},
+                new GpuEquivalence {Nvidia = "Nvidia GTX 1080", Amd = "Amd Radeon RX Vega 64"},
+                new GpuEquivalence {Nvidia = "Nvidia RTX 2060 SUPER", Amd = "Amd Radeon RX Vega 64"},
+                new GpuEquivalence {Nvidia = "Nvidia RTX 2060 SUPER", Amd = "Amd Radeon 5700"},
+                new GpuEquivalence {Nvidia = "Nvidia RTX 2070", Amd = "Amd Radeon RX Vega 64"},
+                new GpuEquivalence {Nvidia = "Nvidia RTX 2070", Amd = "Amd Radeon 5700 XT"}
             };
         private string CardPcName { get; set; } 
         private GpuObject CardPc { get; set; } 
@@ -90,10 +112,6 @@ namespace SystemChecker.Services
 
             CardPc.ResolutionHorizontal = (int)systemConfiguration.CurrentHorizontalResolution;
             CardRequierement.ResolutionHorizontal = ResolutionHorizontal;
-
-
-            //logger.Debug($"Pc({DeleteInfo(systemConfiguration.GpuName)}) " + JsonConvert.SerializeObject(CardPc));
-            //logger.Debug($"Requierement({DeleteInfo(GpuRequierement)}) " + JsonConvert.SerializeObject(CardRequierement));
         }
 
         public bool IsBetter()
@@ -216,6 +234,66 @@ namespace SystemChecker.Services
                 }
             }
 
+            // Nvidia vs Amd
+            if (CardRequierement.IsNvidia && CardPc.IsAmd)
+            {
+                string gpuEquivalenceName = string.Empty;
+                try
+                {
+                    List<GpuEquivalence> EquivalenceAmd = Equivalence.FindAll(x => x.Amd.ToLower().Contains(CardRequierement.Number.ToString()) && x.Amd.ToLower().Contains(CardRequierement.Type)).ToList();
+
+                    bool tempValue = false;
+                    foreach (GpuEquivalence gpuEquivalence in EquivalenceAmd)
+                    {
+                        gpuEquivalenceName = gpuEquivalence.Amd;
+                        CardRequierement = SetCard(gpuEquivalenceName);
+
+                        tempValue = IsBetter();
+                        if (tempValue != false)
+                        {
+                            return tempValue;
+                        }
+                    }
+
+                    logger.Warn($"SystemChecker - No equivalence for {JsonConvert.SerializeObject(CardPc)} & {JsonConvert.SerializeObject(CardRequierement)}");
+                    return false;
+                }
+                catch (Exception ex)
+                {
+                    Common.LogError(ex, "SystemChecker", $"Error on IsBetter() for Nvidia vs Amd");
+                }
+            }
+
+            // Amd vs Nvidia
+            if (CardRequierement.IsAmd && CardPc.IsNvidia)
+            {
+                string gpuEquivalenceName = string.Empty;
+                try
+                {
+                    List<GpuEquivalence> EquivalenceNvidia = Equivalence.FindAll(x => x.Nvidia.ToLower().Contains(CardRequierement.Number.ToString()) && x.Nvidia.ToLower().Contains(CardRequierement.Type)).ToList();
+
+                    bool tempValue = false;
+                    foreach (GpuEquivalence gpuEquivalence in EquivalenceNvidia)
+                    {
+                        gpuEquivalenceName = gpuEquivalence.Nvidia;
+                        CardRequierement = SetCard(gpuEquivalenceName);
+
+                        tempValue = IsBetter();
+                        if (tempValue != false)
+                        {
+                            return tempValue;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Common.LogError(ex, "SystemChecker", $"Error on IsBetter() for Amd vs Nvidia");
+                }
+
+                logger.Warn($"SystemChecker - No equivalence for {JsonConvert.SerializeObject(CardPc)} & {JsonConvert.SerializeObject(CardRequierement)}");
+                return false;
+            }
+
             logger.Warn($"SystemChecker - No GPU treatment for {JsonConvert.SerializeObject(CardPc)} & {JsonConvert.SerializeObject(CardRequierement)}");
             return false;
         }
@@ -246,6 +324,10 @@ namespace SystemChecker.Services
         public static bool CallIsAmd(string GpuName)
         {
             return (GpuName.ToLower().IndexOf("amd") > -1 || GpuName.ToLower().IndexOf("radeon") > -1 || GpuName.ToLower().IndexOf("ati ") > -1);
+        }
+        public static bool CallIsIntel(string GpuName)
+        {
+            return GpuName.ToLower().IndexOf("intel") > -1;
         }
 
         private GpuObject SetCard(string GpuName)
@@ -291,6 +373,11 @@ namespace SystemChecker.Services
                 if (DxVersion > 0)
                 {
                     IsDx = true;
+
+                    if (DxVersion > 50)
+                    {
+                        DxVersion = int.Parse(DxVersion.ToString().Substring(0, DxVersion.ToString().Length - 1));
+                    }
                 }
             }
             if (GpuName.ToLower().IndexOf("pretty much any 3d graphics card") > -1 || GpuName.ToLower().IndexOf("integrat") > -1)

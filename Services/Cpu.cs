@@ -59,6 +59,12 @@ namespace SystemChecker.Services
                 }
                 else
                 {
+                    if (ProcessorPc.Clock == 0)
+                    {
+                        logger.Warn($"SystemChecker - ProcessorPc.Clock is 0");
+                        return true;
+                    }
+
                     return ProcessorPc.Clock >= ProcessorRequierement.Clock;
                 }
             }

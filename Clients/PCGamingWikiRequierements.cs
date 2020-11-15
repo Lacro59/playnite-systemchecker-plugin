@@ -98,7 +98,7 @@ namespace SystemChecker.Clients
             try
             {
 #if DEBUG
-                logger.Debug($"SystemChecker PCGamingWikiRequierements.GetRequirements - - url {url}");
+                logger.Debug($"SystemChecker PCGamingWikiRequierements.GetRequirements - url {url}");
 #endif
 
                 // Get data & parse
@@ -268,7 +268,10 @@ namespace SystemChecker.Clients
 
                                     gameRequierements.Minimum.Gpu = dataMinimum.Split('¤')
                                         .Select(x => x.Trim()).ToList()
+                                        .Where(x => x.Length > 6)
                                         .Where(x => x.ToLower().IndexOf("shader") == -1)
+                                        .Where(x => x.ToLower().IndexOf("anything") == -1)
+                                        .Where(x => x.ToLower().IndexOf("any card") == -1)
                                         .Where(x => x.Trim() != string.Empty).ToList();
                                 }
                                 if (!dataRecommended.IsNullOrEmpty())
@@ -284,7 +287,10 @@ namespace SystemChecker.Clients
 
                                     gameRequierements.Recommanded.Gpu = dataRecommended.Split('¤')
                                         .Select(x => x.Trim()).ToList()
+                                        .Where(x => x.Length > 6)
                                         .Where(x => x.ToLower().IndexOf("shader") == -1).ToList()
+                                        .Where(x => x.ToLower().IndexOf("anything") == -1).ToList()
+                                        .Where(x => x.ToLower().IndexOf("any card") == -1)
                                         .Where(x => x.Trim() != string.Empty).ToList();
                                 }
                                 break;

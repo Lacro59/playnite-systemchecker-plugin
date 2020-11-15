@@ -106,18 +106,34 @@ namespace SystemChecker.Services
                 ManagementObjectSearcher myVideoObject = new ManagementObjectSearcher("select * from Win32_VideoController");
                 foreach (ManagementObject obj in myVideoObject.Get())
                 {
-                    GpuName = (string)obj["Name"];
-                    GpuRam = (long)Convert.ToDouble(obj["AdapterRAM"]);
-                    CurrentHorizontalResolution = (uint)obj["CurrentHorizontalResolution"];
-                    CurrentVerticalResolution = (uint)obj["CurrentVerticalResolution"];
+                    string GpuNameTemp = (string)obj["Name"];
 
-                    if (Gpu.CallIsNvidia(GpuName))
+#if DEBUG
+                    logger.Debug($"SystemChecker - GpuName: {GpuNameTemp}");
+#endif
+
+                    if (Gpu.CallIsNvidia(GpuNameTemp))
                     {
+                        GpuName = (string)obj["Name"];
+                        GpuRam = (long)Convert.ToDouble(obj["AdapterRAM"]);
+                        CurrentHorizontalResolution = (uint)obj["CurrentHorizontalResolution"];
+                        CurrentVerticalResolution = (uint)obj["CurrentVerticalResolution"];
                         break;
                     }
-                    if (Gpu.CallIsAmd(GpuName))
+                    if (Gpu.CallIsAmd(GpuNameTemp))
                     {
+                        GpuName = (string)obj["Name"];
+                        GpuRam = (long)Convert.ToDouble(obj["AdapterRAM"]);
+                        CurrentHorizontalResolution = (uint)obj["CurrentHorizontalResolution"];
+                        CurrentVerticalResolution = (uint)obj["CurrentVerticalResolution"];
                         break;
+                    }
+                    if (Gpu.CallIsIntel(GpuNameTemp))
+                    {
+                        GpuName = (string)obj["Name"];
+                        GpuRam = (long)Convert.ToDouble(obj["AdapterRAM"]);
+                        CurrentHorizontalResolution = (uint)obj["CurrentHorizontalResolution"];
+                        CurrentVerticalResolution = (uint)obj["CurrentVerticalResolution"];
                     }
                 }
             }
