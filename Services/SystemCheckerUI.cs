@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 using SystemChecker.Clients;
 using SystemChecker.Models;
 using SystemChecker.Views;
@@ -20,7 +21,7 @@ namespace SystemChecker.Services
 {
     public class SystemCheckerUI : PlayniteUiHelper
     {
-        private readonly SystemCheckerSettings _Settings;
+        private SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
 
         public override string _PluginUserDataPath { get; set; } = string.Empty;
 
@@ -34,15 +35,15 @@ namespace SystemChecker.Services
 
         public override List<CustomElement> ListCustomElements { get; set; } = new List<CustomElement>();
 
-        private Brush DefaultBtForeground;
 
-        CheckSystem CheckMinimum = new CheckSystem();
-        CheckSystem CheckRecommanded = new CheckSystem();
+        public static Brush DefaultBtForeground;
+
+        public static CheckSystem CheckMinimum = new CheckSystem();
+        public static CheckSystem CheckRecommanded = new CheckSystem();
 
 
         public SystemCheckerUI(IPlayniteAPI PlayniteApi, SystemCheckerSettings Settings, string PluginUserDataPath) : base(PlayniteApi, PluginUserDataPath)
         {
-            _Settings = Settings;
             _PluginUserDataPath = PluginUserDataPath;
 
             BtActionBarName = "PART_BtActionBar";
@@ -51,27 +52,11 @@ namespace SystemChecker.Services
 
         public override void Initial()
         {
-            if (_PlayniteApi.ApplicationInfo.Mode == ApplicationMode.Desktop)
-            {
-                if (_Settings.EnableIntegrationButton || _Settings.EnableIntegrationButtonDetails)
-                {
-#if DEBUG
-                    logger.Debug($"SystemChecker - InitialBtActionBar()");
-#endif
-                    InitialBtActionBar();
-                }
 
-                if (_Settings.EnableIntegrationInCustomTheme)
-                {
-#if DEBUG
-                    logger.Debug($"SystemChecker - InitialCustomElements()");
-#endif
-                    InitialCustomElements();
-                }
-            }
+
         }
 
-        public override void AddElements()
+        public override DispatcherOperation AddElements()
         {
             if (_PlayniteApi.ApplicationInfo.Mode == ApplicationMode.Desktop)
             {
@@ -80,29 +65,37 @@ namespace SystemChecker.Services
 #if DEBUG
                     logger.Debug($"SystemChecker - IsFirstLoad");
 #endif
-                    Thread.Sleep(1000);
+                    Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new ThreadStart(delegate
+                    {
+                        System.Threading.SpinWait.SpinUntil(() => IntegrationUI.SearchElementByName("PART_HtmlDescription") != null, 5000);
+                    })).Wait();
                     IsFirstLoad = false;
                 }
 
-                Application.Current.Dispatcher.BeginInvoke((Action)delegate
+
+                return Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, new ThreadStart(delegate
                 {
-                    if (_Settings.EnableIntegrationButton || _Settings.EnableIntegrationButtonDetails)
+                    CheckTypeView();
+
+                    if (PluginDatabase.PluginSettings.EnableIntegrationButton || PluginDatabase.PluginSettings.EnableIntegrationButtonDetails)
                     {
 #if DEBUG
-                    logger.Debug($"SystemChecker - AddBtActionBar()");
+                        logger.Debug($"SystemChecker - AddBtActionBar()");
 #endif
-                    AddBtActionBar();
+                        AddBtActionBar();
                     }
 
-                    if (_Settings.EnableIntegrationInCustomTheme)
+                    if (PluginDatabase.PluginSettings.EnableIntegrationInCustomTheme)
                     {
 #if DEBUG
-                    logger.Debug($"SystemChecker - AddCustomElements()");
+                        logger.Debug($"SystemChecker - AddCustomElements()");
 #endif
-                    AddCustomElements();
+                        AddCustomElements();
                     }
-                });
+                }));
             }
+
+            return null;
         }
 
         public override void RefreshElements(Game GameSelected, bool force = false)
@@ -110,7 +103,7 @@ namespace SystemChecker.Services
             CancellationTokenSource tokenSource = new CancellationTokenSource();
             CancellationToken ct = tokenSource.Token;
 
-            Task TaskRefresh = Task.Run(() => 
+            Task TaskRefresh = Task.Run(() =>
             {
                 try
                 {
@@ -127,15 +120,21 @@ namespace SystemChecker.Services
                     if (!PlayniteTools.IsGameEmulated(_PlayniteApi, GameSelected))
                     {
                         // Load data
-                        SystemApi systemApi = new SystemApi(_PluginUserDataPath, _PlayniteApi);
-                        SystemConfiguration systemConfiguration = systemApi.GetInfo();
-                        GameRequierements gameRequierements = systemApi.GetGameRequierements(GameSelected, force);
+                        if (!PluginDatabase.IsLoaded)
+                        {
+                            return;
+                        }
+                        GameRequierements gameRequierements = PluginDatabase.Get(GameSelected);
+
+                        SystemConfiguration systemConfiguration = PluginDatabase.Database.PC;
+
 
                         CheckMinimum = new CheckSystem();
                         CheckRecommanded = new CheckSystem();
-                        if (gameRequierements.Minimum != null && gameRequierements.Minimum.Os.Count != 0)
+                        resourcesLists = new List<ResourcesList>();
+                        if (gameRequierements.GetMinimum().HasData)
                         {
-                            CheckMinimum = SystemApi.CheckConfig(gameRequierements.Minimum, systemConfiguration);
+                            CheckMinimum = SystemApi.CheckConfig(gameRequierements.GetMinimum(), systemConfiguration);
 #if DEBUG
                             logger.Debug($"SystemChecker - CheckMinimum: {JsonConvert.SerializeObject(CheckMinimum)}");
 #endif
@@ -143,9 +142,9 @@ namespace SystemChecker.Services
                             resourcesLists.Add(new ResourcesList { Key = "Scheck_IsMinimumOK", Value = CheckMinimum.AllOk });
                             resourcesLists.Add(new ResourcesList { Key = "Scheck_IsAllOK", Value = CheckMinimum.AllOk });
                         }
-                        if (gameRequierements.Recommanded != null && gameRequierements.Recommanded.Os.Count != 0)
+                        if (gameRequierements.GetRecommanded().HasData)
                         {
-                            CheckRecommanded = SystemApi.CheckConfig(gameRequierements.Recommanded, systemConfiguration);
+                            CheckRecommanded = SystemApi.CheckConfig(gameRequierements.GetRecommanded(), systemConfiguration);
 #if DEBUG
                             logger.Debug($"SystemChecker - CheckRecommanded: {JsonConvert.SerializeObject(CheckRecommanded)}");
 #endif
@@ -155,28 +154,14 @@ namespace SystemChecker.Services
                         }
 
                         // If not cancel, show
-                        if (!ct.IsCancellationRequested && _PlayniteApi.ApplicationInfo.Mode == ApplicationMode.Desktop)
+                        if (!ct.IsCancellationRequested && GameSelected.Id == SystemChecker.GameSelected.Id)
                         {
                             ui.AddResources(resourcesLists);
 
-                            Application.Current.Dispatcher.BeginInvoke((Action)delegate
+                            if (_PlayniteApi.ApplicationInfo.Mode == ApplicationMode.Desktop)
                             {
-                                if (_Settings.EnableIntegrationButton || _Settings.EnableIntegrationButtonDetails)
-                                {
-#if DEBUG
-                                    logger.Debug($"SystemChecker - RefreshBtActionBar()");
-#endif
-                                    RefreshBtActionBar();
-                                }
-
-                                if (_Settings.EnableIntegrationInCustomTheme)
-                                {
-#if DEBUG
-                                    logger.Debug($"SystemChecker - RefreshCustomElements()");
-#endif
-                                    RefreshCustomElements();
-                                }
-                            });
+                                PluginDatabase.SetCurrent(gameRequierements);
+                            }
                         }
                     }
                     else
@@ -197,17 +182,7 @@ namespace SystemChecker.Services
         #region BtActionBar
         public override void InitialBtActionBar()
         {
-            Application.Current.Dispatcher.BeginInvoke((Action)delegate
-            {
-                if (PART_BtActionBar != null)
-                {
-#if DEBUG
-                    logger.Debug("SystemChecker  - InitialBtActionBar()");
-#endif
-                    PART_BtActionBar.Visibility = Visibility.Collapsed;
-                    ((Button)PART_BtActionBar).Foreground = DefaultBtForeground;
-                }
-            });
+
         }
 
         public override void AddBtActionBar()
@@ -215,7 +190,7 @@ namespace SystemChecker.Services
             CheckTypeView();
 
             if (PART_BtActionBar != null)
-            { 
+            {
 #if DEBUG
                 logger.Debug($"SystemChecker - PART_BtActionBar allready insert");
 #endif
@@ -224,12 +199,12 @@ namespace SystemChecker.Services
 
             Button BtActionBar = new Button();
 
-            if (_Settings.EnableIntegrationButton)
+            if (PluginDatabase.PluginSettings.EnableIntegrationButton)
             {
                 BtActionBar = new SystemCheckerButton();
             }
 
-            if (_Settings.EnableIntegrationButtonDetails)
+            if (PluginDatabase.PluginSettings.EnableIntegrationButtonDetails)
             {
                 BtActionBar = new SystemCheckerButtonDetails();
             }
@@ -252,19 +227,7 @@ namespace SystemChecker.Services
 
         public override void RefreshBtActionBar()
         {
-            if (PART_BtActionBar != null)
-            {
-                PART_BtActionBar.Visibility = Visibility.Visible;
 
-                if (PART_BtActionBar is SystemCheckerButtonDetails)
-                {
-                    ((SystemCheckerButtonDetails)PART_BtActionBar).SetData(CheckMinimum, CheckRecommanded, DefaultBtForeground);
-                }
-            }
-            else
-            {
-                logger.Warn($"CheckLocalizations - PART_BtActionBar is not defined");
-            }
         }
 
 
@@ -272,9 +235,11 @@ namespace SystemChecker.Services
         {
             if (SystemChecker.GameSelected != null)
             {
-                var ViewExtension = new SystemCheckerGameView(_PluginUserDataPath, SystemChecker.GameSelected, _PlayniteApi);
+                PluginDatabase.IsViewOpen = true;
+                var ViewExtension = new SystemCheckerGameView(_PlayniteApi, _PluginUserDataPath, SystemChecker.GameSelected);
                 Window windowExtension = CreateExtensionWindow(_PlayniteApi, "SystemChecker", ViewExtension);
                 windowExtension.ShowDialog();
+                PluginDatabase.IsViewOpen = false;
             }
             else
             {
@@ -284,7 +249,7 @@ namespace SystemChecker.Services
 
         public void OnCustomThemeButtonClick(object sender, RoutedEventArgs e)
         {
-            if (_Settings.EnableIntegrationInCustomTheme)
+            if (PluginDatabase.PluginSettings.EnableIntegrationInCustomTheme)
             {
                 string ButtonName = string.Empty;
                 try
@@ -322,17 +287,7 @@ namespace SystemChecker.Services
         #region CustomElements
         public override void InitialCustomElements()
         {
-            Application.Current.Dispatcher.BeginInvoke((Action)delegate
-            {
-                foreach (CustomElement customElement in ListCustomElements)
-                {
-                    customElement.Element.Visibility = Visibility.Collapsed;
-                    if (customElement.Element is Button)
-                    {
-                        ((Button)customElement.Element).Foreground = DefaultBtForeground;
-                    }
-                }
-            });
+
         }
 
         public override void AddCustomElements()
@@ -390,15 +345,7 @@ namespace SystemChecker.Services
 
         public override void RefreshCustomElements()
         {
-            foreach (CustomElement customElement in ListCustomElements)
-            {
-                customElement.Element.Visibility = Visibility.Visible;
 
-                if (customElement.Element is SystemCheckerButtonDetails)
-                {
-                    ((SystemCheckerButtonDetails)customElement.Element).SetData(CheckMinimum, CheckRecommanded, DefaultBtForeground);
-                }
-            }
         }
         #endregion
     }

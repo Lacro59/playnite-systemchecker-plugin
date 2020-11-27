@@ -24,13 +24,9 @@ namespace SystemChecker.Clients
         private uint appId { get; set; }
 
 
-        public SteamRequierements(Game game, uint appId = 0)
+        public SteamRequierements()
         {
-            this.appId = appId;
-            if (appId == 0)
-            {
-                this.appId = uint.Parse(game.GameId);
-            }
+
         }
 
         private string GetSteamData()
@@ -48,8 +44,14 @@ namespace SystemChecker.Clients
             }
         }
 
+
         public override GameRequierements GetRequirements()
         {
+            gameRequierements = SystemChecker.PluginDatabase.GetDefault(_game);
+
+            Requirement Minimum = new Requirement();
+            Requirement Recommanded = new Requirement();
+
             try
             {
                 string data = GetSteamData();
@@ -63,27 +65,43 @@ namespace SystemChecker.Clients
 
                     if (pc_requirements["minimum"] != null)
                     {
-                        gameRequierements.Minimum = ParseRequirement((string)pc_requirements["minimum"]);
+                        Minimum = ParseRequirement((string)pc_requirements["minimum"]);
                     }
 
                     if (pc_requirements["recommended"] != null)
                     {
-                        gameRequierements.Recommanded = ParseRequirement((string)pc_requirements["recommended"]);
+                        Recommanded = ParseRequirement((string)pc_requirements["recommended"]);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "SystemChecker", "Error on SteamRequierements.GetRequirements()");
+                Common.LogError(ex, "SystemChecker");
             }
 
+            Minimum.IsMinimum = true;
+            gameRequierements.Items = new List<Requirement> { Minimum, Recommanded };
             return gameRequierements;
+        }
+
+        public GameRequierements GetRequirements(Game game, uint appId = 0)
+        {
+            _game = game;
+
+            this.appId = appId;
+            if (appId == 0)
+            {
+                this.appId = uint.Parse(_game.GameId);
+            }
+
+            return GetRequirements();
         }
 
         public override GameRequierements GetRequirements(string url)
         {
             throw new NotImplementedException();
         }
+
 
         private Requirement ParseRequirement(string pc_requirement)
         {

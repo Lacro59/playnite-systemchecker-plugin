@@ -1,6 +1,8 @@
-﻿namespace SystemChecker.Models
+﻿using System.Collections.Generic;
+
+namespace SystemChecker.Models
 {
-    public class SystemDisk
+    public class SystemDisk : ObservableObject
     {
         public string Name { get; set; }
         public string Drive { get; set; }

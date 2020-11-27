@@ -10,17 +10,14 @@ namespace SystemChecker.Models
         private static readonly ILogger logger = LogManager.GetLogger();
 
         internal Game _game;
-        internal GameRequierements gameRequierements = new GameRequierements
-        {
-            Minimum = new Requirement(),
-            Recommanded = new Requirement()
-        };
+        internal GameRequierements gameRequierements = new GameRequierements();
 
 
         public bool IsFind()
         {
-            return gameRequierements.Minimum.Os.Count > 0;
+            return gameRequierements.GetMinimum().HasData;
         }
+
 
         public static string SizeSuffix(Int64 value, bool WithoutDouble = false)
         {

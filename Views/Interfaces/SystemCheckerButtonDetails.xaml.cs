@@ -1,12 +1,16 @@
-﻿using Playnite.SDK;
+﻿using Newtonsoft.Json;
+using Playnite.SDK;
+using PluginCommon;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 using SystemChecker.Clients;
 using SystemChecker.Services;
 
@@ -19,39 +23,82 @@ namespace SystemChecker.Views.Interfaces
     {
         private static readonly ILogger logger = LogManager.GetLogger();
 
+        private SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
+
 
         public SystemCheckerButtonDetails()
         {
             InitializeComponent();
+
+            PluginDatabase.PropertyChanged += OnPropertyChanged;
         }
 
-        public void SetData(CheckSystem CheckMinimum, CheckSystem CheckRecommanded, Brush DefaultForeground)
+
+        protected void OnPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            OnlyIcon.Foreground = DefaultForeground;
-
-            if (CheckMinimum.AllOk != null)
+            try
             {
-                if (!(bool)CheckMinimum.AllOk)
+#if DEBUG
+                logger.Debug($"SystemCheckerButtonDetails.OnPropertyChanged({e.PropertyName}): {JsonConvert.SerializeObject(PluginDatabase.GameSelectedData)}");
+#endif
+                if (e.PropertyName == "GameSelectedData" || e.PropertyName == "PluginSettings")
                 {
-                    OnlyIcon.Foreground = Brushes.Red;
-                }
-
-                if ((bool)CheckMinimum.AllOk)
-                {
-                    OnlyIcon.Foreground = Brushes.Orange;
-                    if (CheckRecommanded.AllOk == null)
+                    this.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new ThreadStart(delegate
                     {
-                        logger.Debug("Green");
-                        OnlyIcon.Foreground = Brushes.Green;
-                    }
+                        OnlyIcon.Foreground = SystemCheckerUI.DefaultBtForeground;
+
+                        if (PluginDatabase.GameSelectedData.HasData)
+                        {
+                            this.Visibility = Visibility.Visible;
+                        }
+                        else
+                        {
+                            this.Visibility = Visibility.Collapsed;
+                            return;
+                        }
+
+                        CheckSystem CheckMinimum = SystemCheckerUI.CheckMinimum;
+                        CheckSystem CheckRecommanded = SystemCheckerUI.CheckRecommanded;
+
+                        if (CheckMinimum.AllOk != null)
+                        {
+                            if (!(bool)CheckMinimum.AllOk)
+                            {
+                                OnlyIcon.Foreground = Brushes.Red;
+                            }
+
+                            if ((bool)CheckMinimum.AllOk)
+                            {
+                                OnlyIcon.Foreground = Brushes.Orange;
+                                if (CheckRecommanded.AllOk == null)
+                                {
+                                    OnlyIcon.Foreground = Brushes.Green;
+                                }
+                            }
+                        }
+                        if (CheckRecommanded.AllOk != null)
+                        {
+                            if ((bool)CheckRecommanded.AllOk)
+                            {
+                                OnlyIcon.Foreground = Brushes.Green;
+                            }
+                        }
+                    }));
+                }
+                else
+                {
+                    this.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new ThreadStart(delegate
+                    {
+                        if (!PluginDatabase.IsViewOpen)
+                        {
+                            this.Visibility = Visibility.Collapsed;
+                        }
+                    }));
                 }
             }
-            if (CheckRecommanded.AllOk != null)
+            catch (Exception ex)
             {
-                if ((bool)CheckRecommanded.AllOk)
-                {
-                    OnlyIcon.Foreground = Brushes.Green;
-                }
+                Common.LogError(ex, "SystemChecker");
             }
         }
     }

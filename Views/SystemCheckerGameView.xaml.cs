@@ -21,6 +21,7 @@ namespace SystemChecker.Views
         private static IResourceProvider resources = new ResourceProvider();
         private IPlayniteAPI PlayniteApi;
 
+        private SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
 
         public string ScSourceName { get; set; }
 
@@ -54,15 +55,14 @@ namespace SystemChecker.Views
         public string RecommandedCheckStorage { get; set; }
 
 
-        public SystemCheckerGameView(string PluginUserDataPath, Game GameSelected, IPlayniteAPI PlayniteApi)
+        public SystemCheckerGameView(IPlayniteAPI PlayniteApi, string PluginUserDataPath, Game GameSelected)
         {
             this.PlayniteApi = PlayniteApi;
 
             InitializeComponent();
 
             // Local
-            SystemApi systemApi = new SystemApi(PluginUserDataPath, PlayniteApi);
-            SystemConfiguration systemConfiguration = systemApi.GetInfo();
+            SystemConfiguration systemConfiguration = PluginDatabase.Database.PC;
 
             LocalOs = systemConfiguration.Os;
             LocalCpu = systemConfiguration.Cpu;
@@ -72,23 +72,27 @@ namespace SystemChecker.Views
 
 
             // Minimum & Recommanded
-            GameRequierements gameRequierements = systemApi.GetGameRequierements(GameSelected);
+            GameRequierements gameRequierements = PluginDatabase.Get(GameSelected, true);
 
-            if (gameRequierements.Minimum != null && gameRequierements.Minimum.Os.Count != 0)
+            Requirement Minimum = gameRequierements.GetMinimum();
+            Requirement Recommanded = gameRequierements.GetRecommanded();
+
+            if (Minimum.HasData)
             {
-                MinimumOs = "Windows " + string.Join(" / ", gameRequierements.Minimum.Os);
-                MinimumCpu = gameRequierements.Minimum.Cpu;
-                MinimumRamUsage = gameRequierements.Minimum.RamUsage;
-                MinimumGpu = gameRequierements.Minimum.Gpu;
-                MinimumStorage = gameRequierements.Minimum.StorageUsage;
+                MinimumOs = "Windows " + string.Join(" / ", Minimum.Os);
+                MinimumCpu = Minimum.Cpu;
+                MinimumRamUsage = Minimum.RamUsage;
+                MinimumGpu = Minimum.Gpu;
+                MinimumStorage = Minimum.StorageUsage;
             }
-            if (gameRequierements.Recommanded != null && gameRequierements.Recommanded.Os.Count != 0)
+
+            if (Recommanded.HasData)
             {
-                RecommandedOs = "Windows " + string.Join(" / ", gameRequierements.Recommanded.Os);
-                RecommandedCpu = gameRequierements.Recommanded.Cpu;
-                RecommandedRamUsage = gameRequierements.Recommanded.RamUsage;
-                RecommandedGpu = gameRequierements.Recommanded.Gpu;
-                RecommandedStorage = gameRequierements.Recommanded.StorageUsage;
+                RecommandedOs = "Windows " + string.Join(" / ", Recommanded.Os);
+                RecommandedCpu = Recommanded.Cpu;
+                RecommandedRamUsage = Recommanded.RamUsage;
+                RecommandedGpu = Recommanded.Gpu;
+                RecommandedStorage = Recommanded.StorageUsage;
             }
 
 
@@ -96,15 +100,15 @@ namespace SystemChecker.Views
             string IsOk = "";
             string IsKo = "";
 
-            CheckSystem CheckMinimum = SystemApi.CheckConfig(gameRequierements.Minimum, systemConfiguration);
-            if (gameRequierements.Minimum != null && gameRequierements.Minimum.Os.Count != 0)
+            CheckSystem CheckMinimum = SystemApi.CheckConfig(Minimum, systemConfiguration);
+            if (Minimum.HasData)
             {
                 MinimumCheckOs = IsKo;
                 if (CheckMinimum.CheckOs)
                 {
                     MinimumCheckOs = IsOk;
                 }
-                if (gameRequierements.Minimum.Os.Count == 0)
+                if (Minimum.Os.Count == 0)
                 {
                     MinimumCheckOs = string.Empty;
                 }
@@ -114,7 +118,7 @@ namespace SystemChecker.Views
                 {
                     MinimumCheckCpu = IsOk;
                 }
-                if (gameRequierements.Minimum.Cpu.Count == 0)
+                if (Minimum.Cpu.Count == 0)
                 {
                     MinimumCheckCpu = string.Empty;
                 }
@@ -124,7 +128,7 @@ namespace SystemChecker.Views
                 {
                     MinimumCheckRam = IsOk;
                 }
-                if (gameRequierements.Minimum.Ram == 0)
+                if (Minimum.Ram == 0)
                 {
                     MinimumCheckRam = string.Empty;
                 }
@@ -134,7 +138,7 @@ namespace SystemChecker.Views
                 {
                     MinimumCheckGpu = IsOk;
                 }
-                if (gameRequierements.Minimum.Gpu.Count == 0)
+                if (Minimum.Gpu.Count == 0)
                 {
                     MinimumCheckGpu = string.Empty;
                 }
@@ -144,21 +148,21 @@ namespace SystemChecker.Views
                 {
                     MinimumCheckStorage = IsOk;
                 }
-                if (gameRequierements.Minimum.Storage == 0)
+                if (Minimum.Storage == 0)
                 {
                     MinimumCheckStorage = string.Empty;
                 }
             }
 
-            CheckSystem CheckRecommanded = SystemApi.CheckConfig(gameRequierements.Recommanded, systemConfiguration);
-            if (gameRequierements.Recommanded != null && gameRequierements.Recommanded.Os.Count != 0)
+            CheckSystem CheckRecommanded = SystemApi.CheckConfig(Recommanded, systemConfiguration);
+            if (Recommanded.HasData)
             {
                 RecommandedCheckOs = IsKo;
                 if (CheckRecommanded.CheckOs)
                 {
                     RecommandedCheckOs = IsOk;
                 }
-                if (gameRequierements.Recommanded.Os.Count == 0)
+                if (Recommanded.Os.Count == 0)
                 {
                     RecommandedCheckOs = string.Empty;
                 }
@@ -168,7 +172,7 @@ namespace SystemChecker.Views
                 {
                     RecommandedCheckCpu = IsOk;
                 }
-                if (gameRequierements.Recommanded.Cpu.Count == 0)
+                if (Recommanded.Cpu.Count == 0)
                 {
                     RecommandedCheckCpu = string.Empty;
                 }
@@ -178,7 +182,7 @@ namespace SystemChecker.Views
                 {
                     RecommandedCheckRam = IsOk;
                 }
-                if (gameRequierements.Recommanded.Ram == 0)
+                if (Recommanded.Ram == 0)
                 {
                     RecommandedCheckRam = string.Empty;
                 }
@@ -188,7 +192,7 @@ namespace SystemChecker.Views
                 {
                     RecommandedCheckGpu = IsOk;
                 }
-                if (gameRequierements.Recommanded.Gpu.Count == 0)
+                if (Recommanded.Gpu.Count == 0)
                 {
                     RecommandedCheckGpu = string.Empty;
                 }
@@ -198,14 +202,14 @@ namespace SystemChecker.Views
                 {
                     RecommandedCheckStorage = IsOk;
                 }
-                if (gameRequierements.Recommanded.Storage == 0)
+                if (Recommanded.Storage == 0)
                 {
                     RecommandedCheckStorage = string.Empty;
                 }
             }
 
             btLink.Visibility = System.Windows.Visibility.Hidden;
-            if (gameRequierements.Minimum != null || gameRequierements.Recommanded != null) 
+            if (Minimum.HasData || Recommanded.HasData) 
             {
                 btLink.Visibility = System.Windows.Visibility.Visible;
                 btLink.Tag = gameRequierements.Link;

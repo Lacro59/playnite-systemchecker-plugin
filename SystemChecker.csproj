@@ -58,6 +58,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\RequierementsCollection.cs" />
     <Compile Include="Services\Cpu.cs" />
     <Compile Include="Services\Gpu.cs" />
     <Compile Include="Clients\PCGamingWikiRequierements.cs" />
@@ -69,6 +70,7 @@
     <Compile Include="Models\SystemConfiguration.cs" />
     <Compile Include="Models\SystemDisk.cs" />
     <Compile Include="PlayniteLibrary\StoreAppDetailsResult.cs" />
+    <Compile Include="Services\SystemCheckerDatabase.cs" />
     <Compile Include="Services\SystemCheckerUI.cs" />
     <Compile Include="SystemChecker.cs" />
     <Compile Include="SystemCheckerSettings.cs" />
@@ -149,6 +151,10 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Include="Resources\Common.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\Interfaces\SystemCheckerButton.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -171,9 +177,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="playnite-plugincommon\PluginCommon.csproj">
       <Project>{e05ac297-6067-4270-a572-1df926bb3635}</Project>

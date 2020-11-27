@@ -9,17 +9,13 @@ namespace SystemChecker.Views
 {
     public partial class SystemCheckerSettingsView : UserControl
     {
-        private readonly IPlayniteAPI _PlayniteApi;
         private static IResourceProvider resources = new ResourceProvider();
 
-        private string _PluginUserDataPath { get; set; }
+        private SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
 
 
-        public SystemCheckerSettingsView(IPlayniteAPI PlayniteApi, string PluginUserDataPath)
+        public SystemCheckerSettingsView()
         {
-            _PlayniteApi = PlayniteApi;
-            _PluginUserDataPath = PluginUserDataPath;
-
             InitializeComponent();
         }
 
@@ -47,7 +43,7 @@ namespace SystemChecker.Views
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            SystemApi.DataDeleteAll(_PlayniteApi, _PluginUserDataPath);
+            PluginDatabase.ClearDatabase();
         }
     }
 }

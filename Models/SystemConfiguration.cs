@@ -2,7 +2,7 @@
 
 namespace SystemChecker.Models
 {
-    public class SystemConfiguration
+    public class SystemConfiguration : ObservableObject
     {
         public string Name { get; set; }
         public string Os { get; set; }
