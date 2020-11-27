@@ -33,10 +33,15 @@ namespace SystemChecker
         public static Game GameSelected { get; set; }
         public static SystemCheckerUI systemCheckerUI;
 
+        private OldToNew oldToNew;
+
 
         public SystemChecker(IPlayniteAPI api) : base(api)
         {
             settings = new SystemCheckerSettings(this);
+
+            // Old database
+            oldToNew = new OldToNew(this.GetPluginUserDataPath());
 
             // Loading plugin database 
             PluginDatabase = new SystemCheckerDatabase(PlayniteApi, settings, this.GetPluginUserDataPath());
@@ -167,6 +172,12 @@ namespace SystemChecker
 
         public override void OnGameSelected(GameSelectionEventArgs args)
         {
+            // Old database
+            if (oldToNew.IsOld)
+            {
+                oldToNew.ConvertDB(PlayniteApi);
+            }
+
             try
             {
                 if (args.NewValue != null && args.NewValue.Count == 1)

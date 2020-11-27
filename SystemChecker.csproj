@@ -63,6 +63,7 @@
     <Compile Include="Services\Gpu.cs" />
     <Compile Include="Clients\PCGamingWikiRequierements.cs" />
     <Compile Include="Clients\SteamRequierements.cs" />
+    <Compile Include="Services\OldToNew.cs" />
     <Compile Include="Services\SystemApi.cs" />
     <Compile Include="Models\GameRequierements.cs" />
     <Compile Include="Models\RequierementMetadata.cs" />
