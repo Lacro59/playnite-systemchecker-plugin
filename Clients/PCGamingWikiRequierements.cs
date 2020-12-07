@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using SystemChecker.Models;
 
@@ -22,6 +23,7 @@ namespace SystemChecker.Clients
 
         private readonly string UrlSteamId = "https://pcgamingwiki.com/api/appid.php?appid={0}";
         private string UrlPCGamingWiki { get; set; } = string.Empty;
+        private string UrlPCGamingWikiSearch { get; set; } = @"https://pcgamingwiki.com/w/index.php?search=";
         private int SteamId { get; set; } = 0;
 
 
@@ -94,13 +96,22 @@ namespace SystemChecker.Clients
                     if (link.Url.ToLower().Contains("pcgamingwiki"))
                     {
                         UrlPCGamingWiki = link.Url;
+
+                        if (UrlPCGamingWiki.Contains(UrlPCGamingWikiSearch))
+                        {
+                            UrlPCGamingWiki = UrlPCGamingWikiSearch + WebUtility.UrlEncode(UrlPCGamingWiki.Replace(UrlPCGamingWikiSearch, string.Empty));
+                        }
+                        if (UrlPCGamingWiki.Contains(@"http://pcgamingwiki.com/w/index.php?search="))
+                        {
+                            UrlPCGamingWiki = UrlPCGamingWikiSearch + WebUtility.UrlEncode(UrlPCGamingWiki.Replace(@"http://pcgamingwiki.com/w/index.php?search=", string.Empty));
+                        }
                     }
                 }
             }
 
             if (UrlPCGamingWiki.IsNullOrEmpty() && _game.ReleaseDate != null)
             {
-                UrlPCGamingWiki = @"https://pcgamingwiki.com/w/index.php?search=" + game.Name + $"+%28{((DateTime)game.ReleaseDate).ToString("yyyy")}%29";
+                UrlPCGamingWiki = UrlPCGamingWikiSearch + WebUtility.UrlEncode(game.Name) + $"+%28{((DateTime)game.ReleaseDate).ToString("yyyy")}%29";
             }
 
 #if DEBUG
