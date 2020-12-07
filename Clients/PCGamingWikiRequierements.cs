@@ -34,38 +34,95 @@ namespace SystemChecker.Clients
         }
 
 
+        private string FindGoodUrl(Game game, int SteamId = 0)
+        {
+            string url = string.Empty;
+            string WebResponse = string.Empty;
+
+
+            url = string.Empty;
+            if (SteamId != 0)
+            {
+                url = string.Format(UrlSteamId, SteamId);
+
+                WebResponse = Web.DownloadStringData(url).GetAwaiter().GetResult();
+                if (!WebResponse.ToLower().Contains("search results"))
+                {
+                    return url;
+                }
+            }
+
+
+            url = string.Empty;
+            if (game.Links != null)
+            {
+                foreach (Link link in game.Links)
+                {
+                    if (link.Url.ToLower().Contains("pcgamingwiki"))
+                    {
+                        url = link.Url;
+
+                        if (url.Contains(UrlPCGamingWikiSearch))
+                        {
+                            url = UrlPCGamingWikiSearch + WebUtility.UrlEncode(url.Replace(UrlPCGamingWikiSearch, string.Empty));
+                        }
+                        if (url.Contains(@"http://pcgamingwiki.com/w/index.php?search="))
+                        {
+                            url = UrlPCGamingWikiSearch + WebUtility.UrlEncode(url.Replace(@"http://pcgamingwiki.com/w/index.php?search=", string.Empty));
+                        }
+                    }
+                }
+
+                if (!url.IsNullOrEmpty())
+                {
+                    WebResponse = Web.DownloadStringData(url).GetAwaiter().GetResult();
+                    if (!WebResponse.ToLower().Contains("search results"))
+                    {
+                        return url;
+                    }
+                }
+            }
+
+
+            url = string.Empty;
+            url = UrlPCGamingWikiSearch + WebUtility.UrlEncode(game.Name) + $"+%28{((DateTime)game.ReleaseDate).ToString("yyyy")}%29";
+
+            WebResponse = Web.DownloadStringData(url).GetAwaiter().GetResult();
+            if (!WebResponse.ToLower().Contains("search results"))
+            {
+                return url;
+            }
+
+
+            url = string.Empty;
+            url = UrlPCGamingWikiSearch + WebUtility.UrlEncode(game.Name);
+
+            WebResponse = Web.DownloadStringData(url).GetAwaiter().GetResult();
+            if (!WebResponse.ToLower().Contains("search results"))
+            {
+                return url;
+            }
+
+
+            return string.Empty;
+        }
+
+
+
         public override GameRequierements GetRequirements()
         {
             gameRequierements = SystemChecker.PluginDatabase.GetDefault(_game);
 
-            // Search data with SteamId (is find) or game url (if defined)
-            if (SteamId != 0)
-            {
-                gameRequierements = GetRequirements(string.Format(UrlSteamId, SteamId));
-                if (IsFind())
-                {
-#if DEBUG
-                    logger.Debug($"SystemChecker - PCGamingWikiRequierements.IsFind - SteamId: {SteamId} - gameRequierements: {JsonConvert.SerializeObject(gameRequierements)}");
-#endif
-
-                    return gameRequierements;
-                }
-            }
+            UrlPCGamingWiki = FindGoodUrl(_game, SteamId);
 
             if (!UrlPCGamingWiki.IsNullOrEmpty())
             {
                 gameRequierements = GetRequirements(UrlPCGamingWiki);
-                if (IsFind())
-                {
-#if DEBUG
-                    logger.Debug($"SystemChecker - PCGamingWikiRequierements.IsFind - UrlPCGamingWiki: {UrlPCGamingWiki} - gameRequierements: {JsonConvert.SerializeObject(gameRequierements)}");
-#endif
-
-                    return gameRequierements;
-                }
             }
-
-            logger.Warn($"SystemChecker - PCGamingWikiRequierements - Not find for {_game.Name}");
+            else
+            {
+                logger.Warn($"SystemChecker - PCGamingWikiRequierements - Not find for {_game.Name}");
+            }
 
             return gameRequierements;
         }
@@ -89,34 +146,6 @@ namespace SystemChecker.Clients
                 SteamId = steamApi.GetSteamId(game.Name);
             }
 
-            if (_game.Links != null)
-            {
-                foreach (Link link in game.Links)
-                {
-                    if (link.Url.ToLower().Contains("pcgamingwiki"))
-                    {
-                        UrlPCGamingWiki = link.Url;
-
-                        if (UrlPCGamingWiki.Contains(UrlPCGamingWikiSearch))
-                        {
-                            UrlPCGamingWiki = UrlPCGamingWikiSearch + WebUtility.UrlEncode(UrlPCGamingWiki.Replace(UrlPCGamingWikiSearch, string.Empty));
-                        }
-                        if (UrlPCGamingWiki.Contains(@"http://pcgamingwiki.com/w/index.php?search="))
-                        {
-                            UrlPCGamingWiki = UrlPCGamingWikiSearch + WebUtility.UrlEncode(UrlPCGamingWiki.Replace(@"http://pcgamingwiki.com/w/index.php?search=", string.Empty));
-                        }
-                    }
-                }
-            }
-
-            if (UrlPCGamingWiki.IsNullOrEmpty() && _game.ReleaseDate != null)
-            {
-                UrlPCGamingWiki = UrlPCGamingWikiSearch + WebUtility.UrlEncode(game.Name) + $"+%28{((DateTime)game.ReleaseDate).ToString("yyyy")}%29";
-            }
-
-#if DEBUG
-            logger.Debug($"SystemChecker - PCGamingWikiRequierements - {_game.Name} - SteamId: {SteamId} - UrlPCGamingWiki: {UrlPCGamingWiki}");
-#endif
 
             return GetRequirements();
         }
