@@ -194,7 +194,7 @@ namespace SystemChecker
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "CheckLocalizations", $"OnGameSelected()");
+                Common.LogError(ex, "SystemChecker", $"OnGameSelected()");
             }
         }
 

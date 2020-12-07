@@ -73,7 +73,7 @@ namespace SystemChecker.Services
                 }
 
 
-                return Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, new ThreadStart(delegate
+                return Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new ThreadStart(delegate
                 {
                     CheckTypeView();
 
@@ -171,7 +171,7 @@ namespace SystemChecker.Services
                 }
                 catch (Exception ex)
                 {
-                    Common.LogError(ex, "CheckLocalizations", $"Error on TaskRefreshBtActionBar()");
+                    Common.LogError(ex, "SystemChecker", $"Error on TaskRefreshBtActionBar()");
                 }
             }, ct);
 
@@ -323,7 +323,7 @@ namespace SystemChecker.Services
                 }
                 catch (Exception ex)
                 {
-                    Common.LogError(ex, "CheckLocalizations", "Error on AddCustomElements()");
+                    Common.LogError(ex, "SystemChecker", "Error on AddCustomElements()");
                 }
             }
 
@@ -338,7 +338,7 @@ namespace SystemChecker.Services
                 }
                 catch (Exception ex)
                 {
-                    Common.LogError(ex, "CheckLocalizations", "Error on AddCustomElements()");
+                    Common.LogError(ex, "SystemChecker", "Error on AddCustomElements()");
                 }
             }
         }

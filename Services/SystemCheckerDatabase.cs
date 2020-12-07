@@ -84,20 +84,10 @@ namespace SystemChecker.Services
 
         public override GameRequierements GetDefault(Game game)
         {
-            return new GameRequierements
-            {
-                Id = game.Id,
-                Name = game.Name,
-                SourceId = game.SourceId,
-                Hidden = game.Hidden,
-                Icon = game.Icon,
-                CoverImage = game.CoverImage,
-                GenreIds = game.GenreIds,
-                Genres = game.Genres,
-                Playtime = game.Playtime,
-                LastActivity = game.LastActivity,
-                Items = new List<Requirement> { new Requirement { IsMinimum = true }, new Requirement() }
-            };
+            GameRequierements gameRequierements = base.GetDefault(game);
+            gameRequierements.Items = new List<Requirement> { new Requirement { IsMinimum = true }, new Requirement() };
+
+            return gameRequierements;
         }
 
 
