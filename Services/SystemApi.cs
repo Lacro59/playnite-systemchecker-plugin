@@ -108,7 +108,7 @@ namespace SystemChecker.Services
             return false;
         }
 
-        private static bool CheckRam(long systemRam, string systemRamUsage, long requierementRam, string requierementRamUsage)
+        private static bool CheckRam(double systemRam, string systemRamUsage, double requierementRam, string requierementRamUsage)
         {
             try
             {
@@ -164,7 +164,7 @@ namespace SystemChecker.Services
             return false;
         }
 
-        private static bool CheckStorage(List<SystemDisk> systemDisks, long Storage)
+        private static bool CheckStorage(List<SystemDisk> systemDisks, double Storage)
         {
             if (Storage == 0)
             {

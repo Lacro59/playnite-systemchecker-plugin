@@ -19,7 +19,7 @@ namespace SystemChecker.Models
         }
 
 
-        public static string SizeSuffix(Int64 value, bool WithoutDouble = false)
+        public static string SizeSuffix(double value, bool WithoutDouble = false)
         {
             string[] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
 

@@ -125,7 +125,11 @@ namespace SystemChecker.Clients
                         .Replace("<strong>OS:</strong>", string.Empty)
                         .Replace("with Platform Update for  7 ( versions only)", string.Empty)
                         .Replace("Win ", string.Empty)
+                        .Replace("win ", string.Empty)
+                        .Replace("windows", string.Empty)
                         .Replace("Windows", string.Empty)
+                        .Replace("Microsoft", string.Empty)
+                        .Replace("microsoft", string.Empty)
                         .Replace(", 32-bit", string.Empty)
                         .Replace(", 32bit", string.Empty)
                         .Replace(", 64-bit", string.Empty)
@@ -176,6 +180,7 @@ namespace SystemChecker.Clients
                             .Replace("\t", " ")
                             .Replace("<strong>Processor:</strong>", string.Empty)
                             .Replace("&nbsp;", string.Empty)
+                            .Replace("equivalent or higher processor", string.Empty)
                             .Replace("- Low budget CPUs such as Celeron or Duron needs to be at about twice the CPU speed", string.Empty)
                             .Replace(" equivalent or faster processor", string.Empty)
                             .Replace(" equivalent or better", string.Empty)
@@ -246,6 +251,7 @@ namespace SystemChecker.Clients
                             .Replace("DirectX 11 class GPU with 1GB VRAM (", string.Empty)
                             //.Replace(")<br>", string.Empty)
                             .Replace("/320M 512MB VRAM", string.Empty)
+                            .Replace("/Intel Extreme Graphics 82845, 82865, 82915", string.Empty)
                             .Replace(" 512MB VRAM (Intel integrated GPUs are not supported!)", " / Intel integrated GPUs are not supported!")
                             .Replace("(not recommended for Intel HD Graphics cards)", ", not recommended for Intel HD Graphics cards")
                             .Replace("or similar (no support for onboard cards)", string.Empty)
@@ -256,6 +262,7 @@ namespace SystemChecker.Clients
                             .Replace(" compatible", string.Empty)
                             .Replace("Any", string.Empty)
                             .Replace("any", string.Empty)
+                            .Replace("/Nvidia", " / Nvidia")
                             .Replace("or AMD equivalent", string.Empty)
                             .Replace("DX9 Compliant with PS3.0 support", string.Empty)
                             .Replace("DX9 Compliant", string.Empty)
@@ -354,11 +361,11 @@ namespace SystemChecker.Clients
                     logger.Debug($"storage: {storage}");
                     if (storage.IndexOf("mb") > -1)
                     {
-                        requirement.Storage = 1024 * 1024 * long.Parse(storage.Replace("mb", string.Empty).Trim());
+                        requirement.Storage = 1024 * 1024 * double.Parse(storage.Replace("mb", string.Empty).Replace("available hard disk space", string.Empty).Trim());
                     }
                     if (storage.IndexOf("gb") > -1)
                     {
-                        requirement.Storage = 1024 * 1024 * 1024 * long.Parse(storage.Replace("gb", string.Empty).Trim());
+                        requirement.Storage = 1024 * 1024 * 1024 * double.Parse(storage.Replace("gb", string.Empty).Replace("available hard disk space", string.Empty).Trim());
                     }
                     requirement.StorageUsage = SizeSuffix(requirement.Storage);
                 }

@@ -237,12 +237,14 @@ namespace SystemChecker.Clients
                                     if (dataMinimum.ToLower().IndexOf("mb") > -1)
                                     {
                                         dataMinimum = dataMinimum.Substring(0, dataMinimum.ToLower().IndexOf("mb"));
-                                        Minimum.Ram = 1024 * 1024 * long.Parse(dataMinimum.ToLower().Replace("mb", string.Empty).Trim());
+                                        dataMinimum = dataMinimum.Replace(".", CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator);
+                                        Minimum.Ram = 1024 * 1024 * double.Parse(dataMinimum.ToLower().Replace("mb", string.Empty).Trim());
                                     }
                                     if (dataMinimum.ToLower().IndexOf("gb") > -1)
                                     {
                                         dataMinimum = dataMinimum.Substring(0, dataMinimum.ToLower().IndexOf("gb"));
-                                        Minimum.Ram = 1024 * 1024 * 1024 * long.Parse(dataMinimum.ToLower().Replace("gb", string.Empty).Trim());
+                                        dataMinimum = dataMinimum.Replace(".", CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator);
+                                        Minimum.Ram = 1024 * 1024 * 1024 * double.Parse(dataMinimum.ToLower().Replace("gb", string.Empty).Trim());
                                     }
                                     Minimum.RamUsage = SizeSuffix(Minimum.Ram, true);
                                 }
@@ -251,12 +253,14 @@ namespace SystemChecker.Clients
                                     if (dataRecommended.ToLower().IndexOf("mb") > -1)
                                     {
                                         dataRecommended = dataRecommended.Substring(0, dataRecommended.ToLower().IndexOf("mb"));
-                                        Recommanded.Ram = 1024 * 1024 * long.Parse(dataRecommended.ToLower().Replace("mb", string.Empty).Trim());
+                                        dataRecommended = dataMinimum.Replace(".", CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator);
+                                        Recommanded.Ram = 1024 * 1024 * double.Parse(dataRecommended.ToLower().Replace("mb", string.Empty).Trim());
                                     }
                                     if (dataRecommended.ToLower().IndexOf("gb") > -1)
                                     {
                                         dataRecommended = dataRecommended.Substring(0, dataRecommended.ToLower().IndexOf("gb"));
-                                        Recommanded.Ram = 1024 * 1024 * 1024 * long.Parse(dataRecommended.ToLower().Replace("gb", string.Empty).Trim());
+                                        dataRecommended = dataMinimum.Replace(".", CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator);
+                                        Recommanded.Ram = 1024 * 1024 * 1024 * double.Parse(dataRecommended.ToLower().Replace("gb", string.Empty).Trim());
                                     }
                                     Recommanded.RamUsage = SizeSuffix(Recommanded.Ram, true);
                                 }
