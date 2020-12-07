@@ -20,7 +20,10 @@ namespace SystemChecker.Models
             }
         }
 
-        public string Link { get; set; } = string.Empty;
+        public string SourceGameName { get; set; }
+        public string SourceName { get; set; }
+
+        public string Link { get; set; }
 
 
         public Requirement GetMinimum()

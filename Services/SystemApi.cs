@@ -175,7 +175,6 @@ namespace SystemChecker.Services
             {
                 foreach (SystemDisk Disk in systemDisks)
                 {
-                    //logger.Debug($"CheckStorage - {Disk.FreeSpace} - {requirement.Storage}");
                     if (Disk.FreeSpace >= Storage)
                     {
                         return true;

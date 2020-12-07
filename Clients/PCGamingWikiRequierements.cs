@@ -94,9 +94,12 @@ namespace SystemChecker.Clients
             }
 
 
-            url = string.Empty;
-            url = UrlPCGamingWikiSearch + WebUtility.UrlEncode(game.Name);
+            string Name = Regex.Replace(game.Name, @"([ ]demo\b)", string.Empty, RegexOptions.IgnoreCase);
+            Name = Regex.Replace(Name, @"(demo[ ])", string.Empty, RegexOptions.IgnoreCase);
 
+            url = string.Empty;
+            url = UrlPCGamingWikiSearch + WebUtility.UrlEncode(Name);
+            
             WebResponse = Web.DownloadStringData(url).GetAwaiter().GetResult();
             if (!WebResponse.ToLower().Contains("search results"))
             {
@@ -203,14 +206,20 @@ namespace SystemChecker.Clients
                                 if (!dataMinimum.IsNullOrEmpty())
                                 {
                                     dataMinimum = dataMinimum.Replace("(1803 or later)", string.Empty)
-                                        .Replace(" (Only inclusive until patch 1.16.1. Patch 1.17+ Needs XP and greater.)", string.Empty);
-                                    Minimum.Os = dataMinimum.Split(',').Select(x => x.Trim()).ToList();
+                                        .Replace(" (Only inclusive until patch 1.16.1. Patch 1.17+ Needs XP and greater.)", string.Empty)
+                                        .Replace("Windows", string.Empty)
+                                        .Replace("or better", string.Empty)
+                                        .Replace(",", "¤").Replace(" or ", "¤").Replace("/", "¤");
+                                    Minimum.Os = dataMinimum.Split('¤').Select(x => x.Trim()).ToList();
                                 }
                                 if (!dataRecommended.IsNullOrEmpty())
                                 {
                                     dataRecommended = dataRecommended.Replace("(1803 or later)", string.Empty)
-                                        .Replace(" (Only inclusive until patch 1.16.1. Patch 1.17+ Needs XP and greater.)", string.Empty);
-                                    Recommanded.Os = dataRecommended.Split(',').Select(x => x.Trim()).ToList();
+                                        .Replace(" (Only inclusive until patch 1.16.1. Patch 1.17+ Needs XP and greater.)", string.Empty)
+                                        .Replace("Windows", string.Empty)
+                                        .Replace("or better", string.Empty)
+                                        .Replace(",", "¤").Replace(" or ", "¤").Replace("/", "¤");
+                                    Recommanded.Os = dataRecommended.Split('¤').Select(x => x.Trim()).ToList();
                                 }
                                 break;
 
@@ -218,16 +227,36 @@ namespace SystemChecker.Clients
                                 if (!dataMinimum.IsNullOrEmpty())
                                 {
                                     dataMinimum = dataMinimum.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
+                                        .Replace("(4 CPUs), ~2.4 GHz", string.Empty)
+                                        .Replace("(4 CPUs), ~3.1 GHz", string.Empty)
+                                        .Replace(" from Intel or AMD at", string.Empty)
+                                        .Replace("with SSE2 instruction set support", string.Empty)
+                                        .Replace("(and graphics card with T&amp;L)", string.Empty)
+                                        .Replace("(1.5 GHz if graphics card does not support T&amp;L)", string.Empty)
                                         .Replace("or AMD equivalent", string.Empty)
-                                        .Replace(" / ", "¤").Replace("<br>", "¤");
+                                        .Replace("or better", string.Empty)
+                                        .Replace("(D3D)/300", string.Empty)
+                                        .Replace("(with 3D acceleration)", string.Empty)
+                                        .Replace("(software)", string.Empty)
+                                        .Replace(" / ", "¤").Replace("<br>", "¤").Replace(" or ", "¤");
                                     Minimum.Cpu = dataMinimum.Split('¤').Select(x => x.Trim()).ToList();
                                 }
                                 if (!dataRecommended.IsNullOrEmpty())
                                 {
                                     dataRecommended = dataRecommended.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
+                                        .Replace("(4 CPUs), ~2.4 GHz", string.Empty)
+                                        .Replace("(4 CPUs), ~3.1 GHz", string.Empty)
+                                        .Replace(" from Intel or AMD at", string.Empty)
+                                        .Replace("with SSE2 instruction set support", string.Empty)
+                                        .Replace("(and graphics card with T&amp;L)", string.Empty)
+                                        .Replace("(1.5 GHz if graphics card does not support T&amp;L)", string.Empty)
                                         .Replace("or AMD equivalent", string.Empty)
-                                        .Replace(" / ", "¤").Replace("<br>", "¤");
-                                    Recommanded.Cpu = dataMinimum.Split('¤').Select(x => x.Trim()).ToList();
+                                        .Replace("or better", string.Empty)
+                                        .Replace("(D3D)/300", string.Empty)
+                                        .Replace("(with 3D acceleration)", string.Empty)
+                                        .Replace("(software)", string.Empty)
+                                        .Replace(" / ", "¤").Replace("<br>", "¤").Replace(" or ", "¤");
+                                    Recommanded.Cpu = dataRecommended.Split('¤').Select(x => x.Trim()).ToList();
                                 }
                                 break;
 
@@ -253,13 +282,13 @@ namespace SystemChecker.Clients
                                     if (dataRecommended.ToLower().IndexOf("mb") > -1)
                                     {
                                         dataRecommended = dataRecommended.Substring(0, dataRecommended.ToLower().IndexOf("mb"));
-                                        dataRecommended = dataMinimum.Replace(".", CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator);
+                                        dataRecommended = dataRecommended.Replace(".", CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator);
                                         Recommanded.Ram = 1024 * 1024 * double.Parse(dataRecommended.ToLower().Replace("mb", string.Empty).Trim());
                                     }
                                     if (dataRecommended.ToLower().IndexOf("gb") > -1)
                                     {
                                         dataRecommended = dataRecommended.Substring(0, dataRecommended.ToLower().IndexOf("gb"));
-                                        dataRecommended = dataMinimum.Replace(".", CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator);
+                                        dataRecommended = dataRecommended.Replace(".", CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator);
                                         Recommanded.Ram = 1024 * 1024 * 1024 * double.Parse(dataRecommended.ToLower().Replace("gb", string.Empty).Trim());
                                     }
                                     Recommanded.RamUsage = SizeSuffix(Recommanded.Ram, true);
@@ -298,7 +327,7 @@ namespace SystemChecker.Clients
                                     {
                                         dataRecommended = dataRecommended.Substring(0, dataRecommended.ToLower().IndexOf("mb"));
 
-                                        Double.TryParse(dataMinimum.ToLower().Replace("mb", string.Empty).Trim()
+                                        Double.TryParse(dataRecommended.ToLower().Replace("mb", string.Empty).Trim()
                                            .Replace(".", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim()
                                            .Replace(",", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim(), out hdd);
 
@@ -308,7 +337,7 @@ namespace SystemChecker.Clients
                                     {
                                         dataRecommended = dataRecommended.Substring(0, dataRecommended.ToLower().IndexOf("gb"));
 
-                                        Double.TryParse(dataMinimum.ToLower().Replace("mb", string.Empty).Trim()
+                                        Double.TryParse(dataRecommended.ToLower().Replace("mb", string.Empty).Trim()
                                            .Replace(".", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim()
                                            .Replace(",", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim(), out hdd);
 
@@ -321,18 +350,25 @@ namespace SystemChecker.Clients
                             case "video card (gpu)":
                                 if (!dataMinimum.IsNullOrEmpty())
                                 {
-                                    dataMinimum = dataMinimum.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
-                                        .Replace("Integrated", string.Empty).Replace("Dedicated", string.Empty)
-                                        .Replace("+ compatible", string.Empty).Replace("compatible", string.Empty)
-                                        .Replace("that supports DirectDraw at 640x480 resolution, 256 colors", string.Empty)
-                                        .Replace(" / ", "¤").Replace("<br>", "¤");
+                                    dataMinimum = dataMinimum.Replace(" / ", "¤").Replace("<br>", "¤");
 
                                     dataMinimum = Regex.Replace(dataMinimum, "(</[^>]*>)", "");
                                     dataMinimum = Regex.Replace(dataMinimum, "(<[^>]*>)", "");
 
+                                    dataMinimum = dataMinimum.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
+                                        .Replace("DirectX-compliant", string.Empty)
+                                        .Replace("or better", string.Empty)
+                                        .Replace("of VRAM", "VRAM")
+                                        .Replace("Integrated graphics, monitor with resolution of 1280x720.", "1280x720")
+                                        .Replace("Integrated", string.Empty).Replace("Dedicated", string.Empty)
+                                        .Replace("+ compatible", string.Empty).Replace("compatible", string.Empty)
+                                        .Replace("that supports DirectDraw at 640x480 resolution, 256 colors", string.Empty)
+                                        .Replace("or higher", string.Empty)
+                                        .Replace(" / ", "¤").Replace("<br>", "¤");
+
                                     Minimum.Gpu = dataMinimum.Split('¤')
                                         .Select(x => x.Trim()).ToList()
-                                        .Where(x => x.Length > 6)
+                                        .Where(x => x.Length > 4)
                                         .Where(x => x.ToLower().IndexOf("shader") == -1)
                                         .Where(x => x.ToLower().IndexOf("anything") == -1)
                                         .Where(x => x.ToLower().IndexOf("any card") == -1)
@@ -340,18 +376,25 @@ namespace SystemChecker.Clients
                                 }
                                 if (!dataRecommended.IsNullOrEmpty())
                                 {
-                                    dataRecommended = dataRecommended.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
-                                        .Replace("Integrated", string.Empty).Replace("Dedicated", string.Empty)
-                                        .Replace("+ compatible", string.Empty).Replace("compatible", string.Empty)
-                                        .Replace("that supports DirectDraw at 640x480 resolution, 256 colors", string.Empty)
-                                        .Replace(" / ", "¤").Replace("<br>", "¤");
+                                    dataRecommended = dataRecommended.Replace(" / ", "¤").Replace("<br>", "¤");
 
                                     dataRecommended = Regex.Replace(dataRecommended, "(</[^>]*>)", "");
                                     dataRecommended = Regex.Replace(dataRecommended, "(<[^>]*>)", "");
 
+                                    dataRecommended = dataRecommended.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
+                                        .Replace("DirectX-compliant", string.Empty)
+                                        .Replace("or better", string.Empty)
+                                        .Replace("of VRAM", "VRAM")
+                                        .Replace("Integrated graphics, monitor with resolution of 1280x720.", "1280x720")
+                                        .Replace("Integrated", string.Empty).Replace("Dedicated", string.Empty)
+                                        .Replace("+ compatible", string.Empty).Replace("compatible", string.Empty)
+                                        .Replace("that supports DirectDraw at 640x480 resolution, 256 colors", string.Empty)
+                                        .Replace("or higher", string.Empty)
+                                        .Replace(" / ", "¤").Replace("<br>", "¤");
+
                                     Recommanded.Gpu = dataRecommended.Split('¤')
                                         .Select(x => x.Trim()).ToList()
-                                        .Where(x => x.Length > 6)
+                                        .Where(x => x.Length > 4)
                                         .Where(x => x.ToLower().IndexOf("shader") == -1).ToList()
                                         .Where(x => x.ToLower().IndexOf("anything") == -1).ToList()
                                         .Where(x => x.ToLower().IndexOf("any card") == -1)
@@ -371,6 +414,9 @@ namespace SystemChecker.Clients
                     logger.Debug($"SystemChecker - PCGamingWikiRequierements - Recommanded: {JsonConvert.SerializeObject(Recommanded)}");
 #endif
                     gameRequierements.Items = new List<Requirement> { Minimum, Recommanded };
+
+                    gameRequierements.SourceName = "PCGamingWiki";
+                    gameRequierements.SourceGameName = HtmlRequirement.QuerySelector("h1.article-title").InnerHtml;
                 }
                 else
                 {

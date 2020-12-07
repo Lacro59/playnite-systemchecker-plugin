@@ -65,7 +65,8 @@ namespace SystemChecker.Services
                         return true;
                     }
 
-                    return ProcessorPc.Clock >= ProcessorRequierement.Clock;
+                    return true;
+                    //return ProcessorPc.Clock >= ProcessorRequierement.Clock;
                 }
             }
 

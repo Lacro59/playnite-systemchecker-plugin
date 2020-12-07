@@ -59,8 +59,9 @@ namespace SystemChecker.Clients
 
                 if (parsedData[appId.ToString()].data != null && JsonConvert.SerializeObject(parsedData[appId.ToString()].data.pc_requirements) != "[]")
                 {
+#if DEBUG
                     logger.Debug(JsonConvert.SerializeObject(parsedData[appId.ToString()].data.pc_requirements));
-
+#endif
                     JObject pc_requirements = JObject.FromObject(parsedData[appId.ToString()].data.pc_requirements);
 
                     if (pc_requirements["minimum"] != null)
@@ -72,6 +73,9 @@ namespace SystemChecker.Clients
                     {
                         Recommanded = ParseRequirement((string)pc_requirements["recommended"]);
                     }
+
+                    gameRequierements.SourceName = "Steam";
+                    gameRequierements.SourceGameName = parsedData[appId.ToString()].data.name;
                 }
             }
             catch (Exception ex)
@@ -166,7 +170,7 @@ namespace SystemChecker.Clients
                         .Replace("()", string.Empty)
                         .Replace("<br>", string.Empty)
                         .Trim();
-                    logger.Debug($"os: {os}");
+               
                     foreach (string sTemp in os.Replace(",", "¤").Replace(" or ", "¤").Replace("/", "¤").Split('¤'))
                     {
                         requirement.Os.Add(sTemp.Trim());
@@ -199,14 +203,16 @@ namespace SystemChecker.Clients
                             .Replace(", ~3.1GHz", string.Empty)
                             .Replace("ghz", "GHz")
                             .Replace("Ghz", "GHz")
+                            .Replace("Processor", string.Empty)
+                            .Replace("processor", string.Empty)
                             .Replace("(not recommended for Intel HD Graphics cards)", ", not recommended for Intel HD Graphics cards")
                             .Replace("()", string.Empty)
                             .Replace("<br>", string.Empty)
                             .Trim();
-                    logger.Debug($"cpu: {cpu}");
+               
                     cpu = Regex.Replace(cpu, ", ([0-9])", " $1");
                     cpu = Regex.Replace(cpu, "([0-9]),([0-9] GHz)", "$1.$2");
-                    cpu = Regex.Replace(cpu, "([0-9]) GHz", "$1GHz");
+                    cpu = Regex.Replace(cpu, "([0-9])GHz", "$1 GHz");
                     cpu = Regex.Replace(cpu, "([0-9999])k", "$1K");
                     cpu = cpu.Replace(",", "¤").Replace(" / ", "¤").Replace(" or ", "¤").Replace(" OR ", "¤")
                         .Replace(" and ", "¤").Replace(" AND ", "¤").Replace(" | ", "¤");
@@ -227,7 +233,7 @@ namespace SystemChecker.Clients
                             .Replace("<br>", string.Empty)
                             .Trim();
                     ram = ram.Split('/')[ram.Split('/').Length - 1];
-                    logger.Debug($"ram: {ram}");
+             
                     if (ram.ToLower().IndexOf("mb") > -1)
                     {
                         requirement.Ram = 1024 * 1024 * long.Parse(ram.ToLower().Replace("mb", string.Empty).Trim());
@@ -310,7 +316,7 @@ namespace SystemChecker.Clients
                             .Replace("  ", " ")
                             .Replace(". Integrated Intel HD Graphics should work but is not supported; problems are generally solved with a driver update.", string.Empty)
                             .Trim();
-                    logger.Debug($"gpu: {gpu}");
+                  
                     gpu = Regex.Replace(gpu, " - ([0-9]) GB", " ($1 GB)");
                     //gpu = Regex.Replace(gpu, "([0-9])Gb", "($1 GB)");
                     gpu = gpu.Replace(",", "¤").Replace(" or ", "¤").Replace(" OR ", "¤").Replace(" / ", "¤").Replace(" | ", "¤");
@@ -358,7 +364,7 @@ namespace SystemChecker.Clients
                         .Replace("free hard drive space", string.Empty)
                         .Replace("<br>", string.Empty)
                         .Trim();
-                    logger.Debug($"storage: {storage}");
+               
                     if (storage.IndexOf("mb") > -1)
                     {
                         requirement.Storage = 1024 * 1024 * double.Parse(storage.Replace("mb", string.Empty).Replace("available hard disk space", string.Empty).Trim());

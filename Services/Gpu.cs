@@ -6,6 +6,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using SystemChecker.Models;
+using System.Globalization;
 
 namespace SystemChecker.Services
 {
@@ -50,36 +51,28 @@ namespace SystemChecker.Services
 
 
             // VRAM only
-            int Vram = 0;
+            double Vram = 0;
+            string TempVram = string.Empty;
             if (GpuRequierement.ToLower().IndexOf("vram") > -1 && !CallIsNvidia(GpuRequierement) && !CallIsAmd(GpuRequierement))
             {
-                int.TryParse(Regex.Replace(GpuRequierement, "[^.0-9]", string.Empty).Trim(), out Vram);
-                if (Vram > 0)
+                TempVram = GpuRequierement.Replace(".", CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator);
+                TempVram = Regex.Replace(TempVram, "vram", string.Empty, RegexOptions.IgnoreCase);
+                
+                if (TempVram.ToLower().IndexOf("mb") > -1 && !CallIsNvidia(GpuRequierement) && !CallIsAmd(GpuRequierement))
                 {
-                    if (GpuRequierement.ToLower().IndexOf("g") > -1)
-                    {
-                        Vram = Vram * 1024 * 1024;
-                    }
-                    else
+                    double.TryParse(Regex.Replace(TempVram, "mb", string.Empty, RegexOptions.IgnoreCase).Trim(), out Vram);
+                    if (Vram > 0)
                     {
                         Vram = Vram * 1024;
                     }
                 }
-            }
-            if (GpuRequierement.ToLower().IndexOf("mb") > -1 && !CallIsNvidia(GpuRequierement) && !CallIsAmd(GpuRequierement))
-            {
-                int.TryParse(Regex.Replace(GpuRequierement, "[^.0-9]", string.Empty).Trim(), out Vram);
-                if (Vram > 0)
+                if (TempVram.ToLower().IndexOf("gb") > -1 && !CallIsNvidia(GpuRequierement) && !CallIsAmd(GpuRequierement))
                 {
-                    Vram = Vram * 1024;
-                }
-            }
-            if (GpuRequierement.ToLower().IndexOf("gb") > -1 && !CallIsNvidia(GpuRequierement) && !CallIsAmd(GpuRequierement))
-            {
-                int.TryParse(Regex.Replace(GpuRequierement, "[^.0-9]", string.Empty).Trim(), out Vram);
-                if (Vram > 0)
-                {
-                    Vram = Vram * 1024 * 1024;
+                    double.TryParse(Regex.Replace(TempVram, "gb", string.Empty, RegexOptions.IgnoreCase).Trim(), out Vram);
+                    if (Vram > 0)
+                    {
+                        Vram = Vram * 1024 * 1024;
+                    }
                 }
             }
 
@@ -108,7 +101,7 @@ namespace SystemChecker.Services
 
 
             CardPc.Vram = systemConfiguration.GpuRam;
-            CardRequierement.Vram = Vram;
+            CardRequierement.Vram = (long)Vram;
 
             CardPc.ResolutionHorizontal = (int)systemConfiguration.CurrentHorizontalResolution;
             CardRequierement.ResolutionHorizontal = ResolutionHorizontal;
@@ -397,6 +390,10 @@ namespace SystemChecker.Services
                     out OglVersion
                 );
             }
+            if (GpuName.ToLower().IndexOf("direct3d") > -1)
+            {
+                IsOld = true;
+            }
 
             if (IsNvidia)
             {
@@ -404,7 +401,7 @@ namespace SystemChecker.Services
                 {
                     IsOld = true;
                 }
-                if (Number >= 7000)
+                if (Number >= 5000 && GpuName.ToLower().IndexOf("rtx") == -1)
                 {
                     IsOld = true;
                 }

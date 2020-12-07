@@ -220,7 +220,13 @@ namespace SystemChecker.Views
             logger.Debug("CheckRecommanded" + JsonConvert.SerializeObject(CheckRecommanded));
 #endif
 
-            ScSourceName = resources.GetString("LOCSourceLabel") + ": " + GameSelected.Name;
+            if (!gameRequierements.SourceGameName.IsNullOrEmpty() && !gameRequierements.SourceName.IsNullOrEmpty())
+            {
+                ScSourceName = resources.GetString("LOCSourceLabel") + ": " + gameRequierements.SourceGameName + $" ({gameRequierements.SourceName})";
+            }
+            else {
+                ScSourceName = resources.GetString("LOCSourceLabel") + ": " + GameSelected.Name;
+            }
 
             DataContext = this;
         }
