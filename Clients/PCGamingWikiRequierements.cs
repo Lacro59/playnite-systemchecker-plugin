@@ -352,8 +352,8 @@ namespace SystemChecker.Clients
                                 {
                                     dataMinimum = dataMinimum.Replace(" / ", "¤").Replace("<br>", "¤");
 
-                                    dataMinimum = Regex.Replace(dataMinimum, "(</[^>]*>)", "");
-                                    dataMinimum = Regex.Replace(dataMinimum, "(<[^>]*>)", "");
+                                    dataMinimum = Regex.Replace(dataMinimum, "(</[^>]*>)", string.Empty);
+                                    dataMinimum = Regex.Replace(dataMinimum, "(<[^>]*>)", string.Empty);
 
                                     dataMinimum = dataMinimum.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
                                         .Replace("DirectX-compliant", string.Empty)

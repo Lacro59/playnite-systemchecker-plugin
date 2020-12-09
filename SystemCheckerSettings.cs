@@ -20,6 +20,9 @@ namespace SystemChecker
 
         public bool EnableIntegrationInCustomTheme { get; set; } = false;
 
+        public bool EnableIntegrationFS { get; set; } = false;
+
+
         // Playnite serializes settings object to a JSON object and saves it as text file.
         // If you want to exclude some property from being saved then use `JsonIgnore` ignore attribute.
         [JsonIgnore]
@@ -48,6 +51,8 @@ namespace SystemChecker
                 EnableIntegrationButtonDetails = savedSettings.EnableIntegrationButtonDetails;
 
                 EnableIntegrationInCustomTheme = savedSettings.EnableIntegrationInCustomTheme;
+
+                EnableIntegrationFS = savedSettings.EnableIntegrationFS;
             }
         }
 
