@@ -19,7 +19,7 @@
     <sys:String x:Key="LOCSystemCheckerRam">Memory</sys:String>
     <sys:String x:Key="LOCSystemCheckerGpu">Graphics</sys:String>
     <sys:String x:Key="LOCSystemCheckerDisk">Storage</sys:String>
-
+    
     <!-- SystemCheckerNotifications -->
 
 </ResourceDictionary>
