@@ -219,7 +219,6 @@ namespace SystemChecker.Services
 
             BtActionBar.Click += OnBtActionBarClick;
             BtActionBar.Name = BtActionBarName;
-            BtActionBar.Margin = new Thickness(10, 0, 0, 0);
             DefaultBtForeground = BtActionBar.Foreground;
 
             try

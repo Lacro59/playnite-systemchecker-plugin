@@ -38,9 +38,6 @@ namespace SystemChecker.Views.Interfaces
         {
             try
             {
-#if DEBUG
-                logger.Debug($"SystemCheckerButtonDetails.OnPropertyChanged({e.PropertyName}): {JsonConvert.SerializeObject(PluginDatabase.GameSelectedData)}");
-#endif
                 if (e.PropertyName == "GameSelectedData" || e.PropertyName == "PluginSettings")
                 {
                     this.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new ThreadStart(delegate
@@ -56,7 +53,10 @@ namespace SystemChecker.Views.Interfaces
                             this.Visibility = Visibility.Collapsed;
                             return;
                         }
+                    }));
 
+                    this.Dispatcher.BeginInvoke(DispatcherPriority.Background, new ThreadStart(delegate
+                    {
                         CheckSystem CheckMinimum = SystemCheckerUI.CheckMinimum;
                         CheckSystem CheckRecommanded = SystemCheckerUI.CheckRecommanded;
 
