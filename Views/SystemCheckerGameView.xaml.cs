@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Playnite.SDK;
 using Playnite.SDK.Models;
-using PluginCommon;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -35,7 +34,7 @@ namespace SystemChecker.Views
         public string MinimumRamUsage { get; set; }
         public List<string> MinimumGpu { get; set; }
         public string MinimumStorage { get; set; }
-        
+
         public string RecommandedOs { get; set; }
         public List<string> RecommandedCpu { get; set; }
         public string RecommandedRamUsage { get; set; }
@@ -209,7 +208,7 @@ namespace SystemChecker.Views
             }
 
             btLink.Visibility = System.Windows.Visibility.Hidden;
-            if (Minimum.HasData || Recommanded.HasData) 
+            if (Minimum.HasData || Recommanded.HasData)
             {
                 btLink.Visibility = System.Windows.Visibility.Visible;
                 btLink.Tag = gameRequierements.Link;
@@ -224,7 +223,8 @@ namespace SystemChecker.Views
             {
                 ScSourceName = resources.GetString("LOCSourceLabel") + ": " + gameRequierements.SourceGameName + $" ({gameRequierements.SourceName})";
             }
-            else {
+            else
+            {
                 ScSourceName = resources.GetString("LOCSourceLabel") + ": " + GameSelected.Name;
             }
 

@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using CommonPluginsShared;
+using Newtonsoft.Json;
 using Playnite.SDK;
-using PluginCommon;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -66,7 +66,7 @@ namespace SystemChecker.Services
                 }
                 catch (Exception ex)
                 {
-                    Common.LogError(ex, "SystemChecker", $"Failed to load item from {objectFile} or {objectFileManual}");
+                    Common.LogError(ex, false, $"Failed to load item from {objectFile} or {objectFileManual}");
                 }
             });
 
@@ -116,7 +116,7 @@ namespace SystemChecker.Services
                     }
                     catch (Exception ex)
                     {
-                        Common.LogError(ex, "SystemChecker", $"Failed to load ConvertDB from {item.Key.ToString()}");
+                        Common.LogError(ex, false, $"Failed to load ConvertDB from {item.Key.ToString()}");
                     }
                 }
 

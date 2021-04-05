@@ -1,12 +1,12 @@
 ﻿using Newtonsoft.Json;
 using Playnite.SDK;
-using PluginCommon;
 using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using SystemChecker.Models;
 using System.Globalization;
+using CommonPluginsShared;
 
 namespace SystemChecker.Services
 {
@@ -37,10 +37,10 @@ namespace SystemChecker.Services
                 new GpuEquivalence {Nvidia = "Nvidia RTX 2070", Amd = "Amd Radeon RX Vega 64"},
                 new GpuEquivalence {Nvidia = "Nvidia RTX 2070", Amd = "Amd Radeon 5700 XT"}
             };
-        private string CardPcName { get; set; } 
-        private GpuObject CardPc { get; set; } 
-        private string CardRequierementName { get; set; } 
-        private GpuObject CardRequierement { get; set; } 
+        private string CardPcName { get; set; }
+        private GpuObject CardPc { get; set; }
+        private string CardRequierementName { get; set; }
+        private GpuObject CardRequierement { get; set; }
 
         public bool IsWithNoCard = false;
 
@@ -57,7 +57,7 @@ namespace SystemChecker.Services
             {
                 TempVram = GpuRequierement.Replace(".", CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator);
                 TempVram = Regex.Replace(TempVram, "vram", string.Empty, RegexOptions.IgnoreCase);
-                
+
                 if (TempVram.ToLower().IndexOf("mb") > -1 && !CallIsNvidia(GpuRequierement) && !CallIsAmd(GpuRequierement))
                 {
                     double.TryParse(Regex.Replace(TempVram, "mb", string.Empty, RegexOptions.IgnoreCase).Trim(), out Vram);
@@ -253,7 +253,7 @@ namespace SystemChecker.Services
                 }
                 catch (Exception ex)
                 {
-                    Common.LogError(ex, "SystemChecker", $"Error on IsBetter() for Nvidia vs Amd");
+                    Common.LogError(ex, false, $"Error on IsBetter() for Nvidia vs Amd");
                 }
             }
 
@@ -280,7 +280,7 @@ namespace SystemChecker.Services
                 }
                 catch (Exception ex)
                 {
-                    Common.LogError(ex, "SystemChecker", $"Error on IsBetter() for Amd vs Nvidia");
+                    Common.LogError(ex, false, $"Error on IsBetter() for Amd vs Nvidia");
                 }
 
                 logger.Warn($"SystemChecker - No equivalence for {JsonConvert.SerializeObject(CardPc)} & {JsonConvert.SerializeObject(CardRequierement)}");
@@ -386,7 +386,7 @@ namespace SystemChecker.Services
                 IsOgl = true;
                 int.TryParse(
                     GpuName.ToLower().Replace("opengl", string.Empty).Replace("open gl", string.Empty)
-                    .Replace(".0", string.Empty).Trim(), 
+                    .Replace(".0", string.Empty).Trim(),
                     out OglVersion
                 );
             }

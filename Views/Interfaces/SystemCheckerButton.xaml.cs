@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using CommonPluginsShared;
+using Newtonsoft.Json;
 using Playnite.SDK;
-using PluginCommon;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,15 +47,15 @@ namespace SystemChecker.Views.Interfaces
                 {
                     this.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new ThreadStart(delegate
                     {
-                        if (PluginDatabase.GameSelectedData.HasData)
-                        {
-                            this.Visibility = Visibility.Visible;
-                        }
-                        else
-                        {
-                            this.Visibility = Visibility.Collapsed;
-                            return;
-                        }
+                        //if (PluginDatabase.GameSelectedData.HasData)
+                        //{
+                        //    this.Visibility = Visibility.Visible;
+                        //}
+                        //else
+                        //{
+                        //    this.Visibility = Visibility.Collapsed;
+                        //    return;
+                        //}
                     }));
                 }
                 else
@@ -71,7 +71,7 @@ namespace SystemChecker.Views.Interfaces
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "SystemChecker");
+                Common.LogError(ex, false);
             }
         }
     }

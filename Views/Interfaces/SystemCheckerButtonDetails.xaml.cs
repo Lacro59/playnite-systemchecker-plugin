@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using CommonPluginsShared;
+using Newtonsoft.Json;
 using Playnite.SDK;
-using PluginCommon;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,47 +42,47 @@ namespace SystemChecker.Views.Interfaces
                 {
                     this.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new ThreadStart(delegate
                     {
-                        OnlyIcon.Foreground = SystemCheckerUI.DefaultBtForeground;
-
-                        if (PluginDatabase.GameSelectedData.HasData)
-                        {
-                            this.Visibility = Visibility.Visible;
-                        }
-                        else
-                        {
-                            this.Visibility = Visibility.Collapsed;
-                            return;
-                        }
+                        //OnlyIcon.Foreground = SystemCheckerUI.DefaultBtForeground;
+                        //
+                        //if (PluginDatabase.GameSelectedData.HasData)
+                        //{
+                        //    this.Visibility = Visibility.Visible;
+                        //}
+                        //else
+                        //{
+                        //    this.Visibility = Visibility.Collapsed;
+                        //    return;
+                        //}
                     }));
 
                     this.Dispatcher.BeginInvoke(DispatcherPriority.Background, new ThreadStart(delegate
                     {
-                        CheckSystem CheckMinimum = SystemCheckerUI.CheckMinimum;
-                        CheckSystem CheckRecommanded = SystemCheckerUI.CheckRecommanded;
-
-                        if (CheckMinimum.AllOk != null)
-                        {
-                            if (!(bool)CheckMinimum.AllOk)
-                            {
-                                OnlyIcon.Foreground = Brushes.Red;
-                            }
-
-                            if ((bool)CheckMinimum.AllOk)
-                            {
-                                OnlyIcon.Foreground = Brushes.Orange;
-                                if (CheckRecommanded.AllOk == null)
-                                {
-                                    OnlyIcon.Foreground = Brushes.Green;
-                                }
-                            }
-                        }
-                        if (CheckRecommanded.AllOk != null)
-                        {
-                            if ((bool)CheckRecommanded.AllOk)
-                            {
-                                OnlyIcon.Foreground = Brushes.Green;
-                            }
-                        }
+                        //CheckSystem CheckMinimum = SystemCheckerUI.CheckMinimum;
+                        //CheckSystem CheckRecommanded = SystemCheckerUI.CheckRecommanded;
+                        //
+                        //if (CheckMinimum.AllOk != null)
+                        //{
+                        //    if (!(bool)CheckMinimum.AllOk)
+                        //    {
+                        //        OnlyIcon.Foreground = Brushes.Red;
+                        //    }
+                        //
+                        //    if ((bool)CheckMinimum.AllOk)
+                        //    {
+                        //        OnlyIcon.Foreground = Brushes.Orange;
+                        //        if (CheckRecommanded.AllOk == null)
+                        //        {
+                        //            OnlyIcon.Foreground = Brushes.Green;
+                        //        }
+                        //    }
+                        //}
+                        //if (CheckRecommanded.AllOk != null)
+                        //{
+                        //    if ((bool)CheckRecommanded.AllOk)
+                        //    {
+                        //        OnlyIcon.Foreground = Brushes.Green;
+                        //    }
+                        //}
                     }));
                 }
                 else
@@ -98,7 +98,7 @@ namespace SystemChecker.Views.Interfaces
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "SystemChecker");
+                Common.LogError(ex, false);
             }
         }
     }

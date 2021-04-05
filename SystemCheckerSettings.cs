@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using Playnite.SDK;
+﻿using Playnite.SDK;
+using Playnite.SDK.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,11 +8,9 @@ using System.Threading.Tasks;
 
 namespace SystemChecker
 {
-    public class SystemCheckerSettings : ISettings
+    public class SystemCheckerSettings : ObservableObject
     {
-        private readonly SystemChecker plugin;
-
-        public bool EnableCheckVersion { get; set; } = true;
+        #region Settings variables
         public bool MenuInExtensions { get; set; } = true;
 
         public bool EnableIntegrationButton { get; set; } = false;
@@ -21,22 +19,47 @@ namespace SystemChecker
         public bool EnableIntegrationInCustomTheme { get; set; } = false;
 
         public bool EnableIntegrationFS { get; set; } = false;
-
+        #endregion
 
         // Playnite serializes settings object to a JSON object and saves it as text file.
-        // If you want to exclude some property from being saved then use `JsonIgnore` ignore attribute.
-        [JsonIgnore]
-        public bool OptionThatWontBeSaved { get; set; } = false;
-
-        // Parameterless constructor must exist if you want to use LoadPluginSettings method.
-        public SystemCheckerSettings()
+        // If you want to exclude some property from being saved then use `JsonDontSerialize` ignore attribute.
+        #region Variables exposed
+        [DontSerialize]
+        private bool _HasData { get; set; } = false;
+        public bool HasData
         {
+            get => _HasData;
+            set
+            {
+                _HasData = value;
+                OnPropertyChanged();
+            }
+        }
+        #endregion  
+    }
+
+
+    public class SystemCheckerSettingsViewModel : ObservableObject, ISettings
+    {
+        private readonly SystemChecker Plugin;
+        private SystemCheckerSettings EditingClone { get; set; }
+
+        private SystemCheckerSettings _Settings;
+        public SystemCheckerSettings Settings
+        {
+            get => _Settings;
+            set
+            {
+                _Settings = value;
+                OnPropertyChanged();
+            }
         }
 
-        public SystemCheckerSettings(SystemChecker plugin)
+
+        public SystemCheckerSettingsViewModel(SystemChecker plugin)
         {
             // Injecting your plugin instance is required for Save/Load method because Playnite saves data to a location based on what plugin requested the operation.
-            this.plugin = plugin;
+            Plugin = plugin;
 
             // Load saved settings.
             var savedSettings = plugin.LoadPluginSettings<SystemCheckerSettings>();
@@ -44,48 +67,41 @@ namespace SystemChecker
             // LoadPluginSettings returns null if not saved data is available.
             if (savedSettings != null)
             {
-                EnableCheckVersion = savedSettings.EnableCheckVersion;
-                MenuInExtensions = savedSettings.MenuInExtensions;
-
-                EnableIntegrationButton = savedSettings.EnableIntegrationButton;
-                EnableIntegrationButtonDetails = savedSettings.EnableIntegrationButtonDetails;
-
-                EnableIntegrationInCustomTheme = savedSettings.EnableIntegrationInCustomTheme;
-
-                EnableIntegrationFS = savedSettings.EnableIntegrationFS;
+                Settings = savedSettings;
+            }
+            else
+            {
+                Settings = new SystemCheckerSettings();
             }
         }
 
+        // Code executed when settings view is opened and user starts editing values.
         public void BeginEdit()
         {
-            // Code executed when settings view is opened and user starts editing values.
+            EditingClone = Serialization.GetClone(Settings);
         }
 
+        // Code executed when user decides to cancel any changes made since BeginEdit was called.
+        // This method should revert any changes made to Option1 and Option2.
         public void CancelEdit()
         {
-            // Code executed when user decides to cancel any changes made since BeginEdit was called.
-            // This method should revert any changes made to Option1 and Option2.
+            Settings = EditingClone;
         }
 
+        // Code executed when user decides to confirm changes made since BeginEdit was called.
+        // This method should save settings made to Option1 and Option2.
         public void EndEdit()
         {
-            // Code executed when user decides to confirm changes made since BeginEdit was called.
-            // This method should save settings made to Option1 and Option2.
-            plugin.SavePluginSettings(this);
-
-            SystemChecker.systemCheckerUI.RemoveElements();
-            var TaskIntegrationUI = Task.Run(() =>
-            { 
-                SystemChecker.systemCheckerUI.AddElements();
-                SystemChecker.systemCheckerUI.RefreshElements(SystemChecker.GameSelected);
-            });
+            Plugin.SavePluginSettings(Settings);
+            SystemChecker.PluginDatabase.PluginSettings = this;
+            this.OnPropertyChanged();
         }
 
+        // Code execute when user decides to confirm changes made since BeginEdit was called.
+        // Executed before EndEdit is called and EndEdit is not called if false is returned.
+        // List of errors is presented to user if verification fails.
         public bool VerifySettings(out List<string> errors)
         {
-            // Code execute when user decides to confirm changes made since BeginEdit was called.
-            // Executed before EndEdit is called and EndEdit is not called if false is returned.
-            // List of errors is presented to user if verification fails.
             errors = new List<string>();
             return true;
         }

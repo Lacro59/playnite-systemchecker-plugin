@@ -1,9 +1,9 @@
 ﻿using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
+using CommonPluginsShared;
 using Newtonsoft.Json;
 using Playnite.SDK;
 using Playnite.SDK.Models;
-using PluginCommon;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -14,7 +14,7 @@ using SystemChecker.Models;
 
 namespace SystemChecker.Clients
 {
-    class PCGamingWikiRequierements: RequierementMetadata
+    class PCGamingWikiRequierements : RequierementMetadata
     {
         private static readonly ILogger logger = LogManager.GetLogger();
         private readonly IPlayniteAPI _PlayniteApi;
@@ -99,7 +99,7 @@ namespace SystemChecker.Clients
 
             url = string.Empty;
             url = UrlPCGamingWikiSearch + WebUtility.UrlEncode(Name);
-            
+
             WebResponse = Web.DownloadStringData(url).GetAwaiter().GetResult();
             if (!WebResponse.ToLower().Contains("search results"))
             {
@@ -145,7 +145,7 @@ namespace SystemChecker.Clients
                 }
             }
             if (SteamId == 0)
-            {   
+            {
                 SteamId = steamApi.GetSteamId(game.Name);
             }
 
@@ -165,11 +165,11 @@ namespace SystemChecker.Clients
                 string ResultWeb = string.Empty;
                 try
                 {
-                    ResultWeb =  Web.DownloadStringData(url).GetAwaiter().GetResult();
+                    ResultWeb = Web.DownloadStringData(url).GetAwaiter().GetResult();
                 }
                 catch (Exception ex)
                 {
-                    Common.LogError(ex, "SystemChecker", $"Failed to download {url}");
+                    Common.LogError(ex, false, $"Failed to download {url}");
                 }
 
 
@@ -402,7 +402,7 @@ namespace SystemChecker.Clients
                                 }
                                 break;
 
-                            default :
+                            default:
                                 logger.Warn($"SystemChecker - No treatment for {dataTitle}");
                                 break;
                         }
@@ -426,7 +426,7 @@ namespace SystemChecker.Clients
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "SystemChecker");
+                Common.LogError(ex, false);
             }
 
             return gameRequierements;

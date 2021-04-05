@@ -1,14 +1,10 @@
 ﻿using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
+using CommonPluginsShared;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Playnite.SDK;
 using Playnite.SDK.Models;
-using PluginCommon;
-using PluginCommon.PlayniteResources;
-using PluginCommon.PlayniteResources.API;
-using PluginCommon.PlayniteResources.Common;
-using PluginCommon.PlayniteResources.Converters;
 using Steam.Models;
 using System;
 using System.Collections.Generic;
@@ -39,7 +35,7 @@ namespace SystemChecker.Clients
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "SystemChecker", $"Failed to download {url}");
+                Common.LogError(ex, false, $"Failed to download {url}");
                 return string.Empty;
             }
         }
@@ -80,7 +76,7 @@ namespace SystemChecker.Clients
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "SystemChecker");
+                Common.LogError(ex, false);
             }
 
             Minimum.IsMinimum = true;
@@ -170,7 +166,7 @@ namespace SystemChecker.Clients
                         .Replace("()", string.Empty)
                         .Replace("<br>", string.Empty)
                         .Trim();
-               
+
                     foreach (string sTemp in os.Replace(",", "¤").Replace(" or ", "¤").Replace("/", "¤").Split('¤'))
                     {
                         requirement.Os.Add(sTemp.Trim());
@@ -209,7 +205,7 @@ namespace SystemChecker.Clients
                             .Replace("()", string.Empty)
                             .Replace("<br>", string.Empty)
                             .Trim();
-               
+
                     cpu = Regex.Replace(cpu, ", ([0-9])", " $1");
                     cpu = Regex.Replace(cpu, "([0-9]),([0-9] GHz)", "$1.$2");
                     cpu = Regex.Replace(cpu, "([0-9])GHz", "$1 GHz");
@@ -233,7 +229,7 @@ namespace SystemChecker.Clients
                             .Replace("<br>", string.Empty)
                             .Trim();
                     ram = ram.Split('/')[ram.Split('/').Length - 1];
-             
+
                     if (ram.ToLower().IndexOf("mb") > -1)
                     {
                         requirement.Ram = 1024 * 1024 * long.Parse(ram.ToLower().Replace("mb", string.Empty).Trim());
@@ -316,7 +312,7 @@ namespace SystemChecker.Clients
                             .Replace("  ", " ")
                             .Replace(". Integrated Intel HD Graphics should work but is not supported; problems are generally solved with a driver update.", string.Empty)
                             .Trim();
-                  
+
                     gpu = Regex.Replace(gpu, " - ([0-9]) GB", " ($1 GB)");
                     //gpu = Regex.Replace(gpu, "([0-9])Gb", "($1 GB)");
                     gpu = gpu.Replace(",", "¤").Replace(" or ", "¤").Replace(" OR ", "¤").Replace(" / ", "¤").Replace(" | ", "¤");
@@ -364,7 +360,7 @@ namespace SystemChecker.Clients
                         .Replace("free hard drive space", string.Empty)
                         .Replace("<br>", string.Empty)
                         .Trim();
-               
+
                     if (storage.IndexOf("mb") > -1)
                     {
                         requirement.Storage = 1024 * 1024 * double.Parse(storage.Replace("mb", string.Empty).Replace("available hard disk space", string.Empty).Trim());

@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using CommonPluginsShared;
+using CommonPluginsShared.Collections;
+using Newtonsoft.Json;
 using Playnite.SDK;
 using Playnite.SDK.Models;
-using PluginCommon;
-using PluginCommon.Collections;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,69 +15,49 @@ using SystemChecker.Models;
 
 namespace SystemChecker.Services
 {
-    public class SystemCheckerDatabase : PluginDatabaseObject<SystemCheckerSettings, RequierementsCollection, GameRequierements>
+    public class SystemCheckerDatabase : PluginDatabaseObject<SystemCheckerSettingsViewModel, RequierementsCollection, GameRequierements>
     {
         private PCGamingWikiRequierements pCGamingWikiRequierements;
         private SteamRequierements steamRequierements;
 
-        public SystemCheckerDatabase(IPlayniteAPI PlayniteApi, SystemCheckerSettings PluginSettings, string PluginUserDataPath) : base(PlayniteApi, PluginSettings, PluginUserDataPath)
+        public SystemCheckerDatabase(IPlayniteAPI PlayniteApi, SystemCheckerSettingsViewModel PluginSettings, string PluginUserDataPath) : base(PlayniteApi, PluginSettings, "SystemChecker", PluginUserDataPath)
         {
-            PluginName = "SystemChecker";
-
-            ControlAndCreateDirectory(PluginUserDataPath, "Requierements");
-
-            pCGamingWikiRequierements = new PCGamingWikiRequierements(_PlayniteApi, PluginUserDataPath);
+            pCGamingWikiRequierements = new PCGamingWikiRequierements(PlayniteApi, PluginUserDataPath);
             steamRequierements = new SteamRequierements();
         }
 
 
         protected override bool LoadDatabase()
         {
-            IsLoaded = false;
-            Database = new RequierementsCollection(PluginDatabaseDirectory);
-            Database.SetGameInfo<Requirement>(_PlayniteApi);
+            Database = new RequierementsCollection(Paths.PluginDatabasePath);
+            Database.SetGameInfo<Requirement>(PlayniteApi);
 
             Database.PC = GetPcInfo();
-            
-#if DEBUG
-            logger.Debug($"{PluginName} - db: {JsonConvert.SerializeObject(Database)}");
-#endif
 
-            GameSelectedData = new GameRequierements();
             GetPluginTags();
 
-            IsLoaded = true;
             return true;
         }
 
 
-        public override GameRequierements Get(Guid Id, bool OnlyCache = false)
+        public override GameRequierements Get(Guid Id, bool OnlyCache = false, bool Force = false)
         {
-            GameIsLoaded = false;
             GameRequierements gameRequierements = base.GetOnlyCache(Id);
-#if DEBUG
-            logger.Debug($"{PluginName} - GetFromDb({Id.ToString()}) - gameRequierements: {JsonConvert.SerializeObject(gameRequierements)}");
-#endif
 
             // Get from web
-            if (gameRequierements == null && !OnlyCache)
+            if ((gameRequierements == null && !OnlyCache) || Force)
             {
-                gameRequierements = GetFromWeb(_PlayniteApi.Database.Games.Get(Id));
+                gameRequierements = GetFromWeb(PlayniteApi.Database.Games.Get(Id));
                 Add(gameRequierements);
-
-#if DEBUG
-                logger.Debug($"{PluginName} - GetFromWeb({Id.ToString()}) - gameRequierements: {JsonConvert.SerializeObject(gameRequierements)}");
-#endif
             }
 
             if (gameRequierements == null)
             {
-                Game game = _PlayniteApi.Database.Games.Get(Id);
+                Game game = PlayniteApi.Database.Games.Get(Id);
                 gameRequierements = GetDefault(game);
                 Add(gameRequierements);
             }
 
-            GameIsLoaded = true;
             return gameRequierements;
         }
 
@@ -99,7 +79,7 @@ namespace SystemChecker.Services
 
             try
             {
-                SourceName = PlayniteTools.GetSourceName(_PlayniteApi, game);
+                SourceName = PlayniteTools.GetSourceName(PlayniteApi, game);
 
                 // Search datas
                 logger.Info($"SystemChecker - Try find with PCGamingWikiRequierements for {game.Name}");
@@ -116,7 +96,7 @@ namespace SystemChecker.Services
                             break;
 
                         default:
-                            SteamApi steamApi = new SteamApi(PluginUserDataPath);
+                            SteamApi steamApi = new SteamApi(Paths.PluginUserDataPath);
                             int SteamID = steamApi.GetSteamId(game.Name);
                             if (SteamID != 0)
                             {
@@ -131,7 +111,7 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "SystemChecker");
+                Common.LogError(ex, false);
             }
 
             return gameRequierements;
@@ -142,7 +122,7 @@ namespace SystemChecker.Services
 
         public SystemConfiguration GetPcInfo()
         {
-            string FilePlugin = Path.Combine(PluginDatabaseDirectory, "pc.json");
+            string FilePlugin = Path.Combine(Paths.PluginDatabasePath, "pc.json");
 
             SystemConfiguration systemConfiguration = new SystemConfiguration();
             List<SystemDisk> Disks = GetInfoDisks();
@@ -159,7 +139,7 @@ namespace SystemChecker.Services
                 }
                 catch (Exception ex)
                 {
-                    Common.LogError(ex, "SystemChecker", $"Failed to load item from {FilePlugin}");
+                    Common.LogError(ex, false, $"Failed to load item from {FilePlugin}");
                 }
             }
 
@@ -185,7 +165,7 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "SystemChecker", "Error on Win32_OperatingSystem");
+                Common.LogError(ex, false, "Error on Win32_OperatingSystem");
             }
 
             // CPU
@@ -200,7 +180,7 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "SystemChecker", "Error on Win32_Processor");
+                Common.LogError(ex, false, "Error on Win32_Processor");
             }
 
             // GPU
@@ -242,7 +222,7 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "SystemChecker", "Error on Win32_VideoController");
+                Common.LogError(ex, false, "Error on Win32_VideoController");
             }
 
             // RAM
@@ -257,7 +237,7 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "SystemChecker", "Error on Win32_ComputerSystem");
+                Common.LogError(ex, false, "Error on Win32_ComputerSystem");
             }
 
 
@@ -373,6 +353,22 @@ namespace SystemChecker.Services
             gameRequierements.Items = new List<Requirement> { Minimum, Recommanded };
 
             return gameRequierements;
+        }
+
+
+        public override void SetThemesResources(Game game)
+        {
+            GameRequierements gameRequierements = Get(game, true);
+
+            PluginSettings.Settings.HasData = gameRequierements.HasData;
+        }
+
+        public override void Games_ItemUpdated(object sender, ItemUpdatedEventArgs<Game> e)
+        {
+            foreach (var GameUpdated in e.UpdatedItems)
+            {
+                Database.SetGameInfo<Requirement>(PlayniteApi, GameUpdated.NewData.Id);
+            }
         }
     }
 }

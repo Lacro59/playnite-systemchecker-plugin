@@ -1,12 +1,12 @@
 ﻿using Newtonsoft.Json;
 using Playnite.SDK;
 using Playnite.SDK.Models;
-using PluginCommon;
 using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using SystemChecker.Models;
+using CommonPluginsShared;
 
 namespace SystemChecker.Services
 {
@@ -74,7 +74,7 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "SystemChecker", $"Error on CheckOs() with {systemOs} & {JsonConvert.SerializeObject(requierementOs)}");
+                Common.LogError(ex, false, $"Error on CheckOs() with {systemOs} & {JsonConvert.SerializeObject(requierementOs)}");
             }
 
             return false;
@@ -102,7 +102,7 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "SystemChecker", $"Error on CheckGpu() with {systemConfiguration.Cpu} & {JsonConvert.SerializeObject(requierementCpu)}");
+                Common.LogError(ex, false, $"Error on CheckGpu() with {systemConfiguration.Cpu} & {JsonConvert.SerializeObject(requierementCpu)}");
             }
 
             return false;
@@ -121,7 +121,7 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "SystemChecker", $"Error on CheckRam() with {systemRam} & {requierementRam}");
+                Common.LogError(ex, false, $"Error on CheckRam() with {systemRam} & {requierementRam}");
             }
 
             return false;
@@ -133,7 +133,7 @@ namespace SystemChecker.Services
             {
                 if (requierementGpu.Count > 0)
                 {
-                    for(int i = 0; i < requierementGpu.Count; i++)
+                    for (int i = 0; i < requierementGpu.Count; i++)
                     {
                         var gpu = requierementGpu[i];
 
@@ -158,7 +158,7 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "SystemChecker", $"Error on CheckGpu() with {systemConfiguration.GpuName} & {JsonConvert.SerializeObject(requierementGpu)}");
+                Common.LogError(ex, false, $"Error on CheckGpu() with {systemConfiguration.GpuName} & {JsonConvert.SerializeObject(requierementGpu)}");
             }
 
             return false;
@@ -183,7 +183,7 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "SystemChecker", $"Error on CheckStorage() with {Storage} & {JsonConvert.SerializeObject(systemDisks)}");
+                Common.LogError(ex, false, $"Error on CheckStorage() with {Storage} & {JsonConvert.SerializeObject(systemDisks)}");
             }
 
             return false;

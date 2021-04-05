@@ -1,9 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using CommonPluginsShared;
+using CommonPluginsShared.PlayniteExtended;
+using Newtonsoft.Json;
 using Playnite.SDK;
 using Playnite.SDK.Events;
 using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
-using PluginCommon;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,91 +20,75 @@ using SystemChecker.Views;
 
 namespace SystemChecker
 {
-    public class SystemChecker : Plugin
+    public class SystemChecker : PluginExtended<SystemCheckerSettingsViewModel, SystemCheckerDatabase>
     {
-        private static readonly ILogger logger = LogManager.GetLogger();
-        private static IResourceProvider resources = new ResourceProvider();
-
-        private SystemCheckerSettings settings { get; set; }
-
         public override Guid Id { get; } = Guid.Parse("e248b230-6edf-41ea-a3c3-7861fa267263");
-
-        public static string pluginFolder;
-        public static SystemCheckerDatabase PluginDatabase;
-        public static Game GameSelected { get; set; }
-        public static SystemCheckerUI systemCheckerUI;
 
         private OldToNew oldToNew;
 
 
         public SystemChecker(IPlayniteAPI api) : base(api)
         {
-            settings = new SystemCheckerSettings(this);
-
             // Old database
             oldToNew = new OldToNew(this.GetPluginUserDataPath());
 
-            // Loading plugin database 
-            PluginDatabase = new SystemCheckerDatabase(PlayniteApi, settings, this.GetPluginUserDataPath());
-            PluginDatabase.InitializeDatabase();
-
-            // Get plugin's location 
-            pluginFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
-            // Add plugin localization in application ressource.
-            PluginCommon.PluginLocalization.SetPluginLanguage(pluginFolder, api.ApplicationSettings.Language);
-            // Add common in application ressource.
-            PluginCommon.Common.Load(pluginFolder);
-
-            // Check version
-            if (settings.EnableCheckVersion)
-            {
-                CheckVersion cv = new CheckVersion();
-
-                if (cv.Check("SystemChecker", pluginFolder))
-                {
-                    cv.ShowNotification(api, "SystemChecker - " + resources.GetString("LOCUpdaterWindowTitle"));
-                }
-            }
-
-            // Init ui interagration
-            systemCheckerUI = new SystemCheckerUI(api, settings, this.GetPluginUserDataPath());
-
             // Custom theme button
-            EventManager.RegisterClassHandler(typeof(Button), Button.ClickEvent, new RoutedEventHandler(systemCheckerUI.OnCustomThemeButtonClick));
+            EventManager.RegisterClassHandler(typeof(Button), Button.ClickEvent, new RoutedEventHandler(OnCustomThemeButtonClick));
 
-            // Add event fullScreen
-            if (api.ApplicationInfo.Mode == ApplicationMode.Fullscreen)
+            // Custom elements integration
+            AddCustomElementSupport(new AddCustomElementSupportArgs
             {
-                EventManager.RegisterClassHandler(typeof(Button), Button.ClickEvent, new RoutedEventHandler(BtFullScreen_ClickEvent));
-            }
+                ElementList = new List<string> { },
+                SourceName = "SystemChecker",
+                SettingsRoot = $"{nameof(PluginSettings)}.{nameof(PluginSettings.Settings)}"
+            });
         }
 
 
         #region Custom event
-        private void BtFullScreen_ClickEvent(object sender, System.EventArgs e)
+        public void OnCustomThemeButtonClick(object sender, RoutedEventArgs e)
         {
+            string ButtonName = string.Empty;
             try
             {
-                if (((Button)sender).Name == "PART_ButtonDetails")
+                ButtonName = ((Button)sender).Name;
+                if (ButtonName == "PART_CustomSysCheckerButton")
                 {
-                    var TaskIntegrationUI = Task.Run(() =>
-                    {
-                        systemCheckerUI.Initial();
-                        systemCheckerUI.taskHelper.Check();
-                        var dispatcherOp = systemCheckerUI.AddElementsFS();
-                        dispatcherOp.Completed += (s, ev) => { systemCheckerUI.RefreshElements(GameSelected); };
-                    });
+                    PluginDatabase.IsViewOpen = true;
+                    var ViewExtension = new SystemCheckerGameView(PlayniteApi, this.GetPluginUserDataPath(), PluginDatabase.GameContext);
+                    Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PlayniteApi, "SystemChecker", ViewExtension);
+                    windowExtension.ShowDialog();
+                    PluginDatabase.IsViewOpen = false;
                 }
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "SystemChecker");
+                Common.LogError(ex, false);
             }
         }
         #endregion
 
 
+        #region Theme integration
+        public override List<TopPanelItem> GetTopPanelItems()
+        {
+            return null;
+        }
+
+        // List custom controls
+        public override Control GetGameViewControl(GetGameViewControlArgs args)
+        {
+            if (args.Name == "PluginViewItem")
+            {
+                //return new PluginViewItem();
+            }
+
+            return null;
+        }
+        #endregion
+
+
+        #region Menus
         // To add new game menu items override GetGameMenuItems
         public override List<GameMenuItem> GetGameMenuItems(GetGameMenuItemsArgs args)
         {
@@ -133,9 +118,7 @@ namespace SystemChecker
                     {
                         var TaskIntegrationUI = Task.Run(() =>
                         {
-                            PluginDatabase.Remove(GameMenu);
-                            var dispatcherOp = systemCheckerUI.AddElements();
-                            dispatcherOp.Completed += (s, e) => { systemCheckerUI.RefreshElements(GameMenu); };
+                            PluginDatabase.Refresh(GameMenu.Id);
                         });
                     }
                 }
@@ -157,7 +140,7 @@ namespace SystemChecker
         public override List<MainMenuItem> GetMainMenuItems(GetMainMenuItemsArgs args)
         {
             string MenuInExtensions = string.Empty;
-            if (settings.MenuInExtensions)
+            if (PluginSettings.Settings.MenuInExtensions)
             {
                 MenuInExtensions = "@";
             }
@@ -169,9 +152,9 @@ namespace SystemChecker
                 {
                     MenuSection = MenuInExtensions + resources.GetString("LOCSystemChecker"),
                     Description = resources.GetString("LOCCommonGettingAllDatas"),
-                    Action = (mainMenuItem) => 
+                    Action = (mainMenuItem) =>
                     {
-                        PluginDatabase.GetAllDatas();
+                        PluginDatabase.GetSelectData();
                     }
                 },
 
@@ -180,7 +163,7 @@ namespace SystemChecker
                 {
                     MenuSection = MenuInExtensions + resources.GetString("LOCSystemChecker"),
                     Description = resources.GetString("LOCCommonClearAllDatas"),
-                    Action = (mainMenuItem) => 
+                    Action = (mainMenuItem) =>
                     {
                         PluginDatabase.ClearDatabase();
                     }
@@ -198,8 +181,10 @@ namespace SystemChecker
 
             return mainMenuItems;
         }
+        #endregion
 
 
+        #region Game event
         public override void OnGameSelected(GameSelectionEventArgs args)
         {
             // Old database
@@ -212,22 +197,13 @@ namespace SystemChecker
             {
                 if (args.NewValue != null && args.NewValue.Count == 1)
                 {
-                    GameSelected = args.NewValue[0];
-
-                    var TaskIntegrationUI = Task.Run(() =>
-                    {
-                        systemCheckerUI.taskHelper.Check();
-                        var dispatcherOp = systemCheckerUI.AddElements();
-                        if (dispatcherOp != null)
-                        {
-                            dispatcherOp.Completed += (s, e) => { systemCheckerUI.RefreshElements((args.NewValue[0])); };
-                        }
-                    });
+                    PluginDatabase.GameContext = args.NewValue[0];
+                    PluginDatabase.SetThemesResources(PluginDatabase.GameContext);
                 }
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, "SystemChecker", $"OnGameSelected()");
+                Common.LogError(ex, false);
             }
         }
 
@@ -260,8 +236,10 @@ namespace SystemChecker
         {
 
         }
+        #endregion
 
 
+        #region Application event
         // Add code to be executed when Playnite is initialized.
         public override void OnApplicationStarted()
         {
@@ -273,6 +251,7 @@ namespace SystemChecker
         {
 
         }
+        #endregion
 
 
         // Add code to be executed when library is updated.
@@ -282,14 +261,16 @@ namespace SystemChecker
         }
 
 
+        #region Settings
         public override ISettings GetSettings(bool firstRunSettings)
         {
-            return settings;
+            return PluginSettings;
         }
 
         public override UserControl GetSettingsView(bool firstRunSettings)
         {
             return new SystemCheckerSettingsView();
         }
+        #endregion
     }
 }

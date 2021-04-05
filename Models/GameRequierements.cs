@@ -1,9 +1,9 @@
-﻿using PluginCommon.Collections;
+﻿using CommonPluginsShared.Collections;
 using System.Collections.Generic;
 
 namespace SystemChecker.Models
 {
-    public class GameRequierements :  PluginDataBaseGame<Requirement>
+    public class GameRequierements : PluginDataBaseGame<Requirement>
     {
         private List<Requirement> _Items = new List<Requirement>();
         public override List<Requirement> Items
