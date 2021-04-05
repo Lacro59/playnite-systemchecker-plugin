@@ -15,6 +15,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using SystemChecker.Clients;
+using SystemChecker.Controls;
 using SystemChecker.Services;
 using SystemChecker.Views;
 
@@ -24,13 +25,13 @@ namespace SystemChecker
     {
         public override Guid Id { get; } = Guid.Parse("e248b230-6edf-41ea-a3c3-7861fa267263");
 
-        private OldToNew oldToNew;
+        //private OldToNew oldToNew;
 
 
         public SystemChecker(IPlayniteAPI api) : base(api)
         {
             // Old database
-            oldToNew = new OldToNew(this.GetPluginUserDataPath());
+            //oldToNew = new OldToNew(this.GetPluginUserDataPath());
 
             // Custom theme button
             EventManager.RegisterClassHandler(typeof(Button), Button.ClickEvent, new RoutedEventHandler(OnCustomThemeButtonClick));
@@ -38,7 +39,7 @@ namespace SystemChecker
             // Custom elements integration
             AddCustomElementSupport(new AddCustomElementSupportArgs
             {
-                ElementList = new List<string> { },
+                ElementList = new List<string> { "PluginButton", "PluginViewItem" },
                 SourceName = "SystemChecker",
                 SettingsRoot = $"{nameof(PluginSettings)}.{nameof(PluginSettings.Settings)}"
             });
@@ -78,6 +79,11 @@ namespace SystemChecker
         // List custom controls
         public override Control GetGameViewControl(GetGameViewControlArgs args)
         {
+            if (args.Name == "PluginButton")
+            {
+                return new PluginButton();
+            }
+
             if (args.Name == "PluginViewItem")
             {
                 //return new PluginViewItem();
@@ -188,10 +194,10 @@ namespace SystemChecker
         public override void OnGameSelected(GameSelectionEventArgs args)
         {
             // Old database
-            if (oldToNew.IsOld)
-            {
-                oldToNew.ConvertDB(PlayniteApi);
-            }
+            //if (oldToNew.IsOld)
+            //{
+            //    oldToNew.ConvertDB(PlayniteApi);
+            //}
 
             try
             {

@@ -3,58 +3,83 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:AttachedProperties="clr-namespace:CommonPluginsShared.Controls"
              mc:Ignorable="d">
 
-    <StackPanel Margin="20">
-        <StackPanel>
-            <Label Content="{DynamicResource LOCSystemChecker}" FontSize="18" />
-            <Separator Margin="0,0,0,10" />
+    <TabControl Margin="20">
+        <TabItem Header="{DynamicResource LOCSystemChecker}">
+            <StackPanel Margin="0,10,0,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="35"/>
+                        <RowDefinition Height="35"/>
+                    </Grid.RowDefinitions>
 
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="35"/>
-                    <RowDefinition Height="35"/>
-                </Grid.RowDefinitions>
+                    <CheckBox Grid.Column="0" Grid.Row="0" IsChecked="{Binding Settings.MenuInExtensions}" VerticalAlignment="Center">
+                        <Label Content="{DynamicResource LOCCommonMenuInExtensions}" />
+                    </CheckBox>
 
-                <CheckBox Grid.Column="0" Grid.Row="0" IsChecked="{Binding Settings.MenuInExtensions}" VerticalAlignment="Center">
-                    <Label Content="{DynamicResource LOCCommonMenuInExtensions}" />
-                </CheckBox>
-
-                <Button Grid.Column="0" Grid.Row="1" Content="{DynamicResource LOCClearAll}" Click="Button_Click" Width="200" 
+                    <Button Grid.Column="0" Grid.Row="1" Content="{DynamicResource LOCClearAll}" Click="Button_Click" Width="200" 
                         HorizontalAlignment="Left" VerticalAlignment="Center" />
-            </Grid>
+                </Grid>
+            </StackPanel>
+        </TabItem>
 
-            <Label Content="{DynamicResource LOCCommonIntegration}" FontSize="18" Margin="0,20,0,0" />
-            <Separator Margin="0,0,0,10" />
+        <TabItem Header="{DynamicResource LOCCommonIntegration}">
+            <StackPanel Margin="0,10,0,0">
+                <Label Content="{DynamicResource LOCCommonControlsAvailable}" />
+                <Separator Margin="0,0,0,10" />
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="10" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="10" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
 
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="10" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="35"/>
-                    <RowDefinition Height="35"/>
-                </Grid.RowDefinitions>
+                    <Expander Grid.Row="0">
+                        <Expander.Style>
+                            <Style TargetType="{x:Type Expander}" BasedOn="{StaticResource {x:Type Expander}}">
+                                <Setter Property="Background" Value="Transparent" />
+                            </Style>
+                        </Expander.Style>
 
-                <CheckBox Grid.Column="0" Grid.Row="0" IsChecked="{Binding Settings.EnableIntegrationButton}" Margin="0,0,0,0" 
-                          Name="Scheck_IntegrationInButton" Click="Checkbox_Click" VerticalAlignment="Center">
-                    <Label Content="{DynamicResource LOCCommonIntegrationButton}" />
-                </CheckBox>
-                <CheckBox Grid.Column="2" Grid.Row="0" IsChecked="{Binding Settings.EnableIntegrationButtonDetails}" Margin="0,0,0,0" 
-                          Name="Scheck_IntegrationInButtonDetails" Click="Checkbox_Click" VerticalAlignment="Center">
-                    <Label Content="{DynamicResource LOCCommonIntegrationButtonDetails}" />
-                </CheckBox>
+                        <Expander.Header>
+                            <CheckBox IsChecked="{Binding Settings.EnableIntegrationButton}" Name="PART_IntegrationButton">
+                                <Label Content="{DynamicResource LOCCommonControlsPluginButtonShow}" />
+                            </CheckBox>
+                        </Expander.Header>
 
-                <CheckBox Grid.Row="2" Grid.ColumnSpan="3" IsChecked="{Binding Settings.EnableIntegrationInCustomTheme}" Margin="0,5,0,0" 
-                          Name="Scheck_IntegrationInCustomTheme" Click="Checkbox_Click" VerticalAlignment="Center">
-                    <Label Content="{DynamicResource LOCCommonIntegrationInCustomTheme}" />
-                </CheckBox>
-            </Grid>
-        </StackPanel>
-    </StackPanel>
+                        <Expander.Content>
+                            <Border IsEnabled="{Binding ElementName=PART_IntegrationButton, Path=IsChecked}"
+				                    Margin="5" Padding="10"
+				                    BorderBrush="{DynamicResource PopupBorderBrush}"
+				                    BorderThickness="{DynamicResource PopupBorderThickness}">
+                                <Grid>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="10" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="auto" />
+                                        </Grid.RowDefinitions>
+
+                                        <CheckBox Grid.Column="0" Grid.Row="0" IsChecked="{Binding Settings.EnableIntegrationButtonDetails}">
+                                            <Label Content="{DynamicResource LOCCommonIntegrationButtonDetails}" />
+                                        </CheckBox>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                        </Expander.Content>
+                    </Expander>
+                </Grid>
+            </StackPanel>
+        </TabItem>
+    </TabControl>
 </UserControl>

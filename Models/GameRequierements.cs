@@ -1,4 +1,5 @@
 ﻿using CommonPluginsShared.Collections;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace SystemChecker.Models
@@ -24,6 +25,21 @@ namespace SystemChecker.Models
         public string SourceName { get; set; }
 
         public string Link { get; set; }
+
+
+        [JsonIgnore]
+        public override bool HasData
+        {
+            get
+            {
+                if (Items.Count > 0)
+                {
+                    return Items.Find(x => x.IsMinimum).HasData;
+                }
+
+                return false;
+            }
+        }
 
 
         public Requirement GetMinimum()

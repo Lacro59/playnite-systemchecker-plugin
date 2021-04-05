@@ -87,6 +87,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\PluginButton.xaml.cs">
+      <DependentUpon>PluginButton.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Models\RequierementsCollection.cs" />
     <Compile Include="playnite-plugincommon\CommonPluginsControls\Views\OptionsDownloadData.xaml.cs">
       <DependentUpon>OptionsDownloadData.xaml</DependentUpon>
@@ -106,12 +109,6 @@
     <Compile Include="Services\SystemCheckerDatabase.cs" />
     <Compile Include="SystemChecker.cs" />
     <Compile Include="SystemCheckerSettings.cs" />
-    <Compile Include="Views\Interfaces\SystemCheckerButton.xaml.cs">
-      <DependentUpon>SystemCheckerButton.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Interfaces\SystemCheckerButtonDetails.xaml.cs">
-      <DependentUpon>SystemCheckerButtonDetails.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\SystemCheckerGameView.xaml.cs">
       <DependentUpon>SystemCheckerGameView.xaml</DependentUpon>
     </Compile>
@@ -228,6 +225,10 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Include="Controls\PluginButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="playnite-plugincommon\CommonPluginsControls\Views\OptionsDownloadData.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -235,14 +236,6 @@
     <Page Include="Resources\Common.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Interfaces\SystemCheckerButton.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Interfaces\SystemCheckerButtonDetails.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\SystemCheckerGameView.xaml">
       <SubType>Designer</SubType>

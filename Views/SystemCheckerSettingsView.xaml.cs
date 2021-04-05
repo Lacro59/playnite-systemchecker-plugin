@@ -18,28 +18,7 @@ namespace SystemChecker.Views
         {
             InitializeComponent();
         }
-
-        private void Checkbox_Click(object sender, RoutedEventArgs e)
-        {
-            CheckBox cb = (CheckBox)sender;
-
-            if ((cb.Name == "Scheck_IntegrationInButton") && (bool)cb.IsChecked)
-            {
-                Scheck_IntegrationInButtonDetails.IsChecked = false;
-                Scheck_IntegrationInCustomTheme.IsChecked = false;
-            }
-            if ((cb.Name == "Scheck_IntegrationInButtonDetails") && (bool)cb.IsChecked)
-            {
-                Scheck_IntegrationInButton.IsChecked = false;
-                Scheck_IntegrationInCustomTheme.IsChecked = false;
-            }
-
-            if ((cb.Name == "Scheck_IntegrationInCustomTheme") && (bool)cb.IsChecked)
-            {
-                Scheck_IntegrationInButton.IsChecked = false;
-                Scheck_IntegrationInButtonDetails.IsChecked = false;
-            }
-        }
+        
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {

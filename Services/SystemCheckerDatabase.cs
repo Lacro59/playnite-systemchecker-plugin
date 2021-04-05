@@ -47,7 +47,7 @@ namespace SystemChecker.Services
             // Get from web
             if ((gameRequierements == null && !OnlyCache) || Force)
             {
-                gameRequierements = GetFromWeb(PlayniteApi.Database.Games.Get(Id));
+                gameRequierements = GetWeb(Id);
                 Add(gameRequierements);
             }
 
@@ -71,8 +71,9 @@ namespace SystemChecker.Services
         }
 
 
-        public GameRequierements GetFromWeb(Game game)
+        public override GameRequierements GetWeb(Guid Id)
         {
+            Game game = PlayniteApi.Database.Games.Get(Id);
             GameRequierements gameRequierements = GetDefault(game);
 
             string SourceName = string.Empty;
