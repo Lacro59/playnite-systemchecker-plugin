@@ -9,9 +9,9 @@
         mc:Ignorable="d">
 
     <Grid>
-        <TextBlock Text="{Binding Text, Mode=OneWay, FallbackValue='&#xea45;'}" 
-                   FontFamily="{DynamicResource FontIcoFont}"
-                   Foreground="{Binding Foreground}"
+        <TextBlock Text="{Binding Text, Mode=OneWay}" 
+                   FontFamily="{DynamicResource CommonFont}"
+                   Foreground="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=Foreground}"
                    FontSize="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=FontSize}" />
     </Grid>
 </controls:PluginUserControlExtend>

@@ -11,9 +11,9 @@
     <Button Name="PART_PluginButton"
             Click="PART_PluginButton_Click" Style="{StaticResource {x:Type Button}}">
         <Grid>
-            <TextBlock Text="{Binding Text, Mode=OneWay, FallbackValue='&#xea45;'}" FontFamily="{DynamicResource FontIcoFont}"
+            <TextBlock Text="{Binding Text, Mode=OneWay, FallbackValue='&#xea4c;'}" FontFamily="{DynamicResource CommonFont}"
                        FontSize="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=FontSize}">
-                <TextBlock.Style>
+                <!--TextBlock.Style>
                     <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
                         <Setter Property="Foreground" Value="{Binding Foreground, FallbackValue='#55CDFF'}"/>
                         <Style.Triggers>
@@ -22,7 +22,7 @@
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
-                </TextBlock.Style>
+                </TextBlock.Style-->
             </TextBlock>
         </Grid>
     </Button>

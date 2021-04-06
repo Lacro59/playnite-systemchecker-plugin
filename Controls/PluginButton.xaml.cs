@@ -57,6 +57,12 @@ namespace SystemChecker.Controls
         }
 
 
+        private readonly string IconOk = "\uea50";
+        private readonly string IconKo = "\uea52";
+        private readonly string IconMinimum = "\uea51";
+        private readonly string IconEmpty = "\uea53";
+
+
         public PluginButton()
         {
             InitializeComponent();
@@ -87,7 +93,7 @@ namespace SystemChecker.Controls
                 IsActivated = PluginDatabase.PluginSettings.Settings.EnableIntegrationButton,
                 DisplayDetails = PluginDatabase.PluginSettings.Settings.EnableIntegrationButtonDetails,
 
-                Text = "\uea45",
+                Text = IconEmpty,
                 Foreground = (SolidColorBrush)resources.GetResource("GlyphBrush")
             };
         }
@@ -112,22 +118,26 @@ namespace SystemChecker.Controls
                     {
                         if (!(bool)CheckMinimum.AllOk)
                         {
-                            ControlDataContext.Foreground = Brushes.Red;
+                            //ControlDataContext.Foreground = Brushes.Red;
+                            ControlDataContext.Text = IconKo;
                         }
                         else if ((bool)CheckMinimum.AllOk)
                         {
-                            ControlDataContext.Foreground = Brushes.Orange;
+                            //ControlDataContext.Foreground = Brushes.Orange;
+                            ControlDataContext.Text = IconMinimum;
 
                             if (!systemRecommanded.HasData)
                             {
-                                ControlDataContext.Foreground = Brushes.Green;
+                                //ControlDataContext.Foreground = Brushes.Green;
+                                ControlDataContext.Text = IconOk;
                             }
                         }
                     }
 
                     if (systemRecommanded.HasData && (bool)CheckRecommanded.AllOk)
                     {
-                        ControlDataContext.Foreground = Brushes.Green;
+                        //ControlDataContext.Foreground = Brushes.Green;
+                        ControlDataContext.Text = IconOk;
                     }
                 }
 
