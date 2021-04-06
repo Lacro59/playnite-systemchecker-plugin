@@ -119,8 +119,6 @@ namespace SystemChecker.Services
         }
 
 
-
-
         public SystemConfiguration GetPcInfo()
         {
             string FilePlugin = Path.Combine(Paths.PluginDatabasePath, "pc.json");
@@ -359,7 +357,30 @@ namespace SystemChecker.Services
         {
             GameRequierements gameRequierements = Get(game, true);
 
+            SystemConfiguration systemConfiguration = Database.PC;
+            Requirement systemMinimum = gameRequierements.GetMinimum();
+            Requirement systemRecommanded = gameRequierements.GetRecommanded();
+
+            CheckSystem CheckMinimum = CheckMinimum = SystemApi.CheckConfig(systemMinimum, systemConfiguration);
+            CheckSystem CheckRecommanded = SystemApi.CheckConfig(systemRecommanded, systemConfiguration);
+
+
             PluginSettings.Settings.HasData = gameRequierements.HasData;
+            PluginSettings.Settings.IsMinimumOK = false;
+            PluginSettings.Settings.IsRecommandedOK = false;
+            PluginSettings.Settings.IsAllOK = false;
+
+            if (systemMinimum.HasData)
+            {
+                PluginSettings.Settings.IsMinimumOK = (bool)CheckMinimum.AllOk;
+                PluginSettings.Settings.IsAllOK = (bool)CheckMinimum.AllOk;
+            }
+
+            if (systemRecommanded.HasData && (bool)CheckRecommanded.AllOk)
+            {
+                PluginSettings.Settings.IsRecommandedOK = (bool)CheckRecommanded.AllOk;
+                PluginSettings.Settings.IsAllOK = (bool)CheckRecommanded.AllOk;
+            }
         }
 
         public override void Games_ItemUpdated(object sender, ItemUpdatedEventArgs<Game> e)

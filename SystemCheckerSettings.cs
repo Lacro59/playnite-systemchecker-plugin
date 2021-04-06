@@ -61,6 +61,42 @@ namespace SystemChecker
                 OnPropertyChanged();
             }
         }
+
+        [DontSerialize]
+        private bool _IsMinimumOK { get; set; } = false;
+        public bool IsMinimumOK
+        {
+            get => _IsMinimumOK;
+            set
+            {
+                _IsMinimumOK = value;
+                OnPropertyChanged();
+            }
+        }
+
+        [DontSerialize]
+        private bool _IsRecommandedOK { get; set; } = false;
+        public bool IsRecommandedOK
+        {
+            get => _IsRecommandedOK;
+            set
+            {
+                _IsRecommandedOK = value;
+                OnPropertyChanged();
+            }
+        }
+
+        [DontSerialize]
+        private bool _IsAllOK { get; set; } = false;
+        public bool IsAllOK
+        {
+            get => _IsAllOK;
+            set
+            {
+                _IsAllOK = value;
+                OnPropertyChanged();
+            }
+        }
         #endregion  
     }
 
