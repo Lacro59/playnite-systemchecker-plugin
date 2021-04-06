@@ -1,11 +1,11 @@
 ﻿using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
+using CommonPluginsPlaynite.PluginLibrary.SteamLibrary.SteamShared;
 using CommonPluginsShared;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Playnite.SDK;
 using Playnite.SDK.Models;
-using Steam.Models;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -17,7 +17,7 @@ namespace SystemChecker.Clients
     {
         private static readonly ILogger logger = LogManager.GetLogger();
 
-        private uint appId { get; set; }
+        private uint AppId { get; set; }
 
 
         public SteamRequierements()
@@ -30,7 +30,7 @@ namespace SystemChecker.Clients
             string url = string.Empty;
             try
             {
-                url = $"https://store.steampowered.com/api/appdetails?appids={appId}&l=english";
+                url = $"https://store.steampowered.com/api/appdetails?appids={AppId}&l=english";
                 return Web.DownloadStringData(url).GetAwaiter().GetResult();
             }
             catch (Exception ex)
@@ -53,11 +53,11 @@ namespace SystemChecker.Clients
                 string data = GetSteamData();
                 var parsedData = JsonConvert.DeserializeObject<Dictionary<string, StoreAppDetailsResult>>(data);
 
-                if (parsedData[appId.ToString()].data != null && JsonConvert.SerializeObject(parsedData[appId.ToString()].data.pc_requirements) != "[]")
+                if (parsedData[AppId.ToString()].data != null && JsonConvert.SerializeObject(parsedData[AppId.ToString()].data.pc_requirements) != "[]")
                 {
-                    Common.LogDebug(true, JsonConvert.SerializeObject(parsedData[appId.ToString()].data.pc_requirements));
+                    Common.LogDebug(true, JsonConvert.SerializeObject(parsedData[AppId.ToString()].data.pc_requirements));
 
-                    JObject pc_requirements = JObject.FromObject(parsedData[appId.ToString()].data.pc_requirements);
+                    JObject pc_requirements = JObject.FromObject(parsedData[AppId.ToString()].data.pc_requirements);
 
                     if (pc_requirements["minimum"] != null)
                     {
@@ -70,7 +70,7 @@ namespace SystemChecker.Clients
                     }
 
                     gameRequierements.SourceName = "Steam";
-                    gameRequierements.SourceGameName = parsedData[appId.ToString()].data.name;
+                    gameRequierements.SourceGameName = parsedData[AppId.ToString()].data.name;
                 }
             }
             catch (Exception ex)
@@ -87,10 +87,10 @@ namespace SystemChecker.Clients
         {
             _game = game;
 
-            this.appId = appId;
+            this.AppId = appId;
             if (appId == 0)
             {
-                this.appId = uint.Parse(_game.GameId);
+                this.AppId = uint.Parse(_game.GameId);
             }
 
             return GetRequirements();

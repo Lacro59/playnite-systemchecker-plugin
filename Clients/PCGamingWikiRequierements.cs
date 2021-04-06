@@ -111,7 +111,6 @@ namespace SystemChecker.Clients
         }
 
 
-
         public override GameRequierements GetRequirements()
         {
             gameRequierements = SystemChecker.PluginDatabase.GetDefault(_game);

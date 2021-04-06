@@ -1,9 +1,0 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:Sys="clr-namespace:System;assembly=mscorlib">
-
-    <Sys:Boolean x:Key="Scheck_HasData">True</Sys:Boolean>
-    <Sys:Boolean x:Key="Scheck_IsMinimumOK">True</Sys:Boolean>
-    <Sys:Boolean x:Key="Scheck_IsRecommandedOK">True</Sys:Boolean>
-    <Sys:Boolean x:Key="Scheck_IsAllOK">True</Sys:Boolean>
-
-</ResourceDictionary>
