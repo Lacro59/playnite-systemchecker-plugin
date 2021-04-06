@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using CommonPluginsShared;
+using Newtonsoft.Json;
 using Playnite.SDK;
 using System;
 using System.Collections.Generic;
@@ -29,10 +30,8 @@ namespace SystemChecker.Services
 
         public bool IsBetter()
         {
-#if DEBUG
-            logger.Debug($"SystemChecker - Cpu.IsBetter - ProcessorPc: {JsonConvert.SerializeObject(ProcessorPc)}");
-            logger.Debug($"SystemChecker - Cpu.IsBetter - ProcessorRequierement: {JsonConvert.SerializeObject(ProcessorRequierement)}");
-#endif
+            Common.LogDebug(true, $"Cpu.IsBetter - ProcessorPc: {JsonConvert.SerializeObject(ProcessorPc)}");
+            Common.LogDebug(true, $"Cpu.IsBetter - ProcessorRequierement: {JsonConvert.SerializeObject(ProcessorRequierement)}");
 
             // Old Processor
             if (!ProcessorPc.IsOld && ProcessorRequierement.IsOld)
@@ -46,7 +45,7 @@ namespace SystemChecker.Services
             if (ProcessorPc.IsOld && ProcessorRequierement.IsOld)
             {
                 // TODO: CPU old vs old
-                logger.Warn($"SystemChecker - TODO - No CPU treatment for {JsonConvert.SerializeObject(ProcessorPc)} & {JsonConvert.SerializeObject(ProcessorRequierement)}");
+                logger.Warn($"No CPU treatment for {JsonConvert.SerializeObject(ProcessorPc)} & {JsonConvert.SerializeObject(ProcessorRequierement)}");
                 return false;
             }
 
@@ -61,7 +60,7 @@ namespace SystemChecker.Services
                 {
                     if (ProcessorPc.Clock == 0)
                     {
-                        logger.Warn($"SystemChecker - ProcessorPc.Clock is 0");
+                        logger.Warn($"ProcessorPc.Clock is 0");
                         return true;
                     }
 
@@ -112,7 +111,7 @@ namespace SystemChecker.Services
             }
 
 
-            logger.Warn($"SystemChecker - No CPU treatment for {JsonConvert.SerializeObject(ProcessorPc)} & {JsonConvert.SerializeObject(ProcessorRequierement)}");
+            logger.Warn($"No CPU treatment for {JsonConvert.SerializeObject(ProcessorPc)} & {JsonConvert.SerializeObject(ProcessorRequierement)}");
             return false;
         }
 

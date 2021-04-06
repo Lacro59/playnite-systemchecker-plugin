@@ -42,7 +42,7 @@ namespace SystemChecker.Services
 
         public void LoadOldDB()
         {
-            logger.Info($"SystemChecker - LoadOldDB()");
+            logger.Info($"LoadOldDB()");
 
             Parallel.ForEach(Directory.EnumerateFiles(PathActivityDB, "*.json"), (objectFile) =>
             {
@@ -54,9 +54,8 @@ namespace SystemChecker.Services
                     {
                         var JsonStringData = File.ReadAllText(objectFile);
 
-#if DEBUG
-                        logger.Debug(objectFile.Replace(PathActivityDB, "").Replace(".json", "").Replace("\\", ""));
-#endif
+                        Common.LogDebug(true, objectFile.Replace(PathActivityDB, "").Replace(".json", "").Replace("\\", ""));
+
                         Guid gameId = Guid.Parse(objectFile.Replace(PathActivityDB, "").Replace(".json", "").Replace("\\", ""));
 
                         GameRequierementsOld gameRequierements = JsonConvert.DeserializeObject<GameRequierementsOld>(JsonStringData);
@@ -70,7 +69,7 @@ namespace SystemChecker.Services
                 }
             });
 
-            logger.Info($"SystemChecker - Find {Items.Count} items");
+            logger.Info($"Find {Items.Count} items");
         }
 
         public void ConvertDB(IPlayniteAPI PlayniteApi)
@@ -86,7 +85,7 @@ namespace SystemChecker.Services
                 Stopwatch stopWatch = new Stopwatch();
                 stopWatch.Start();
 
-                logger.Info($"SystemChecker - ConvertDB()");
+                logger.Info($"ConvertDB()");
 
                 int Converted = 0;
 
@@ -111,7 +110,7 @@ namespace SystemChecker.Services
                         }
                         else
                         {
-                            logger.Warn($"SystemChecker - Game is deleted - {item.Key.ToString()}");
+                            logger.Warn($"Game is deleted - {item.Key.ToString()}");
                         }
                     }
                     catch (Exception ex)
@@ -120,11 +119,11 @@ namespace SystemChecker.Services
                     }
                 }
 
-                logger.Info($"SystemChecker - Converted {Converted} / {Items.Count}");
+                logger.Info($"Converted {Converted} / {Items.Count}");
 
                 stopWatch.Stop();
                 TimeSpan ts = stopWatch.Elapsed;
-                logger.Info($"SystemChecker - Migration - {String.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10)}");
+                logger.Info($"Migration - {String.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10)}");
             }, globalProgressOptions);
 
             IsOld = false;

@@ -40,7 +40,7 @@ namespace SystemChecker.Services
             }
             else
             {
-                logger.Warn($"SystemChecker - CheckConfig() with null requirement");
+                logger.Warn($"CheckConfig() with null requirement");
             }
 
             return new CheckSystem();

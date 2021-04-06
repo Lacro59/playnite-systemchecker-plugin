@@ -83,12 +83,12 @@ namespace SystemChecker.Services
                 SourceName = PlayniteTools.GetSourceName(PlayniteApi, game);
 
                 // Search datas
-                logger.Info($"SystemChecker - Try find with PCGamingWikiRequierements for {game.Name}");
+                logger.Info($"Try find with PCGamingWikiRequierements for {game.Name}");
                 gameRequierements = pCGamingWikiRequierements.GetRequirements(game);
 
                 if (!pCGamingWikiRequierements.IsFind())
                 {
-                    logger.Info($"SystemChecker - Try find with SteamRequierements for {game.Name}");
+                    logger.Info($"Try find with SteamRequierements for {game.Name}");
                     switch (SourceName.ToLower())
                     {
                         case "steam":
@@ -192,9 +192,7 @@ namespace SystemChecker.Services
                 {
                     string GpuNameTemp = (string)obj["Name"];
 
-#if DEBUG
-                    logger.Debug($"SystemChecker - GpuName: {GpuNameTemp}");
-#endif
+                    Common.LogDebug(true, $"GpuName: {GpuNameTemp}");
 
                     if (Gpu.CallIsNvidia(GpuNameTemp))
                     {
@@ -274,7 +272,7 @@ namespace SystemChecker.Services
                     }
                     catch (Exception ex)
                     {
-                        logger.Warn($"SystemChecker - Error on VolumeLabel - {ex.Message.Trim()}");
+                        logger.Warn($"Error on VolumeLabel - {ex.Message.Trim()}");
                     }
 
                     string Name = string.Empty;
@@ -284,7 +282,7 @@ namespace SystemChecker.Services
                     }
                     catch (Exception ex)
                     {
-                        logger.Warn($"SystemChecker - Error on Name - {ex.Message.Trim()}");
+                        logger.Warn($"Error on Name - {ex.Message.Trim()}");
                     }
 
                     long FreeSpace = 0;
@@ -294,7 +292,7 @@ namespace SystemChecker.Services
                     }
                     catch (Exception ex)
                     {
-                        logger.Warn($"SystemChecker - Error on TotalFreeSpace - {ex.Message.Trim()}");
+                        logger.Warn($"Error on TotalFreeSpace - {ex.Message.Trim()}");
                     }
 
                     string FreeSpaceUsage = string.Empty;
@@ -304,7 +302,7 @@ namespace SystemChecker.Services
                     }
                     catch (Exception ex)
                     {
-                        logger.Warn($"SystemChecker - Error on FreeSpaceUsage - {ex.Message.Trim()}");
+                        logger.Warn($"Error on FreeSpaceUsage - {ex.Message.Trim()}");
                     }
 
                     Disks.Add(new SystemDisk

@@ -124,7 +124,7 @@ namespace SystemChecker.Clients
             }
             else
             {
-                logger.Warn($"SystemChecker - PCGamingWikiRequierements - Not find for {_game.Name}");
+                logger.Warn($"PCGamingWikiRequierements - Not find for {_game.Name}");
             }
 
             return gameRequierements;
@@ -158,7 +158,7 @@ namespace SystemChecker.Clients
             try
             {
 #if DEBUG
-                logger.Debug($"SystemChecker PCGamingWikiRequierements.GetRequirements - url {url}");
+                logger.Debug($"PCGamingWikiRequierements.GetRequirements - url {url}");
 #endif
 
                 // Get data & parse
@@ -195,10 +195,8 @@ namespace SystemChecker.Clients
                             dataRecommended = row.QuerySelector(".table-sysreqs-body-recommended").InnerHtml.Trim();
                         }
 
-#if DEBUG
-                        logger.Debug($"SystemChecker - PCGamingWikiRequierements - dataMinimum: {dataMinimum}");
-                        logger.Debug($"SystemChecker - PCGamingWikiRequierements - dataRecommended: {dataRecommended}");
-#endif
+                        Common.LogDebug(true, $"PCGamingWikiRequierements - dataMinimum: {dataMinimum}");
+                        Common.LogDebug(true, $"PCGamingWikiRequierements - dataRecommended: {dataRecommended}");
 
                         switch (dataTitle)
                         {
@@ -403,16 +401,16 @@ namespace SystemChecker.Clients
                                 break;
 
                             default:
-                                logger.Warn($"SystemChecker - No treatment for {dataTitle}");
+                                logger.Warn($"No treatment for {dataTitle}");
                                 break;
                         }
                     }
 
                     Minimum.IsMinimum = true;
-#if DEBUG
-                    logger.Debug($"SystemChecker - PCGamingWikiRequierements - Minimum: {JsonConvert.SerializeObject(Minimum)}");
-                    logger.Debug($"SystemChecker - PCGamingWikiRequierements - Recommanded: {JsonConvert.SerializeObject(Recommanded)}");
-#endif
+
+                    Common.LogDebug(true, $"PCGamingWikiRequierements - Minimum: {JsonConvert.SerializeObject(Minimum)}");
+                    Common.LogDebug(true, $"PCGamingWikiRequierements - Recommanded: {JsonConvert.SerializeObject(Recommanded)}");
+
                     gameRequierements.Items = new List<Requirement> { Minimum, Recommanded };
 
                     gameRequierements.SourceName = "PCGamingWiki";
@@ -420,7 +418,7 @@ namespace SystemChecker.Clients
                 }
                 else
                 {
-                    logger.Warn($"SystemChecker - No data find for {_game.Name} in {url}");
+                    logger.Warn($"No data find for {_game.Name} in {url}");
                 }
 
             }

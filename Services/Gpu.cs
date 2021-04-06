@@ -109,10 +109,8 @@ namespace SystemChecker.Services
 
         public bool IsBetter()
         {
-#if DEBUG
-            logger.Debug($"SystemChecker - Gpu.IsBetter - CardPc({CardPcName}): {JsonConvert.SerializeObject(CardPc)}");
-            logger.Debug($"SystemChecker - Gpu.IsBetter - CardRequierement({CardRequierementName}): {JsonConvert.SerializeObject(CardRequierement)}");
-#endif
+            Common.LogDebug(true, $"Gpu.IsBetter - CardPc({CardPcName}): {JsonConvert.SerializeObject(CardPc)}");
+            Common.LogDebug(true, $"Gpu.IsBetter - CardRequierement({CardRequierementName}): {JsonConvert.SerializeObject(CardRequierement)}");
 
             // Old card requiered
             if (CardRequierement.IsOld || CardPc.IsOld)
@@ -248,7 +246,7 @@ namespace SystemChecker.Services
                         }
                     }
 
-                    logger.Warn($"SystemChecker - No equivalence for {JsonConvert.SerializeObject(CardPc)} & {JsonConvert.SerializeObject(CardRequierement)}");
+                    logger.Warn($"No equivalence for {JsonConvert.SerializeObject(CardPc)} & {JsonConvert.SerializeObject(CardRequierement)}");
                     return false;
                 }
                 catch (Exception ex)
@@ -283,11 +281,11 @@ namespace SystemChecker.Services
                     Common.LogError(ex, false, $"Error on IsBetter() for Amd vs Nvidia");
                 }
 
-                logger.Warn($"SystemChecker - No equivalence for {JsonConvert.SerializeObject(CardPc)} & {JsonConvert.SerializeObject(CardRequierement)}");
+                logger.Warn($"No equivalence for {JsonConvert.SerializeObject(CardPc)} & {JsonConvert.SerializeObject(CardRequierement)}");
                 return false;
             }
 
-            logger.Warn($"SystemChecker - No GPU treatment for {JsonConvert.SerializeObject(CardPc)} & {JsonConvert.SerializeObject(CardRequierement)}");
+            logger.Warn($"No GPU treatment for {JsonConvert.SerializeObject(CardPc)} & {JsonConvert.SerializeObject(CardRequierement)}");
             return false;
         }
 

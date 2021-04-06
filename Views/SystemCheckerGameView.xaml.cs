@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using CommonPluginsShared;
+using Newtonsoft.Json;
 using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;
@@ -214,10 +215,8 @@ namespace SystemChecker.Views
                 btLink.Tag = gameRequierements.Link;
             }
 
-#if DEBUG
-            logger.Debug("CheckMinimum" + JsonConvert.SerializeObject(CheckMinimum));
-            logger.Debug("CheckRecommanded" + JsonConvert.SerializeObject(CheckRecommanded));
-#endif
+            Common.LogDebug(true, $"CheckMinimum" + JsonConvert.SerializeObject(CheckMinimum));
+            Common.LogDebug(true, $"CheckRecommanded" + JsonConvert.SerializeObject(CheckRecommanded));
 
             if (!gameRequierements.SourceGameName.IsNullOrEmpty() && !gameRequierements.SourceName.IsNullOrEmpty())
             {

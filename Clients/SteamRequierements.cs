@@ -55,9 +55,8 @@ namespace SystemChecker.Clients
 
                 if (parsedData[appId.ToString()].data != null && JsonConvert.SerializeObject(parsedData[appId.ToString()].data.pc_requirements) != "[]")
                 {
-#if DEBUG
-                    logger.Debug(JsonConvert.SerializeObject(parsedData[appId.ToString()].data.pc_requirements));
-#endif
+                    Common.LogDebug(true, JsonConvert.SerializeObject(parsedData[appId.ToString()].data.pc_requirements));
+
                     JObject pc_requirements = JObject.FromObject(parsedData[appId.ToString()].data.pc_requirements);
 
                     if (pc_requirements["minimum"] != null)
@@ -113,9 +112,7 @@ namespace SystemChecker.Clients
             // Only recent game
             foreach (var ElementRequirement in HtmlRequirement.QuerySelectorAll("li"))
             {
-#if DEBUG
-                logger.Debug($"SteamRequierements - {ElementRequirement.InnerHtml}");
-#endif
+                Common.LogDebug(true, $"SteamRequierements - {ElementRequirement.InnerHtml}");
 
                 //<strong>OS:</strong> Windows XP / 7 / 8 / 8.1 / 10 x32 and x64<br> </ li >
                 if (ElementRequirement.InnerHtml.IndexOf("<strong>OS") > -1)
