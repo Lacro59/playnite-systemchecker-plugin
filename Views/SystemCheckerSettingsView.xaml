@@ -37,8 +37,6 @@
                         <RowDefinition Height="auto" />
                         <RowDefinition Height="10" />
                         <RowDefinition Height="auto" />
-                        <RowDefinition Height="10" />
-                        <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
 
                     <Expander Grid.Row="0">
@@ -77,6 +75,20 @@
                                 </Grid>
                             </Border>
                         </Expander.Content>
+                    </Expander>
+
+                    <Expander Grid.Row="2" AttachedProperties:ExpanderAttachedProperties.HideExpanderArrow="True">
+                        <Expander.Style>
+                            <Style TargetType="{x:Type Expander}" BasedOn="{StaticResource {x:Type Expander}}">
+                                <Setter Property="Background" Value="Transparent" />
+                            </Style>
+                        </Expander.Style>
+
+                        <Expander.Header>
+                            <CheckBox IsChecked="{Binding Settings.EnableIntegrationViewItem}" Name="PART_IntegrationViewItem">
+                                <Label Content="{DynamicResource LOCCommonControlsPluginViewItemShow}" />
+                            </CheckBox>
+                        </Expander.Header>
                     </Expander>
                 </Grid>
             </StackPanel>

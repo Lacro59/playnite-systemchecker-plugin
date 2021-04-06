@@ -90,6 +90,9 @@
     <Compile Include="Controls\PluginButton.xaml.cs">
       <DependentUpon>PluginButton.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\PluginViewItem.xaml.cs">
+      <DependentUpon>PluginViewItem.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Models\RequierementsCollection.cs" />
     <Compile Include="playnite-plugincommon\CommonPluginsControls\Views\OptionsDownloadData.xaml.cs">
       <DependentUpon>OptionsDownloadData.xaml</DependentUpon>
@@ -226,6 +229,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <Page Include="Controls\PluginButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\PluginViewItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

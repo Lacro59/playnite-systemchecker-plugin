@@ -86,7 +86,7 @@ namespace SystemChecker
 
             if (args.Name == "PluginViewItem")
             {
-                //return new PluginViewItem();
+                return new PluginViewItem();
             }
 
             return null;

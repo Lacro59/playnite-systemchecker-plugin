@@ -13,12 +13,38 @@ namespace SystemChecker
         #region Settings variables
         public bool MenuInExtensions { get; set; } = true;
 
-        public bool EnableIntegrationButton { get; set; } = false;
-        public bool EnableIntegrationButtonDetails { get; set; } = false;
+        private bool _EnableIntegrationViewItem { get; set; } = false;
+        public bool EnableIntegrationViewItem
+        {
+            get => _EnableIntegrationViewItem;
+            set
+            {
+                _EnableIntegrationViewItem = value;
+                OnPropertyChanged();
+            }
+        }
 
-        public bool EnableIntegrationInCustomTheme { get; set; } = false;
+        private bool _EnableIntegrationButton { get; set; } = false;
+        public bool EnableIntegrationButton
+        {
+            get => _EnableIntegrationButton;
+            set
+            {
+                _EnableIntegrationButton = value;
+                OnPropertyChanged();
+            }
+        }
 
-        public bool EnableIntegrationFS { get; set; } = false;
+        private bool _EnableIntegrationButtonDetails { get; set; } = false;
+        public bool EnableIntegrationButtonDetails
+        {
+            get => _EnableIntegrationButtonDetails;
+            set
+            {
+                _EnableIntegrationButtonDetails = value;
+                OnPropertyChanged();
+            }
+        }
         #endregion
 
         // Playnite serializes settings object to a JSON object and saves it as text file.
