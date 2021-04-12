@@ -157,7 +157,7 @@ namespace SystemChecker
                 new MainMenuItem
                 {
                     MenuSection = MenuInExtensions + resources.GetString("LOCSystemChecker"),
-                    Description = resources.GetString("LOCCommonGettingAllDatas"),
+                    Description = resources.GetString("LOCCommonDownloadPluginData"),
                     Action = (mainMenuItem) =>
                     {
                         PluginDatabase.GetSelectData();
@@ -168,7 +168,7 @@ namespace SystemChecker
                 new MainMenuItem
                 {
                     MenuSection = MenuInExtensions + resources.GetString("LOCSystemChecker"),
-                    Description = resources.GetString("LOCCommonClearAllDatas"),
+                    Description = resources.GetString("LOCCommonDeletePluginData"),
                     Action = (mainMenuItem) =>
                     {
                         PluginDatabase.ClearDatabase();
