@@ -48,14 +48,14 @@ namespace SystemChecker.Services
             if ((gameRequierements == null && !OnlyCache) || Force)
             {
                 gameRequierements = GetWeb(Id);
-                Add(gameRequierements);
+                AddOrUpdate(gameRequierements);
             }
 
             if (gameRequierements == null)
             {
                 Game game = PlayniteApi.Database.Games.Get(Id);
                 gameRequierements = GetDefault(game);
-                Add(gameRequierements);
+                AddOrUpdate(gameRequierements);
             }
 
             return gameRequierements;
