@@ -237,6 +237,13 @@ namespace SystemChecker.Services
                 IsOld = true;
             }
 
+            // No Version
+            if (Version == 0)
+            {
+                IsOld = true;
+            }
+
+
             return new CpuObject
             {
                 IsIntel = IsIntel,
