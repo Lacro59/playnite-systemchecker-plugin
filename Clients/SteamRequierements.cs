@@ -263,6 +263,8 @@ namespace SystemChecker.Clients
                             .Replace("- Integrated graphics and very low budget cards might not work.", string.Empty)
                             .Replace("Shader Model 3.0", string.Empty)
                             .Replace("shader model 3.0", string.Empty)
+                            .Replace("card capable of shader 3.0", string.Empty)
+                            .Replace("3D with TnL support and", string.Empty)
                             .Replace(" compatible", string.Empty)
                             .Replace("Any", string.Empty)
                             .Replace("any", string.Empty)

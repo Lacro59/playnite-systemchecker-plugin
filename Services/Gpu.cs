@@ -493,6 +493,12 @@ namespace SystemChecker.Services
             #endregion
 
 
+            if (!IsAmd && !IsNvidia && !IsIntegrate)
+            {
+                IsOld = true;
+            }
+
+
             return new GpuObject
             {
                 IsIntegrate = IsIntegrate,
