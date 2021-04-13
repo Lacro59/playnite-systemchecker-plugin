@@ -50,6 +50,11 @@ namespace SystemChecker.Services
         {
             try
             {
+                if (requierementOs.Count == 0)
+                {
+                    return true;
+                }
+
                 foreach (string Os in requierementOs)
                 {
                     if (systemOs.ToLower().IndexOf("10") > -1)

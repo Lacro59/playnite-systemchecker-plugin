@@ -79,7 +79,11 @@ namespace SystemChecker.Views
 
             if (Minimum.HasData)
             {
-                MinimumOs = "Windows " + string.Join(" / ", Minimum.Os);
+                if (Minimum.Os.Count > 0)
+                {
+                    MinimumOs = "Windows " + string.Join(" / ", Minimum.Os);
+                }
+                
                 MinimumCpu = Minimum.Cpu;
                 MinimumRamUsage = Minimum.RamUsage;
                 MinimumGpu = Minimum.Gpu;
@@ -88,7 +92,11 @@ namespace SystemChecker.Views
 
             if (Recommanded.HasData)
             {
-                RecommandedOs = "Windows " + string.Join(" / ", Recommanded.Os);
+                if (Minimum.Os.Count > 0)
+                {
+                    RecommandedOs = "Windows " + string.Join(" / ", Recommanded.Os);
+                }
+
                 RecommandedCpu = Recommanded.Cpu;
                 RecommandedRamUsage = Recommanded.RamUsage;
                 RecommandedGpu = Recommanded.Gpu;
