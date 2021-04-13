@@ -8,6 +8,7 @@ using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using SystemChecker.Models;
 
@@ -229,11 +230,15 @@ namespace SystemChecker.Clients
 
                     if (ram.ToLower().IndexOf("mb") > -1)
                     {
-                        requirement.Ram = 1024 * 1024 * long.Parse(ram.ToLower().Replace("mb", string.Empty).Trim());
+                        requirement.Ram = 1024 * 1024 * long.Parse(ram.ToLower()
+                            .Replace("mb", string.Empty)
+                            .Replace(".", CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator).Trim());
                     }
                     if (ram.ToLower().IndexOf("gb") > -1)
                     {
-                        requirement.Ram = 1024 * 1024 * 1024 * long.Parse(ram.ToLower().Replace("gb", string.Empty).Trim());
+                        requirement.Ram = 1024 * 1024 * 1024 * long.Parse(ram.ToLower().
+                            Replace("gb", string.Empty)
+                            .Replace(".", CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator).Trim());
                     }
                     requirement.RamUsage = Tools.SizeSuffix(requirement.Ram, true);
                 }
@@ -360,11 +365,15 @@ namespace SystemChecker.Clients
 
                     if (storage.IndexOf("mb") > -1)
                     {
-                        requirement.Storage = 1024 * 1024 * double.Parse(storage.Replace("mb", string.Empty).Replace("available hard disk space", string.Empty).Trim());
+                        requirement.Storage = 1024 * 1024 * double.Parse(storage.Replace("mb", string.Empty)
+                            .Replace(".", CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator)
+                            .Replace("available hard disk space", string.Empty).Trim());
                     }
                     if (storage.IndexOf("gb") > -1)
                     {
-                        requirement.Storage = 1024 * 1024 * 1024 * double.Parse(storage.Replace("gb", string.Empty).Replace("available hard disk space", string.Empty).Trim());
+                        requirement.Storage = 1024 * 1024 * 1024 * double.Parse(storage.Replace("gb", string.Empty)
+                            .Replace(".", CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator)
+                            .Replace("available hard disk space", string.Empty).Trim());
                     }
                     requirement.StorageUsage = Tools.SizeSuffix(requirement.Storage);
                 }

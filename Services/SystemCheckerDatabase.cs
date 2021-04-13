@@ -118,6 +118,7 @@ namespace SystemChecker.Services
         }
 
 
+        #region System infos
         public SystemConfiguration GetPcInfo()
         {
             string Name = Environment.MachineName;
@@ -324,6 +325,7 @@ namespace SystemChecker.Services
             Database.PC = GetPcInfo();
             Database.OnCollectionChanged(null, null);
         }
+        #endregion
 
 
         private GameRequierements NormalizeRecommanded(GameRequierements gameRequierements)

@@ -84,8 +84,11 @@ namespace SystemChecker.Clients
             }
 
 
-            url = string.Empty;
-            url = UrlPCGamingWikiSearch + WebUtility.UrlEncode(game.Name) + $"+%28{((DateTime)game.ReleaseDate).ToString("yyyy")}%29";
+            url = UrlPCGamingWikiSearch + WebUtility.UrlEncode(game.Name);
+            if (game.ReleaseDate != null)
+            {
+                 url += $"+%28{((DateTime)game.ReleaseDate).ToString("yyyy")}%29";
+            }
 
             WebResponse = Web.DownloadStringData(url).GetAwaiter().GetResult();
             if (!WebResponse.ToLower().Contains("search results"))
@@ -136,7 +139,7 @@ namespace SystemChecker.Clients
             UrlPCGamingWiki = string.Empty;
 
 
-            if (_game.SourceId != Guid.Parse("00000000-0000-0000-0000-000000000000"))
+            if (_game.SourceId != default(Guid))
             {
                 if (game.Source.Name.ToLower() == "steam")
                 {
@@ -260,6 +263,8 @@ namespace SystemChecker.Clients
                             case "system memory (ram)":
                                 if (!dataMinimum.IsNullOrEmpty())
                                 {
+                                    dataMinimum = dataMinimum.ToLower().Replace("ram mb ram", string.Empty);
+                                    dataMinimum = dataMinimum.ToLower().Replace("ram", string.Empty);
                                     if (dataMinimum.ToLower().IndexOf("mb") > -1)
                                     {
                                         dataMinimum = dataMinimum.Substring(0, dataMinimum.ToLower().IndexOf("mb"));
@@ -276,6 +281,8 @@ namespace SystemChecker.Clients
                                 }
                                 if (!dataRecommended.IsNullOrEmpty())
                                 {
+                                    dataRecommended = dataRecommended.ToLower().Replace("ram mb ram", string.Empty);
+                                    dataRecommended = dataRecommended.ToLower().Replace("ram", string.Empty);
                                     if (dataRecommended.ToLower().IndexOf("mb") > -1)
                                     {
                                         dataRecommended = dataRecommended.Substring(0, dataRecommended.ToLower().IndexOf("mb"));
