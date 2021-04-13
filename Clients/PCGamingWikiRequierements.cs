@@ -272,7 +272,7 @@ namespace SystemChecker.Clients
                                         dataMinimum = dataMinimum.Replace(".", CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator);
                                         Minimum.Ram = 1024 * 1024 * 1024 * double.Parse(dataMinimum.ToLower().Replace("gb", string.Empty).Trim());
                                     }
-                                    Minimum.RamUsage = SizeSuffix(Minimum.Ram, true);
+                                    Minimum.RamUsage = Tools.SizeSuffix(Minimum.Ram, true);
                                 }
                                 if (!dataRecommended.IsNullOrEmpty())
                                 {
@@ -288,7 +288,7 @@ namespace SystemChecker.Clients
                                         dataRecommended = dataRecommended.Replace(".", CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator);
                                         Recommanded.Ram = 1024 * 1024 * 1024 * double.Parse(dataRecommended.ToLower().Replace("gb", string.Empty).Trim());
                                     }
-                                    Recommanded.RamUsage = SizeSuffix(Recommanded.Ram, true);
+                                    Recommanded.RamUsage = Tools.SizeSuffix(Recommanded.Ram, true);
                                 }
                                 break;
 
@@ -316,7 +316,7 @@ namespace SystemChecker.Clients
 
                                         Minimum.Storage = (long)(1024 * 1024 * 1024 * hdd);
                                     }
-                                    Minimum.StorageUsage = SizeSuffix(Minimum.Storage);
+                                    Minimum.StorageUsage = Tools.SizeSuffix(Minimum.Storage);
                                 }
                                 if (!dataRecommended.IsNullOrEmpty())
                                 {
@@ -340,7 +340,7 @@ namespace SystemChecker.Clients
 
                                         Minimum.Storage = (long)(1024 * 1024 * 1024 * hdd);
                                     }
-                                    Recommanded.StorageUsage = SizeSuffix(Recommanded.Storage);
+                                    Recommanded.StorageUsage = Tools.SizeSuffix(Recommanded.Storage);
                                 }
                                 break;
 

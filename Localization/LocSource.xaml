@@ -6,6 +6,8 @@
     <sys:String x:Key="LOCSystemChecker">SystemChecker</sys:String>
 
     <sys:String x:Key="LOCSystemCheckerCheckConfig">Check configuration</sys:String>
+    
+    <sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Refresh your system configuration</sys:String>
 
     <!-- SystemCheckerSettingsView -->
 

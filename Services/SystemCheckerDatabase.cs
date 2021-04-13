@@ -6,6 +6,7 @@ using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Management;
 using System.Text;
@@ -61,7 +62,6 @@ namespace SystemChecker.Services
             return gameRequierements;
         }
 
-
         public override GameRequierements GetDefault(Game game)
         {
             GameRequierements gameRequierements = base.GetDefault(game);
@@ -69,7 +69,6 @@ namespace SystemChecker.Services
 
             return gameRequierements;
         }
-
 
         public override GameRequierements GetWeb(Guid Id)
         {
@@ -121,7 +120,8 @@ namespace SystemChecker.Services
 
         public SystemConfiguration GetPcInfo()
         {
-            string FilePlugin = Path.Combine(Paths.PluginDatabasePath, "pc.json");
+            string Name = Environment.MachineName;
+            string FilePlugin = Path.Combine(Paths.PluginUserDataPath, $"{CommonPluginsPlaynite.Common.Paths.GetSafeFilename(Name)}.json");
 
             SystemConfiguration systemConfiguration = new SystemConfiguration();
             List<SystemDisk> Disks = GetInfoDisks();
@@ -142,7 +142,7 @@ namespace SystemChecker.Services
                 }
             }
 
-            string Name = Environment.MachineName;
+
             string Os = string.Empty;
             string Cpu = string.Empty;
             uint CpuMaxClockSpeed = 0;
@@ -247,7 +247,7 @@ namespace SystemChecker.Services
             systemConfiguration.CurrentHorizontalResolution = CurrentHorizontalResolution;
             systemConfiguration.CurrentVerticalResolution = CurrentVerticalResolution;
             systemConfiguration.Ram = Ram;
-            systemConfiguration.RamUsage = RequierementMetadata.SizeSuffix(Ram, true);
+            systemConfiguration.RamUsage = Tools.SizeSuffix(Ram, true);
             systemConfiguration.Disks = Disks;
 
 
@@ -296,7 +296,7 @@ namespace SystemChecker.Services
                     string FreeSpaceUsage = string.Empty;
                     try
                     {
-                        FreeSpaceUsage = RequierementMetadata.SizeSuffix(d.TotalFreeSpace);
+                        FreeSpaceUsage = Tools.SizeSuffix(d.TotalFreeSpace);
                     }
                     catch (Exception ex)
                     {
@@ -313,6 +313,16 @@ namespace SystemChecker.Services
                 }
             }
             return Disks;
+        }
+
+        public void RefreshPcInfo()
+        {
+            string Name = Environment.MachineName;
+            string FilePlugin = Path.Combine(Paths.PluginUserDataPath, $"{CommonPluginsPlaynite.Common.Paths.GetSafeFilename(Name)}.json");
+
+            CommonPluginsPlaynite.Common.FileSystem.DeleteFileSafe(FilePlugin);
+            Database.PC = GetPcInfo();
+            Database.OnCollectionChanged(null, null);
         }
 
 

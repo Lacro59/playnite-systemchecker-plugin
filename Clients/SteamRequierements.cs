@@ -235,7 +235,7 @@ namespace SystemChecker.Clients
                     {
                         requirement.Ram = 1024 * 1024 * 1024 * long.Parse(ram.ToLower().Replace("gb", string.Empty).Trim());
                     }
-                    requirement.RamUsage = SizeSuffix(requirement.Ram, true);
+                    requirement.RamUsage = Tools.SizeSuffix(requirement.Ram, true);
                 }
 
                 //< li >< strong > Graphics:</ strong > GeForce GT 440(1024 MB) or equivalent / Radeon HD 6450(512 MB) or equivalent / Iris Pro Graphics 5200(1792 MB) < br ></ li >
@@ -366,7 +366,7 @@ namespace SystemChecker.Clients
                     {
                         requirement.Storage = 1024 * 1024 * 1024 * double.Parse(storage.Replace("gb", string.Empty).Replace("available hard disk space", string.Empty).Trim());
                     }
-                    requirement.StorageUsage = SizeSuffix(requirement.Storage);
+                    requirement.StorageUsage = Tools.SizeSuffix(requirement.Storage);
                 }
             }
 
