@@ -106,8 +106,8 @@ namespace SystemChecker.Controls
                 Requirement systemMinimum = gameRequierements.GetMinimum();
                 Requirement systemRecommanded = gameRequierements.GetRecommanded();
 
-                CheckSystem CheckMinimum = CheckMinimum = SystemApi.CheckConfig(systemMinimum, systemConfiguration);
-                CheckSystem CheckRecommanded = SystemApi.CheckConfig(systemRecommanded, systemConfiguration);
+                CheckSystem CheckMinimum = CheckMinimum = SystemApi.CheckConfig(systemMinimum, systemConfiguration, newContext.IsInstalled);
+                CheckSystem CheckRecommanded = SystemApi.CheckConfig(systemRecommanded, systemConfiguration, newContext.IsInstalled);
 
                 if (systemMinimum.HasData)
                 {

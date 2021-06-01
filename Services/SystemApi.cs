@@ -16,7 +16,7 @@ namespace SystemChecker.Services
         private static IResourceProvider resources = new ResourceProvider();
 
 
-        public static CheckSystem CheckConfig(Requirement requirement, SystemConfiguration systemConfiguration)
+        public static CheckSystem CheckConfig(Requirement requirement, SystemConfiguration systemConfiguration, bool IsInstalled)
         {
             if (requirement != null)
             {
@@ -24,7 +24,7 @@ namespace SystemChecker.Services
                 bool isCheckCpu = CheckCpu(systemConfiguration, requirement.Cpu);
                 bool isCheckRam = CheckRam(systemConfiguration.Ram, systemConfiguration.RamUsage, requirement.Ram, requirement.RamUsage);
                 bool isCheckGpu = CheckGpu(systemConfiguration, requirement.Gpu);
-                bool isCheckStorage = CheckStorage(systemConfiguration.Disks, requirement.Storage); ;
+                bool isCheckStorage = (IsInstalled) ? IsInstalled : CheckStorage(systemConfiguration.Disks, requirement.Storage); ;
 
                 bool AllOk = (isCheckOs && isCheckCpu && isCheckRam && isCheckGpu && isCheckStorage);
 

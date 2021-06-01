@@ -208,8 +208,8 @@ namespace SystemChecker.Services
             Requirement systemMinimum = gameRequierements.GetMinimum();
             Requirement systemRecommanded = gameRequierements.GetRecommanded();
 
-            CheckSystem CheckMinimum = CheckMinimum = SystemApi.CheckConfig(systemMinimum, systemConfiguration);
-            CheckSystem CheckRecommanded = SystemApi.CheckConfig(systemRecommanded, systemConfiguration);
+            CheckSystem CheckMinimum = CheckMinimum = SystemApi.CheckConfig(systemMinimum, systemConfiguration, game.IsInstalled);
+            CheckSystem CheckRecommanded = SystemApi.CheckConfig(systemRecommanded, systemConfiguration, game.IsInstalled);
 
 
             PluginSettings.Settings.HasData = gameRequierements.HasData;
