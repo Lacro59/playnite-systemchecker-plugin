@@ -40,6 +40,12 @@ namespace SystemChecker
             AddCustomElementSupport(new AddCustomElementSupportArgs
             {
                 ElementList = new List<string> { "PluginButton", "PluginViewItem" },
+                SourceName = "SystemChecker"
+            });
+
+            // Settings integration
+            AddSettingsSupport(new AddSettingsSupportArgs
+            {
                 SourceName = "SystemChecker",
                 SettingsRoot = $"{nameof(PluginSettings)}.{nameof(PluginSettings.Settings)}"
             });
@@ -134,6 +140,11 @@ namespace SystemChecker
             gameMenuItems.Add(new GameMenuItem
             {
                 MenuSection = resources.GetString("LOCSystemChecker"),
+                Description = "-"
+            });
+            gameMenuItems.Add(new GameMenuItem
+            {
+                MenuSection = resources.GetString("LOCSystemChecker"),
                 Description = "Test",
                 Action = (mainMenuItem) => { }
             });
@@ -164,17 +175,6 @@ namespace SystemChecker
                     }
                 },
 
-                // Delete database
-                new MainMenuItem
-                {
-                    MenuSection = MenuInExtensions + resources.GetString("LOCSystemChecker"),
-                    Description = resources.GetString("LOCCommonDeletePluginData"),
-                    Action = (mainMenuItem) =>
-                    {
-                        PluginDatabase.ClearDatabase();
-                    }
-                },
-
                 // Refresh system configuration
                 new MainMenuItem
                 {
@@ -184,10 +184,32 @@ namespace SystemChecker
                     {
                         PluginDatabase.RefreshPcInfo();
                     }
+                },
+
+                new MainMenuItem
+                {
+                    MenuSection = MenuInExtensions + resources.GetString("LOCSystemChecker"),
+                    Description = "-"
+                },
+
+                // Delete database
+                new MainMenuItem
+                {
+                    MenuSection = MenuInExtensions + resources.GetString("LOCSystemChecker"),
+                    Description = resources.GetString("LOCCommonDeletePluginData"),
+                    Action = (mainMenuItem) =>
+                    {
+                        PluginDatabase.ClearDatabase();
+                    }
                 }
             };
 
 #if DEBUG
+            mainMenuItems.Add(new MainMenuItem
+            {
+                MenuSection = MenuInExtensions + resources.GetString("LOCSystemChecker"),
+                Description = "-"
+            });
             mainMenuItems.Add(new MainMenuItem
             {
                 MenuSection = MenuInExtensions + resources.GetString("LOCSystemChecker"),
