@@ -106,8 +106,6 @@
     <Compile Include="Models\GameRequierements.cs" />
     <Compile Include="Models\RequierementMetadata.cs" />
     <Compile Include="Models\Requirement.cs" />
-    <Compile Include="Models\SystemConfiguration.cs" />
-    <Compile Include="Models\SystemDisk.cs" />
     <Compile Include="Services\SystemCheckerDatabase.cs" />
     <Compile Include="SystemChecker.cs" />
     <Compile Include="SystemCheckerSettings.cs" />

@@ -125,7 +125,7 @@ namespace SystemChecker.Services
             string FilePlugin = Path.Combine(Paths.PluginUserDataPath, $"{CommonPluginsPlaynite.Common.Paths.GetSafeFilename(Name)}.json");
 
             SystemConfiguration systemConfiguration = new SystemConfiguration();
-            List<SystemDisk> Disks = GetInfoDisks();
+            List<SystemDisk> Disks = LocalSystem.GetInfoDisks();
 
             if (File.Exists(FilePlugin))
             {
@@ -144,176 +144,11 @@ namespace SystemChecker.Services
             }
 
 
-            string Os = string.Empty;
-            string Cpu = string.Empty;
-            uint CpuMaxClockSpeed = 0;
-            string GpuName = string.Empty;
-            long GpuRam = 0;
-            uint CurrentHorizontalResolution = 0;
-            uint CurrentVerticalResolution = 0;
-            long Ram = 0;
-
-
-            // OS
-            try
-            {
-                ManagementObjectSearcher myOperativeSystemObject = new ManagementObjectSearcher("select * from Win32_OperatingSystem");
-                foreach (ManagementObject obj in myOperativeSystemObject.Get())
-                {
-                    Os = (string)obj["Caption"];
-                }
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, false, "Error on Win32_OperatingSystem");
-            }
-
-            // CPU
-            try
-            {
-                ManagementObjectSearcher myProcessorObject = new ManagementObjectSearcher("select * from Win32_Processor");
-                foreach (ManagementObject obj in myProcessorObject.Get())
-                {
-                    Cpu = (string)obj["Name"];
-                    CpuMaxClockSpeed = (uint)obj["MaxClockSpeed"];
-                }
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, false, "Error on Win32_Processor");
-            }
-
-            // GPU
-            try
-            {
-                ManagementObjectSearcher myVideoObject = new ManagementObjectSearcher("select * from Win32_VideoController");
-                foreach (ManagementObject obj in myVideoObject.Get())
-                {
-                    string GpuNameTemp = (string)obj["Name"];
-
-                    Common.LogDebug(true, $"GpuName: {GpuNameTemp}");
-
-                    if (Gpu.CallIsNvidia(GpuNameTemp))
-                    {
-                        GpuName = (string)obj["Name"];
-                        GpuRam = (long)Convert.ToDouble(obj["AdapterRAM"]);
-                        CurrentHorizontalResolution = (uint)obj["CurrentHorizontalResolution"];
-                        CurrentVerticalResolution = (uint)obj["CurrentVerticalResolution"];
-                        break;
-                    }
-                    if (Gpu.CallIsAmd(GpuNameTemp))
-                    {
-                        GpuName = (string)obj["Name"];
-                        GpuRam = (long)Convert.ToDouble(obj["AdapterRAM"]);
-                        CurrentHorizontalResolution = (uint)obj["CurrentHorizontalResolution"];
-                        CurrentVerticalResolution = (uint)obj["CurrentVerticalResolution"];
-                        break;
-                    }
-                    if (Gpu.CallIsIntel(GpuNameTemp))
-                    {
-                        GpuName = (string)obj["Name"];
-                        GpuRam = (long)Convert.ToDouble(obj["AdapterRAM"]);
-                        CurrentHorizontalResolution = (uint)obj["CurrentHorizontalResolution"];
-                        CurrentVerticalResolution = (uint)obj["CurrentVerticalResolution"];
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, false, "Error on Win32_VideoController");
-            }
-
-            // RAM
-            try
-            {
-                ManagementObjectSearcher myComputerSystemObject = new ManagementObjectSearcher("select * from Win32_ComputerSystem");
-                foreach (ManagementObject obj in myComputerSystemObject.Get())
-                {
-                    double TempRam = Math.Ceiling(Convert.ToDouble(obj["TotalPhysicalMemory"]) / 1024 / 1024 / 1024);
-                    Ram = (long)(TempRam * 1024 * 1024 * 1024);
-                }
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, false, "Error on Win32_ComputerSystem");
-            }
-
-
-            systemConfiguration.Name = Name.Trim();
-            systemConfiguration.Os = Os.Trim();
-            systemConfiguration.Cpu = Cpu.Trim();
-            systemConfiguration.CpuMaxClockSpeed = CpuMaxClockSpeed;
-            systemConfiguration.GpuName = GpuName.Trim();
-            systemConfiguration.GpuRam = GpuRam;
-            systemConfiguration.CurrentHorizontalResolution = CurrentHorizontalResolution;
-            systemConfiguration.CurrentVerticalResolution = CurrentVerticalResolution;
-            systemConfiguration.Ram = Ram;
-            systemConfiguration.RamUsage = Tools.SizeSuffix(Ram, true);
-            systemConfiguration.Disks = Disks;
+            systemConfiguration = LocalSystem.GetPcInfo();
 
 
             File.WriteAllText(FilePlugin, JsonConvert.SerializeObject(systemConfiguration));
             return systemConfiguration;
-        }
-
-        private List<SystemDisk> GetInfoDisks()
-        {
-            List<SystemDisk> Disks = new List<SystemDisk>();
-            DriveInfo[] allDrives = DriveInfo.GetDrives();
-            foreach (DriveInfo d in allDrives)
-            {
-                if (d.DriveType == DriveType.Fixed)
-                {
-                    string VolumeLabel = string.Empty;
-                    try
-                    {
-                        VolumeLabel = d.VolumeLabel;
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Warn($"Error on VolumeLabel - {ex.Message.Trim()}");
-                    }
-
-                    string Name = string.Empty;
-                    try
-                    {
-                        Name = d.Name;
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Warn($"Error on Name - {ex.Message.Trim()}");
-                    }
-
-                    long FreeSpace = 0;
-                    try
-                    {
-                        FreeSpace = d.TotalFreeSpace;
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Warn($"Error on TotalFreeSpace - {ex.Message.Trim()}");
-                    }
-
-                    string FreeSpaceUsage = string.Empty;
-                    try
-                    {
-                        FreeSpaceUsage = Tools.SizeSuffix(d.TotalFreeSpace);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Warn($"Error on FreeSpaceUsage - {ex.Message.Trim()}");
-                    }
-
-                    Disks.Add(new SystemDisk
-                    {
-                        Name = VolumeLabel,
-                        Drive = Name,
-                        FreeSpace = FreeSpace,
-                        FreeSpaceUsage = FreeSpaceUsage
-                    });
-                }
-            }
-            return Disks;
         }
 
         public void RefreshPcInfo()
