@@ -13,6 +13,9 @@ namespace SystemChecker
         #region Settings variables
         public bool MenuInExtensions { get; set; } = true;
 
+        public bool EnableTag { get; set; } = false;
+
+
         private bool _EnableIntegrationViewItem { get; set; } = false;
         public bool EnableIntegrationViewItem
         {

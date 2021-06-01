@@ -11,6 +11,8 @@ using System.Linq;
 using System.Management;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 using SystemChecker.Clients;
 using SystemChecker.Models;
 
@@ -235,6 +237,140 @@ namespace SystemChecker.Services
             foreach (var GameUpdated in e.UpdatedItems)
             {
                 Database.SetGameInfo<Requirement>(PlayniteApi, GameUpdated.NewData.Id);
+            }
+        }
+
+
+        protected override void GetPluginTags()
+        {
+            try
+            {
+                // Get tags in playnite database
+                PluginTags = new List<Tag>();
+                foreach (Tag tag in PlayniteApi.Database.Tags)
+                {
+                    if (tag.Name?.IndexOf("[SC] ") > -1 && tag.Name?.IndexOf("<!LOC") == -1)
+                    {
+                        PluginTags.Add(tag);
+                    }
+                }
+
+                // Add missing tags
+                if (PluginTags.Count < 2)
+                {
+                    if (PluginTags.Find(x => x.Name == $"[SC] {resources.GetString("LOCSystemCheckerConfigMinimum")}") == null)
+                    {
+                        PlayniteApi.Database.Tags.Add(new Tag { Name = $"[SC] {resources.GetString("LOCSystemCheckerConfigMinimum")}" });
+                    }
+                    if (PluginTags.Find(x => x.Name == $"[SC] {resources.GetString("LOCSystemCheckerConfigRecommanded")}") == null)
+                    {
+                        PlayniteApi.Database.Tags.Add(new Tag { Name = $"[SC] {resources.GetString("LOCSystemCheckerConfigRecommanded")}" });
+                    }
+
+                    foreach (Tag tag in PlayniteApi.Database.Tags)
+                    {
+                        if (tag.Name.IndexOf("[SC] ") > -1 && tag.Name.IndexOf("<!LOC") == -1)
+                        {
+                            PluginTags.Add(tag);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false);
+            }
+        }
+
+        public override void AddTag(Game game, bool noUpdate = false)
+        {
+            GameRequierements gameRequierements = Get(game, true);
+
+            if (gameRequierements.HasData)
+            {
+                try
+                {
+                    SystemConfiguration systemConfiguration = Database.PC;
+                    Requirement systemMinimum = gameRequierements.GetMinimum();
+                    Requirement systemRecommanded = gameRequierements.GetRecommanded();
+
+                    CheckSystem CheckMinimum = SystemApi.CheckConfig(systemMinimum, systemConfiguration, game.IsInstalled);
+                    CheckSystem CheckRecommanded = SystemApi.CheckConfig(systemRecommanded, systemConfiguration, game.IsInstalled);
+
+
+                    if (!(bool)CheckMinimum.AllOk && !(bool)CheckRecommanded.AllOk)
+                    {
+                        return;
+                    }
+
+                    // Minimum
+                    Guid? TagId = null;
+
+                    if ((bool)CheckMinimum.AllOk)
+                    {
+                        TagId = (PluginTags.Find(x => x.Name == $"[SC] {resources.GetString("LOCSystemCheckerConfigMinimum")}")).Id;
+                    }
+
+                    if (TagId != null)
+                    {
+                        if (game.TagIds != null)
+                        {
+                            game.TagIds.Add((Guid)TagId);
+                        }
+                        else
+                        {
+                            game.TagIds = new List<Guid> { (Guid)TagId };
+                        }
+
+                        if (!noUpdate)
+                        {
+                            Application.Current.Dispatcher?.Invoke(() =>
+                            {
+                                PlayniteApi.Database.Games.Update(game);
+                                game.OnPropertyChanged();
+                            }, DispatcherPriority.Send);
+                        }
+                    }
+
+                    // Recommanded
+                    TagId = null;
+
+                    if ((bool)CheckMinimum.AllOk)
+                    {
+                        TagId = (PluginTags.Find(x => x.Name == $"[SC] {resources.GetString("LOCSystemCheckerConfigRecommanded")}")).Id;
+                    }
+
+                    if (TagId != null)
+                    {
+                        if (game.TagIds != null)
+                        {
+                            game.TagIds.Add((Guid)TagId);
+                        }
+                        else
+                        {
+                            game.TagIds = new List<Guid> { (Guid)TagId };
+                        }
+
+                        if (!noUpdate)
+                        {
+                            Application.Current.Dispatcher?.Invoke(() =>
+                            {
+                                PlayniteApi.Database.Games.Update(game);
+                                game.OnPropertyChanged();
+                            }, DispatcherPriority.Send);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Common.LogError(ex, true);
+                    logger.Error($"Tag insert error with {game.Name}");
+                    PlayniteApi.Notifications.Add(new NotificationMessage(
+                        $"{PluginName}-Tag-Errors",
+                        $"{PluginName}\r\n" + resources.GetString("LOCCommonNotificationTagError"),
+                        NotificationType.Error
+                    ));
+                }
             }
         }
     }
