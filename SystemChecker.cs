@@ -173,18 +173,7 @@ namespace SystemChecker
                     {
                         PluginDatabase.GetSelectData();
                     }
-                },
-
-                // Refresh system configuration
-                new MainMenuItem
-                {
-                    MenuSection = MenuInExtensions + resources.GetString("LOCSystemChecker"),
-                    Description = resources.GetString("LOCSystemCheckerRefreshPcInfo"),
-                    Action = (mainMenuItem) =>
-                    {
-                        PluginDatabase.RefreshPcInfo();
-                    }
-                },
+                }
             };
 
             if (PluginDatabase.PluginSettings.Settings.EnableTag)

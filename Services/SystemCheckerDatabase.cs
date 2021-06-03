@@ -1,5 +1,6 @@
 ﻿using CommonPluginsShared;
 using CommonPluginsShared.Collections;
+using CommonPluginsPlaynite.Common;
 using Newtonsoft.Json;
 using Playnite.SDK;
 using Playnite.SDK.Models;
@@ -20,6 +21,8 @@ namespace SystemChecker.Services
 {
     public class SystemCheckerDatabase : PluginDatabaseObject<SystemCheckerSettingsViewModel, RequierementsCollection, GameRequierements>
     {
+        public LocalSystem LocalSystem;
+
         private PCGamingWikiRequierements pCGamingWikiRequierements;
         private SteamRequierements steamRequierements;
 
@@ -35,7 +38,8 @@ namespace SystemChecker.Services
             Database = new RequierementsCollection(Paths.PluginDatabasePath);
             Database.SetGameInfo<Requirement>(PlayniteApi);
 
-            Database.PC = GetPcInfo();
+            LocalSystem = new LocalSystem(Path.Combine(Paths.PluginUserDataPath, $"Configurations.json"));
+            Database.PC = LocalSystem.GetSystemConfiguration();
 
             GetPluginTags();
 
@@ -118,51 +122,6 @@ namespace SystemChecker.Services
 
             return gameRequierements;
         }
-
-
-        #region System infos
-        public SystemConfiguration GetPcInfo()
-        {
-            string Name = Environment.MachineName;
-            string FilePlugin = Path.Combine(Paths.PluginUserDataPath, $"{CommonPluginsPlaynite.Common.Paths.GetSafeFilename(Name)}.json");
-
-            SystemConfiguration systemConfiguration = new SystemConfiguration();
-            List<SystemDisk> Disks = LocalSystem.GetInfoDisks();
-
-            if (File.Exists(FilePlugin))
-            {
-                try
-                {
-                    string JsonStringData = File.ReadAllText(FilePlugin);
-                    systemConfiguration = JsonConvert.DeserializeObject<SystemConfiguration>(JsonStringData);
-                    systemConfiguration.Disks = Disks;
-
-                    return systemConfiguration;
-                }
-                catch (Exception ex)
-                {
-                    Common.LogError(ex, false, $"Failed to load item from {FilePlugin}");
-                }
-            }
-
-
-            systemConfiguration = LocalSystem.GetPcInfo();
-
-
-            File.WriteAllText(FilePlugin, JsonConvert.SerializeObject(systemConfiguration));
-            return systemConfiguration;
-        }
-
-        public void RefreshPcInfo()
-        {
-            string Name = Environment.MachineName;
-            string FilePlugin = Path.Combine(Paths.PluginUserDataPath, $"{CommonPluginsPlaynite.Common.Paths.GetSafeFilename(Name)}.json");
-
-            CommonPluginsPlaynite.Common.FileSystem.DeleteFileSafe(FilePlugin);
-            Database.PC = GetPcInfo();
-            Database.OnCollectionChanged(null, null);
-        }
-        #endregion
 
 
         private GameRequierements NormalizeRecommanded(GameRequierements gameRequierements)
