@@ -18,7 +18,7 @@ namespace SystemChecker.Services
 
         public static CheckSystem CheckConfig(Requirement requirement, SystemConfiguration systemConfiguration, bool IsInstalled)
         {
-            if (requirement != null)
+            if (requirement != null && systemConfiguration != null)
             {
                 bool isCheckOs = CheckOS(systemConfiguration.Os, requirement.Os);
                 bool isCheckCpu = CheckCpu(systemConfiguration, requirement.Cpu);
@@ -40,7 +40,7 @@ namespace SystemChecker.Services
             }
             else
             {
-                logger.Warn($"CheckConfig() with null requirement");
+                Common.LogDebug(true, $"CheckConfig() with null requirement and/or systemConfiguration");
             }
 
             return new CheckSystem();

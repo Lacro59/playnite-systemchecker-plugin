@@ -180,14 +180,14 @@ namespace SystemChecker.Services
 
             if (systemMinimum.HasData)
             {
-                PluginSettings.Settings.IsMinimumOK = (bool)CheckMinimum.AllOk;
-                PluginSettings.Settings.IsAllOK = (bool)CheckMinimum.AllOk;
+                PluginSettings.Settings.IsMinimumOK = CheckMinimum.AllOk ?? false;
+                PluginSettings.Settings.IsAllOK = CheckMinimum.AllOk ?? false;
             }
 
-            if (systemRecommanded.HasData && (bool)CheckRecommanded.AllOk)
+            if (systemRecommanded.HasData && (CheckRecommanded.AllOk ?? false))
             {
-                PluginSettings.Settings.IsRecommandedOK = (bool)CheckRecommanded.AllOk;
-                PluginSettings.Settings.IsAllOK = (bool)CheckRecommanded.AllOk;
+                PluginSettings.Settings.IsRecommandedOK = CheckRecommanded.AllOk ?? false;
+                PluginSettings.Settings.IsAllOK = CheckRecommanded.AllOk ?? false;
             }
         }
 
