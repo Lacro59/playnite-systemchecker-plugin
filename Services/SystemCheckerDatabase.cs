@@ -311,30 +311,7 @@ namespace SystemChecker.Services
                         TagId = (PluginTags.Find(x => x.Name == $"[SC] {resources.GetString("LOCSystemCheckerConfigMinimum")}")).Id;
                     }
 
-                    if (TagId != null)
-                    {
-                        if (game.TagIds != null)
-                        {
-                            game.TagIds.Add((Guid)TagId);
-                        }
-                        else
-                        {
-                            game.TagIds = new List<Guid> { (Guid)TagId };
-                        }
-
-                        if (!noUpdate)
-                        {
-                            Application.Current.Dispatcher?.Invoke(() =>
-                            {
-                                PlayniteApi.Database.Games.Update(game);
-                                game.OnPropertyChanged();
-                            }, DispatcherPriority.Send);
-                        }
-                    }
-
                     // Recommanded
-                    TagId = null;
-
                     if ((bool)CheckMinimum.AllOk)
                     {
                         TagId = (PluginTags.Find(x => x.Name == $"[SC] {resources.GetString("LOCSystemCheckerConfigRecommanded")}")).Id;
