@@ -16,6 +16,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using SystemChecker.Clients;
 using SystemChecker.Controls;
+using SystemChecker.Models;
 using SystemChecker.Services;
 using SystemChecker.Views;
 
@@ -105,11 +106,15 @@ namespace SystemChecker
         public override List<GameMenuItem> GetGameMenuItems(GetGameMenuItemsArgs args)
         {
             var GameMenu = args.Games.First();
+            GameRequierements gameRequierements = PluginDatabase.Get(GameMenu, true);
 
-            List<GameMenuItem> gameMenuItems = new List<GameMenuItem>
+            List<GameMenuItem> gameMenuItems = new List<GameMenuItem>();
+
+            if (gameRequierements.HasData)
             {
                 // Show requierements for the selected game
-                new GameMenuItem {
+                gameMenuItems.Add(new GameMenuItem
+                {
                     MenuSection = resources.GetString("LOCSystemChecker"),
                     Description = resources.GetString("LOCSystemCheckerCheckConfig"),
                     Action = (gameMenuItem) =>
@@ -120,21 +125,43 @@ namespace SystemChecker
                         windowExtension.ShowDialog();
                         PluginDatabase.IsViewOpen = false;
                     }
-                },
+                });
 
-                // Delete & download requierements data for the selected game
-                new GameMenuItem {
+                gameMenuItems.Add(new GameMenuItem
+                {
                     MenuSection = resources.GetString("LOCSystemChecker"),
-                    Description = resources.GetString("LOCCommonRefreshGameData"),
-                    Action = (gameMenuItem) =>
+                    Description = "-"
+                });
+            }
+
+
+            // Delete & download requierements data for the selected game
+            gameMenuItems.Add(new GameMenuItem
+            {
+                MenuSection = resources.GetString("LOCSystemChecker"),
+                Description = resources.GetString("LOCCommonRefreshGameData"),
+                Action = (gameMenuItem) =>
+                {
+                    var TaskIntegrationUI = Task.Run(() =>
                     {
-                        var TaskIntegrationUI = Task.Run(() =>
-                        {
-                            PluginDatabase.Refresh(GameMenu.Id);
-                        });
-                    }
+                        PluginDatabase.Refresh(GameMenu.Id);
+                    });
                 }
-            };
+            });
+
+
+            if (gameRequierements.HasData)
+            {
+                gameMenuItems.Add(new GameMenuItem
+                {
+                    MenuSection = resources.GetString("LOCSystemChecker"),
+                    Description = resources.GetString("LOCCommonDeleteGameData"),
+                    Action = (mainMenuItem) =>
+                    {
+                        PluginDatabase.Remove(GameMenu);
+                    }
+                });
+            }
 
 #if DEBUG
             gameMenuItems.Add(new GameMenuItem
