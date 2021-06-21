@@ -41,8 +41,6 @@ namespace SystemChecker.Services
             LocalSystem = new LocalSystem(Path.Combine(Paths.PluginUserDataPath, $"Configurations.json"));
             Database.PC = LocalSystem.GetSystemConfiguration();
 
-            GetPluginTags();
-
             return true;
         }
 
@@ -243,6 +241,7 @@ namespace SystemChecker.Services
 
         public override void AddTag(Game game, bool noUpdate = false)
         {
+            GetPluginTags();
             GameRequierements gameRequierements = Get(game, true);
 
             if (gameRequierements.HasData)
