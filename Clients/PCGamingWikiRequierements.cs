@@ -1,6 +1,7 @@
 ﻿using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
 using CommonPluginsShared;
+using CommonPluginsStores;
 using Newtonsoft.Json;
 using Playnite.SDK;
 using Playnite.SDK.Models;
@@ -30,7 +31,7 @@ namespace SystemChecker.Clients
         public PCGamingWikiRequierements(IPlayniteAPI PlayniteApi, string PluginUserDataPath)
         {
             _PlayniteApi = PlayniteApi;
-            steamApi = new SteamApi(PluginUserDataPath);
+            steamApi = new SteamApi();
         }
 
 

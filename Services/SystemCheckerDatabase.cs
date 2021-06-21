@@ -16,6 +16,7 @@ using System.Windows;
 using System.Windows.Threading;
 using SystemChecker.Clients;
 using SystemChecker.Models;
+using CommonPluginsStores;
 
 namespace SystemChecker.Services
 {
@@ -83,7 +84,7 @@ namespace SystemChecker.Services
 
             try
             {
-                SourceName = PlayniteTools.GetSourceName(PlayniteApi, game);
+                SourceName = CommonPluginsShared.PlayniteTools.GetSourceName(PlayniteApi, game);
 
                 // Search datas
                 logger.Info($"Try find with PCGamingWikiRequierements for {game.Name}");
@@ -100,7 +101,7 @@ namespace SystemChecker.Services
                             break;
 
                         default:
-                            SteamApi steamApi = new SteamApi(Paths.PluginUserDataPath);
+                            SteamApi steamApi = new SteamApi();
                             int SteamID = steamApi.GetSteamId(game.Name);
                             if (SteamID != 0)
                             {
