@@ -140,6 +140,12 @@ namespace SystemChecker.Services
             {
                 Type = Regex.Match(CpuName, "i[0-9]", RegexOptions.IgnoreCase).Value.Trim();   
                 int.TryParse(Regex.Match(CpuName, "i[0-9]-[0-9]*", RegexOptions.IgnoreCase).Value.Replace(Type + "-", string.Empty).Trim(), out Version);
+
+                if (Version == 0)
+                {
+                    int.TryParse(Regex.Match(CpuName, @"\d{4}", RegexOptions.IgnoreCase).Value.Trim(), out Version);
+                }
+
                 IsOld = !Regex.IsMatch(CpuName, "i[0-9]", RegexOptions.IgnoreCase);
             }
             if (IsAmd)

@@ -411,61 +411,27 @@ namespace SystemChecker.Clients
                             case "video card (gpu)":
                                 if (!dataMinimum.IsNullOrEmpty())
                                 {
-                                    dataMinimum = dataMinimum.Replace(" / ", "¤").Replace("<br>", "¤");
+                                    dataMinimum = ReplaceGPU(dataMinimum);
 
+                                    dataMinimum = dataMinimum.Replace(" / ", "¤").Replace("<br>", "¤").Replace(" or ", "¤");
                                     dataMinimum = Regex.Replace(dataMinimum, "(</[^>]*>)", string.Empty);
                                     dataMinimum = Regex.Replace(dataMinimum, "(<[^>]*>)", string.Empty);
 
-                                    dataMinimum = dataMinimum.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
-                                        .Replace("DirectX-compliant", string.Empty)
-                                        .Replace("DirectX compatible card", string.Empty)
-                                        .Replace("or better", string.Empty)
-                                        .Replace("of VRAM", "VRAM")
-                                        .Replace("TnL support", string.Empty)
-                                        .Replace("Integrated graphics, monitor with resolution of 1280x720.", "1280x720")
-                                        .Replace("Integrated graphics", string.Empty)
-                                        .Replace("Integrated", string.Empty).Replace("Dedicated", string.Empty)
-                                        .Replace("+ compatible", string.Empty).Replace("compatible", string.Empty)
-                                        .Replace("that supports DirectDraw at 640x480 resolution, 256 colors", string.Empty)
-                                        .Replace("or higher", string.Empty)
-                                        .Replace(" / ", "¤").Replace("<br>", "¤");
+                                    dataMinimum = ReplaceGPU(dataMinimum);
 
-                                    Minimum.Gpu = dataMinimum.Split('¤')
-                                        .Select(x => x.Trim()).ToList()
-                                        .Where(x => x.Length > 4)
-                                        .Where(x => x.ToLower().IndexOf("shader") == -1)
-                                        .Where(x => x.ToLower().IndexOf("anything") == -1)
-                                        .Where(x => x.ToLower().IndexOf("any card") == -1)
-                                        .Where(x => x.Trim() != string.Empty).ToList();
+                                    Minimum.Gpu = SplitAndFilterGPU(dataMinimum);
                                 }
                                 if (!dataRecommended.IsNullOrEmpty())
                                 {
-                                    dataRecommended = dataRecommended.Replace(" / ", "¤").Replace("<br>", "¤");
+                                    dataRecommended = ReplaceGPU(dataRecommended);
 
+                                    dataRecommended = dataRecommended.Replace(" / ", "¤").Replace("<br>", "¤").Replace(" or ", "¤");
                                     dataRecommended = Regex.Replace(dataRecommended, "(</[^>]*>)", "");
                                     dataRecommended = Regex.Replace(dataRecommended, "(<[^>]*>)", "");
 
-                                    dataRecommended = dataRecommended.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
-                                        .Replace("DirectX-compliant", string.Empty)
-                                        .Replace("DirectX compatible card", string.Empty)
-                                        .Replace("or better", string.Empty)
-                                        .Replace("of VRAM", "VRAM")
-                                        .Replace("TnL support", string.Empty)
-                                        .Replace("Integrated graphics, monitor with resolution of 1280x720.", "1280x720")
-                                        .Replace("Integrated graphics", string.Empty)
-                                        .Replace("Integrated", string.Empty).Replace("Dedicated", string.Empty)
-                                        .Replace("+ compatible", string.Empty).Replace("compatible", string.Empty)
-                                        .Replace("that supports DirectDraw at 640x480 resolution, 256 colors", string.Empty)
-                                        .Replace("or higher", string.Empty)
-                                        .Replace(" / ", "¤").Replace("<br>", "¤");
+                                    dataRecommended = ReplaceGPU(dataRecommended);
 
-                                    Recommanded.Gpu = dataRecommended.Split('¤')
-                                        .Select(x => x.Trim()).ToList()
-                                        .Where(x => x.Length > 4)
-                                        .Where(x => x.ToLower().IndexOf("shader") == -1).ToList()
-                                        .Where(x => x.ToLower().IndexOf("anything") == -1).ToList()
-                                        .Where(x => x.ToLower().IndexOf("any card") == -1)
-                                        .Where(x => x.Trim() != string.Empty).ToList();
+                                    Recommanded.Gpu = SplitAndFilterGPU(dataRecommended);
                                 }
                                 break;
 
@@ -502,6 +468,37 @@ namespace SystemChecker.Clients
             }
 
             return gameRequierements;
+        }
+
+
+        private string ReplaceGPU(string data)
+        {
+            return data.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
+                .Replace("XNA Hi Def Profile Compatible GPU", string.Empty)
+                .Replace("DirectX-compliant", string.Empty)
+                .Replace("Mobile or dedicated", string.Empty)
+                .Replace("DirectX compatible card", string.Empty)
+                .Replace("or better", string.Empty)
+                .Replace("of VRAM", "VRAM")
+                .Replace("TnL support", string.Empty)
+                .Replace("Integrated graphics, monitor with resolution of 1280x720.", "1280x720")
+                .Replace("Integrated graphics", string.Empty)
+                .Replace("Integrated", string.Empty).Replace("Dedicated", string.Empty)
+                .Replace("+ compatible", string.Empty).Replace("compatible", string.Empty)
+                .Replace("that supports DirectDraw at 640x480 resolution, 256 colors", string.Empty)
+                .Replace("or higher", string.Empty)
+                .Replace(" / ", "¤").Replace("<br>", "¤");
+        }
+
+        private List<string> SplitAndFilterGPU(string data)
+        {
+            return data.Split('¤')
+                .Select(x => x.Trim()).ToList()
+                .Where(x => x.Length > 4)
+                .Where(x => x.ToLower().IndexOf("shader") == -1)
+                .Where(x => x.ToLower().IndexOf("anything") == -1)
+                .Where(x => x.ToLower().IndexOf("any card") == -1)
+                .Where(x => x.Trim() != string.Empty).ToList();
         }
     }
 }

@@ -493,7 +493,7 @@ namespace SystemChecker.Services
             #endregion
 
 
-            if (!IsAmd && !IsNvidia && !IsIntegrate)
+            if (!IsAmd && !IsNvidia && !IsIntegrate && !IsDx)
             {
                 IsOld = true;
             }
