@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using SystemChecker.Clients;
 using SystemChecker.Models;
 using SystemChecker.Services;
@@ -216,35 +217,31 @@ namespace SystemChecker.Views
                 }
             }
 
-            btLink.Visibility = System.Windows.Visibility.Hidden;
-            if (Minimum.HasData || Recommanded.HasData)
-            {
-                btLink.Visibility = System.Windows.Visibility.Visible;
-                btLink.Tag = gameRequierements.Link;
-            }
+
 
             Common.LogDebug(true, $"CheckMinimum" + JsonConvert.SerializeObject(CheckMinimum));
             Common.LogDebug(true, $"CheckRecommanded" + JsonConvert.SerializeObject(CheckRecommanded));
 
-            if (!gameRequierements.SourceGameName.IsNullOrEmpty() && !gameRequierements.SourceName.IsNullOrEmpty())
+
+            if (gameRequierements.SourcesLink != null)
             {
-                ScSourceName = resources.GetString("LOCSourceLabel") + ": " + gameRequierements.SourceGameName + $" ({gameRequierements.SourceName})";
+                PART_SourceLabel.Text = gameRequierements.SourcesLink.GameName + " (" + gameRequierements.SourcesLink.Name + ")";
+                PART_SourceLink.Tag = gameRequierements.SourcesLink.Url;
             }
-            else
-            {
-                ScSourceName = resources.GetString("LOCSourceLabel") + ": " + GameSelected.Name;
-            }
+
 
             DataContext = this;
         }
 
-        private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
-        {
-            Button bt = (Button)sender;
 
-            if (!((string)bt.Tag).IsNullOrEmpty())
+        private void PART_SourceLink_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (((Hyperlink)sender).Tag is string)
             {
-                Process.Start((string)bt.Tag);
+                if (!((string)((Hyperlink)sender).Tag).IsNullOrEmpty())
+                {
+                    Process.Start((string)((Hyperlink)sender).Tag);
+                }
             }
         }
     }

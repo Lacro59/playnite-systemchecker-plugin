@@ -1,4 +1,5 @@
 ﻿using CommonPluginsShared.Collections;
+using CommonPluginsShared.Models;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
@@ -21,12 +22,6 @@ namespace SystemChecker.Models
             }
         }
 
-        public string SourceGameName { get; set; }
-        public string SourceName { get; set; }
-
-        public string Link { get; set; }
-
-
         [JsonIgnore]
         public override bool HasData
         {
@@ -40,6 +35,9 @@ namespace SystemChecker.Models
                 return false;
             }
         }
+
+
+        public SourceLink SourcesLink { get; set; }
 
 
         public Requirement GetMinimum()

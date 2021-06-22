@@ -97,7 +97,6 @@ namespace SystemChecker.Services
                     {
                         case "steam":
                             gameRequierements = steamRequierements.GetRequirements(game);
-                            gameRequierements.Link = "https://store.steampowered.com/app/" + game.GameId;
                             break;
 
                         default:
@@ -106,7 +105,6 @@ namespace SystemChecker.Services
                             if (SteamID != 0)
                             {
                                 gameRequierements = steamRequierements.GetRequirements(game, (uint)SteamID);
-                                gameRequierements.Link = "https://store.steampowered.com/app/" + SteamID;
                             }
                             break;
                     }

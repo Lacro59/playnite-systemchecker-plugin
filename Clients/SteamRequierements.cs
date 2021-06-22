@@ -2,6 +2,7 @@
 using AngleSharp.Parser.Html;
 using CommonPluginsPlaynite.PluginLibrary.SteamLibrary.SteamShared;
 using CommonPluginsShared;
+using CommonPluginsShared.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Playnite.SDK;
@@ -70,8 +71,13 @@ namespace SystemChecker.Clients
                         Recommanded = ParseRequirement((string)pc_requirements["recommended"]);
                     }
 
-                    gameRequierements.SourceName = "Steam";
-                    gameRequierements.SourceGameName = parsedData[AppId.ToString()].data.name;
+
+                    gameRequierements.SourcesLink = new SourceLink
+                    {
+                        Name = "Steam",
+                        GameName = parsedData[AppId.ToString()].data.name,
+                        Url = $"https://store.steampowered.com/app/{AppId}/"
+                    };
                 }
             }
             catch (Exception ex)

@@ -1,6 +1,7 @@
 ﻿using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
 using CommonPluginsShared;
+using CommonPluginsShared.Models;
 using CommonPluginsStores;
 using Newtonsoft.Json;
 using Playnite.SDK;
@@ -11,6 +12,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading;
 using SystemChecker.Models;
 
 namespace SystemChecker.Clients
@@ -46,6 +48,7 @@ namespace SystemChecker.Clients
             {
                 url = string.Format(UrlSteamId, SteamId);
 
+                Thread.Sleep(1000);
                 WebResponse = Web.DownloadStringData(url).GetAwaiter().GetResult();
                 if (!WebResponse.ToLower().Contains("search results"))
                 {
@@ -76,6 +79,7 @@ namespace SystemChecker.Clients
 
                 if (!url.IsNullOrEmpty())
                 {
+                    Thread.Sleep(1000);
                     WebResponse = Web.DownloadStringData(url).GetAwaiter().GetResult();
                     if (!WebResponse.ToLower().Contains("search results"))
                     {
@@ -91,6 +95,7 @@ namespace SystemChecker.Clients
                  url += $"+%28{((DateTime)game.ReleaseDate).ToString("yyyy")}%29";
             }
 
+            Thread.Sleep(1000);
             WebResponse = Web.DownloadStringData(url).GetAwaiter().GetResult();
             if (!WebResponse.ToLower().Contains("search results"))
             {
@@ -104,6 +109,7 @@ namespace SystemChecker.Clients
             url = string.Empty;
             url = UrlPCGamingWikiSearch + WebUtility.UrlEncode(Name);
 
+            Thread.Sleep(1000);
             WebResponse = Web.DownloadStringData(url).GetAwaiter().GetResult();
             if (!WebResponse.ToLower().Contains("search results"))
             {
@@ -182,8 +188,6 @@ namespace SystemChecker.Clients
                 var systemRequierement = HtmlRequirement.QuerySelector("div.sysreq_Windows");
                 if (systemRequierement != null)
                 {
-                    gameRequierements.Link = url;
-
                     Requirement Minimum = new Requirement();
                     Requirement Recommanded = new Requirement();
 
@@ -428,8 +432,13 @@ namespace SystemChecker.Clients
 
                     gameRequierements.Items = new List<Requirement> { Minimum, Recommanded };
 
-                    gameRequierements.SourceName = "PCGamingWiki";
-                    gameRequierements.SourceGameName = HtmlRequirement.QuerySelector("h1.article-title").InnerHtml;
+
+                    gameRequierements.SourcesLink = new SourceLink
+                    {
+                        Name = "PCGamingWiki",
+                        GameName = HtmlRequirement.QuerySelector("h1.article-title").InnerHtml,
+                        Url = url
+                    };
                 }
                 else
                 {
