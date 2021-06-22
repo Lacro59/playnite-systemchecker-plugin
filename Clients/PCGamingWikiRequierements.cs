@@ -37,9 +37,39 @@ namespace SystemChecker.Clients
         }
 
 
+        private string GetUrlIsOneResult(string WebResponse)
+        {
+            string url = string.Empty;
+
+            try
+            {
+                if (!WebResponse.Contains("There were no results matching the query"))
+                {
+                    HtmlParser parser = new HtmlParser();
+                    IHtmlDocument HtmlDocument = parser.Parse(WebResponse);
+
+                    if (HtmlDocument.QuerySelectorAll("ul.mw-search-results")?.Count() == 2)
+                    {
+                        var TitleMatches = HtmlDocument.QuerySelectorAll("ul.mw-search-results")[0].QuerySelectorAll("li");
+                        if (TitleMatches?.Count() == 1)
+                        {
+                            url = UrlPCGamingWiki + TitleMatches[0].QuerySelector("a").GetAttribute("href");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false);
+            }
+
+            return url;
+        }
+
         private string FindGoodUrl(Game game, int SteamId = 0)
         {
             string url = string.Empty;
+            string urlMatch = string.Empty;
             string WebResponse = string.Empty;
 
 
@@ -66,13 +96,13 @@ namespace SystemChecker.Clients
                     {
                         url = link.Url;
 
-                        if (url.Contains(UrlPCGamingWikiSearch))
-                        {
-                            url = UrlPCGamingWikiSearch + WebUtility.UrlEncode(url.Replace(UrlPCGamingWikiSearch, string.Empty));
-                        }
                         if (url.Contains(@"http://pcgamingwiki.com/w/index.php?search="))
                         {
                             url = UrlPCGamingWikiSearch + WebUtility.UrlEncode(url.Replace(@"http://pcgamingwiki.com/w/index.php?search=", string.Empty));
+                        }
+                        if (url.Length == UrlPCGamingWikiSearch.Length)
+                        {
+                            url = string.Empty;
                         }
                     }
                 }
@@ -85,26 +115,21 @@ namespace SystemChecker.Clients
                     {
                         return url;
                     }
+                    else
+                    {
+                        urlMatch = GetUrlIsOneResult(WebResponse);
+                        if (!urlMatch.IsNullOrEmpty())
+                        {
+                            return urlMatch;
+                        }
+                    }
                 }
-            }
-
-
-            url = UrlPCGamingWikiSearch + WebUtility.UrlEncode(game.Name);
-            if (game.ReleaseDate != null)
-            {
-                 url += $"+%28{((DateTime)game.ReleaseDate).ToString("yyyy")}%29";
-            }
-
-            Thread.Sleep(1000);
-            WebResponse = Web.DownloadStringData(url).GetAwaiter().GetResult();
-            if (!WebResponse.ToLower().Contains("search results"))
-            {
-                return url;
             }
 
 
             string Name = Regex.Replace(game.Name, @"([ ]demo\b)", string.Empty, RegexOptions.IgnoreCase);
             Name = Regex.Replace(Name, @"(demo[ ])", string.Empty, RegexOptions.IgnoreCase);
+            Name = CommonPluginsShared.PlayniteTools.NormalizeGameName(Name);
 
             url = string.Empty;
             url = UrlPCGamingWikiSearch + WebUtility.UrlEncode(Name);
@@ -114,6 +139,33 @@ namespace SystemChecker.Clients
             if (!WebResponse.ToLower().Contains("search results"))
             {
                 return url;
+            }
+            else
+            {
+                urlMatch = GetUrlIsOneResult(WebResponse);
+                if (!urlMatch.IsNullOrEmpty())
+                {
+                    return urlMatch;
+                }
+            }
+
+
+            url = string.Empty;
+            url = UrlPCGamingWikiSearch + WebUtility.UrlEncode(game.Name);
+
+            Thread.Sleep(1000);
+            WebResponse = Web.DownloadStringData(url).GetAwaiter().GetResult();
+            if (!WebResponse.ToLower().Contains("search results"))
+            {
+                return url;
+            }
+            else
+            {
+                urlMatch = GetUrlIsOneResult(WebResponse);
+                if (!urlMatch.IsNullOrEmpty())
+                {
+                    return urlMatch;
+                }
             }
 
 
