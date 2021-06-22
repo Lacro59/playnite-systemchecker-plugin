@@ -166,9 +166,7 @@ namespace SystemChecker.Clients
         {
             try
             {
-#if DEBUG
-                logger.Debug($"PCGamingWikiRequierements.GetRequirements - url {url}");
-#endif
+                Common.LogDebug(true, $"PCGamingWikiRequierements.GetRequirements - url {url}");
 
                 // Get data & parse
                 string ResultWeb = string.Empty;
