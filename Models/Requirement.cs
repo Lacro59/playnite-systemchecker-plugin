@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using Playnite.SDK.Data;
 using System.Collections.Generic;
 
 namespace SystemChecker.Models
@@ -14,7 +14,7 @@ namespace SystemChecker.Models
         public double Storage { get; set; }
         public string StorageUsage { get; set; }
 
-        [JsonIgnore]
+        [DontSerialize]
         public bool HasData
         {
             get

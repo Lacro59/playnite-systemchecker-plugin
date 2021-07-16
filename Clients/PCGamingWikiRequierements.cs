@@ -3,9 +3,9 @@ using AngleSharp.Parser.Html;
 using CommonPluginsShared;
 using CommonPluginsShared.Models;
 using CommonPluginsStores;
-using Newtonsoft.Json;
 using Playnite.SDK;
 using Playnite.SDK.Models;
+using Playnite.SDK.Data;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -443,8 +443,8 @@ namespace SystemChecker.Clients
 
                     Minimum.IsMinimum = true;
 
-                    Common.LogDebug(true, $"PCGamingWikiRequierements - Minimum: {JsonConvert.SerializeObject(Minimum)}");
-                    Common.LogDebug(true, $"PCGamingWikiRequierements - Recommanded: {JsonConvert.SerializeObject(Recommanded)}");
+                    Common.LogDebug(true, $"PCGamingWikiRequierements - Minimum: {Serialization.ToJson(Minimum)}");
+                    Common.LogDebug(true, $"PCGamingWikiRequierements - Recommanded: {Serialization.ToJson(Recommanded)}");
 
                     gameRequierements.Items = new List<Requirement> { Minimum, Recommanded };
 

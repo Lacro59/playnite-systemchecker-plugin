@@ -1,6 +1,6 @@
 ﻿using CommonPluginsShared;
-using Newtonsoft.Json;
 using Playnite.SDK;
+using Playnite.SDK.Data;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -58,7 +58,7 @@ namespace SystemChecker.Services
 
                         Guid gameId = Guid.Parse(objectFile.Replace(PathActivityDB, "").Replace(".json", "").Replace("\\", ""));
 
-                        GameRequierementsOld gameRequierements = JsonConvert.DeserializeObject<GameRequierementsOld>(JsonStringData);
+                        GameRequierementsOld gameRequierements = Serialization.FromJson<GameRequierementsOld>(JsonStringData);
 
                         Items.TryAdd(gameId, gameRequierements);
                     }

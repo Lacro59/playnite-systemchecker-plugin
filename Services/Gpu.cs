@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using Playnite.SDK;
+﻿using Playnite.SDK;
+using Playnite.SDK.Data;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -15,28 +15,28 @@ namespace SystemChecker.Services
         private static readonly ILogger logger = LogManager.GetLogger();
 
         private List<GpuEquivalence> Equivalence = new List<GpuEquivalence>
-            {
-                new GpuEquivalence {Nvidia = "Nvidia GTX 960", Amd = "Amd R9 380"},
-                new GpuEquivalence {Nvidia = "Nvidia GTX 760", Amd = "Amd Radeo HD 7870"},
-                new GpuEquivalence {Nvidia = "Nvidia GTX 1030", Amd = "Amd RX 550"},
-                new GpuEquivalence {Nvidia = "Nvidia GTX 1050", Amd = "Amd RX 560"},
-                new GpuEquivalence {Nvidia = "Nvidia GTX 1060", Amd = "Amd RX 580"},
-                new GpuEquivalence {Nvidia = "Nvidia GTX 1660", Amd = "Amd RX 590"},
-                new GpuEquivalence {Nvidia = "Nvidia GTX 970", Amd = "Amd RX 570"},
-                new GpuEquivalence {Nvidia = "Nvidia GTX 970", Amd = "Amd R9 390"},
-                new GpuEquivalence {Nvidia = "Nvidia GTX 660", Amd = "Amd Radeon HD 7850"},
-                new GpuEquivalence {Nvidia = "Nvidia GTX 670", Amd = "Amd Radep HD 7870"},
-                new GpuEquivalence {Nvidia = "Nvidia GTX 780", Amd = "Amd Radeon R9 290"},
-                new GpuEquivalence {Nvidia = "Nvidia GTX 1070", Amd = "Amd Radeon RX Vega 56"},
-                new GpuEquivalence {Nvidia = "Nvidia GTX 1070", Amd = "Amd Radeon 5600 XT"},
-                new GpuEquivalence {Nvidia = "Nvidia RTX 2060", Amd = "Amd Radeon RX Vega 56"},
-                new GpuEquivalence {Nvidia = "Nvidia RTX 2060", Amd = "Amd Radeon 5600 XT"},
-                new GpuEquivalence {Nvidia = "Nvidia GTX 1080", Amd = "Amd Radeon RX Vega 64"},
-                new GpuEquivalence {Nvidia = "Nvidia RTX 2060 SUPER", Amd = "Amd Radeon RX Vega 64"},
-                new GpuEquivalence {Nvidia = "Nvidia RTX 2060 SUPER", Amd = "Amd Radeon 5700"},
-                new GpuEquivalence {Nvidia = "Nvidia RTX 2070", Amd = "Amd Radeon RX Vega 64"},
-                new GpuEquivalence {Nvidia = "Nvidia RTX 2070", Amd = "Amd Radeon 5700 XT"}
-            };
+        {
+            new GpuEquivalence {Nvidia = "Nvidia GTX 960", Amd = "Amd R9 380"},
+            new GpuEquivalence {Nvidia = "Nvidia GTX 760", Amd = "Amd Radeo HD 7870"},
+            new GpuEquivalence {Nvidia = "Nvidia GTX 1030", Amd = "Amd RX 550"},
+            new GpuEquivalence {Nvidia = "Nvidia GTX 1050", Amd = "Amd RX 560"},
+            new GpuEquivalence {Nvidia = "Nvidia GTX 1060", Amd = "Amd RX 580"},
+            new GpuEquivalence {Nvidia = "Nvidia GTX 1660", Amd = "Amd RX 590"},
+            new GpuEquivalence {Nvidia = "Nvidia GTX 970", Amd = "Amd RX 570"},
+            new GpuEquivalence {Nvidia = "Nvidia GTX 970", Amd = "Amd R9 390"},
+            new GpuEquivalence {Nvidia = "Nvidia GTX 660", Amd = "Amd Radeon HD 7850"},
+            new GpuEquivalence {Nvidia = "Nvidia GTX 670", Amd = "Amd Radep HD 7870"},
+            new GpuEquivalence {Nvidia = "Nvidia GTX 780", Amd = "Amd Radeon R9 290"},
+            new GpuEquivalence {Nvidia = "Nvidia GTX 1070", Amd = "Amd Radeon RX Vega 56"},
+            new GpuEquivalence {Nvidia = "Nvidia GTX 1070", Amd = "Amd Radeon 5600 XT"},
+            new GpuEquivalence {Nvidia = "Nvidia RTX 2060", Amd = "Amd Radeon RX Vega 56"},
+            new GpuEquivalence {Nvidia = "Nvidia RTX 2060", Amd = "Amd Radeon 5600 XT"},
+            new GpuEquivalence {Nvidia = "Nvidia GTX 1080", Amd = "Amd Radeon RX Vega 64"},
+            new GpuEquivalence {Nvidia = "Nvidia RTX 2060 SUPER", Amd = "Amd Radeon RX Vega 64"},
+            new GpuEquivalence {Nvidia = "Nvidia RTX 2060 SUPER", Amd = "Amd Radeon 5700"},
+            new GpuEquivalence {Nvidia = "Nvidia RTX 2070", Amd = "Amd Radeon RX Vega 64"},
+            new GpuEquivalence {Nvidia = "Nvidia RTX 2070", Amd = "Amd Radeon 5700 XT"}
+        };
         private string CardPcName { get; set; }
         private GpuObject CardPc { get; set; }
         private string CardRequierementName { get; set; }
@@ -109,8 +109,8 @@ namespace SystemChecker.Services
 
         public bool IsBetter()
         {
-            Common.LogDebug(true, $"Gpu.IsBetter - CardPc({CardPcName}): {JsonConvert.SerializeObject(CardPc)}");
-            Common.LogDebug(true, $"Gpu.IsBetter - CardRequierement({CardRequierementName}): {JsonConvert.SerializeObject(CardRequierement)}");
+            Common.LogDebug(true, $"Gpu.IsBetter - CardPc({CardPcName}): {Serialization.ToJson(CardPc)}");
+            Common.LogDebug(true, $"Gpu.IsBetter - CardRequierement({CardRequierementName}): {Serialization.ToJson(CardRequierement)}");
 
             // Old card requiered
             if (CardRequierement.IsOld || CardPc.IsOld)
@@ -246,7 +246,7 @@ namespace SystemChecker.Services
                         }
                     }
 
-                    logger.Warn($"No equivalence for {JsonConvert.SerializeObject(CardPc)} & {JsonConvert.SerializeObject(CardRequierement)}");
+                    logger.Warn($"No equivalence for {Serialization.ToJson(CardPc)} & {Serialization.ToJson(CardRequierement)}");
                     return false;
                 }
                 catch (Exception ex)
@@ -281,11 +281,11 @@ namespace SystemChecker.Services
                     Common.LogError(ex, false, $"Error on IsBetter() for Amd vs Nvidia");
                 }
 
-                logger.Warn($"No equivalence for {JsonConvert.SerializeObject(CardPc)} & {JsonConvert.SerializeObject(CardRequierement)}");
+                logger.Warn($"No equivalence for {Serialization.ToJson(CardPc)} & {Serialization.ToJson(CardRequierement)}");
                 return false;
             }
 
-            logger.Warn($"No GPU treatment for {JsonConvert.SerializeObject(CardPc)} & {JsonConvert.SerializeObject(CardRequierement)}");
+            logger.Warn($"No GPU treatment for {Serialization.ToJson(CardPc)} & {Serialization.ToJson(CardRequierement)}");
             return false;
         }
 

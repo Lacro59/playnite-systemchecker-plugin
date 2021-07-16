@@ -3,10 +3,9 @@ using AngleSharp.Parser.Html;
 using CommonPluginsPlaynite.PluginLibrary.SteamLibrary.SteamShared;
 using CommonPluginsShared;
 using CommonPluginsShared.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Playnite.SDK;
 using Playnite.SDK.Models;
+using Playnite.SDK.Data;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -53,13 +52,13 @@ namespace SystemChecker.Clients
             try
             {
                 string data = GetSteamData();
-                var parsedData = JsonConvert.DeserializeObject<Dictionary<string, StoreAppDetailsResult>>(data);
+                var parsedData = Serialization.FromJson<Dictionary<string, StoreAppDetailsResult>>(data);
 
-                if (parsedData[AppId.ToString()].data != null && JsonConvert.SerializeObject(parsedData[AppId.ToString()].data.pc_requirements) != "[]")
+                if (parsedData[AppId.ToString()].data != null && Serialization.ToJson(parsedData[AppId.ToString()].data.pc_requirements) != "[]")
                 {
-                    Common.LogDebug(true, JsonConvert.SerializeObject(parsedData[AppId.ToString()].data.pc_requirements));
+                    Common.LogDebug(true, Serialization.ToJson(parsedData[AppId.ToString()].data.pc_requirements));
 
-                    JObject pc_requirements = JObject.FromObject(parsedData[AppId.ToString()].data.pc_requirements);
+                    dynamic pc_requirements = Serialization.FromJson<dynamic>(Serialization.ToJson(parsedData[AppId.ToString()].data.pc_requirements));
 
                     if (pc_requirements["minimum"] != null)
                     {

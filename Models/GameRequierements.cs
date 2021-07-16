@@ -1,6 +1,6 @@
 ﻿using CommonPluginsShared.Collections;
 using CommonPluginsShared.Models;
-using Newtonsoft.Json;
+using Playnite.SDK.Data;
 using System.Collections.Generic;
 
 namespace SystemChecker.Models
@@ -22,7 +22,7 @@ namespace SystemChecker.Models
             }
         }
 
-        [JsonIgnore]
+        [DontSerialize]
         public override bool HasData
         {
             get

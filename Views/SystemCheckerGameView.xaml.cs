@@ -1,6 +1,6 @@
 ﻿using CommonPluginsShared;
-using Newtonsoft.Json;
 using Playnite.SDK;
+using Playnite.SDK.Data;
 using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
@@ -219,8 +219,8 @@ namespace SystemChecker.Views
 
 
 
-            Common.LogDebug(true, $"CheckMinimum" + JsonConvert.SerializeObject(CheckMinimum));
-            Common.LogDebug(true, $"CheckRecommanded" + JsonConvert.SerializeObject(CheckRecommanded));
+            Common.LogDebug(true, $"CheckMinimum" + Serialization.ToJson(CheckMinimum));
+            Common.LogDebug(true, $"CheckRecommanded" + Serialization.ToJson(CheckRecommanded));
 
 
             if (gameRequierements.SourcesLink != null)

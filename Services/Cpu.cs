@@ -1,6 +1,6 @@
 ﻿using CommonPluginsShared;
-using Newtonsoft.Json;
 using Playnite.SDK;
+using Playnite.SDK.Data;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -30,8 +30,8 @@ namespace SystemChecker.Services
 
         public bool IsBetter()
         {
-            Common.LogDebug(true, $"Cpu.IsBetter - ProcessorPc: {JsonConvert.SerializeObject(ProcessorPc)}");
-            Common.LogDebug(true, $"Cpu.IsBetter - ProcessorRequierement: {JsonConvert.SerializeObject(ProcessorRequierement)}");
+            Common.LogDebug(true, $"Cpu.IsBetter - ProcessorPc: {Serialization.ToJson(ProcessorPc)}");
+            Common.LogDebug(true, $"Cpu.IsBetter - ProcessorRequierement: {Serialization.ToJson(ProcessorRequierement)}");
 
             // Old Processor
             if (!ProcessorPc.IsOld && ProcessorRequierement.IsOld)
@@ -45,7 +45,7 @@ namespace SystemChecker.Services
             if (ProcessorPc.IsOld && ProcessorRequierement.IsOld)
             {
                 // TODO: CPU old vs old
-                logger.Warn($"No CPU treatment for {JsonConvert.SerializeObject(ProcessorPc)} & {JsonConvert.SerializeObject(ProcessorRequierement)}");
+                logger.Warn($"No CPU treatment for {Serialization.ToJson(ProcessorPc)} & {Serialization.ToJson(ProcessorRequierement)}");
                 return false;
             }
 
@@ -198,7 +198,7 @@ namespace SystemChecker.Services
             }
 
 
-            logger.Warn($"No CPU treatment for {JsonConvert.SerializeObject(ProcessorPc)} & {JsonConvert.SerializeObject(ProcessorRequierement)}");
+            logger.Warn($"No CPU treatment for {Serialization.ToJson(ProcessorPc)} & {Serialization.ToJson(ProcessorRequierement)}");
             return false;
         }
 

@@ -1,6 +1,5 @@
-﻿using Newtonsoft.Json;
-using Playnite.SDK;
-using Playnite.SDK.Models;
+﻿using Playnite.SDK;
+using Playnite.SDK.Data;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -79,7 +78,7 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, $"Error on CheckOs() with {systemOs} & {JsonConvert.SerializeObject(requierementOs)}");
+                Common.LogError(ex, false, $"Error on CheckOs() with {systemOs} & {Serialization.ToJson(requierementOs)}");
             }
 
             return false;
@@ -107,7 +106,7 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, $"Error on CheckGpu() with {systemConfiguration.Cpu} & {JsonConvert.SerializeObject(requierementCpu)}");
+                Common.LogError(ex, false, $"Error on CheckGpu() with {systemConfiguration.Cpu} & {Serialization.ToJson(requierementCpu)}");
             }
 
             return false;
@@ -163,7 +162,7 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, $"Error on CheckGpu() with {systemConfiguration.GpuName} & {JsonConvert.SerializeObject(requierementGpu)}");
+                Common.LogError(ex, false, $"Error on CheckGpu() with {systemConfiguration.GpuName} & {Serialization.ToJson(requierementGpu)}");
             }
 
             return false;
@@ -188,7 +187,7 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, $"Error on CheckStorage() with {Storage} & {JsonConvert.SerializeObject(systemDisks)}");
+                Common.LogError(ex, false, $"Error on CheckStorage() with {Storage} & {Serialization.ToJson(systemDisks)}");
             }
 
             return false;
