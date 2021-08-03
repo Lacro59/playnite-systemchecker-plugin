@@ -53,8 +53,8 @@ namespace SystemChecker
         // Playnite serializes settings object to a JSON object and saves it as text file.
         // If you want to exclude some property from being saved then use `JsonDontSerialize` ignore attribute.
         #region Variables exposed
-        [DontSerialize]
         private bool _HasData { get; set; } = false;
+        [DontSerialize]
         public bool HasData
         {
             get => _HasData;
@@ -65,8 +65,8 @@ namespace SystemChecker
             }
         }
 
-        [DontSerialize]
         private bool _IsMinimumOK { get; set; } = false;
+        [DontSerialize]
         public bool IsMinimumOK
         {
             get => _IsMinimumOK;
@@ -77,8 +77,8 @@ namespace SystemChecker
             }
         }
 
-        [DontSerialize]
         private bool _IsRecommandedOK { get; set; } = false;
+        [DontSerialize]
         public bool IsRecommandedOK
         {
             get => _IsRecommandedOK;
@@ -89,8 +89,8 @@ namespace SystemChecker
             }
         }
 
-        [DontSerialize]
         private bool _IsAllOK { get; set; } = false;
+        [DontSerialize]
         public bool IsAllOK
         {
             get => _IsAllOK;
