@@ -59,8 +59,11 @@ namespace SystemChecker.Services
             if (gameRequierements == null)
             {
                 Game game = PlayniteApi.Database.Games.Get(Id);
-                gameRequierements = GetDefault(game);
-                AddOrUpdate(gameRequierements);
+                if (game != null)
+                {
+                    gameRequierements = GetDefault(game);
+                    AddOrUpdate(gameRequierements);
+                }
             }
 
             return gameRequierements;
@@ -160,6 +163,11 @@ namespace SystemChecker.Services
         public override void SetThemesResources(Game game)
         {
             GameRequierements gameRequierements = Get(game, true);
+
+            if (gameRequierements == null)
+            {
+                return;
+            }
 
             SystemConfiguration systemConfiguration = Database.PC;
             Requirement systemMinimum = gameRequierements.GetMinimum();
