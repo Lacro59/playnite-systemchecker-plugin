@@ -43,7 +43,7 @@ namespace SystemChecker.Controls
             }
         }
 
-        private PluginButtonDataContext ControlDataContext;
+        public PluginButtonDataContext ControlDataContext;
         internal override IDataContext _ControlDataContext
         {
             get
@@ -118,17 +118,14 @@ namespace SystemChecker.Controls
                     {
                         if (!(bool)CheckMinimum.AllOk)
                         {
-                            //ControlDataContext.Foreground = Brushes.Red;
                             ControlDataContext.Text = IconKo;
                         }
                         else if ((bool)CheckMinimum.AllOk)
                         {
-                            //ControlDataContext.Foreground = Brushes.Orange;
                             ControlDataContext.Text = IconMinimum;
 
                             if (!systemRecommanded.HasData)
                             {
-                                //ControlDataContext.Foreground = Brushes.Green;
                                 ControlDataContext.Text = IconOk;
                             }
                         }
@@ -136,7 +133,6 @@ namespace SystemChecker.Controls
 
                     if (systemRecommanded.HasData && (bool)CheckRecommanded.AllOk)
                     {
-                        //ControlDataContext.Foreground = Brushes.Green;
                         ControlDataContext.Text = IconOk;
                     }
                 }
@@ -166,7 +162,7 @@ namespace SystemChecker.Controls
         public bool IsActivated { get; set; }
         public bool DisplayDetails { get; set; }
 
-        public string Text { get; set; }
+        public string Text { get; set; } = "\uea53";
         public SolidColorBrush Foreground { get; set; }
     }
 }

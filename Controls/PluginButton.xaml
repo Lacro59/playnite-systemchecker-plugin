@@ -6,24 +6,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         xmlns:local="clr-namespace:SystemChecker.Controls"
-        mc:Ignorable="d" d:DesignHeight="40" d:DesignWidth="40">
+        mc:Ignorable="d" d:DesignHeight="40" d:DesignWidth="40"
+        d:DataContext="{d:DesignInstance local:PluginButtonDataContext, IsDesignTimeCreatable=True}">
 
     <Button Name="PART_PluginButton"
             Click="PART_PluginButton_Click" Style="{StaticResource {x:Type Button}}">
         <Grid>
-            <TextBlock Text="{Binding Text, Mode=OneWay, FallbackValue='&#xea4c;'}" FontFamily="{DynamicResource CommonFont}"
-                       FontSize="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=FontSize}">
-                <!--TextBlock.Style>
-                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-                        <Setter Property="Foreground" Value="{Binding Foreground, FallbackValue='#55CDFF'}"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=IsMouseOver}" Value="True">
-                                <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBlock.Style-->
-            </TextBlock>
+            <TextBlock Text="{Binding Text, Mode=OneWay}" FontFamily="{DynamicResource CommonFont}"
+                       FontSize="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=FontSize}" />
         </Grid>
     </Button>
 </controls:PluginUserControlExtend>
