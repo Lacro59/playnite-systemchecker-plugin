@@ -53,7 +53,7 @@ namespace SystemChecker.Clients
                         var TitleMatches = HtmlDocument.QuerySelectorAll("ul.mw-search-results")[0].QuerySelectorAll("li");
                         if (TitleMatches?.Count() == 1)
                         {
-                            url = UrlPCGamingWiki + TitleMatches[0].QuerySelector("a").GetAttribute("href");
+                            url = "https://pcgamingwiki.com" + TitleMatches[0].QuerySelector("a").GetAttribute("href");
                         }
                     }
                 }
@@ -72,8 +72,6 @@ namespace SystemChecker.Clients
             string urlMatch = string.Empty;
             string WebResponse = string.Empty;
 
-
-            url = string.Empty;
             if (SteamId != 0)
             {
                 url = string.Format(UrlSteamId, SteamId);
