@@ -263,18 +263,22 @@ namespace SystemChecker.Clients
                                     dataMinimum = dataMinimum.Replace("(1803 or later)", string.Empty)
                                         .Replace(" (Only inclusive until patch 1.16.1. Patch 1.17+ Needs XP and greater.)", string.Empty)
                                         .Replace("Windows", string.Empty)
+                                        .Replace("10 October 2018 Update", string.Empty)
+                                        .Replace("<b>(DXR)</b>", string.Empty)
                                         .Replace("or better", string.Empty)
                                         .Replace(",", "¤").Replace(" or ", "¤").Replace("/", "¤");
-                                    Minimum.Os = dataMinimum.Split('¤').Select(x => x.Trim()).ToList();
+                                    Minimum.Os = dataMinimum.Split('¤').Select(x => x.Trim()).Where(x => !x.Trim().IsNullOrEmpty()).ToList();
                                 }
                                 if (!dataRecommended.IsNullOrEmpty())
                                 {
                                     dataRecommended = dataRecommended.Replace("(1803 or later)", string.Empty)
                                         .Replace(" (Only inclusive until patch 1.16.1. Patch 1.17+ Needs XP and greater.)", string.Empty)
                                         .Replace("Windows", string.Empty)
+                                        .Replace("10 October 2018 Update", string.Empty)
+                                        .Replace("<b>(DXR)</b>", string.Empty)
                                         .Replace("or better", string.Empty)
                                         .Replace(",", "¤").Replace(" or ", "¤").Replace("/", "¤");
-                                    Recommanded.Os = dataRecommended.Split('¤').Select(x => x.Trim()).ToList();
+                                    Recommanded.Os = dataRecommended.Split('¤').Select(x => x.Trim()).Where(x => !x.Trim().IsNullOrEmpty()).ToList();
                                 }
                                 break;
 
@@ -284,6 +288,7 @@ namespace SystemChecker.Clients
                                     dataMinimum = dataMinimum.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
                                         .Replace("(4 CPUs), ~2.4 GHz", string.Empty)
                                         .Replace("(4 CPUs), ~3.1 GHz", string.Empty)
+                                        .Replace("<b>(DXR)</b>", string.Empty)
                                         .Replace(" from Intel or AMD at", string.Empty)
                                         .Replace("with SSE2 instruction set support", string.Empty)
                                         .Replace("(and graphics card with T&amp;L)", string.Empty)
@@ -295,13 +300,14 @@ namespace SystemChecker.Clients
                                         .Replace("(with 3D acceleration)", string.Empty)
                                         .Replace("(software)", string.Empty)
                                         .Replace(" / ", "¤").Replace("<br>", "¤").Replace(" or ", "¤");
-                                    Minimum.Cpu = dataMinimum.Split('¤').Select(x => x.Trim()).ToList();
+                                    Minimum.Cpu = dataMinimum.Split('¤').Select(x => x.Trim()).Where(x => !x.Trim().IsNullOrEmpty()).ToList();
                                 }
                                 if (!dataRecommended.IsNullOrEmpty())
                                 {
                                     dataRecommended = dataRecommended.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
                                         .Replace("(4 CPUs), ~2.4 GHz", string.Empty)
                                         .Replace("(4 CPUs), ~3.1 GHz", string.Empty)
+                                        .Replace("<b>(DXR)</b>", string.Empty)
                                         .Replace(" from Intel or AMD at", string.Empty)
                                         .Replace("with SSE2 instruction set support", string.Empty)
                                         .Replace("(and graphics card with T&amp;L)", string.Empty)
@@ -313,7 +319,7 @@ namespace SystemChecker.Clients
                                         .Replace("(with 3D acceleration)", string.Empty)
                                         .Replace("(software)", string.Empty)
                                         .Replace(" / ", "¤").Replace("<br>", "¤").Replace(" or ", "¤");
-                                    Recommanded.Cpu = dataRecommended.Split('¤').Select(x => x.Trim()).ToList();
+                                    Recommanded.Cpu = dataRecommended.Split('¤').Select(x => x.Trim()).Where(x => !x.Trim().IsNullOrEmpty()).ToList();
                                 }
                                 break;
 
@@ -480,6 +486,8 @@ namespace SystemChecker.Clients
                 .Replace("DirectX compatible card", string.Empty)
                 .Replace("or better", string.Empty)
                 .Replace("of VRAM", "VRAM")
+
+                .Replace("<b>(DXR)</b>", string.Empty)
                 .Replace("TnL support", string.Empty)
                 .Replace("Integrated graphics, monitor with resolution of 1280x720.", "1280x720")
                 .Replace("Integrated graphics", string.Empty)
@@ -498,7 +506,7 @@ namespace SystemChecker.Clients
                 .Where(x => x.ToLower().IndexOf("shader") == -1)
                 .Where(x => x.ToLower().IndexOf("anything") == -1)
                 .Where(x => x.ToLower().IndexOf("any card") == -1)
-                .Where(x => x.Trim() != string.Empty).ToList();
+                .Where(x => x.Trim() != string.Empty).Where(x => !x.Trim().IsNullOrEmpty()).ToList();
         }
     }
 }
