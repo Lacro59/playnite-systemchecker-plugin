@@ -104,7 +104,8 @@ namespace SystemChecker
         // To add new game menu items override GetGameMenuItems
         public override IEnumerable<GameMenuItem> GetGameMenuItems(GetGameMenuItemsArgs args)
         {
-            var GameMenu = args.Games.First();
+            Game GameMenu = args.Games.First();
+            List<Guid> Ids = args.Games.Select(x => x.Id).ToList();
             GameRequierements gameRequierements = PluginDatabase.Get(GameMenu, true);
 
             List<GameMenuItem> gameMenuItems = new List<GameMenuItem>();
@@ -141,10 +142,14 @@ namespace SystemChecker
                 Description = resources.GetString("LOCCommonRefreshGameData"),
                 Action = (gameMenuItem) =>
                 {
-                    var TaskIntegrationUI = Task.Run(() =>
+                    if (Ids.Count == 1)
                     {
                         PluginDatabase.Refresh(GameMenu.Id);
-                    });
+                    }
+                    else
+                    {
+                        PluginDatabase.Refresh(Ids);
+                    }
                 }
             });
 
@@ -157,7 +162,14 @@ namespace SystemChecker
                     Description = resources.GetString("LOCCommonDeleteGameData"),
                     Action = (mainMenuItem) =>
                     {
-                        PluginDatabase.Remove(GameMenu);
+                        if (Ids.Count == 1)
+                        {
+                            PluginDatabase.Remove(GameMenu);
+                        }
+                        else
+                        {
+                            PluginDatabase.Remove(Ids);
+                        }
                     }
                 });
             }
