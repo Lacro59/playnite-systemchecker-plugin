@@ -77,9 +77,9 @@ namespace SystemChecker
 
 
         #region Theme integration
-        public override List<TopPanelItem> GetTopPanelItems()
+        public override IEnumerable<TopPanelItem> GetTopPanelItems()
         {
-            return null;
+            yield break;
         }
 
         // List custom controls
@@ -102,7 +102,7 @@ namespace SystemChecker
 
         #region Menus
         // To add new game menu items override GetGameMenuItems
-        public override List<GameMenuItem> GetGameMenuItems(GetGameMenuItemsArgs args)
+        public override IEnumerable<GameMenuItem> GetGameMenuItems(GetGameMenuItemsArgs args)
         {
             var GameMenu = args.Games.First();
             GameRequierements gameRequierements = PluginDatabase.Get(GameMenu, true);
@@ -180,7 +180,7 @@ namespace SystemChecker
         }
 
         // To add new main menu items override GetMainMenuItems
-        public override List<MainMenuItem> GetMainMenuItems(GetMainMenuItemsArgs args)
+        public override IEnumerable<MainMenuItem> GetMainMenuItems(GetMainMenuItemsArgs args)
         {
             string MenuInExtensions = string.Empty;
             if (PluginSettings.Settings.MenuInExtensions)
@@ -270,7 +270,7 @@ namespace SystemChecker
 
 
         #region Game event
-        public override void OnGameSelected(GameSelectionEventArgs args)
+        public override void OnGameSelected(OnGameSelectedEventArgs args)
         {
             // Old database
             //if (oldToNew.IsOld)
@@ -280,7 +280,7 @@ namespace SystemChecker
 
             try
             {
-                if (args.NewValue != null && args.NewValue.Count == 1)
+                if (args.NewValue?.Count == 1)
                 {
                     PluginDatabase.GameContext = args.NewValue[0];
                     PluginDatabase.SetThemesResources(PluginDatabase.GameContext);
@@ -293,31 +293,31 @@ namespace SystemChecker
         }
 
         // Add code to be executed when game is finished installing.
-        public override void OnGameInstalled(Game game)
-        {
-
-        }
-
-        // Add code to be executed when game is started running.
-        public override void OnGameStarted(Game game)
-        {
-
-        }
-
-        // Add code to be executed when game is preparing to be started.
-        public override void OnGameStarting(Game game)
-        {
-
-        }
-
-        // Add code to be executed when game is preparing to be started.
-        public override void OnGameStopped(Game game, long elapsedSeconds)
+        public override void OnGameInstalled(OnGameInstalledEventArgs args)
         {
 
         }
 
         // Add code to be executed when game is uninstalled.
-        public override void OnGameUninstalled(Game game)
+        public override void OnGameUninstalled(OnGameUninstalledEventArgs args)
+        {
+
+        }
+
+        // Add code to be executed when game is preparing to be started.
+        public override void OnGameStarting(OnGameStartingEventArgs args)
+        {
+
+        }
+
+        // Add code to be executed when game is started running.
+        public override void OnGameStarted(OnGameStartedEventArgs args)
+        {
+
+        }
+
+        // Add code to be executed when game is preparing to be started.
+        public override void OnGameStopped(OnGameStoppedEventArgs args)
         {
 
         }
@@ -326,13 +326,13 @@ namespace SystemChecker
 
         #region Application event
         // Add code to be executed when Playnite is initialized.
-        public override void OnApplicationStarted()
+        public override void OnApplicationStarted(OnApplicationStartedEventArgs args)
         {
 
         }
 
         // Add code to be executed when Playnite is shutting down.
-        public override void OnApplicationStopped()
+        public override void OnApplicationStopped(OnApplicationStoppedEventArgs args)
         {
 
         }
@@ -340,7 +340,7 @@ namespace SystemChecker
 
 
         // Add code to be executed when library is updated.
-        public override void OnLibraryUpdated()
+        public override void OnLibraryUpdated(OnLibraryUpdatedEventArgs args)
         {
 
         }
