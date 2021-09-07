@@ -5,21 +5,25 @@
 
     <sys:String x:Key="LOCSystemChecker">SystemChecker</sys:String>
 
-    <sys:String x:Key="LOCSystemCheckerCheckConfig">Check configuration</sys:String>
+    <sys:String x:Key="LOCSystemCheckerCheckConfig">بررسی پیکربندی</sys:String>
+    
+    <sys:String x:Key="LOCSystemCheckerRefreshPcInfo">به‌روزرسانی پیکربندی سیستم</sys:String>
 
     <!-- SystemCheckerSettingsView -->
 
+    <sys:String x:Key="LOCSystemCheckerAddTag">برچسبی را اضافه کنید تا نشان دهد کدام تنظیمات درست بود</sys:String>
+
     <!-- SystemCheckerGameView -->
 
-    <sys:String x:Key="LOCSystemCheckerConfigMinimum">Minimum</sys:String>
-    <sys:String x:Key="LOCSystemCheckerConfigRecommanded">Recommended</sys:String>
+    <sys:String x:Key="LOCSystemCheckerConfigMinimum">حداقل سیستم مورد نیاز</sys:String>
+    <sys:String x:Key="LOCSystemCheckerConfigRecommanded">سیستم پیشنهادی</sys:String>
 
-    <sys:String x:Key="LOCSystemCheckerOS">Operating system</sys:String>
-    <sys:String x:Key="LOCSystemCheckerCpu">Processor</sys:String>
-    <sys:String x:Key="LOCSystemCheckerRam">Memory</sys:String>
-    <sys:String x:Key="LOCSystemCheckerGpu">Graphics</sys:String>
-    <sys:String x:Key="LOCSystemCheckerDisk">Storage</sys:String>
-    
+    <sys:String x:Key="LOCSystemCheckerOS">سیستم عامل</sys:String>
+    <sys:String x:Key="LOCSystemCheckerCpu">پردازشگر</sys:String>
+    <sys:String x:Key="LOCSystemCheckerRam">حافظه</sys:String>
+    <sys:String x:Key="LOCSystemCheckerGpu">گرافیک</sys:String>
+    <sys:String x:Key="LOCSystemCheckerDisk">فضای ذخیره‌سازی</sys:String>
+
     <!-- SystemCheckerNotifications -->
 
 </ResourceDictionary>

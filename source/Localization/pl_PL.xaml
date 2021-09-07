@@ -5,9 +5,13 @@
 
     <sys:String x:Key="LOCSystemChecker">SystemChecker</sys:String>
 
-    <sys:String x:Key="LOCSystemCheckerCheckConfig">Check configuration</sys:String>
+    <sys:String x:Key="LOCSystemCheckerCheckConfig">Sprawdź konfigurację</sys:String>
+    
+    <sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Refresh your system configuration</sys:String>
 
     <!-- SystemCheckerSettingsView -->
+
+    <sys:String x:Key="LOCSystemCheckerAddTag">Add a tag to indicate which configuration was successful</sys:String>
 
     <!-- SystemCheckerGameView -->
 
@@ -19,7 +23,7 @@
     <sys:String x:Key="LOCSystemCheckerRam">Pamięć</sys:String>
     <sys:String x:Key="LOCSystemCheckerGpu">Karta graficzna</sys:String>
     <sys:String x:Key="LOCSystemCheckerDisk">Miejsce na dysku</sys:String>
-    
+
     <!-- SystemCheckerNotifications -->
 
 </ResourceDictionary>
