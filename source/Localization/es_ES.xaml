@@ -1,0 +1,25 @@
+﻿<?xml version="1.0"?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- MainView -->
+
+    <sys:String x:Key="LOCSystemChecker">SystemChecker</sys:String>
+
+    <sys:String x:Key="LOCSystemCheckerCheckConfig">Comprobar configuración</sys:String>
+
+    <!-- SystemCheckerSettingsView -->
+
+    <!-- SystemCheckerGameView -->
+
+    <sys:String x:Key="LOCSystemCheckerConfigMinimum">Mínimo</sys:String>
+    <sys:String x:Key="LOCSystemCheckerConfigRecommanded">Recomendado</sys:String>
+
+    <sys:String x:Key="LOCSystemCheckerOS">Sistema operativo</sys:String>
+    <sys:String x:Key="LOCSystemCheckerCpu">Procesador</sys:String>
+    <sys:String x:Key="LOCSystemCheckerRam">Memoria</sys:String>
+    <sys:String x:Key="LOCSystemCheckerGpu">Gráficos</sys:String>
+    <sys:String x:Key="LOCSystemCheckerDisk">Almacenamiento</sys:String>
+    
+    <!-- SystemCheckerNotifications -->
+
+</ResourceDictionary>

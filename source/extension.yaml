@@ -1,0 +1,14 @@
+﻿Id: playnite-systemchecker-plugin
+Name: SystemChecker
+Author: Lacro59
+Version: 1.2.1
+Module: SystemChecker.dll
+Type: GenericPlugin
+Icon: icon.png
+Links:
+  - Name: Plugin forum
+    Url: https://playnite.link/forum/thread-339.html
+  - Name: Plugin Github
+    Url: https://github.com/Lacro59/playnite-systemchecker-plugin
+  - Name: Plugin translations
+    Url: https://crowdin.com/project/playnite-extensions
