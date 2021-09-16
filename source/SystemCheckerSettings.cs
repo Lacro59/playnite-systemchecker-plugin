@@ -16,7 +16,7 @@ namespace SystemChecker
         public bool EnableTag { get; set; } = false;
 
 
-        private bool _EnableIntegrationViewItem { get; set; } = false;
+        private bool _EnableIntegrationViewItem { get; set; } = true;
         public bool EnableIntegrationViewItem
         {
             get => _EnableIntegrationViewItem;
@@ -27,7 +27,7 @@ namespace SystemChecker
             }
         }
 
-        private bool _EnableIntegrationButton { get; set; } = false;
+        private bool _EnableIntegrationButton { get; set; } = true;
         public bool EnableIntegrationButton
         {
             get => _EnableIntegrationButton;
