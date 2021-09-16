@@ -7,11 +7,11 @@
 
     <sys:String x:Key="LOCSystemCheckerCheckConfig">Comprobar configuración</sys:String>
     
-    <sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Refresh your system configuration</sys:String>
+    <sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Actualizar la configuración del sistema</sys:String>
 
     <!-- SystemCheckerSettingsView -->
 
-    <sys:String x:Key="LOCSystemCheckerAddTag">Add a tag to indicate which configuration was successful</sys:String>
+    <sys:String x:Key="LOCSystemCheckerAddTag">Añadir una etiqueta para indicar qué configuración fue exitosa</sys:String>
 
     <!-- SystemCheckerGameView -->
 

@@ -19,7 +19,7 @@
     <sys:String x:Key="LOCSystemCheckerConfigRecommanded">Рекомендуемые</sys:String>
 
     <sys:String x:Key="LOCSystemCheckerOS">Операционная система</sys:String>
-    <sys:String x:Key="LOCSystemCheckerCpu">Процессор</sys:String>
+    <sys:String x:Key="LOCSystemCheckerCpu">Процессо</sys:String>
     <sys:String x:Key="LOCSystemCheckerRam">Память</sys:String>
     <sys:String x:Key="LOCSystemCheckerGpu">Графики</sys:String>
     <sys:String x:Key="LOCSystemCheckerDisk">Память</sys:String>

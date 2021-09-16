@@ -20,7 +20,7 @@
 
     <sys:String x:Key="LOCSystemCheckerOS">System operacyjny</sys:String>
     <sys:String x:Key="LOCSystemCheckerCpu">Procesor</sys:String>
-    <sys:String x:Key="LOCSystemCheckerRam">Pamięć</sys:String>
+    <sys:String x:Key="LOCSystemCheckerRam">Pamię</sys:String>
     <sys:String x:Key="LOCSystemCheckerGpu">Karta graficzna</sys:String>
     <sys:String x:Key="LOCSystemCheckerDisk">Miejsce na dysku</sys:String>
 
