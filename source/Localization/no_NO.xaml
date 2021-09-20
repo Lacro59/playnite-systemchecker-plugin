@@ -5,24 +5,24 @@
 
     <sys:String x:Key="LOCSystemChecker">SystemChecker</sys:String>
 
-    <sys:String x:Key="LOCSystemCheckerCheckConfig">Check configuration</sys:String>
+    <sys:String x:Key="LOCSystemCheckerCheckConfig">Sjekk konfigurasjon</sys:String>
     
-    <sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Refresh your system configuration</sys:String>
+    <sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Oppdater systemkonfigurasjonen</sys:String>
 
     <!-- SystemCheckerSettingsView -->
 
-    <sys:String x:Key="LOCSystemCheckerAddTag">Add a tag to indicate which configuration was successful</sys:String>
+    <sys:String x:Key="LOCSystemCheckerAddTag">Legge til en tag for å angi hvilken konfigurasjon som var vellykket</sys:String>
 
     <!-- SystemCheckerGameView -->
 
     <sys:String x:Key="LOCSystemCheckerConfigMinimum">Minimum</sys:String>
-    <sys:String x:Key="LOCSystemCheckerConfigRecommanded">Recommended</sys:String>
+    <sys:String x:Key="LOCSystemCheckerConfigRecommanded">Anbefalt</sys:String>
 
-    <sys:String x:Key="LOCSystemCheckerOS">Operating system</sys:String>
-    <sys:String x:Key="LOCSystemCheckerCpu">Processor</sys:String>
-    <sys:String x:Key="LOCSystemCheckerRam">Memory</sys:String>
-    <sys:String x:Key="LOCSystemCheckerGpu">Graphics</sys:String>
-    <sys:String x:Key="LOCSystemCheckerDisk">Storage</sys:String>
+    <sys:String x:Key="LOCSystemCheckerOS">Operativsystem</sys:String>
+    <sys:String x:Key="LOCSystemCheckerCpu">Prosessor</sys:String>
+    <sys:String x:Key="LOCSystemCheckerRam">Minne</sys:String>
+    <sys:String x:Key="LOCSystemCheckerGpu">Grafikkort</sys:String>
+    <sys:String x:Key="LOCSystemCheckerDisk">Lagring</sys:String>
 
     <!-- SystemCheckerNotifications -->
 
