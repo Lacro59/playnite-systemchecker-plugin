@@ -1,4 +1,5 @@
-﻿using CommonPluginsShared;
+﻿using CommonPluginsControls.Views;
+using CommonPluginsShared;
 using CommonPluginsShared.PlayniteExtended;
 using Playnite.SDK;
 using Playnite.SDK.Events;
@@ -253,6 +254,30 @@ namespace SystemChecker
                     }
                 });
             }
+
+            mainMenuItems.Add(new MainMenuItem
+            {
+                MenuSection = MenuInExtensions + resources.GetString("LOCSystemChecker"),
+                Description = "-"
+            });
+            mainMenuItems.Add(new MainMenuItem
+            {
+                MenuSection = MenuInExtensions + resources.GetString("LOCSystemChecker"),
+                Description = "LOCCommonViewNoData",
+                Action = (mainMenuItem) =>
+                {
+                    var windowOptions = new WindowOptions
+                    {
+                        ShowMinimizeButton = false,
+                        ShowMaximizeButton = false,
+                        ShowCloseButton = true
+                    };
+
+                    var ViewExtension = new ListWithNoData(PlayniteApi, PluginDatabase);
+                    Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PlayniteApi, "HowLongToBeat", ViewExtension, windowOptions);
+                    windowExtension.ShowDialog();
+                }
+            });
 
             mainMenuItems.Add(new MainMenuItem
             {
