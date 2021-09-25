@@ -241,6 +241,11 @@ namespace SystemChecker.Services
 
             if (gameRequierements == null)
             {
+                PluginSettings.Settings.HasData = false;
+                PluginSettings.Settings.IsMinimumOK = false;
+                PluginSettings.Settings.IsRecommandedOK = false;
+                PluginSettings.Settings.IsAllOK = false;
+
                 return;
             }
 
