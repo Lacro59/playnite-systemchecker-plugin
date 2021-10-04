@@ -1,4 +1,4 @@
-# playnite-successstory-plugin
+# playnite-systemchecker-plugin
 Generic plugin for [Playnite](https://playnite.link/) application.
 This plugin get the game requiere configuration and check with your configuration in application. 
 
