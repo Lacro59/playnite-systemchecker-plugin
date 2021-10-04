@@ -57,7 +57,7 @@
             <ListBox Name="LocalDisks" BorderThickness="0" MaxHeight="70" Grid.Column="2" Grid.Row="10" 
                      Margin="-10,0,0,0" VerticalAlignment="Center"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
-                     ScrollViewer.VerticalScrollBarVisibility="Auto">
+                     ScrollViewer.VerticalScrollBarVisibility="Auto" Background="Transparent">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="{x:Type ListBoxItem}">
                         <Setter Property="Focusable" Value="False"/>
@@ -87,7 +87,7 @@
             <!-- Minimum -->
             <Label Grid.Column="4" Grid.Row="2" Content="{Binding MinimumOs}" VerticalAlignment="Center" FontSize="14" />
             <ListBox Grid.Column="4" Grid.Row="4" BorderThickness="0" ItemsSource="{Binding MinimumCpu}" 
-                     FontSize="14" Margin="-10,0,0,0" MaxHeight="70" VerticalAlignment="Center">
+                     FontSize="14" Margin="-10,0,0,0" MaxHeight="70" VerticalAlignment="Center" Background="Transparent">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="{x:Type ListBoxItem}">
                         <Setter Property="Focusable" Value="False"/>
@@ -102,7 +102,7 @@
             </ListBox>
             <Label Grid.Column="4" Grid.Row="6" Content="{Binding MinimumRamUsage}" VerticalAlignment="Center" FontSize="14" />
             <ListBox Grid.Column="4" Grid.Row="8" BorderThickness="0" ItemsSource="{Binding MinimumGpu}" 
-                     FontSize="14" Margin="-10,0,0,0" MaxHeight="70" VerticalAlignment="Center">
+                     FontSize="14" Margin="-10,0,0,0" MaxHeight="70" VerticalAlignment="Center" Background="Transparent">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="{x:Type ListBoxItem}">
                         <Setter Property="Focusable" Value="False"/>
@@ -120,7 +120,7 @@
             <!-- Recommanded -->
             <Label Grid.Column="6" Grid.Row="2" Content="{Binding RecommandedOs}" VerticalAlignment="Center" FontSize="14" />
             <ListBox Grid.Column="6" Grid.Row="4" BorderThickness="0" ItemsSource="{Binding RecommandedCpu}" 
-                     FontSize="14" Margin="-10,0,0,0" MaxHeight="70" VerticalAlignment="Center">
+                     FontSize="14" Margin="-10,0,0,0" MaxHeight="70" VerticalAlignment="Center" Background="Transparent">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="{x:Type ListBoxItem}">
                         <Setter Property="Focusable" Value="False"/>
@@ -135,7 +135,7 @@
             </ListBox>
             <Label Grid.Column="6" Grid.Row="6" Content="{Binding RecommandedRamUsage}" VerticalAlignment="Center" FontSize="14" />
             <ListBox Grid.Column="6" Grid.Row="8" BorderThickness="0" ItemsSource="{Binding RecommandedGpu}" 
-                     FontSize="14" Margin="-10,0,0,0" MaxHeight="70" VerticalAlignment="Center">
+                     FontSize="14" Margin="-10,0,0,0" MaxHeight="70" VerticalAlignment="Center" Background="Transparent">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="{x:Type ListBoxItem}">
                         <Setter Property="Focusable" Value="False"/>
