@@ -7,11 +7,11 @@
 
     <sys:String x:Key="LOCSystemCheckerCheckConfig">Перевірити конфігурацію</sys:String>
     
-    <sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Refresh your system configuration</sys:String>
+    <sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Оновити конфігурацію системи</sys:String>
 
     <!-- SystemCheckerSettingsView -->
 
-    <sys:String x:Key="LOCSystemCheckerAddTag">Add a tag to indicate which configuration was successful</sys:String>
+    <sys:String x:Key="LOCSystemCheckerAddTag">Додати тег, щоб вказати, яка конфігурація була успішною</sys:String>
 
     <!-- SystemCheckerGameView -->
 
@@ -19,7 +19,7 @@
     <sys:String x:Key="LOCSystemCheckerConfigRecommanded">Рекомендовано</sys:String>
 
     <sys:String x:Key="LOCSystemCheckerOS">Операційна система</sys:String>
-    <sys:String x:Key="LOCSystemCheckerCpu">Процесо</sys:String>
+    <sys:String x:Key="LOCSystemCheckerCpu">Процесор</sys:String>
     <sys:String x:Key="LOCSystemCheckerRam">Пам'ять</sys:String>
     <sys:String x:Key="LOCSystemCheckerGpu">Графіка</sys:String>
     <sys:String x:Key="LOCSystemCheckerDisk">Сховище</sys:String>
