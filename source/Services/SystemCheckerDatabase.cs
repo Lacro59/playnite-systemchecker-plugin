@@ -1,16 +1,12 @@
 ﻿using CommonPluginsShared;
 using CommonPluginsShared.Collections;
-using CommonPlayniteShared.Common;
 using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Abstractions;
 using System.Linq;
-using System.Management;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using SystemChecker.Clients;
