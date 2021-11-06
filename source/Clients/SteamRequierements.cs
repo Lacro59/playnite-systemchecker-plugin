@@ -1,6 +1,6 @@
 ﻿using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
-using CommonPluginsPlaynite.PluginLibrary.SteamLibrary.SteamShared;
+using CommonPlayniteShared.PluginLibrary.SteamLibrary.SteamShared;
 using CommonPluginsShared;
 using CommonPluginsShared.Models;
 using Playnite.SDK;

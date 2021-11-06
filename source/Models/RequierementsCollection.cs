@@ -1,7 +1,7 @@
 ﻿using Playnite.SDK;
 using Playnite.SDK.Models;
 using CommonPluginsShared.Collections;
-using CommonPluginsPlaynite.Database;
+using CommonPlayniteShared.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
