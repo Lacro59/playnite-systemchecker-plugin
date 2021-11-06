@@ -7,18 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Threading;
 using SystemChecker.Models;
 using SystemChecker.Services;
 
@@ -42,7 +32,7 @@ namespace SystemChecker.Controls
             }
         }
 
-        private PluginViewItemDataContext ControlDataContext;
+        private PluginViewItemDataContext ControlDataContext = new PluginViewItemDataContext();
         internal override IDataContext _ControlDataContext
         {
             get
@@ -64,6 +54,7 @@ namespace SystemChecker.Controls
         public PluginViewItem()
         {
             InitializeComponent();
+            this.DataContext = ControlDataContext;
 
             Task.Run(() =>
             {
@@ -86,71 +77,62 @@ namespace SystemChecker.Controls
 
         public override void SetDefaultDataContext()
         {
-            ControlDataContext = new PluginViewItemDataContext
-            {
-                IsActivated = PluginDatabase.PluginSettings.Settings.EnableIntegrationViewItem,
+            ControlDataContext.IsActivated = PluginDatabase.PluginSettings.Settings.EnableIntegrationViewItem;
 
-                Text = IconEmpty,
-                Foreground = (SolidColorBrush)resources.GetResource("GlyphBrush")
-            };
+            ControlDataContext.Text = IconEmpty;
+            ControlDataContext.Foreground = (SolidColorBrush)resources.GetResource("GlyphBrush");
         }
 
 
-        public override Task<bool> SetData(Game newContext, PluginDataBaseGameBase PluginGameData)
+        public override void SetData(Game newContext, PluginDataBaseGameBase PluginGameData)
         {
-            return Task.Run(() =>
+            GameRequierements gameRequierements = (GameRequierements)PluginGameData;
+
+            SystemConfiguration systemConfiguration = PluginDatabase.Database.PC;
+            Requirement systemMinimum = gameRequierements.GetMinimum();
+            Requirement systemRecommanded = gameRequierements.GetRecommanded();
+
+            CheckSystem CheckMinimum = CheckMinimum = SystemApi.CheckConfig(systemMinimum, systemConfiguration, newContext.IsInstalled);
+            CheckSystem CheckRecommanded = SystemApi.CheckConfig(systemRecommanded, systemConfiguration, newContext.IsInstalled);
+
+            if (systemMinimum.HasData)
             {
-                GameRequierements gameRequierements = (GameRequierements)PluginGameData;
-
-                SystemConfiguration systemConfiguration = PluginDatabase.Database.PC;
-                Requirement systemMinimum = gameRequierements.GetMinimum();
-                Requirement systemRecommanded = gameRequierements.GetRecommanded();
-
-                CheckSystem CheckMinimum = CheckMinimum = SystemApi.CheckConfig(systemMinimum, systemConfiguration, newContext.IsInstalled);
-                CheckSystem CheckRecommanded = SystemApi.CheckConfig(systemRecommanded, systemConfiguration, newContext.IsInstalled);
-
-                if (systemMinimum.HasData)
+                if (!(bool)CheckMinimum.AllOk)
                 {
-                    if (!(bool)CheckMinimum.AllOk)
-                    {
-                        //ControlDataContext.Foreground = Brushes.Red;
-                        ControlDataContext.Text = IconKo;
-                    }
-                    else if ((bool)CheckMinimum.AllOk)
-                    {
-                        //ControlDataContext.Foreground = Brushes.Orange;
-                        ControlDataContext.Text = IconMinimum;
+                    //ControlDataContext.Foreground = Brushes.Red;
+                    ControlDataContext.Text = IconKo;
+                }
+                else if ((bool)CheckMinimum.AllOk)
+                {
+                    //ControlDataContext.Foreground = Brushes.Orange;
+                    ControlDataContext.Text = IconMinimum;
 
-                        if (!systemRecommanded.HasData)
-                        {
-                            //ControlDataContext.Foreground = Brushes.Green;
-                            ControlDataContext.Text = IconOk;
-                        }
+                    if (!systemRecommanded.HasData)
+                    {
+                        //ControlDataContext.Foreground = Brushes.Green;
+                        ControlDataContext.Text = IconOk;
                     }
                 }
+            }
 
-                if (systemRecommanded.HasData && (bool)CheckRecommanded.AllOk)
-                {
-                    //ControlDataContext.Foreground = Brushes.Green;
-                    ControlDataContext.Text = IconOk;
-                }
-
-                this.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new ThreadStart(delegate
-                {
-                    this.DataContext = ControlDataContext;
-                }));
-
-                return true;
-            });
+            if (systemRecommanded.HasData && (bool)CheckRecommanded.AllOk)
+            {
+                //ControlDataContext.Foreground = Brushes.Green;
+                ControlDataContext.Text = IconOk;
+            }
         }
     }
 
 
-    public class PluginViewItemDataContext : IDataContext
+    public class PluginViewItemDataContext : ObservableObject, IDataContext
     {
-        public bool IsActivated { get; set; }
+        private bool _IsActivated;
+        public bool IsActivated { get => _IsActivated; set => SetValue(ref _IsActivated, value); }
 
-        public string Text { get; set; }
-        public SolidColorBrush Foreground { get; set; }
+        public string _Text;
+        public string Text { get => _Text; set => SetValue(ref _Text, value); }
+
+        public SolidColorBrush _Foreground;
+        public SolidColorBrush Foreground { get => _Foreground; set => SetValue(ref _Foreground, value); }
     }
 }

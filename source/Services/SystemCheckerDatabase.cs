@@ -88,7 +88,7 @@ namespace SystemChecker.Services
 
             try
             {
-                SourceName = CommonPluginsShared.PlayniteTools.GetSourceName(PlayniteApi, game);
+                SourceName = CommonPluginsShared.PlayniteTools.GetSourceName(game);
 
                 // Search datas
                 logger.Info($"Try find with PCGamingWikiRequierements for {game.Name}");

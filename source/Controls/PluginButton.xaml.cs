@@ -7,18 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Threading;
 using SystemChecker.Models;
 using SystemChecker.Services;
 using SystemChecker.Views;
@@ -43,7 +34,7 @@ namespace SystemChecker.Controls
             }
         }
 
-        public PluginButtonDataContext ControlDataContext;
+        public PluginButtonDataContext ControlDataContext = new PluginButtonDataContext();
         internal override IDataContext _ControlDataContext
         {
             get
@@ -66,6 +57,7 @@ namespace SystemChecker.Controls
         public PluginButton()
         {
             InitializeComponent();
+            this.DataContext = ControlDataContext;
 
             Task.Run(() =>
             {
@@ -88,62 +80,49 @@ namespace SystemChecker.Controls
 
         public override void SetDefaultDataContext()
         {
-            ControlDataContext = new PluginButtonDataContext
-            {
-                IsActivated = PluginDatabase.PluginSettings.Settings.EnableIntegrationButton,
-                DisplayDetails = PluginDatabase.PluginSettings.Settings.EnableIntegrationButtonDetails,
+            ControlDataContext.IsActivated = PluginDatabase.PluginSettings.Settings.EnableIntegrationButton;
+            ControlDataContext.DisplayDetails = PluginDatabase.PluginSettings.Settings.EnableIntegrationButtonDetails;
 
-                Text = IconEmpty,
-                Foreground = (SolidColorBrush)resources.GetResource("GlyphBrush")
-            };
+            ControlDataContext.Text = IconEmpty;
+            ControlDataContext.Foreground = (SolidColorBrush)resources.GetResource("GlyphBrush");
         }
 
 
-        public override Task<bool> SetData(Game newContext, PluginDataBaseGameBase PluginGameData)
+        public override void SetData(Game newContext, PluginDataBaseGameBase PluginGameData)
         {
-            return Task.Run(() =>
+            GameRequierements gameRequierements = (GameRequierements)PluginGameData;
+
+            if (ControlDataContext.DisplayDetails)
             {
-                GameRequierements gameRequierements = (GameRequierements)PluginGameData;
+                SystemConfiguration systemConfiguration = PluginDatabase.Database.PC;
+                Requirement systemMinimum = gameRequierements.GetMinimum();
+                Requirement systemRecommanded = gameRequierements.GetRecommanded();
 
-                if (ControlDataContext.DisplayDetails)
+                CheckSystem CheckMinimum = CheckMinimum = SystemApi.CheckConfig(systemMinimum, systemConfiguration, newContext.IsInstalled);
+                CheckSystem CheckRecommanded = SystemApi.CheckConfig(systemRecommanded, systemConfiguration, newContext.IsInstalled);
+
+                if (systemMinimum.HasData)
                 {
-                    SystemConfiguration systemConfiguration = PluginDatabase.Database.PC;
-                    Requirement systemMinimum = gameRequierements.GetMinimum();
-                    Requirement systemRecommanded = gameRequierements.GetRecommanded();
-
-                    CheckSystem CheckMinimum = CheckMinimum = SystemApi.CheckConfig(systemMinimum, systemConfiguration, newContext.IsInstalled);
-                    CheckSystem CheckRecommanded = SystemApi.CheckConfig(systemRecommanded, systemConfiguration, newContext.IsInstalled);
-
-                    if (systemMinimum.HasData)
+                    if (!(bool)CheckMinimum.AllOk)
                     {
-                        if (!(bool)CheckMinimum.AllOk)
-                        {
-                            ControlDataContext.Text = IconKo;
-                        }
-                        else if ((bool)CheckMinimum.AllOk)
-                        {
-                            ControlDataContext.Text = IconMinimum;
-
-                            if (!systemRecommanded.HasData)
-                            {
-                                ControlDataContext.Text = IconOk;
-                            }
-                        }
+                        ControlDataContext.Text = IconKo;
                     }
-
-                    if (systemRecommanded.HasData && (bool)CheckRecommanded.AllOk)
+                    else if ((bool)CheckMinimum.AllOk)
                     {
-                        ControlDataContext.Text = IconOk;
+                        ControlDataContext.Text = IconMinimum;
+
+                        if (!systemRecommanded.HasData)
+                        {
+                            ControlDataContext.Text = IconOk;
+                        }
                     }
                 }
 
-                this.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new ThreadStart(delegate
+                if (systemRecommanded.HasData && (bool)CheckRecommanded.AllOk)
                 {
-                    this.DataContext = ControlDataContext;
-                }));
-
-                return true;
-            });
+                    ControlDataContext.Text = IconOk;
+                }
+            }
         }
 
         #region Events
@@ -157,12 +136,18 @@ namespace SystemChecker.Controls
     }
 
 
-    public class PluginButtonDataContext : IDataContext
+    public class PluginButtonDataContext : ObservableObject, IDataContext
     {
-        public bool IsActivated { get; set; }
-        public bool DisplayDetails { get; set; }
+        private bool _IsActivated;
+        public bool IsActivated { get => _IsActivated; set => SetValue(ref _IsActivated, value); }
 
-        public string Text { get; set; } = "\uea53";
-        public SolidColorBrush Foreground { get; set; }
+        public bool _DisplayDetails;
+        public bool DisplayDetails { get => _DisplayDetails; set => SetValue(ref _DisplayDetails, value); }
+
+        public string _Text;
+        public string Text { get => _Text; set => SetValue(ref _Text, value); }
+
+        public SolidColorBrush _Foreground;
+        public SolidColorBrush Foreground { get => _Foreground; set => SetValue(ref _Foreground, value); }
     }
 }
