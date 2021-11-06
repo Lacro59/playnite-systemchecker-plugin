@@ -289,6 +289,7 @@ namespace SystemChecker.Clients
                                         .Replace("<b>(DXR)</b>", string.Empty)
                                         .Replace(" from Intel or AMD at", string.Empty)
                                         .Replace("with SSE2 instruction set support", string.Empty)
+                                        .Replace("faster", string.Empty)
                                         .Replace("(and graphics card with T&amp;L)", string.Empty)
                                         .Replace("(1.5 GHz if graphics card does not support T&amp;L)", string.Empty)
                                         .Replace("or AMD equivalent", string.Empty)
@@ -297,6 +298,7 @@ namespace SystemChecker.Clients
                                         .Replace("(D3D)/300", string.Empty)
                                         .Replace("(with 3D acceleration)", string.Empty)
                                         .Replace("(software)", string.Empty)
+                                        .Replace(", x86", string.Empty)
                                         .Replace(" / ", "¤").Replace("<br>", "¤").Replace(" or ", "¤");
                                     Minimum.Cpu = dataMinimum.Split('¤').Select(x => x.Trim()).Where(x => !x.Trim().IsNullOrEmpty()).ToList();
                                 }
@@ -308,6 +310,7 @@ namespace SystemChecker.Clients
                                         .Replace("<b>(DXR)</b>", string.Empty)
                                         .Replace(" from Intel or AMD at", string.Empty)
                                         .Replace("with SSE2 instruction set support", string.Empty)
+                                        .Replace("faster", string.Empty)
                                         .Replace("(and graphics card with T&amp;L)", string.Empty)
                                         .Replace("(1.5 GHz if graphics card does not support T&amp;L)", string.Empty)
                                         .Replace("or AMD equivalent", string.Empty)
@@ -316,6 +319,7 @@ namespace SystemChecker.Clients
                                         .Replace("(D3D)/300", string.Empty)
                                         .Replace("(with 3D acceleration)", string.Empty)
                                         .Replace("(software)", string.Empty)
+                                        .Replace(", x86", string.Empty)
                                         .Replace(" / ", "¤").Replace("<br>", "¤").Replace(" or ", "¤");
                                     Recommanded.Cpu = dataRecommended.Split('¤').Select(x => x.Trim()).Where(x => !x.Trim().IsNullOrEmpty()).ToList();
                                 }

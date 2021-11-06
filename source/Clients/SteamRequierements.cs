@@ -188,6 +188,7 @@ namespace SystemChecker.Clients
                             .Replace(" equivalent or faster processor", string.Empty)
                             .Replace(" equivalent or better", string.Empty)
                             .Replace("above", string.Empty)
+                            .Replace("or faster", string.Empty)
                             .Replace("and up", string.Empty)
                             .Replace("(or higher)", string.Empty)
                             .Replace("or higher", string.Empty)
@@ -204,9 +205,11 @@ namespace SystemChecker.Clients
                             .Replace("Ghz", "GHz")
                             .Replace("Processor", string.Empty)
                             .Replace("processor", string.Empty)
+                            .Replace("x86-compatible", string.Empty)
                             .Replace("(not recommended for Intel HD Graphics cards)", ", not recommended for Intel HD Graphics cards")
                             .Replace("()", string.Empty)
                             .Replace("<br>", string.Empty)
+                            .Replace(", x86", string.Empty)
                             .Trim();
 
                     cpu = Regex.Replace(cpu, ", ([0-9])", " $1");
@@ -271,6 +274,7 @@ namespace SystemChecker.Clients
                             .Replace("card capable of shader 3.0", string.Empty)
                             .Replace("3D with TnL support and", string.Empty)
                             .Replace(" compatible", string.Empty)
+                            .Replace("of addressable memory", string.Empty)
                             .Replace("Any", string.Empty)
                             .Replace("any", string.Empty)
                             .Replace("/Nvidia", " / Nvidia")
