@@ -42,6 +42,8 @@ namespace SystemChecker.Services
         private GpuObject CardRequierement { get; set; }
 
         public bool IsWithNoCard = false;
+        public bool IsIntegrate { get => CardPc.IsIntegrate; }
+        public bool CardRequierementIsOld { get => CardRequierement.IsOld; }
 
         public Gpu(SystemConfiguration systemConfiguration, string GpuRequierement)
         {
@@ -111,12 +113,6 @@ namespace SystemChecker.Services
             Common.LogDebug(true, $"Gpu.IsBetter - CardPc({CardPcName}): {Serialization.ToJson(CardPc)}");
             Common.LogDebug(true, $"Gpu.IsBetter - CardRequierement({CardRequierementName}): {Serialization.ToJson(CardRequierement)}");
 
-            // Old card requiered
-            if (CardRequierement.IsOld || CardPc.IsOld)
-            {
-                return true;
-            }
-
             // DirectX
             if (CardRequierement.IsDx)
             {
@@ -155,6 +151,12 @@ namespace SystemChecker.Services
                     IsWithNoCard = true;
                     return true;
                 }
+            }
+
+            // Old card requiered
+            if (CardRequierement.IsOld || CardPc.IsOld)
+            {
+                return true;
             }
 
             // Integrate
@@ -307,13 +309,14 @@ namespace SystemChecker.Services
         public static bool CallIsNvidia(string GpuName)
         {
             return (
-                GpuName.ToLower().IndexOf("nvidia") > -1 || GpuName.ToLower().IndexOf("geforce") > -1
-                || GpuName.ToLower().IndexOf("gtx") > -1 || GpuName.ToLower().IndexOf("rtx") > -1
+                (GpuName.ToLower().IndexOf("nvidia") > -1 || GpuName.ToLower().IndexOf("geforce") > -1 || GpuName.ToLower().IndexOf("gtx") > -1 || GpuName.ToLower().IndexOf("rtx") > -1) 
+                && GpuName.ToLower().IndexOf("(nvidia)") == -1
                 );
         }
         public static bool CallIsAmd(string GpuName)
         {
-            return (GpuName.ToLower().IndexOf("amd") > -1 || GpuName.ToLower().IndexOf("radeon") > -1 || GpuName.ToLower().IndexOf("ati ") > -1);
+            return ((GpuName.ToLower().IndexOf("amd") > -1 || GpuName.ToLower().IndexOf("radeon") > -1 || GpuName.ToLower().IndexOf("ati ") > -1) 
+                && GpuName.ToLower().IndexOf("(amd)") == -1);
         }
         public static bool CallIsIntel(string GpuName)
         {
@@ -336,7 +339,7 @@ namespace SystemChecker.Services
             string Type = string.Empty;
             int Number = 0;
 
-            IsIntegrate = (GpuName.ToLower().IndexOf("intel") > -1);
+            IsIntegrate = GpuName.Contains("intel", StringComparison.InvariantCultureIgnoreCase) || GpuName.Contains("vega", StringComparison.InvariantCultureIgnoreCase);
             IsNvidia = CallIsNvidia(GpuName);
             IsAmd = CallIsAmd(GpuName);
 
@@ -426,6 +429,10 @@ namespace SystemChecker.Services
                 {
                     IsOld = true;
                 }
+                if (GpuName.ToLower().IndexOf("radeon r") > -1 && Number < 300)
+                {
+                    IsOld = true;
+                }
                 if (Regex.IsMatch(GpuName.ToLower(), "radeon [0-9]"))
                 {
                     IsOld = true;
@@ -495,6 +502,12 @@ namespace SystemChecker.Services
             if (!IsAmd && !IsNvidia && !IsIntegrate && !IsDx)
             {
                 IsOld = true;
+            }
+
+
+            if (GpuName.Contains("(nvidia)", StringComparison.OrdinalIgnoreCase) && GpuName.Contains("(amd)", StringComparison.OrdinalIgnoreCase))
+            {
+                IsOld = false;
             }
 
 

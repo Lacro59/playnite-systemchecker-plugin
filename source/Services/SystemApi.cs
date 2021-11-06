@@ -144,7 +144,7 @@ namespace SystemChecker.Services
                         Gpu gpuCheck = new Gpu(systemConfiguration, gpu);
                         if (gpuCheck.IsBetter())
                         {
-                            if (gpuCheck.IsWithNoCard && i > 0)
+                            if ((gpuCheck.IsWithNoCard || !gpuCheck.CardRequierementIsOld ) && i > 0)
                             {
                                 return false;
                             }
