@@ -258,7 +258,7 @@ namespace SystemChecker
             mainMenuItems.Add(new MainMenuItem
             {
                 MenuSection = MenuInExtensions + resources.GetString("LOCSystemChecker"),
-                Description = "LOCCommonViewNoData",
+                Description = resources.GetString("LOCCommonViewNoData"),
                 Action = (mainMenuItem) =>
                 {
                     var windowOptions = new WindowOptions
