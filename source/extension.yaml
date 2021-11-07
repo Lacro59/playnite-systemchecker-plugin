@@ -1,7 +1,7 @@
 ﻿Id: playnite-systemchecker-plugin
 Name: SystemChecker
 Author: Lacro59
-Version: 2.0.1
+Version: 2.0.2
 Module: SystemChecker.dll
 Type: GenericPlugin
 Icon: icon.png
