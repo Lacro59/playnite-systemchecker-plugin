@@ -84,7 +84,6 @@ namespace SystemChecker.Controls
             ControlDataContext.DisplayDetails = PluginDatabase.PluginSettings.Settings.EnableIntegrationButtonDetails;
 
             ControlDataContext.Text = IconEmpty;
-            ControlDataContext.Foreground = (SolidColorBrush)resources.GetResource("GlyphBrush");
         }
 
 
@@ -146,8 +145,5 @@ namespace SystemChecker.Controls
 
         public string _Text;
         public string Text { get => _Text; set => SetValue(ref _Text, value); }
-
-        public SolidColorBrush _Foreground;
-        public SolidColorBrush Foreground { get => _Foreground; set => SetValue(ref _Foreground, value); }
     }
 }
