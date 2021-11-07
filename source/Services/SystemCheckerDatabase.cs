@@ -114,7 +114,7 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false);
+                Common.LogError(ex, false, true, "SystemChecker");
             }
 
             return gameRequierements;

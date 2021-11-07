@@ -78,7 +78,7 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, $"Error on CheckOs() with {systemOs} & {Serialization.ToJson(requierementOs)}");
+                Common.LogError(ex, false, $"Error on CheckOs() with {systemOs} & {Serialization.ToJson(requierementOs)}", true, "SystemChecker");
             }
 
             return false;
@@ -106,7 +106,7 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, $"Error on CheckGpu() with {systemConfiguration.Cpu} & {Serialization.ToJson(requierementCpu)}");
+                Common.LogError(ex, false, $"Error on CheckGpu() with {systemConfiguration.Cpu} & {Serialization.ToJson(requierementCpu)}", true, "SystemChecker");
             }
 
             return false;
@@ -125,7 +125,7 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, $"Error on CheckRam() with {systemRam} & {requierementRam}");
+                Common.LogError(ex, false, $"Error on CheckRam() with {systemRam} & {requierementRam}", true, "SystemChecker");
             }
 
             return false;
@@ -162,7 +162,7 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, $"Error on CheckGpu() with {systemConfiguration.GpuName} & {Serialization.ToJson(requierementGpu)}");
+                Common.LogError(ex, false, $"Error on CheckGpu() with {systemConfiguration.GpuName} & {Serialization.ToJson(requierementGpu)}", true, "SystemChecker");
             }
 
             return false;
@@ -187,7 +187,7 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, $"Error on CheckStorage() with {Storage} & {Serialization.ToJson(systemDisks)}");
+                Common.LogError(ex, false, $"Error on CheckStorage() with {Storage} & {Serialization.ToJson(systemDisks)}", true, "SystemChecker");
             }
 
             return false;

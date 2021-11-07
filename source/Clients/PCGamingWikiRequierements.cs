@@ -60,7 +60,7 @@ namespace SystemChecker.Clients
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false);
+                Common.LogError(ex, false, true, "SystemChecker");
             }
 
             return url;
@@ -226,7 +226,7 @@ namespace SystemChecker.Clients
                 }
                 catch (Exception ex)
                 {
-                    Common.LogError(ex, false, $"Failed to download {url}");
+                    Common.LogError(ex, false, $"Failed to download {url}", true, "SystemChecker");
                 }
 
 
@@ -472,7 +472,7 @@ namespace SystemChecker.Clients
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false);
+                Common.LogError(ex, false, true, "SystemChecker");
             }
 
             return gameRequierements;

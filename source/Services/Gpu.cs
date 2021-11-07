@@ -252,7 +252,7 @@ namespace SystemChecker.Services
                 }
                 catch (Exception ex)
                 {
-                    Common.LogError(ex, false, $"Error on IsBetter() for Nvidia vs Amd");
+                    Common.LogError(ex, false, $"Error on IsBetter() for Nvidia vs Amd", true, "SystemChecker");
                 }
             }
 
@@ -279,7 +279,7 @@ namespace SystemChecker.Services
                 }
                 catch (Exception ex)
                 {
-                    Common.LogError(ex, false, $"Error on IsBetter() for Amd vs Nvidia");
+                    Common.LogError(ex, false, $"Error on IsBetter() for Amd vs Nvidia", true, "SystemChecker");
                 }
 
                 logger.Warn($"No equivalence for {Serialization.ToJson(CardPc)} & {Serialization.ToJson(CardRequierement)}");

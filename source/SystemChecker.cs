@@ -66,7 +66,7 @@ namespace SystemChecker
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false);
+                Common.LogError(ex, false, true, "SystemChecker");
             }
         }
         #endregion
@@ -330,7 +330,7 @@ namespace SystemChecker
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false);
+                Common.LogError(ex, false, true, "SystemChecker");
             }
         }
 

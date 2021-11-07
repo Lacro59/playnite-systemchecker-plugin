@@ -36,7 +36,7 @@ namespace SystemChecker.Clients
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, $"Failed to download {url}");
+                Common.LogError(ex, false, $"Failed to download {url}", true, "SystemChecker");
                 return string.Empty;
             }
         }
@@ -81,7 +81,7 @@ namespace SystemChecker.Clients
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false);
+                Common.LogError(ex, false, true, "SystemChecker");
             }
 
             Minimum.IsMinimum = true;
