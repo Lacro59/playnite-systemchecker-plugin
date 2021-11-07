@@ -12,7 +12,7 @@ Packages:
   - Version: 2.0.1
     RequiredApiVersion: 6.1.0
     ReleaseDate: 2021-11-07
-    PackageUrl: https://github.com/Lacro59/playnite-systemchecker-plugin/releases/download/v2.0.1/playnite-systemchecker-plugin_2_0.1.pext
+    PackageUrl: https://github.com/Lacro59/playnite-systemchecker-plugin/releases/download/v2.0.1/playnite-systemchecker-plugin_2_0_1.pext
     Changelog:
       - Improved performances
       - Improved data parser
