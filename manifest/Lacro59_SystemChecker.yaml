@@ -9,3 +9,13 @@ Packages:
       - Custom UI Elements for custom theme integration (see wiki on GitHub)
       - Fixed many bugs
       - Many UI tweaks
+  - Version: 2.0.1
+    RequiredApiVersion: 6.1.0
+    ReleaseDate: 2021-11-07
+    PackageUrl: https://github.com/Lacro59/playnite-systemchecker-plugin/releases/download/v2.0.1/playnite-systemchecker-plugin_2_0.1.pext
+    Changelog:
+      - Improved performances
+      - Improved data parser
+      - Fixed crash with some themes
+      - Fixed many bugs
+      - Updated localizations
