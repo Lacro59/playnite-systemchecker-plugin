@@ -287,27 +287,27 @@ namespace SystemChecker.Services
 
             // Clock GHz
             Double.TryParse(Regex.Match(CpuName, "[0-9]*[.][0-9]*[ GHz]*").Value.Replace("GHz", string.Empty)
-                .Replace(".", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim()
-                .Replace(",", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim(), out Clock);
+                .Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim()
+                .Replace(",", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim(), out Clock);
             if (Clock == 0)
             {
                 Double.TryParse(Regex.Match(CpuName, "[0-9]*[.][0-9]*[GHz]*").Value.Replace("GHz", string.Empty)
-                    .Replace(".", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim()
-                    .Replace(",", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim(), out Clock);
+                    .Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim()
+                    .Replace(",", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim(), out Clock);
             }
 
             // Clock MHz
             if (Clock == 0)
             {
                 Double.TryParse(Regex.Match(CpuName, "[0-9]*[.][0-9]*[ MHz]*").Value.Replace("MHz", string.Empty)
-                    .Replace(".", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim()
-                    .Replace(",", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim(), out Clock);
+                    .Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim()
+                    .Replace(",", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim(), out Clock);
 
                 if (Clock == 0)
                 {
                     Double.TryParse(Regex.Match(CpuName, "[0-9]*[.][0-9]*[MHz]*").Value.Replace("MHz", string.Empty)
-                        .Replace(".", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim()
-                        .Replace(",", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim(), out Clock);
+                        .Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim()
+                        .Replace(",", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim(), out Clock);
                 }
 
                 if (Clock != 0)

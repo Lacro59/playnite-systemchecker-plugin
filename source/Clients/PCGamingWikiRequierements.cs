@@ -373,8 +373,8 @@ namespace SystemChecker.Clients
                                         dataMinimum = dataMinimum.Substring(0, dataMinimum.ToLower().IndexOf("mb"));
 
                                         double.TryParse(dataMinimum
-                                            .Replace(".", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim()
-                                            .Replace(",", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim(), out hdd);
+                                            .Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim()
+                                            .Replace(",", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim(), out hdd);
 
                                         Minimum.Storage = (long)(1024 * 1024 * hdd);
                                     }
@@ -383,8 +383,8 @@ namespace SystemChecker.Clients
                                         dataMinimum = dataMinimum.Substring(0, dataMinimum.ToLower().IndexOf("gb"));
 
                                         double.TryParse(dataMinimum
-                                            .Replace(".", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim()
-                                            .Replace(",", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim(), out hdd);
+                                            .Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim()
+                                            .Replace(",", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim(), out hdd);
 
                                         Minimum.Storage = (long)(1024 * 1024 * 1024 * hdd);
                                     }
@@ -397,8 +397,8 @@ namespace SystemChecker.Clients
                                         dataRecommended = dataRecommended.Substring(0, dataRecommended.ToLower().IndexOf("mb"));
 
                                         double.TryParse(dataRecommended
-                                            .Replace(".", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim()
-                                            .Replace(",", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim(), out hdd);
+                                            .Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim()
+                                            .Replace(",", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim(), out hdd);
 
                                         Recommanded.Storage = (long)(1024 * 1024 * hdd);
                                     }
@@ -407,8 +407,8 @@ namespace SystemChecker.Clients
                                         dataRecommended = dataRecommended.Substring(0, dataRecommended.ToLower().IndexOf("gb"));
 
                                         double.TryParse(dataRecommended
-                                            .Replace(".", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim()
-                                            .Replace(",", CultureInfo.CurrentUICulture.NumberFormat.NumberDecimalSeparator).Trim(), out hdd);
+                                            .Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim()
+                                            .Replace(",", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim(), out hdd);
 
                                         Minimum.Storage = (long)(1024 * 1024 * 1024 * hdd);
                                     }
