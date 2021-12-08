@@ -12,6 +12,7 @@ using System.Windows.Threading;
 using SystemChecker.Clients;
 using SystemChecker.Models;
 using CommonPluginsStores;
+using System.Diagnostics;
 
 namespace SystemChecker.Services
 {
@@ -33,11 +34,26 @@ namespace SystemChecker.Services
 
         protected override bool LoadDatabase()
         {
-            Database = new RequierementsCollection(Paths.PluginDatabasePath);
-            Database.SetGameInfo<Requirement>(PlayniteApi);
+            try
+            {
+                Stopwatch stopWatch = new Stopwatch();
+                stopWatch.Start();
 
-            LocalSystem = new LocalSystem(Path.Combine(Paths.PluginUserDataPath, $"Configurations.json"));
-            Database.PC = LocalSystem.GetSystemConfiguration();
+                Database = new RequierementsCollection(Paths.PluginDatabasePath);
+                Database.SetGameInfo<Requirement>(PlayniteApi);
+
+                LocalSystem = new LocalSystem(Path.Combine(Paths.PluginUserDataPath, $"Configurations.json"));
+                Database.PC = LocalSystem.GetSystemConfiguration();
+
+                stopWatch.Stop();
+                TimeSpan ts = stopWatch.Elapsed;
+                logger.Info($"LoadDatabase with {Database.Count} items - {string.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10)}");
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false, true, PluginName);
+                return false;
+            }
 
             return true;
         }
