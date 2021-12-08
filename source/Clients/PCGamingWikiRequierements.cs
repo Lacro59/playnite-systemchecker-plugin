@@ -483,6 +483,7 @@ namespace SystemChecker.Clients
         {
             return data.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
                 .Replace("XNA Hi Def Profile Compatible GPU", string.Empty)
+                .Replace("(GTX 970 or above required for VR)", string.Empty)
                 .Replace("DirectX-compliant", string.Empty)
                 .Replace("Mobile or dedicated", string.Empty)
                 .Replace("DirectX compatible card", string.Empty)

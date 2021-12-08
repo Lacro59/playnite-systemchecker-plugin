@@ -109,7 +109,7 @@ namespace SystemChecker.Views
             string IsOk = "";
             string IsKo = "";
 
-            CheckSystem CheckMinimum = SystemApi.CheckConfig(Minimum, systemConfiguration, GameSelected.IsInstalled);
+            CheckSystem CheckMinimum = SystemApi.CheckConfig(GameSelected, Minimum, systemConfiguration, GameSelected.IsInstalled);
             if (Minimum.HasData)
             {
                 MinimumCheckOs = IsKo;
@@ -163,7 +163,7 @@ namespace SystemChecker.Views
                 }
             }
 
-            CheckSystem CheckRecommanded = SystemApi.CheckConfig(Recommanded, systemConfiguration, GameSelected.IsInstalled);
+            CheckSystem CheckRecommanded = SystemApi.CheckConfig(GameSelected, Recommanded, systemConfiguration, GameSelected.IsInstalled);
             if (Recommanded.HasData)
             {
                 RecommandedCheckOs = IsKo;

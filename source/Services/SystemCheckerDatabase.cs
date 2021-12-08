@@ -172,8 +172,8 @@ namespace SystemChecker.Services
                     Requirement systemMinimum = gameRequierements.GetMinimum();
                     Requirement systemRecommanded = gameRequierements.GetRecommanded();
 
-                    CheckSystem CheckMinimum = SystemApi.CheckConfig(systemMinimum, systemConfiguration, game.IsInstalled);
-                    CheckSystem CheckRecommanded = SystemApi.CheckConfig(systemRecommanded, systemConfiguration, game.IsInstalled);
+                    CheckSystem CheckMinimum = SystemApi.CheckConfig(game, systemMinimum, systemConfiguration, game.IsInstalled);
+                    CheckSystem CheckRecommanded = SystemApi.CheckConfig(game, systemRecommanded, systemConfiguration, game.IsInstalled);
 
 
                     if (!(bool)CheckMinimum.AllOk && !(bool)CheckRecommanded.AllOk)
@@ -249,8 +249,8 @@ namespace SystemChecker.Services
             Requirement systemMinimum = gameRequierements.GetMinimum();
             Requirement systemRecommanded = gameRequierements.GetRecommanded();
 
-            CheckSystem CheckMinimum = CheckMinimum = SystemApi.CheckConfig(systemMinimum, systemConfiguration, game.IsInstalled);
-            CheckSystem CheckRecommanded = SystemApi.CheckConfig(systemRecommanded, systemConfiguration, game.IsInstalled);
+            CheckSystem CheckMinimum = CheckMinimum = SystemApi.CheckConfig(game, systemMinimum, systemConfiguration, game.IsInstalled);
+            CheckSystem CheckRecommanded = SystemApi.CheckConfig(game, systemRecommanded, systemConfiguration, game.IsInstalled);
 
 
             PluginSettings.Settings.HasData = gameRequierements.HasData;

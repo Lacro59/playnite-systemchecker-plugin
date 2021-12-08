@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using SystemChecker.Models;
 using CommonPluginsShared;
+using Playnite.SDK.Models;
 
 namespace SystemChecker.Services
 {
@@ -14,9 +15,13 @@ namespace SystemChecker.Services
         private static readonly ILogger logger = LogManager.GetLogger();
         private static IResourceProvider resources = new ResourceProvider();
 
+        private static Game game;
 
-        public static CheckSystem CheckConfig(Requirement requirement, SystemConfiguration systemConfiguration, bool IsInstalled)
+
+        public static CheckSystem CheckConfig(Game game, Requirement requirement, SystemConfiguration systemConfiguration, bool IsInstalled)
         {
+            SystemApi.game = game;
+
             if (requirement != null && systemConfiguration != null)
             {
                 bool isCheckOs = CheckOS(systemConfiguration.Os, requirement.Os);
@@ -78,7 +83,8 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, $"Error on CheckOs() with {systemOs} & {Serialization.ToJson(requierementOs)}", true, "SystemChecker");
+                string message = string.Format(resources.GetString("LOCSystemCheckerTryRefresh"), SystemApi.game?.Name);
+                Common.LogError(ex, false, message, true, "SystemChecker");
             }
 
             return false;
@@ -106,7 +112,8 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, $"Error on CheckGpu() with {systemConfiguration.Cpu} & {Serialization.ToJson(requierementCpu)}", true, "SystemChecker");
+                string message = string.Format(resources.GetString("LOCSystemCheckerTryRefresh"), SystemApi.game?.Name);
+                Common.LogError(ex, false, message, true, "SystemChecker");
             }
 
             return false;
@@ -125,7 +132,8 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, $"Error on CheckRam() with {systemRam} & {requierementRam}", true, "SystemChecker");
+                string message = string.Format(resources.GetString("LOCSystemCheckerTryRefresh"), SystemApi.game?.Name);
+                Common.LogError(ex, false, message, true, "SystemChecker");
             }
 
             return false;
@@ -162,7 +170,8 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, $"Error on CheckGpu() with {systemConfiguration.GpuName} & {Serialization.ToJson(requierementGpu)}", true, "SystemChecker");
+                string message = string.Format(resources.GetString("LOCSystemCheckerTryRefresh"), SystemApi.game?.Name);
+                Common.LogError(ex, false, message, true, "SystemChecker");
             }
 
             return false;
@@ -187,7 +196,8 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, $"Error on CheckStorage() with {Storage} & {Serialization.ToJson(systemDisks)}", true, "SystemChecker");
+                string message = string.Format(resources.GetString("LOCSystemCheckerTryRefresh"), SystemApi.game?.Name);
+                Common.LogError(ex, false, message, true, "SystemChecker");
             }
 
             return false;
