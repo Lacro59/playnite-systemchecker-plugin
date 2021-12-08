@@ -1,5 +1,6 @@
 ﻿using Playnite.SDK;
 using Playnite.SDK.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,9 +11,10 @@ namespace SystemChecker
     {
         #region Settings variables
         public bool MenuInExtensions { get; set; } = true;
+        public DateTime LastAutoLibUpdateAssetsDownload { get; set; } = DateTime.Now;
 
         public bool EnableTag { get; set; } = false;
-
+        public bool AutoImport { get; set; } = true;
 
         private bool _EnableIntegrationViewItem { get; set; } = true;
         public bool EnableIntegrationViewItem

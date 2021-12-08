@@ -20,6 +20,8 @@
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="10"/>
                         <RowDefinition Height="auto"/>
+                        <RowDefinition Height="10"/>
+                        <RowDefinition Height="auto"/>
                         <RowDefinition Height="30"/>
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
@@ -30,13 +32,7 @@
                         <Label Content="{DynamicResource LOCCommonMenuInExtensions}" />
                     </CheckBox>
 
-                    <Grid Grid.Row="2">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto"/>
-                            <RowDefinition Height="10"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        
+                    <Grid Grid.Row="2">                        
                         <CheckBox Name="cbEnableTag" IsChecked="{Binding Settings.EnableTag}" VerticalAlignment="Center" Grid.Column="0">
                             <Label Content="{DynamicResource LOCSystemCheckerAddTag}" />
                         </CheckBox>
@@ -47,7 +43,11 @@
                         </StackPanel>
                     </Grid>
 
-                    <Button Grid.Column="0" Grid.Row="4" Content="{DynamicResource LOCClearAll}" Click="Button_Click" Width="200" 
+                    <CheckBox Name="cbAutoImport" Grid.Row="4" IsChecked="{Binding Settings.AutoImport}">
+                        <Label Content="{DynamicResource LOCCommonAutoImport}" />
+                    </CheckBox>
+
+                    <Button Grid.Column="0" Grid.Row="6" Content="{DynamicResource LOCClearAll}" Click="Button_Click" Width="200" 
                             HorizontalAlignment="Left" VerticalAlignment="Center" />
                 </Grid>
             </StackPanel>
