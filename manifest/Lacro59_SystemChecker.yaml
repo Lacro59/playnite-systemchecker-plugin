@@ -24,4 +24,13 @@ Packages:
     ReleaseDate: 2021-11-07
     PackageUrl: https://github.com/Lacro59/playnite-systemchecker-plugin/releases/download/v2.0.2/playnite-systemchecker-plugin_2_0_2.pext
     Changelog:
-      - fixed a crash
+      - Fixed a crash
+  - Version: 2.1
+    RequiredApiVersion: 6.2.0
+    ReleaseDate: 2021-12-09
+    PackageUrl: https://github.com/Lacro59/playnite-systemchecker-plugin/releases/download/v2.1/playnite-systemchecker-plugin_2_1.pext
+    Changelog:
+      - Added options for automatic download when updated library
+      - Improved data parser
+      - Fixed minors bugs
+      - Updated localizations
