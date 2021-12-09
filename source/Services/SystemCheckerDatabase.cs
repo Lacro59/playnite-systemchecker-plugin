@@ -5,8 +5,6 @@ using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Threading;
 using SystemChecker.Clients;
@@ -27,7 +25,7 @@ namespace SystemChecker.Services
         {
             TagBefore = "[SC]";
 
-            pCGamingWikiRequierements = new PCGamingWikiRequierements(PlayniteApi, PluginUserDataPath);
+            pCGamingWikiRequierements = new PCGamingWikiRequierements();
             steamRequierements = new SteamRequierements();
         }
 

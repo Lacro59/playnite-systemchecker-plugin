@@ -272,7 +272,7 @@ namespace SystemChecker
                     };
 
                     var ViewExtension = new ListWithNoData(PlayniteApi, PluginDatabase);
-                    Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PlayniteApi, "HowLongToBeat", ViewExtension, windowOptions);
+                    Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PlayniteApi, resources.GetString("LOCSystemChecker"), ViewExtension, windowOptions);
                     windowExtension.ShowDialog();
                 }
             });

@@ -3,7 +3,6 @@ using AngleSharp.Parser.Html;
 using CommonPlayniteShared.PluginLibrary.SteamLibrary.SteamShared;
 using CommonPluginsShared;
 using CommonPluginsShared.Models;
-using Playnite.SDK;
 using Playnite.SDK.Models;
 using Playnite.SDK.Data;
 using System;
@@ -16,8 +15,6 @@ namespace SystemChecker.Clients
 {
     class SteamRequierements : RequierementMetadata
     {
-        private static readonly ILogger logger = LogManager.GetLogger();
-
         private uint AppId { get; set; }
 
 

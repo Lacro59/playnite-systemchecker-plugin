@@ -1,13 +1,11 @@
 ﻿using Playnite.SDK;
 using Playnite.SDK.Models;
-using System;
-using System.Globalization;
 
 namespace SystemChecker.Models
 {
     public abstract class RequierementMetadata
     {
-        private static readonly ILogger logger = LogManager.GetLogger();
+        internal static readonly ILogger logger = LogManager.GetLogger();
 
         internal Game _game;
         internal GameRequierements gameRequierements = new GameRequierements();
