@@ -26,4 +26,6 @@
 
     <!-- SystemCheckerNotifications -->
 
+    <sys:String x:Key="LOCSystemCheckerTryRefresh">Try to refresh the plugin data for {0}</sys:String>
+
 </ResourceDictionary>

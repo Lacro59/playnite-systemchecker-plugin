@@ -26,4 +26,6 @@
 
     <!-- SystemCheckerNotifications -->
 
+    <sys:String x:Key="LOCSystemCheckerTryRefresh">Спробуйте оновити дані плагіну для {0}</sys:String>
+
 </ResourceDictionary>
