@@ -39,5 +39,5 @@ Packages:
     ReleaseDate: 2022-01-04
     PackageUrl: https://github.com/Lacro59/playnite-systemchecker-plugin/releases/download/v2.1.1/playnite-systemchecker-plugin_2_1_1.pext
     Changelog:
-      - Improved data checker
+      - Improved comparator
       - Updated localizations
