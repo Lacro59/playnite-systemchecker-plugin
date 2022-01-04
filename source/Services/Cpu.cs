@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using SystemChecker.Models;
 
 namespace SystemChecker.Services
 {
@@ -27,7 +28,7 @@ namespace SystemChecker.Services
             ProcessorRequierement = SetProcessor(CpuRequierement);
         }
 
-        public bool IsBetter()
+        public CheckResult IsBetter()
         {
             Common.LogDebug(true, $"Cpu.IsBetter - ProcessorPc: {Serialization.ToJson(ProcessorPc)}");
             Common.LogDebug(true, $"Cpu.IsBetter - ProcessorRequierement: {Serialization.ToJson(ProcessorRequierement)}");
@@ -35,17 +36,17 @@ namespace SystemChecker.Services
             // Old Processor
             if (!ProcessorPc.IsOld && ProcessorRequierement.IsOld)
             {
-                return true;
+                return new CheckResult { Result = true };
             }
             if (ProcessorPc.IsOld && !ProcessorRequierement.IsOld)
             {
-                return false;
+                return new CheckResult();
             }
             if (ProcessorPc.IsOld && ProcessorRequierement.IsOld)
             {
                 // TODO: CPU old vs old
                 logger.Warn($"No CPU treatment for {Serialization.ToJson(ProcessorPc)} & {Serialization.ToJson(ProcessorRequierement)}");
-                return false;
+                return new CheckResult();
             }
 
             if (!ProcessorRequierement.IsIntel && !ProcessorRequierement.IsAmd)
@@ -53,17 +54,17 @@ namespace SystemChecker.Services
                 // Clock
                 if (ProcessorRequierement.Clock == 0)
                 {
-                    return true;
+                    return new CheckResult { Result = true };
                 }
                 else
                 {
                     if (ProcessorPc.Clock == 0)
                     {
                         logger.Warn($"ProcessorPc.Clock is 0");
-                        return true;
+                        return new CheckResult { Result = true };
                     }
 
-                    return true;
+                    return new CheckResult { Result = true };
                     //return ProcessorPc.Clock >= ProcessorRequierement.Clock;
                 }
             }
@@ -73,15 +74,15 @@ namespace SystemChecker.Services
             {
                 if (ProcessorPc.Type == ProcessorRequierement.Type)
                 {
-                    return ProcessorPc.Version >= ProcessorRequierement.Version;
+                    return new CheckResult { SameConstructor = true, Result = ProcessorPc.Version >= ProcessorRequierement.Version };
                 }
                 if (int.Parse(Regex.Match(ProcessorPc.Type, @"\d").Value) > int.Parse(Regex.Match(ProcessorRequierement.Type, @"\d").Value))
                 {
-                    return true;
+                    return new CheckResult { Result = true };
                 }
                 else
                 {
-                    return (ProcessorPc.Version + 1500) >= ProcessorRequierement.Version;
+                    return new CheckResult { SameConstructor = true, Result = (ProcessorPc.Version + 1500) >= ProcessorRequierement.Version };
                 }
             }
 
@@ -90,21 +91,21 @@ namespace SystemChecker.Services
             {
                 if (Regex.Match(ProcessorPc.Type, @"Ryzen[ ][0-9]", RegexOptions.IgnoreCase).Value == Regex.Match(ProcessorRequierement.Type, @"Ryzen[ ][0-9]", RegexOptions.IgnoreCase).Value)
                 {
-                    return ProcessorPc.Version >= ProcessorRequierement.Version;
+                    return new CheckResult { SameConstructor = true, Result = ProcessorPc.Version >= ProcessorRequierement.Version };
                 }
                 if (ProcessorPc.Type.ToLower().IndexOf("ryzen") > -1 && ProcessorRequierement.Type.ToLower().IndexOf("athlon") > -1)
                 {
-                    return true;
+                    return new CheckResult { SameConstructor = true, Result = true };
                 }
                 if (ProcessorPc.Type.ToLower().IndexOf("ryzen") > -1 && ProcessorRequierement.Type.ToLower().IndexOf("ryzen") > -1)
                 {
                     if (int.Parse(Regex.Match(ProcessorPc.Type, @"\d").Value) > int.Parse(Regex.Match(ProcessorRequierement.Type, @"\d").Value))
                     {
-                        return true;
+                        return new CheckResult { SameConstructor = true, Result = true };
                     }
                     else
                     {
-                        return (ProcessorPc.Version + 1500) >= ProcessorRequierement.Version;
+                        return new CheckResult { SameConstructor = true, Result = (ProcessorPc.Version + 1500) >= ProcessorRequierement.Version };
                     }
                 }
             }
@@ -115,41 +116,41 @@ namespace SystemChecker.Services
             {
                 if (ProcessorPc.Type.ToLower().Contains("ryzen 3") && ProcessorRequierement.Type.ToLower().Contains("i3"))
                 {
-                    return (ProcessorPc.Version + 4000) >= ProcessorRequierement.Version;
+                    return new CheckResult { Result = (ProcessorPc.Version + 4000) >= ProcessorRequierement.Version };
                 }
                 if (ProcessorPc.Type.ToLower().Contains("ryzen 3") && ProcessorRequierement.Type.ToLower().Contains("i5"))
                 {
-                    return (ProcessorPc.Version + 3000) >= ProcessorRequierement.Version;
+                    return new CheckResult { Result = (ProcessorPc.Version + 3000) >= ProcessorRequierement.Version };
                 }
                 if (ProcessorPc.Type.ToLower().Contains("ryzen 3") && ProcessorRequierement.Type.ToLower().Contains("i7"))
                 {
-                    return (ProcessorPc.Version + 2000) >= ProcessorRequierement.Version;
+                    return new CheckResult { Result = (ProcessorPc.Version + 2000) >= ProcessorRequierement.Version };
                 }
 
                 if (ProcessorPc.Type.ToLower().Contains("ryzen 5") && ProcessorRequierement.Type.ToLower().Contains("i3"))
                 {
-                    return (ProcessorPc.Version + 5000) >= ProcessorRequierement.Version;
+                    return new CheckResult { Result = (ProcessorPc.Version + 5000) >= ProcessorRequierement.Version };
                 }
                 if (ProcessorPc.Type.ToLower().Contains("ryzen 5") && ProcessorRequierement.Type.ToLower().Contains("i5"))
                 {
-                    return (ProcessorPc.Version + 4000) >= ProcessorRequierement.Version;
+                    return new CheckResult { Result = (ProcessorPc.Version + 4000) >= ProcessorRequierement.Version };
                 }
                 if (ProcessorPc.Type.ToLower().Contains("ryzen 5") && ProcessorRequierement.Type.ToLower().Contains("i7"))
                 {
-                    return (ProcessorPc.Version + 3000) >= ProcessorRequierement.Version;
+                    return new CheckResult { Result = (ProcessorPc.Version + 3000) >= ProcessorRequierement.Version };
                 }
 
                 if (ProcessorPc.Type.ToLower().Contains("ryzen 7") && ProcessorRequierement.Type.ToLower().Contains("i3"))
                 {
-                    return (ProcessorPc.Version + 6000) >= ProcessorRequierement.Version;
+                    return new CheckResult { Result = (ProcessorPc.Version + 6000) >= ProcessorRequierement.Version };
                 }
                 if (ProcessorPc.Type.ToLower().Contains("ryzen 7") && ProcessorRequierement.Type.ToLower().Contains("i5"))
                 {
-                    return (ProcessorPc.Version + 5000) >= ProcessorRequierement.Version;
+                    return new CheckResult { Result = (ProcessorPc.Version + 5000) >= ProcessorRequierement.Version };
                 }
                 if (ProcessorPc.Type.ToLower().Contains("ryzen 7") && ProcessorRequierement.Type.ToLower().Contains("i7"))
                 {
-                    return (ProcessorPc.Version + 4000) >= ProcessorRequierement.Version;
+                    return new CheckResult { Result = (ProcessorPc.Version + 4000) >= ProcessorRequierement.Version };
                 }
             }
 
@@ -158,47 +159,47 @@ namespace SystemChecker.Services
             {
                 if (ProcessorRequierement.Type.ToLower().Contains("ryzen 3") && ProcessorPc.Type.ToLower().Contains("i3"))
                 {
-                    return (ProcessorRequierement.Version + 4000) >= ProcessorPc.Version;
+                    return new CheckResult { Result = (ProcessorRequierement.Version + 4000) >= ProcessorPc.Version };
                 }
                 if (ProcessorRequierement.Type.ToLower().Contains("ryzen 3") && ProcessorPc.Type.ToLower().Contains("i5"))
                 {
-                    return (ProcessorRequierement.Version + 3000) >= ProcessorPc.Version;
+                    return new CheckResult { Result = (ProcessorRequierement.Version + 3000) >= ProcessorPc.Version };
                 }
                 if (ProcessorRequierement.Type.ToLower().Contains("ryzen 3") && ProcessorPc.Type.ToLower().Contains("i7"))
                 {
-                    return (ProcessorRequierement.Version + 2000) >= ProcessorPc.Version;
+                    return new CheckResult { Result = (ProcessorRequierement.Version + 2000) >= ProcessorPc.Version };
                 }
 
                 if (ProcessorRequierement.Type.ToLower().Contains("ryzen 5") && ProcessorPc.Type.ToLower().Contains("i3"))
                 {
-                    return (ProcessorRequierement.Version + 5000) >= ProcessorPc.Version;
+                    return new CheckResult { Result = (ProcessorRequierement.Version + 5000) >= ProcessorPc.Version };
                 }
                 if (ProcessorRequierement.Type.ToLower().Contains("ryzen 5") && ProcessorPc.Type.ToLower().Contains("i5"))
                 {
-                    return (ProcessorRequierement.Version + 4000) >= ProcessorPc.Version;
+                    return new CheckResult { Result = (ProcessorRequierement.Version + 4000) >= ProcessorPc.Version };
                 }
                 if (ProcessorRequierement.Type.ToLower().Contains("ryzen 5") && ProcessorPc.Type.ToLower().Contains("i7"))
                 {
-                    return (ProcessorRequierement.Version + 3000) >= ProcessorPc.Version;
+                    return new CheckResult { Result = (ProcessorRequierement.Version + 3000) >= ProcessorPc.Version };
                 }
 
                 if (ProcessorRequierement.Type.ToLower().Contains("ryzen 7") && ProcessorPc.Type.ToLower().Contains("i3"))
                 {
-                    return (ProcessorRequierement.Version + 6000) >= ProcessorPc.Version;
+                    return new CheckResult { Result = (ProcessorRequierement.Version + 6000) >= ProcessorPc.Version };
                 }
                 if (ProcessorRequierement.Type.ToLower().Contains("ryzen 7") && ProcessorPc.Type.ToLower().Contains("i5"))
                 {
-                    return (ProcessorRequierement.Version + 5000) >= ProcessorPc.Version;
+                    return new CheckResult { Result = (ProcessorRequierement.Version + 5000) >= ProcessorPc.Version };
                 }
                 if (ProcessorRequierement.Type.ToLower().Contains("ryzen 7") && ProcessorPc.Type.ToLower().Contains("i7"))
                 {
-                    return (ProcessorRequierement.Version + 4000) >= ProcessorPc.Version;
+                    return new CheckResult { Result = (ProcessorRequierement.Version + 4000) >= ProcessorPc.Version };
                 }
             }
 
 
             logger.Warn($"No CPU treatment for {Serialization.ToJson(ProcessorPc)} & {Serialization.ToJson(ProcessorRequierement)}");
-            return false;
+            return new CheckResult();
         }
 
         private bool CallIsIntel(string CpuName)

@@ -99,9 +99,14 @@ namespace SystemChecker.Services
                     foreach (var cpu in requierementCpu)
                     {
                         Cpu cpuCheck = new Cpu(systemConfiguration, cpu);
-                        if (cpuCheck.IsBetter())
+                        var check = cpuCheck.IsBetter();
+                        if (check.Result)
                         {
                             return true;
+                        }
+                        else if (check.SameConstructor)
+                        {
+                            return check.Result;
                         }
                     }
                 }
@@ -150,7 +155,8 @@ namespace SystemChecker.Services
                         var gpu = requierementGpu[i];
 
                         Gpu gpuCheck = new Gpu(systemConfiguration, gpu);
-                        if (gpuCheck.IsBetter())
+                        var check = gpuCheck.IsBetter();
+                        if (check.Result)
                         {
                             if ((gpuCheck.IsWithNoCard || !gpuCheck.CardRequierementIsOld ) && i > 0)
                             {
@@ -160,6 +166,10 @@ namespace SystemChecker.Services
                             {
                                 return true;
                             }
+                        }
+                        else if (check.SameConstructor)
+                        {
+                            return check.Result;
                         }
                     }
                 }

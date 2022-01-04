@@ -97,6 +97,7 @@
     <Compile Include="Controls\PluginViewItem.xaml.cs">
       <DependentUpon>PluginViewItem.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Models\CheckResult.cs" />
     <Compile Include="Models\RequierementsCollection.cs" />
     <Compile Include="playnite-plugincommon\CommonPluginsControls\Views\ListWithNoData.xaml.cs">
       <DependentUpon>ListWithNoData.xaml</DependentUpon>

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Globalization;
 using CommonPluginsShared;
+using SystemChecker.Models;
 
 namespace SystemChecker.Services
 {
@@ -108,7 +109,7 @@ namespace SystemChecker.Services
             CardRequierement.ResolutionHorizontal = ResolutionHorizontal;
         }
 
-        public bool IsBetter()
+        public CheckResult IsBetter()
         {
             Common.LogDebug(true, $"Gpu.IsBetter - CardPc({CardPcName}): {Serialization.ToJson(CardPc)}");
             Common.LogDebug(true, $"Gpu.IsBetter - CardRequierement({CardRequierementName}): {Serialization.ToJson(CardRequierement)}");
@@ -121,13 +122,13 @@ namespace SystemChecker.Services
                     if (CardRequierement.DxVersion < 10)
                     {
                         IsWithNoCard = true;
-                        return true;
+                        return new CheckResult { Result = true };
                     }
                 }
                 else
                 {
                     IsWithNoCard = true;
-                    return true;
+                    return new CheckResult { Result = true };
                 }
             }
 
@@ -135,7 +136,7 @@ namespace SystemChecker.Services
             if (CardRequierement.IsOGL && CardRequierement.OglVersion < 4)
             {
                 IsWithNoCard = true;
-                return true;
+                return new CheckResult { Result = true };
             }
 
             // No card defined
@@ -144,56 +145,56 @@ namespace SystemChecker.Services
                 if (CardRequierement.Vram != 0 && CardRequierement.Vram <= CardPc.Vram)
                 {
                     IsWithNoCard = true;
-                    return true;
+                    return new CheckResult { Result = true };
                 }
                 if (CardRequierement.ResolutionHorizontal != 0 && CardRequierement.ResolutionHorizontal <= CardPc.ResolutionHorizontal)
                 {
                     IsWithNoCard = true;
-                    return true;
+                    return new CheckResult { Result = true };
                 }
             }
 
             // Old card requiered
             if (CardRequierement.IsOld || CardPc.IsOld)
             {
-                return true;
+                return new CheckResult { Result = true };
             }
 
             // Integrate
             if (CardRequierement.IsIntegrate && (CardPc.IsNvidia || CardPc.IsAmd) && !CardPc.IsOld)
             {
-                return true;
+                return new CheckResult { Result = true };
             }
             if (CardRequierement.IsIntegrate && CardPc.IsIntegrate)
             {
                 if (CardRequierement.Type == CardPc.Type)
                 {
-                    return (CardRequierement.Number <= CardPc.Number);
+                    return new CheckResult { Result = CardRequierement.Number <= CardPc.Number };
                 }
 
                 if (CardRequierement.Type == "HD" && CardPc.Type == "UHD")
                 {
-                    return true;
+                    return new CheckResult { Result = true };
                 }
 
                 if (CardRequierement.Number > 999 && CardPc.Number < 1000)
                 {
-                    return true;
+                    return new CheckResult { Result = true };
                 }
                 if (CardRequierement.Number > 999 && CardPc.Number > 999)
                 {
-                    return (CardRequierement.Number < CardPc.Number);
+                    return new CheckResult { Result = CardRequierement.Number < CardPc.Number };
                 }
                 if (CardRequierement.Number < 1000 && CardPc.Number < 1000)
                 {
-                    return (CardRequierement.Number < CardPc.Number);
+                    return new CheckResult { Result = CardRequierement.Number < CardPc.Number };
                 }
             }
 
             // Nvidia vs Nvidia
             if (CardRequierement.IsNvidia && CardPc.IsNvidia)
             {
-                return (CardRequierement.Number <= CardPc.Number);
+                return new CheckResult { SameConstructor = true, Result = CardRequierement.Number <= CardPc.Number };
             }
 
             // Amd vs Amd
@@ -201,28 +202,28 @@ namespace SystemChecker.Services
             {
                 if (CardRequierement.Type == CardPc.Type)
                 {
-                    return (CardRequierement.Number <= CardPc.Number);
+                    return new CheckResult { SameConstructor = true, Result = CardRequierement.Number <= CardPc.Number };
                 }
 
                 if (CardRequierement.Type == "Radeon HD" && CardRequierement.Type != CardPc.Type)
                 {
-                    return true;
+                    return new CheckResult { SameConstructor = true, Result = true };
                 }
 
                 switch (CardRequierement.Type + CardPc.Type)
                 {
                     case "R5R7":
-                        return true;
+                        return new CheckResult { SameConstructor = true, Result = true };
                     case "R5R9":
-                        return true;
+                        return new CheckResult { SameConstructor = true, Result = true };
                     case "R5RX":
-                        return true;
+                        return new CheckResult { SameConstructor = true, Result = true };
                     case "R7R9":
-                        return true;
+                        return new CheckResult { SameConstructor = true, Result = true };
                     case "R7RX":
-                        return true;
+                        return new CheckResult { SameConstructor = true, Result = true };
                     case "R9RX":
-                        return true;
+                        return new CheckResult { SameConstructor = true, Result = true };
                 }
             }
 
@@ -234,21 +235,21 @@ namespace SystemChecker.Services
                 {
                     List<GpuEquivalence> EquivalenceAmd = Equivalence.FindAll(x => x.Amd.ToLower().Contains(CardRequierement.Number.ToString()) && x.Amd.ToLower().Contains(CardRequierement.Type)).ToList();
 
-                    bool tempValue = false;
+                    CheckResult tempValue = new CheckResult();
                     foreach (GpuEquivalence gpuEquivalence in EquivalenceAmd)
                     {
                         gpuEquivalenceName = gpuEquivalence.Amd;
                         CardRequierement = SetCard(gpuEquivalenceName);
 
                         tempValue = IsBetter();
-                        if (tempValue != false)
+                        if (tempValue.Result)
                         {
                             return tempValue;
                         }
                     }
 
                     logger.Warn($"No equivalence for {Serialization.ToJson(CardPc)} & {Serialization.ToJson(CardRequierement)}");
-                    return false;
+                    return new CheckResult(); 
                 }
                 catch (Exception ex)
                 {
@@ -264,14 +265,14 @@ namespace SystemChecker.Services
                 {
                     List<GpuEquivalence> EquivalenceNvidia = Equivalence.FindAll(x => x.Nvidia.ToLower().Contains(CardRequierement.Number.ToString()) && x.Nvidia.ToLower().Contains(CardRequierement.Type)).ToList();
 
-                    bool tempValue = false;
+                    CheckResult tempValue = new CheckResult();
                     foreach (GpuEquivalence gpuEquivalence in EquivalenceNvidia)
                     {
                         gpuEquivalenceName = gpuEquivalence.Nvidia;
                         CardRequierement = SetCard(gpuEquivalenceName);
 
                         tempValue = IsBetter();
-                        if (tempValue != false)
+                        if (tempValue.Result)
                         {
                             return tempValue;
                         }
@@ -283,11 +284,11 @@ namespace SystemChecker.Services
                 }
 
                 logger.Warn($"No equivalence for {Serialization.ToJson(CardPc)} & {Serialization.ToJson(CardRequierement)}");
-                return false;
+                return new CheckResult();
             }
 
             logger.Warn($"No GPU treatment for {Serialization.ToJson(CardPc)} & {Serialization.ToJson(CardRequierement)}");
-            return false;
+            return new CheckResult();
         }
 
         private string DeleteInfo(string GpuName)
