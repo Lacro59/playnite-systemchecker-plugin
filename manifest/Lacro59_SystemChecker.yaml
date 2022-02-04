@@ -41,3 +41,11 @@ Packages:
     Changelog:
       - Improved comparator
       - Updated localizations
+  - Version: 2.1.2
+    RequiredApiVersion: 6.2.2
+    ReleaseDate: 2022-02-04
+    PackageUrl: https://github.com/Lacro59/playnite-systemchecker-plugin/releases/download/v2.1.2/playnite-systemchecker-plugin_2_1_2.pext
+    Changelog:
+      - Improved data parser
+      - Updated localizations
+      - Added new element for custom theme (see wiki)
