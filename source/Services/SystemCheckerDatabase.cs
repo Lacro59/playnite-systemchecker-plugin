@@ -14,7 +14,7 @@ using System.Diagnostics;
 
 namespace SystemChecker.Services
 {
-    public class SystemCheckerDatabase : PluginDatabaseObject<SystemCheckerSettingsViewModel, RequierementsCollection, GameRequierements>
+    public class SystemCheckerDatabase : PluginDatabaseObject<SystemCheckerSettingsViewModel, RequierementsCollection, GameRequierements, Requirement>
     {
         public LocalSystem LocalSystem;
 
@@ -282,14 +282,6 @@ namespace SystemChecker.Services
             {
                 PluginSettings.Settings.IsRecommandedOK = CheckRecommanded.AllOk ?? false;
                 PluginSettings.Settings.IsAllOK = CheckRecommanded.AllOk ?? false;
-            }
-        }
-
-        public override void Games_ItemUpdated(object sender, ItemUpdatedEventArgs<Game> e)
-        {
-            foreach (var GameUpdated in e.UpdatedItems)
-            {
-                Database.SetGameInfo<Requirement>(PlayniteApi, GameUpdated.NewData.Id);
             }
         }
     }
