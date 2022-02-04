@@ -123,6 +123,7 @@ namespace SystemChecker.Clients
                     string os = ElementRequirement.InnerHtml
                         .Replace("\t", " ")
                         .Replace("<strong>OS:</strong>", string.Empty)
+                        .Replace("(32/64-bit)", string.Empty)
                         .Replace("with Platform Update for  7 ( versions only)", string.Empty)
                         .Replace("Win ", string.Empty)
                         .Replace("win ", string.Empty)
@@ -180,6 +181,7 @@ namespace SystemChecker.Clients
                             .Replace("\t", " ")
                             .Replace("<strong>Processor:</strong>", string.Empty)
                             .Replace("&nbsp;", string.Empty)
+                            .Replace("GHz, or better)", "GHz)")
                             .Replace("equivalent or higher processor", string.Empty)
                             .Replace("- Low budget CPUs such as Celeron or Duron needs to be at about twice the CPU speed", string.Empty)
                             .Replace(" equivalent or faster processor", string.Empty)
@@ -282,6 +284,7 @@ namespace SystemChecker.Clients
                             .Replace("or AMD equivalent", string.Empty)
                             .Replace("DX9 Compliant with PS3.0 support", string.Empty)
                             .Replace("DX9 Compliant", string.Empty)
+                            .Replace("(Requires support for SSE)", string.Empty)
 
                             .Replace("ATI or NVidia card", "Card")
                             .Replace("w/", "with")
@@ -312,7 +315,11 @@ namespace SystemChecker.Clients
                             .Replace("(1Gb)", "(1 GB)")
                             .Replace("(1GB)", "(1 GB)")
                             .Replace(" 1GB", " (1 GB)")
+                            .Replace(", 1 GB", " (1 GB)")
+                            .Replace(", 1GB", " (1 GB)")
                             .Replace(" 2GB", " (2 GB)")
+                            .Replace(", 2 GB", " (2 GB)")
+                            .Replace(", 2GB", " (2 GB)")
                             .Replace("(2GB)", " (2 GB)")
                             .Replace("(3GB)", " (3 GB)")
                             .Replace("(4GB)", " (4 GB)")
@@ -324,6 +331,7 @@ namespace SystemChecker.Clients
                             .Replace("()", string.Empty)
                             .Replace("<br>", string.Empty)
                             .Replace("  ", " ")
+                            .Replace("(Shared Memory is not recommended)", string.Empty)
                             .Replace(". Integrated Intel HD Graphics should work but is not supported; problems are generally solved with a driver update.", string.Empty)
                             .Trim();
 

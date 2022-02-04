@@ -348,6 +348,7 @@ namespace SystemChecker.Clients
         private List<string> ReplaceOS(string data)
         {
             data = data
+                .Replace("(latest service pack)", string.Empty)
                 .Replace("(1803 or later)", string.Empty)
                 .Replace(" (Only inclusive until patch 1.16.1. Patch 1.17+ Needs XP and greater.)", string.Empty)
                 .Replace("Windows", string.Empty)
@@ -361,6 +362,9 @@ namespace SystemChecker.Clients
         private List<string> ReplaceCPU(string data)
         {
             data = data
+                .Replace("2009 or newer dual-core Intel or AMD", string.Empty)
+                .Replace("2011 or newer Intel Core i3, i5 or i7", string.Empty)
+                .Replace("SSE2 instruction set support", string.Empty)
                 .Replace("(or equivalent)", string.Empty)
                 .Replace("or equivalent", string.Empty)
                 .Replace("(4 CPUs), ~2.4 GHz", string.Empty)
@@ -441,11 +445,13 @@ namespace SystemChecker.Clients
 
         private List<string> ReplaceGPU(string data)
         {
-            data = data.Replace(" / ", "¤").Replace("<br>", "¤").Replace(" or ", "¤");
+            data = data.Replace("<br>", "¤");
             data = Regex.Replace(data, "(</[^>]*>)", "");
             data = Regex.Replace(data, "(<[^>]*>)", "");
 
             data = data.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
+                .Replace("XNA 4.0 compatible", string.Empty)
+                .Replace("AMD Radeon or Nvidia GeForce recommended", string.Empty)
                 .Replace("XNA Hi Def Profile Compatible GPU", string.Empty)
                 .Replace("(GTX 970 or above required for VR)", string.Empty)
                 .Replace("DirectX-compliant", string.Empty)
@@ -454,6 +460,7 @@ namespace SystemChecker.Clients
                 .Replace("or better", string.Empty)
                 .Replace("of VRAM", "VRAM")
 
+                .Replace("(Shared Memory is not recommended)", string.Empty)
                 .Replace("<b>(DXR)</b>", string.Empty)
                 .Replace("TnL support", string.Empty)
                 .Replace("Integrated graphics, monitor with resolution of 1280x720.", "1280x720")
@@ -462,7 +469,8 @@ namespace SystemChecker.Clients
                 .Replace("+ compatible", string.Empty).Replace("compatible", string.Empty)
                 .Replace("that supports DirectDraw at 640x480 resolution, 256 colors", string.Empty)
                 .Replace("or higher", string.Empty)
-                .Replace(" / ", "¤").Replace("<br>", "¤");
+                .Replace("  ", " ")
+                .Replace(" / ", "¤").Replace(" or ", "¤");
 
             return data.Split('¤')
                 .Select(x => x.Trim()).ToList()
