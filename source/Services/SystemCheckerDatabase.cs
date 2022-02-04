@@ -249,6 +249,7 @@ namespace SystemChecker.Services
                 PluginSettings.Settings.IsMinimumOK = false;
                 PluginSettings.Settings.IsRecommandedOK = false;
                 PluginSettings.Settings.IsAllOK = false;
+                PluginSettings.Settings.RecommandedStorage = string.Empty;
 
                 return;
             }
@@ -270,12 +271,16 @@ namespace SystemChecker.Services
             {
                 PluginSettings.Settings.IsMinimumOK = CheckMinimum.AllOk ?? false;
                 PluginSettings.Settings.IsAllOK = CheckMinimum.AllOk ?? false;
+
+                PluginSettings.Settings.RecommandedStorage = systemMinimum.Storage != 0 ? Tools.SizeSuffix(systemMinimum.Storage) : string.Empty;
             }
 
             if (systemRecommanded.HasData && (CheckRecommanded.AllOk ?? false))
             {
                 PluginSettings.Settings.IsRecommandedOK = CheckRecommanded.AllOk ?? false;
                 PluginSettings.Settings.IsAllOK = CheckRecommanded.AllOk ?? false;
+
+                PluginSettings.Settings.RecommandedStorage = systemRecommanded.Storage != 0 ? Tools.SizeSuffix(systemRecommanded.Storage) : string.Empty;
             }
         }
     }

@@ -100,6 +100,18 @@ namespace SystemChecker
                 OnPropertyChanged();
             }
         }
+
+        private string _RecommandedStorage { get; set; } = string.Empty;
+        [DontSerialize]
+        public string RecommandedStorage
+        {
+            get => _RecommandedStorage;
+            set
+            {
+                _RecommandedStorage = value;
+                OnPropertyChanged();
+            }
+        }
         #endregion  
     }
 
