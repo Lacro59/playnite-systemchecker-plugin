@@ -5,27 +5,27 @@
 
     <sys:String x:Key="LOCSystemChecker">SystemChecker</sys:String>
 
-    <sys:String x:Key="LOCSystemCheckerCheckConfig">Check configuration</sys:String>
+    <sys:String x:Key="LOCSystemCheckerCheckConfig">فحص</sys:String>
     
-    <sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Refresh your system configuration</sys:String>
+    <sys:String x:Key="LOCSystemCheckerRefreshPcInfo">تحديث إعدادات النظام الخاص بك</sys:String>
 
     <!-- SystemCheckerSettingsView -->
 
-    <sys:String x:Key="LOCSystemCheckerAddTag">Add a tag to indicate which configuration was successful</sys:String>
+    <sys:String x:Key="LOCSystemCheckerAddTag">إضافة علامة للإشارة إلى الإعدادات التي نجحت</sys:String>
 
     <!-- SystemCheckerGameView -->
 
-    <sys:String x:Key="LOCSystemCheckerConfigMinimum">Minimum</sys:String>
-    <sys:String x:Key="LOCSystemCheckerConfigRecommanded">Recommended</sys:String>
+    <sys:String x:Key="LOCSystemCheckerConfigMinimum">الحد الادنى</sys:String>
+    <sys:String x:Key="LOCSystemCheckerConfigRecommanded">الموصى به</sys:String>
 
-    <sys:String x:Key="LOCSystemCheckerOS">Operating system</sys:String>
-    <sys:String x:Key="LOCSystemCheckerCpu">Processor</sys:String>
-    <sys:String x:Key="LOCSystemCheckerRam">Memory</sys:String>
-    <sys:String x:Key="LOCSystemCheckerGpu">Graphics</sys:String>
-    <sys:String x:Key="LOCSystemCheckerDisk">Storage</sys:String>
+    <sys:String x:Key="LOCSystemCheckerOS">نظام التشغيل</sys:String>
+    <sys:String x:Key="LOCSystemCheckerCpu">المعالج</sys:String>
+    <sys:String x:Key="LOCSystemCheckerRam">الذاكرة</sys:String>
+    <sys:String x:Key="LOCSystemCheckerGpu">الجرافيك</sys:String>
+    <sys:String x:Key="LOCSystemCheckerDisk">التخزين</sys:String>
 
     <!-- SystemCheckerNotifications -->
 
-    <sys:String x:Key="LOCSystemCheckerTryRefresh">Try to refresh the plugin data for {0}</sys:String>
+    <sys:String x:Key="LOCSystemCheckerTryRefresh">حاول تحديث بيانات الإضافات لـ {0}</sys:String>
 
 </ResourceDictionary>
