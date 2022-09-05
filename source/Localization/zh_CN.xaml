@@ -11,18 +11,18 @@
 
     <!-- SystemCheckerSettingsView -->
 
-    <sys:String x:Key="LOCSystemCheckerAddTag">添加标签以指示哪个配置是成功的</sys:String>
+    <sys:String x:Key="LOCSystemCheckerAddTag">添加标签以指示哪个配置是成功</sys:String>
 
     <!-- SystemCheckerGameView -->
 
-    <sys:String x:Key="LOCSystemCheckerConfigMinimum">最低的</sys:String>
-    <sys:String x:Key="LOCSystemCheckerConfigRecommanded">推荐的</sys:String>
+    <sys:String x:Key="LOCSystemCheckerConfigMinimum">最低</sys:String>
+    <sys:String x:Key="LOCSystemCheckerConfigRecommanded">推荐</sys:String>
 
-    <sys:String x:Key="LOCSystemCheckerOS">操作系统</sys:String>
-    <sys:String x:Key="LOCSystemCheckerCpu">处理器</sys:String>
+    <sys:String x:Key="LOCSystemCheckerOS">操作系</sys:String>
+    <sys:String x:Key="LOCSystemCheckerCpu">处理</sys:String>
     <sys:String x:Key="LOCSystemCheckerRam">内存</sys:String>
     <sys:String x:Key="LOCSystemCheckerGpu">图形</sys:String>
-    <sys:String x:Key="LOCSystemCheckerDisk">存储</sys:String>
+    <sys:String x:Key="LOCSystemCheckerDisk">存</sys:String>
 
     <!-- SystemCheckerNotifications -->
 
