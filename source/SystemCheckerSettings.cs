@@ -122,15 +122,7 @@ namespace SystemChecker
         private SystemCheckerSettings EditingClone { get; set; }
 
         private SystemCheckerSettings _Settings;
-        public SystemCheckerSettings Settings
-        {
-            get => _Settings;
-            set
-            {
-                _Settings = value;
-                OnPropertyChanged();
-            }
-        }
+        public SystemCheckerSettings Settings { get => _Settings; set => SetValue(ref _Settings, value); }
 
 
         public SystemCheckerSettingsViewModel(SystemChecker plugin)

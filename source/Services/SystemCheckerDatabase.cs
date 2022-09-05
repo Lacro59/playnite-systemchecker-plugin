@@ -11,6 +11,7 @@ using SystemChecker.Clients;
 using SystemChecker.Models;
 using CommonPluginsStores;
 using System.Diagnostics;
+using CommonPluginsStores.Steam;
 
 namespace SystemChecker.Services
 {
@@ -114,8 +115,8 @@ namespace SystemChecker.Services
                             break;
 
                         default:
-                            SteamApi steamApi = new SteamApi();
-                            int SteamID = steamApi.GetSteamId(game.Name);
+                            SteamApi steamApi = new SteamApi(PluginName);
+                            int SteamID = steamApi.GetAppId(game.Name);
                             if (SteamID != 0)
                             {
                                 gameRequierements = steamRequierements.GetRequirements(game, (uint)SteamID);

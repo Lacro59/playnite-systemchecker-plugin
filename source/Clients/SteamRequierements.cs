@@ -10,11 +10,14 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using SystemChecker.Models;
+using SystemChecker.Services;
 
 namespace SystemChecker.Clients
 {
     class SteamRequierements : RequierementMetadata
     {
+        private readonly SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
+
         private uint AppId { get; set; }
 
 
@@ -33,7 +36,7 @@ namespace SystemChecker.Clients
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, $"Failed to download {url}", true, "SystemChecker");
+                Common.LogError(ex, false, $"Failed to download {url}", true, PluginDatabase.PluginName);
                 return string.Empty;
             }
         }
@@ -78,7 +81,7 @@ namespace SystemChecker.Clients
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, true, "SystemChecker");
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
             }
 
             Minimum.IsMinimum = true;

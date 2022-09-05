@@ -125,7 +125,7 @@ namespace SystemChecker.Controls
         private void PART_PluginButton_Click(object sender, RoutedEventArgs e)
         {
             var ViewExtension = new SystemCheckerGameView(PluginDatabase.PlayniteApi, PluginDatabase.Paths.PluginUserDataPath, PluginDatabase.GameContext);
-            Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PluginDatabase.PlayniteApi, "SystemChecker", ViewExtension);
+            Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PluginDatabase.PlayniteApi, PluginDatabase.PluginName, ViewExtension);
             windowExtension.ShowDialog();
         }
         #endregion

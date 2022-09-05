@@ -62,14 +62,14 @@ namespace SystemChecker
                 {
                     PluginDatabase.IsViewOpen = true;
                     var ViewExtension = new SystemCheckerGameView(PlayniteApi, this.GetPluginUserDataPath(), PluginDatabase.GameContext);
-                    Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PlayniteApi, "SystemChecker", ViewExtension);
+                    Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PlayniteApi, PluginDatabase.PluginName, ViewExtension);
                     windowExtension.ShowDialog();
                     PluginDatabase.IsViewOpen = false;
                 }
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, true, "SystemChecker");
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
             }
         }
         #endregion
@@ -120,7 +120,7 @@ namespace SystemChecker
                     {
                         PluginDatabase.IsViewOpen = true;
                         var ViewExtension = new SystemCheckerGameView(PlayniteApi, this.GetPluginUserDataPath(), GameMenu);
-                        Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PlayniteApi, "SystemChecker", ViewExtension);
+                        Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PlayniteApi, PluginDatabase.PluginName, ViewExtension);
                         windowExtension.ShowDialog();
                         PluginDatabase.IsViewOpen = false;
                     }
@@ -349,7 +349,7 @@ namespace SystemChecker
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, true, "SystemChecker");
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
             }
         }
 
@@ -446,7 +446,7 @@ namespace SystemChecker
                     }
                     catch (Exception ex)
                     {
-                        Common.LogError(ex, false, true, "SystemChecker");
+                        Common.LogError(ex, false, true, PluginDatabase.PluginName);
                     }
                 }, globalProgressOptions);
 

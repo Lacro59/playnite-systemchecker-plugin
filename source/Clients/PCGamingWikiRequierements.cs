@@ -2,7 +2,6 @@
 using AngleSharp.Parser.Html;
 using CommonPluginsShared;
 using CommonPluginsShared.Models;
-using CommonPluginsStores;
 using Playnite.SDK.Models;
 using Playnite.SDK.Data;
 using System;
@@ -14,13 +13,15 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using SystemChecker.Models;
 using SystemChecker.Services;
+using CommonPluginsStores.Steam;
+using CommonPluginsShared.Extensions;
 
 namespace SystemChecker.Clients
 {
     class PCGamingWikiRequierements : RequierementMetadata
     {
-        private SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
-        private SteamApi steamApi;
+        private readonly SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
+        private readonly SteamApi steamApi;
 
         private const string UrlBase = "https://pcgamingwiki.com";
         private readonly string UrlSteamId = UrlBase + "/api/appid.php?appid={0}";
@@ -31,7 +32,7 @@ namespace SystemChecker.Clients
 
         public PCGamingWikiRequierements()
         {
-            steamApi = new SteamApi();
+            steamApi = new SteamApi(PluginDatabase.PluginName);
         }
 
 
@@ -58,7 +59,7 @@ namespace SystemChecker.Clients
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, true, "SystemChecker");
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
             }
 
             return url;
@@ -190,19 +191,14 @@ namespace SystemChecker.Clients
             SteamId = 0;
             UrlPCGamingWiki = string.Empty;
 
-
-            if (_game.SourceId != default(Guid))
+            if (_game.SourceId != default(Guid) && game.Source.Name.IsEqual("steam"))
             {
-                if (game.Source.Name.ToLower() == "steam")
-                {
-                    SteamId = int.Parse(game.GameId);
-                }
+                SteamId = int.Parse(game.GameId);
             }
             if (SteamId == 0)
             {
-                SteamId = steamApi.GetSteamId(game.Name);
+                SteamId = steamApi.GetAppId(game.Name);
             }
-
 
             return GetRequirements();
         }
@@ -221,7 +217,7 @@ namespace SystemChecker.Clients
                 }
                 catch (Exception ex)
                 {
-                    Common.LogError(ex, false, $"Failed to download {url}", true, "SystemChecker");
+                    Common.LogError(ex, false, $"Failed to download {url}", true, PluginDatabase.PluginName);
                 }
 
 
@@ -337,7 +333,7 @@ namespace SystemChecker.Clients
             }
             catch (Exception ex)
             {
-                Common.LogError(ex, false, true, "SystemChecker");
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
             }
 
             return gameRequierements;
