@@ -14,9 +14,9 @@ namespace SystemChecker.Services
         private static readonly ILogger logger = LogManager.GetLogger();
 
         private List<CpuEquivalence> Equivalence = new List<CpuEquivalence>
-            {
-                new CpuEquivalence {Intel=string.Empty, Amd=string.Empty}
-            };
+        {
+            new CpuEquivalence {Intel=string.Empty, Amd=string.Empty}
+        };
 
         private CpuObject ProcessorPc { get; set; }
         private CpuObject ProcessorRequierement { get; set; }

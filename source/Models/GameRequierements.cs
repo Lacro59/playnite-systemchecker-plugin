@@ -8,33 +8,10 @@ namespace SystemChecker.Models
     public class GameRequierements : PluginDataBaseGame<Requirement>
     {
         private List<Requirement> _Items = new List<Requirement>();
-        public override List<Requirement> Items
-        {
-            get
-            {
-                return _Items;
-            }
-
-            set
-            {
-                _Items = value;
-                OnPropertyChanged();
-            }
-        }
+        public override List<Requirement> Items { get => _Items; set => SetValue(ref _Items, value); }
 
         [DontSerialize]
-        public override bool HasData
-        {
-            get
-            {
-                if (Items.Count > 0)
-                {
-                    return Items.Find(x => x.IsMinimum).HasData;
-                }
-
-                return false;
-            }
-        }
+        public override bool HasData => (Items.Count > 0) ? Items.Find(x => x.IsMinimum).HasData : false;
 
 
         public SourceLink SourcesLink { get; set; }

@@ -99,6 +99,7 @@
       <DependentUpon>PluginViewItem.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\CheckResult.cs" />
+    <Compile Include="Models\CheckSystem.cs" />
     <Compile Include="Models\RequierementsCollection.cs" />
     <Compile Include="playnite-plugincommon\CommonPluginsControls\Views\ListWithNoData.xaml.cs">
       <DependentUpon>ListWithNoData.xaml</DependentUpon>
@@ -110,7 +111,6 @@
     <Compile Include="Services\Gpu.cs" />
     <Compile Include="Clients\PCGamingWikiRequierements.cs" />
     <Compile Include="Clients\SteamRequierements.cs" />
-    <Compile Include="Services\OldToNew.cs" />
     <Compile Include="Services\SystemApi.cs" />
     <Compile Include="Models\GameRequierements.cs" />
     <Compile Include="Models\RequierementMetadata.cs" />

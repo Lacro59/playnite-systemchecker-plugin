@@ -43,8 +43,8 @@ namespace SystemChecker.Services
         private GpuObject CardRequierement { get; set; }
 
         public bool IsWithNoCard = false;
-        public bool IsIntegrate { get => CardPc.IsIntegrate; }
-        public bool CardRequierementIsOld { get => CardRequierement.IsOld; }
+        public bool IsIntegrate => CardPc.IsIntegrate;
+        public bool CardRequierementIsOld => CardRequierement.IsOld; 
 
         public Gpu(SystemConfiguration systemConfiguration, string GpuRequierement)
         {

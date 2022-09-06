@@ -24,14 +24,9 @@ namespace SystemChecker
     {
         public override Guid Id { get; } = Guid.Parse("e248b230-6edf-41ea-a3c3-7861fa267263");
 
-        //private OldToNew oldToNew;
-
 
         public SystemChecker(IPlayniteAPI api) : base(api)
         {
-            // Old database
-            //oldToNew = new OldToNew(this.GetPluginUserDataPath());
-
             // Custom theme button
             EventManager.RegisterClassHandler(typeof(Button), Button.ClickEvent, new RoutedEventHandler(OnCustomThemeButtonClick));
 
@@ -54,10 +49,9 @@ namespace SystemChecker
         #region Custom event
         public void OnCustomThemeButtonClick(object sender, RoutedEventArgs e)
         {
-            string ButtonName = string.Empty;
             try
             {
-                ButtonName = ((Button)sender).Name;
+                string ButtonName = ((Button)sender).Name;
                 if (ButtonName == "PART_CustomSysCheckerButton")
                 {
                     PluginDatabase.IsViewOpen = true;
@@ -317,12 +311,6 @@ namespace SystemChecker
         #region Game event
         public override void OnGameSelected(OnGameSelectedEventArgs args)
         {
-            // Old database
-            //if (oldToNew.IsOld)
-            //{
-            //    oldToNew.ConvertDB(PlayniteApi);
-            //}
-
             try
             {
                 if (args.NewValue?.Count == 1 && PluginDatabase.IsLoaded)

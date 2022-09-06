@@ -1,5 +1,4 @@
 ﻿using Playnite.SDK;
-using Playnite.SDK.Data;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -212,15 +211,5 @@ namespace SystemChecker.Services
 
             return false;
         }
-    }
-
-    public class CheckSystem
-    {
-        public bool CheckOs { get; set; }
-        public bool CheckCpu { get; set; }
-        public bool CheckRam { get; set; }
-        public bool CheckGpu { get; set; }
-        public bool CheckStorage { get; set; }
-        public bool? AllOk { get; set; } = null;
     }
 }

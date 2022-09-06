@@ -259,7 +259,7 @@ namespace SystemChecker.Services
             Requirement systemMinimum = gameRequierements.GetMinimum();
             Requirement systemRecommanded = gameRequierements.GetRecommanded();
 
-            CheckSystem CheckMinimum = CheckMinimum = SystemApi.CheckConfig(game, systemMinimum, systemConfiguration, game.IsInstalled);
+            CheckSystem CheckMinimum = SystemApi.CheckConfig(game, systemMinimum, systemConfiguration, game.IsInstalled);
             CheckSystem CheckRecommanded = SystemApi.CheckConfig(game, systemRecommanded, systemConfiguration, game.IsInstalled);
 
 
