@@ -15,6 +15,7 @@ using SystemChecker.Models;
 using SystemChecker.Services;
 using CommonPluginsStores.Steam;
 using CommonPluginsShared.Extensions;
+using CommonPluginsStores.PCGamingWiki;
 
 namespace SystemChecker.Clients
 {
@@ -22,148 +23,15 @@ namespace SystemChecker.Clients
     {
         private readonly SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
         private readonly SteamApi steamApi;
+        private readonly PCGamingWikiApi pcGamingWikiApi;
 
-        private const string UrlBase = "https://pcgamingwiki.com";
-        private readonly string UrlSteamId = UrlBase + "/api/appid.php?appid={0}";
-        private string UrlPCGamingWiki { get; set; } = string.Empty;
-        private string UrlPCGamingWikiSearch { get; set; } = UrlBase + @"/w/index.php?search=";
         private int SteamId { get; set; } = 0;
 
 
         public PCGamingWikiRequierements()
         {
-            steamApi = new SteamApi(PluginDatabase.PluginName);
-        }
-
-
-        private string GetUrlIsOneResult(string WebResponse)
-        {
-            string url = string.Empty;
-
-            try
-            {
-                if (!WebResponse.Contains("There were no results matching the query"))
-                {
-                    HtmlParser parser = new HtmlParser();
-                    IHtmlDocument HtmlDocument = parser.Parse(WebResponse);
-
-                    if (HtmlDocument.QuerySelectorAll("ul.mw-search-results")?.Count() == 2)
-                    {
-                        var TitleMatches = HtmlDocument.QuerySelectorAll("ul.mw-search-results")[0].QuerySelectorAll("li");
-                        if (TitleMatches?.Count() == 1)
-                        {
-                            url = UrlBase + TitleMatches[0].QuerySelector("a").GetAttribute("href");
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, false, true, PluginDatabase.PluginName);
-            }
-
-            return url;
-        }
-
-        private string FindGoodUrl(Game game, int SteamId = 0)
-        {
-            string url = string.Empty;
-            string urlMatch = string.Empty;
-            string WebResponse = string.Empty;
-
-            if (SteamId != 0)
-            {
-                url = string.Format(UrlSteamId, SteamId);
-
-                Thread.Sleep(1000);
-                WebResponse = Web.DownloadStringData(url).GetAwaiter().GetResult();
-                if (!WebResponse.ToLower().Contains("search results"))
-                {
-                    return url;
-                }
-            }
-
-
-            url = string.Empty;
-            if (game.Links != null)
-            {
-                foreach (Link link in game.Links)
-                {
-                    if (link.Url.Contains("pcgamingwiki", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        url = link.Url;
-
-                        if (url.Contains(UrlPCGamingWikiSearch))
-                        {
-                            url = UrlPCGamingWikiSearch + WebUtility.UrlEncode(url.Replace(UrlPCGamingWikiSearch, string.Empty));
-                        }
-                        if (url.Length == UrlPCGamingWikiSearch.Length)
-                        {
-                            url = string.Empty;
-                        }
-                    }
-                }
-
-                if (!url.IsNullOrEmpty())
-                {
-                    Thread.Sleep(1000);
-                    WebResponse = Web.DownloadStringData(url).GetAwaiter().GetResult();
-                    if (!WebResponse.ToLower().Contains("search results"))
-                    {
-                        return url;
-                    }
-                    else
-                    {
-                        urlMatch = GetUrlIsOneResult(WebResponse);
-                        if (!urlMatch.IsNullOrEmpty())
-                        {
-                            return urlMatch;
-                        }
-                    }
-                }
-            }
-
-
-            string Name = Regex.Replace(game.Name, @"([ ]demo\b)", string.Empty, RegexOptions.IgnoreCase);
-            Name = Regex.Replace(Name, @"(demo[ ])", string.Empty, RegexOptions.IgnoreCase);
-            Name = CommonPluginsShared.PlayniteTools.NormalizeGameName(Name);
-
-            url = UrlPCGamingWikiSearch + WebUtility.UrlEncode(Name);
-
-            Thread.Sleep(1000);
-            WebResponse = Web.DownloadStringData(url).GetAwaiter().GetResult();
-            if (!WebResponse.ToLower().Contains("search results"))
-            {
-                return url;
-            }
-            else
-            {
-                urlMatch = GetUrlIsOneResult(WebResponse);
-                if (!urlMatch.IsNullOrEmpty())
-                {
-                    return urlMatch;
-                }
-            }
-            
-            url = UrlPCGamingWikiSearch + WebUtility.UrlEncode(game.Name);
-
-            Thread.Sleep(1000);
-            WebResponse = Web.DownloadStringData(url).GetAwaiter().GetResult();
-            if (!WebResponse.ToLower().Contains("search results"))
-            {
-                return url;
-            }
-            else
-            {
-                urlMatch = GetUrlIsOneResult(WebResponse);
-                if (!urlMatch.IsNullOrEmpty())
-                {
-                    return urlMatch;
-                }
-            }
-
-
-            return string.Empty;
+            steamApi = new SteamApi("SystemChecker");
+            pcGamingWikiApi = new PCGamingWikiApi("SystemChecker");
         }
 
 
@@ -171,7 +39,7 @@ namespace SystemChecker.Clients
         {
             gameRequierements = SystemChecker.PluginDatabase.GetDefault(_game);
 
-            UrlPCGamingWiki = FindGoodUrl(_game, SteamId);
+            string UrlPCGamingWiki = pcGamingWikiApi.FindGoodUrl(_game, SteamId);
 
             if (!UrlPCGamingWiki.IsNullOrEmpty())
             {
@@ -189,7 +57,6 @@ namespace SystemChecker.Clients
         {
             _game = game;
             SteamId = 0;
-            UrlPCGamingWiki = string.Empty;
 
             if (_game.SourceId != default(Guid) && game.Source.Name.IsEqual("steam"))
             {
