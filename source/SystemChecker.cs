@@ -8,7 +8,9 @@ using Playnite.SDK.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -43,6 +45,12 @@ namespace SystemChecker
                 SourceName = "SystemChecker",
                 SettingsRoot = $"{nameof(PluginSettings)}.{nameof(PluginSettings.Settings)}"
             });
+
+            //Playnite search integration
+            Searches = new List<SearchSupport>
+            {
+                new SearchSupport("sc", "SystemChecker", new SystemCheckerSearch())
+            };
         }
 
 
