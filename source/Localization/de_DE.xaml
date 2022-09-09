@@ -28,4 +28,15 @@
 
     <sys:String x:Key="LOCSystemCheckerTryRefresh">Versuche die Plugin Daten für {0} zu aktualisieren</sys:String>
 
+    <!-- SystemCheckerSearch -->
+
+    <sys:String x:Key="LOCSystemCheckerSearchDescription">Search on SystemChecker data</sys:String>
+    <sys:String x:Key="LOCSystemCheckerSearchHint" xml:space="preserve">Parameters:
+    -min                Your PC has minimum requirements
+    -rec                Your PC has recommended requirements
+    -any                Your PC has minimum or recommended requirements
+    -np                 You didn't play the game
+    -fav                The game must be a favorite
+    -stores={n}     Filter by store name (ex:-stores=steam / -stores=steam,epic)</sys:String>
+
 </ResourceDictionary>
