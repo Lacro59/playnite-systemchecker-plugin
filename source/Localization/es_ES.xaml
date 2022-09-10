@@ -30,13 +30,13 @@
 
     <!-- SystemCheckerSearch -->
 
-    <sys:String x:Key="LOCSystemCheckerSearchDescription">Search on SystemChecker data</sys:String>
-    <sys:String x:Key="LOCSystemCheckerSearchHint" xml:space="preserve">Parameters:
-    -min                Your PC has minimum requirements
-    -rec                Your PC has recommended requirements
-    -any                Your PC has minimum or recommended requirements
-    -np                 You didn't play the game
-    -fav                The game must be a favorite
-    -stores={n}     Filter by store name (ex:-stores=steam / -stores=steam,epic)</sys:String>
+    <sys:String x:Key="LOCSystemCheckerSearchDescription">Buscar en datos de System Checker</sys:String>
+    <sys:String x:Key="LOCSystemCheckerSearchHint" xml:space="preserve">Parámetros:
+    -min Tu PC tiene requisitos mínimos
+    -rec Tu PC tiene requisitos recomendados
+    -any Tu PC tiene requisitos mínimos o recomendados
+    -np No jugaste el juego
+    -fav El juego debe ser un favorito
+    -stores={n}     Filtro por nombre de tienda (ex:-stores=steam / -stores=steam, epic)</sys:String>
 
 </ResourceDictionary>
