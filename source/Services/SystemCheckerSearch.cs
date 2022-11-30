@@ -42,6 +42,7 @@ namespace SystemChecker.Services
                 bool hasNp = false;
                 bool hasFav = false;
                 List<string> stores = new List<string>();
+                List<string> status = new List<string>();
 
                 args.SearchTerm.Split(' ').ForEach(x => 
                 {
@@ -55,9 +56,15 @@ namespace SystemChecker.Services
                     {
                         stores = x.Replace("-stores=", string.Empty, StringComparison.InvariantCultureIgnoreCase).Split(',').ToList();
                     }
+
+                    if (x.Contains("-status=", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        status = x.Replace("-status=", string.Empty, StringComparison.InvariantCultureIgnoreCase).Split(',').ToList();
+                    }
                 });
                 
                 string SearchTerm = Regex.Replace(args.SearchTerm, @"-stores=(\w*,)*\w*", string.Empty, RegexOptions.IgnoreCase).Trim();
+                SearchTerm = Regex.Replace(SearchTerm, @"-status=(\w*,)*\w*", string.Empty, RegexOptions.IgnoreCase).Trim();
                 SearchTerm = Regex.Replace(SearchTerm, @"-\w*", string.Empty, RegexOptions.IgnoreCase).Trim();
 
 
@@ -72,7 +79,8 @@ namespace SystemChecker.Services
                                 && (args.GameFilterSettings.Hidden || !x.Hidden)
                                 && (!hasNp || x.Playtime == 0)
                                 && (!hasFav || x.Favorite)
-                                && (stores.Any(y => x.Source?.Name?.Contains(y, StringComparison.InvariantCultureIgnoreCase) ?? false))
+                                && (stores.Count == 0 || stores.Any(y => x.Source?.Name?.Contains(y, StringComparison.InvariantCultureIgnoreCase) ?? false))
+                                && (status.Count == 0 || status.Any(y => x.Game?.CompletionStatus?.Name?.Contains(y, StringComparison.InvariantCultureIgnoreCase) ?? false))
                                 )
                     .ForEach(x =>
                     {
