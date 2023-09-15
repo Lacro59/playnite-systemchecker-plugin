@@ -13,7 +13,7 @@ namespace SystemChecker.Services
     {
         private static readonly ILogger logger = LogManager.GetLogger();
 
-        private List<CpuEquivalence> Equivalence = new List<CpuEquivalence>
+        private List<CpuEquivalence> Equivalence { get; set; } = new List<CpuEquivalence>
         {
             new CpuEquivalence {Intel=string.Empty, Amd=string.Empty}
         };

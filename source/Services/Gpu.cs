@@ -14,7 +14,7 @@ namespace SystemChecker.Services
     {
         private static readonly ILogger logger = LogManager.GetLogger();
 
-        private List<GpuEquivalence> Equivalence = new List<GpuEquivalence>
+        private List<GpuEquivalence> Equivalence { get; set; } = new List<GpuEquivalence>
         {
             new GpuEquivalence {Nvidia = "Nvidia GTX 960", Amd = "Amd R9 380"},
             new GpuEquivalence {Nvidia = "Nvidia GTX 760", Amd = "Amd Radeo HD 7870"},
