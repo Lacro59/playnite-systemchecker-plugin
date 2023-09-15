@@ -10,7 +10,7 @@
 Extension for [Playnite](https://playnite.link).  
 
 ## Informations
-This plugin get the game requiere configuration and check with your configuration in playnite from [PCGamingWiki](https://www.pcgamingwiki.com/wiki/Home). 
+This plugin get the game requiere configuration and check with your configuration in playnite from [PCGamingWiki](https://www.pcgamingwiki.com/wiki/Home) or Steam. 
 
 <a href="https://github.com/Lacro59/playnite-systemchecker-plugin/blob/master/forum/main_01.jpg?raw=true">
   <picture>
