@@ -16,102 +16,38 @@ namespace SystemChecker
         public bool EnableTag { get; set; } = false;
         public bool AutoImport { get; set; } = true;
 
-        private bool _EnableIntegrationViewItem { get; set; } = true;
-        public bool EnableIntegrationViewItem
-        {
-            get => _EnableIntegrationViewItem;
-            set
-            {
-                _EnableIntegrationViewItem = value;
-                OnPropertyChanged();
-            }
-        }
+        private bool _EnableIntegrationViewItem = true;
+        public bool EnableIntegrationViewItem { get => _EnableIntegrationViewItem; set => SetValue(ref _EnableIntegrationViewItem, value); }
 
-        private bool _EnableIntegrationButton { get; set; } = true;
-        public bool EnableIntegrationButton
-        {
-            get => _EnableIntegrationButton;
-            set
-            {
-                _EnableIntegrationButton = value;
-                OnPropertyChanged();
-            }
-        }
+        private bool _EnableIntegrationButton = true;
+        public bool EnableIntegrationButton { get => _EnableIntegrationButton; set => SetValue(ref _EnableIntegrationButton, value); }
 
-        private bool _EnableIntegrationButtonDetails { get; set; } = false;
-        public bool EnableIntegrationButtonDetails
-        {
-            get => _EnableIntegrationButtonDetails;
-            set
-            {
-                _EnableIntegrationButtonDetails = value;
-                OnPropertyChanged();
-            }
-        }
+        private bool _EnableIntegrationButtonDetails = false;
+        public bool EnableIntegrationButtonDetails { get => _EnableIntegrationButtonDetails; set => SetValue(ref _EnableIntegrationButtonDetails, value); }
         #endregion
 
         // Playnite serializes settings object to a JSON object and saves it as text file.
         // If you want to exclude some property from being saved then use `JsonDontSerialize` ignore attribute.
         #region Variables exposed
-        private bool _HasData { get; set; } = false;
+        private bool _HasData = false;
         [DontSerialize]
-        public bool HasData
-        {
-            get => _HasData;
-            set
-            {
-                _HasData = value;
-                OnPropertyChanged();
-            }
-        }
+        public bool HasData { get => _HasData; set => SetValue(ref _HasData, value); }
 
-        private bool _IsMinimumOK { get; set; } = false;
+        private bool _IsMinimumOK = false;
         [DontSerialize]
-        public bool IsMinimumOK
-        {
-            get => _IsMinimumOK;
-            set
-            {
-                _IsMinimumOK = value;
-                OnPropertyChanged();
-            }
-        }
+        public bool IsMinimumOK { get => _IsMinimumOK; set => SetValue(ref _IsMinimumOK, value); }
 
-        private bool _IsRecommandedOK { get; set; } = false;
+        private bool _IsRecommandedOK = false;
         [DontSerialize]
-        public bool IsRecommandedOK
-        {
-            get => _IsRecommandedOK;
-            set
-            {
-                _IsRecommandedOK = value;
-                OnPropertyChanged();
-            }
-        }
+        public bool IsRecommandedOK { get => _IsRecommandedOK; set => SetValue(ref _IsRecommandedOK, value); }
 
-        private bool _IsAllOK { get; set; } = false;
+        private bool _IsAllOK = false;
         [DontSerialize]
-        public bool IsAllOK
-        {
-            get => _IsAllOK;
-            set
-            {
-                _IsAllOK = value;
-                OnPropertyChanged();
-            }
-        }
+        public bool IsAllOK { get => _IsAllOK; set => SetValue(ref _IsAllOK, value); }
 
-        private string _RecommandedStorage { get; set; } = string.Empty;
+        private string _RecommandedStorage = string.Empty;
         [DontSerialize]
-        public string RecommandedStorage
-        {
-            get => _RecommandedStorage;
-            set
-            {
-                _RecommandedStorage = value;
-                OnPropertyChanged();
-            }
-        }
+        public string RecommandedStorage { get => _RecommandedStorage; set => SetValue(ref _RecommandedStorage, value); }
         #endregion  
     }
 
@@ -131,17 +67,10 @@ namespace SystemChecker
             Plugin = plugin;
 
             // Load saved settings.
-            var savedSettings = plugin.LoadPluginSettings<SystemCheckerSettings>();
+            SystemCheckerSettings savedSettings = plugin.LoadPluginSettings<SystemCheckerSettings>();
 
             // LoadPluginSettings returns null if not saved data is available.
-            if (savedSettings != null)
-            {
-                Settings = savedSettings;
-            }
-            else
-            {
-                Settings = new SystemCheckerSettings();
-            }
+            Settings = savedSettings ?? new SystemCheckerSettings();
         }
 
         // Code executed when settings view is opened and user starts editing values.

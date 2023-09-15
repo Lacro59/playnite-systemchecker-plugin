@@ -95,11 +95,9 @@ namespace SystemChecker.Services
             Game game = PlayniteApi.Database.Games.Get(Id);
             GameRequierements gameRequierements = GetDefault(game);
 
-            string SourceName = string.Empty;
-
             try
             {
-                SourceName = CommonPluginsShared.PlayniteTools.GetSourceName(game);
+                string SourceName = CommonPluginsShared.PlayniteTools.GetSourceName(game);
 
                 // Search datas
                 logger.Info($"Try find with PCGamingWikiRequierements for {game.Name}");

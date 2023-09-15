@@ -70,10 +70,8 @@ namespace SystemChecker.Services
                         return true;
                     }
 
-                    int numberOsRequirement = 0;
-                    int numberOsPc = 0;
-                    Int32.TryParse(Os, out numberOsRequirement);
-                    Int32.TryParse(Regex.Replace(systemOs, "[^.0-9]", string.Empty).Trim(), out numberOsPc);
+                    Int32.TryParse(Os, out int numberOsRequirement);
+                    Int32.TryParse(Regex.Replace(systemOs, "[^.0-9]", string.Empty).Trim(), out int numberOsPc);
                     if (numberOsRequirement != 0 && numberOsPc != 0 && numberOsPc >= numberOsRequirement)
                     {
                         return true;
@@ -98,7 +96,7 @@ namespace SystemChecker.Services
                     foreach (var cpu in requierementCpu)
                     {
                         Cpu cpuCheck = new Cpu(systemConfiguration, cpu);
-                        var check = cpuCheck.IsBetter();
+                        CheckResult check = cpuCheck.IsBetter();
                         if (check.Result)
                         {
                             return true;
@@ -151,10 +149,10 @@ namespace SystemChecker.Services
                 {
                     for (int i = 0; i < requierementGpu.Count; i++)
                     {
-                        var gpu = requierementGpu[i];
-
+                        string gpu = requierementGpu[i];
                         Gpu gpuCheck = new Gpu(systemConfiguration, gpu);
-                        var check = gpuCheck.IsBetter();
+                        CheckResult check = gpuCheck.IsBetter();
+
                         if (check.Result)
                         {
                             if ((gpuCheck.IsWithNoCard || !gpuCheck.CardRequierementIsOld ) && i > 0)
