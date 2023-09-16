@@ -225,6 +225,7 @@ namespace SystemChecker.Clients
         private List<string> ReplaceCPU(string data)
         {
             data = data
+                .Replace("Dual-core CPU (2 GHz or greater speed)", "Dual-core CPU")
                 .Replace("2009 or newer dual-core Intel or AMD", string.Empty)
                 .Replace("2011 or newer Intel Core i3, i5 or i7", string.Empty)
                 .Replace("SSE2 instruction set support", string.Empty)
@@ -314,7 +315,10 @@ namespace SystemChecker.Clients
 
             data = data.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
                 .Replace("XNA 4.0 compatible", string.Empty)
+                .Replace("compatible hardware", string.Empty)
                 .Replace("AMD Radeon or Nvidia GeForce recommended", string.Empty)
+                .Replace("A dedicated GPU (Nvidia or AMD) with at least", string.Empty)
+                .Replace("strongly recommended", string.Empty)
                 .Replace("XNA Hi Def Profile Compatible GPU", string.Empty)
                 .Replace("(GTX 970 or above required for VR)", string.Empty)
                 .Replace("DirectX-compliant", string.Empty)

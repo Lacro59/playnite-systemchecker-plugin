@@ -271,6 +271,8 @@ namespace SystemChecker.Clients
                             .Replace("\t", " ")
                             .Replace("<strong>Graphics:</strong>", string.Empty)
                             .Replace("<strong>Graphics: </strong>", string.Empty)
+                            .Replace("capable GPU", string.Empty)
+                            .Replace("hardware driver support required for WebGL acceleration. (AMD Catalyst 10.9, nVidia 358.50)", string.Empty)
                             .Replace("ATI or NVidia card w/ 1024 MB RAM (NVIDIA GeForce GTX 260 or ATI HD 4890)", "NVIDIA GeForce GTX 260 or ATI HD 4890")
                             .Replace("Video card must be 128 MB or more and should be a DirectX 9-compatible with support for Pixel Shader 2.0b (", string.Empty)
                             .Replace("- *NOT* an Express graphics card).", string.Empty)
