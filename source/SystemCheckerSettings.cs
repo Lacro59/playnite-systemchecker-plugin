@@ -49,6 +49,10 @@ namespace SystemChecker
         [DontSerialize]
         public string RecommandedStorage { get => _RecommandedStorage; set => SetValue(ref _RecommandedStorage, value); }
         #endregion  
+
+
+        // TODO TMP
+        public bool IsPurged { get; set; } = false;
     }
 
 

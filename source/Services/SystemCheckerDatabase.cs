@@ -5,6 +5,7 @@ using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Threading;
 using SystemChecker.Clients;
@@ -124,6 +125,7 @@ namespace SystemChecker.Services
                 }
 
                 gameRequierements = NormalizeRecommanded(gameRequierements);
+                gameRequierements = PurgeGraphicsCardData(gameRequierements);
             }
             catch (Exception ex)
             {
@@ -166,7 +168,6 @@ namespace SystemChecker.Services
             }
 
             gameRequierements.Items = new List<Requirement> { Minimum, Recommanded };
-
             return gameRequierements;
         }
 
@@ -281,6 +282,26 @@ namespace SystemChecker.Services
 
                 PluginSettings.Settings.RecommandedStorage = systemRecommanded.Storage != 0 ? Tools.SizeSuffix(systemRecommanded.Storage) : string.Empty;
             }
+        }
+
+
+        public GameRequierements PurgeGraphicsCardData(GameRequierements gameRequierements)
+        {
+            Requirement Minimum = gameRequierements.GetMinimum();
+            Requirement Recommanded = gameRequierements.GetRecommanded();
+
+            if (Minimum.HasData && Minimum.Gpu.Count > 1 && Minimum.Gpu.FindAll(x => Gpu.CallIsNvidia(x) || Gpu.CallIsAmd(x) || Gpu.CallIsIntel(x)).Count > 0)
+            {
+                Minimum.Gpu = Minimum.Gpu.FindAll(x => Gpu.CallIsNvidia(x) || Gpu.CallIsAmd(x) || Gpu.CallIsIntel(x)).ToList();
+            }
+
+            if (Recommanded.HasData && Recommanded.Gpu.Count > 1 && Recommanded.Gpu.FindAll(x => Gpu.CallIsNvidia(x) || Gpu.CallIsAmd(x) || Gpu.CallIsIntel(x)).Count > 0)
+            {
+                Recommanded.Gpu = Recommanded.Gpu.FindAll(x => Gpu.CallIsNvidia(x) || Gpu.CallIsAmd(x) || Gpu.CallIsIntel(x)).ToList();
+            }
+
+            gameRequierements.Items = new List<Requirement> { Minimum, Recommanded };
+            return gameRequierements;
         }
     }
 }

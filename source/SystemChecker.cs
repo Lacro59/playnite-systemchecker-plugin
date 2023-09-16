@@ -385,7 +385,36 @@ namespace SystemChecker
         // Add code to be executed when Playnite is initialized.
         public override void OnApplicationStarted(OnApplicationStartedEventArgs args)
         {
+            // TODO TMP
+            if (!PluginSettings.Settings.IsPurged)
+            {
+                GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(
+                    $"SystemChecker - {resources.GetString("LOCSettingsUpdating")}",
+                    true
+                );
+                globalProgressOptions.IsIndeterminate = true;
 
+                PlayniteApi.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
+                {
+                    try
+                    {
+                        // Wait extension database are loaded
+                        System.Threading.SpinWait.SpinUntil(() => PluginDatabase.IsLoaded, -1);
+
+                        foreach (GameRequierements values in PluginDatabase.Database.Items.Values)
+                        {
+                            GameRequierements gameRequierements = PluginDatabase.PurgeGraphicsCardData(values);
+                            PluginDatabase.Update(gameRequierements);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Common.LogError(ex, false, true, PluginDatabase.PluginName);
+                    }
+                }, globalProgressOptions);
+
+                SavePluginSettings(PluginSettings.Settings);
+            }
         }
 
         // Add code to be executed when Playnite is shutting down.
