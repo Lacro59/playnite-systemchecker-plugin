@@ -333,7 +333,7 @@ namespace SystemChecker.Clients
                 .Replace("that supports DirectDraw at 640x480 resolution, 256 colors", string.Empty)
                 .Replace("or higher", string.Empty)
                 .Replace("  ", " ")
-                .Replace(" / ", "¤").Replace(" or ", "¤");
+                .Replace(" / ", "¤").Replace(" or ", "¤").Replace(", ", "¤");
 
             return data.Split('¤')
                 .Select(x => x.Trim()).ToList()

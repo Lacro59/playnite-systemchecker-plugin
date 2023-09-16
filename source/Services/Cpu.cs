@@ -82,7 +82,15 @@ namespace SystemChecker.Services
                 }
                 else
                 {
-                    return new CheckResult { SameConstructor = true, Result = (ProcessorPc.Version + 1500) >= ProcessorRequierement.Version };
+                    if (ProcessorPc.Type == "i3" && ProcessorRequierement.Type == "i5" || ProcessorPc.Type == "i5" && ProcessorRequierement.Type == "i7")
+                    {
+                        return new CheckResult { SameConstructor = true, Result = (ProcessorPc.Version + 1000) >= ProcessorRequierement.Version };
+                    }
+
+                    if (ProcessorPc.Type == "i3" && ProcessorRequierement.Type == "i7")
+                    {
+                        return new CheckResult { SameConstructor = true, Result = (ProcessorPc.Version + 500) >= ProcessorRequierement.Version };
+                    }
                 }
             }
 

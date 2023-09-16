@@ -93,10 +93,11 @@ namespace SystemChecker.Services
             {
                 if (requierementCpu.Count > 0)
                 {
-                    foreach (var cpu in requierementCpu)
+                    foreach (string cpu in requierementCpu)
                     {
                         Cpu cpuCheck = new Cpu(systemConfiguration, cpu);
                         CheckResult check = cpuCheck.IsBetter();
+
                         if (check.Result)
                         {
                             return true;
@@ -125,12 +126,7 @@ namespace SystemChecker.Services
         {
             try
             {
-                if (systemRamUsage == requierementRamUsage)
-                {
-                    return true;
-                }
-
-                return systemRam >= requierementRam;
+                return systemRamUsage == requierementRamUsage || systemRam >= requierementRam;
             }
             catch (Exception ex)
             {
@@ -155,13 +151,13 @@ namespace SystemChecker.Services
 
                         if (check.Result)
                         {
-                            if ((gpuCheck.IsWithNoCard || !gpuCheck.CardRequierementIsOld ) && i > 0)
+                            if (check.SameConstructor)
                             {
-                                return false;
+                                return check.Result;
                             }
                             else
                             {
-                                return true;
+                                return !gpuCheck.IsWithNoCard && gpuCheck.CardRequierementIsOld || i <= 0;
                             }
                         }
                         else if (check.SameConstructor)
