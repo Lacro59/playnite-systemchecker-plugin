@@ -32,12 +32,12 @@
 
     <sys:String x:Key="LOCSystemCheckerSearchDescription">SistemDenetleyici verisinde ara</sys:String>
     <sys:String x:Key="LOCSystemCheckerSearchHint" xml:space="preserve">Parameters:
-    -min		Your PC has minimum requirements
-    -rec		Your PC has recommended requirements
-    -any		Your PC has minimum or recommended requirements
-    -np		You didn't play the game
-    -fav		The game must be a favorite
-    -stores={n}	Filter by store name (ex:-stores=steam / -stores=steam,epic)
-    -status={n}	Filter by status name (ex:-status=played / -status=played,playing)</sys:String>
+    -min		Bilgisayarınız asgari gereksinimleri karşılıyor
+    -rec		Bilgisayarınız önerilen gereksinimleri karşılıyor
+    -any		Bilgisayarınız önerilen yada asgari gereksinimleri karşılıyor
+    -np		Oyunu henüz oynamadınız
+    -fav		Oyun favori olmalı
+    -stores={n}	Mağaza adına göre filtrele (ör:-stores=steam / -stores=steam,epic)
+    -status={n}	Durum adına göre filtrele (ör:-status=played / -status=played,playing)</sys:String>
 
 </ResourceDictionary>
