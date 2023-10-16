@@ -302,6 +302,10 @@ namespace SystemChecker.Clients
                             .Replace("DX9 Compliant with PS3.0 support", string.Empty)
                             .Replace("DX9 Compliant", string.Empty)
                             .Replace("(Requires support for SSE)", string.Empty)
+                            .Replace("de 1 GB", string.Empty)
+                            .Replace("de 2 GB", string.Empty)
+                            .Replace("de 3 GB", string.Empty)
+                            .Replace("de 4 GB", string.Empty)
 
                             .Replace("ATI or NVidia card", "Card")
                             .Replace("w/", "with")
@@ -360,7 +364,7 @@ namespace SystemChecker.Clients
 
                     gpu = Regex.Replace(gpu, " - ([0-9]) GB", " ($1 GB)");
                     //gpu = Regex.Replace(gpu, "([0-9])Gb", "($1 GB)");
-                    gpu = gpu.Replace(",", "¤").Replace(" or ", "¤").Replace(" OR ", "¤").Replace(" / ", "¤").Replace(" | ", "¤");
+                    gpu = gpu.Replace(",", "¤").Replace(" or ", "¤").Replace(" OR ", "¤").Replace(" / ", "¤").Replace(" /", "¤").Replace(" | ", "¤");
                     foreach (string sTemp in gpu.Split('¤'))
                     {
                         if (sTemp.Trim() != string.Empty)
