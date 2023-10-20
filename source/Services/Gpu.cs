@@ -15,29 +15,6 @@ namespace SystemChecker.Services
     {
         private static readonly ILogger logger = LogManager.GetLogger();
 
-        private List<GpuEquivalence> Equivalence { get; set; } = new List<GpuEquivalence>
-        {
-            new GpuEquivalence {Nvidia = "Nvidia GTX 960", Amd = "Amd R9 380"},
-            new GpuEquivalence {Nvidia = "Nvidia GTX 760", Amd = "Amd Radeo HD 7870"},
-            new GpuEquivalence {Nvidia = "Nvidia GTX 1030", Amd = "Amd RX 550"},
-            new GpuEquivalence {Nvidia = "Nvidia GTX 1050", Amd = "Amd RX 560"},
-            new GpuEquivalence {Nvidia = "Nvidia GTX 1060", Amd = "Amd RX 580"},
-            new GpuEquivalence {Nvidia = "Nvidia GTX 1660", Amd = "Amd RX 590"},
-            new GpuEquivalence {Nvidia = "Nvidia GTX 970", Amd = "Amd RX 570"},
-            new GpuEquivalence {Nvidia = "Nvidia GTX 970", Amd = "Amd R9 390"},
-            new GpuEquivalence {Nvidia = "Nvidia GTX 660", Amd = "Amd Radeon HD 7850"},
-            new GpuEquivalence {Nvidia = "Nvidia GTX 670", Amd = "Amd Radep HD 7870"},
-            new GpuEquivalence {Nvidia = "Nvidia GTX 780", Amd = "Amd Radeon R9 290"},
-            new GpuEquivalence {Nvidia = "Nvidia GTX 1070", Amd = "Amd Radeon RX Vega 56"},
-            new GpuEquivalence {Nvidia = "Nvidia GTX 1070", Amd = "Amd Radeon 5600 XT"},
-            new GpuEquivalence {Nvidia = "Nvidia RTX 2060", Amd = "Amd Radeon RX Vega 56"},
-            new GpuEquivalence {Nvidia = "Nvidia RTX 2060", Amd = "Amd Radeon 5600 XT"},
-            new GpuEquivalence {Nvidia = "Nvidia GTX 1080", Amd = "Amd Radeon RX Vega 64"},
-            new GpuEquivalence {Nvidia = "Nvidia RTX 2060 SUPER", Amd = "Amd Radeon RX Vega 64"},
-            new GpuEquivalence {Nvidia = "Nvidia RTX 2060 SUPER", Amd = "Amd Radeon 5700"},
-            new GpuEquivalence {Nvidia = "Nvidia RTX 2070", Amd = "Amd Radeon RX Vega 64"},
-            new GpuEquivalence {Nvidia = "Nvidia RTX 2070", Amd = "Amd Radeon 5700 XT"}
-        };
         private string CardPcName { get; set; }
         private GpuObject CardPc { get; set; }
         private string CardRequierementName { get; set; }
@@ -244,61 +221,13 @@ namespace SystemChecker.Services
             // Nvidia vs Amd
             if (CardRequierement.IsNvidia && CardPc.IsAmd)
             {
-                string gpuEquivalenceName = string.Empty;
-                try
-                {
-                    List<GpuEquivalence> EquivalenceAmd = Equivalence.FindAll(x => x.Amd.ToLower().Contains(CardRequierement.Number.ToString()) && x.Amd.ToLower().Contains(CardRequierement.Type)).ToList();
 
-                    CheckResult tempValue = new CheckResult();
-                    foreach (GpuEquivalence gpuEquivalence in EquivalenceAmd)
-                    {
-                        gpuEquivalenceName = gpuEquivalence.Amd;
-                        CardRequierement = SetCard(gpuEquivalenceName);
-
-                        tempValue = IsBetter();
-                        if (tempValue.Result)
-                        {
-                            return tempValue;
-                        }
-                    }
-
-                    logger.Warn($"No equivalence for {Serialization.ToJson(CardPc)} & {Serialization.ToJson(CardRequierement)}");
-                    return new CheckResult(); 
-                }
-                catch (Exception ex)
-                {
-                    Common.LogError(ex, false, $"Error on IsBetter() for Nvidia vs Amd", true, "SystemChecker");
-                }
             }
 
             // Amd vs Nvidia
             if (CardRequierement.IsAmd && CardPc.IsNvidia)
             {
-                string gpuEquivalenceName = string.Empty;
-                try
-                {
-                    List<GpuEquivalence> EquivalenceNvidia = Equivalence.FindAll(x => x.Nvidia.ToLower().Contains(CardRequierement.Number.ToString()) && x.Nvidia.ToLower().Contains(CardRequierement.Type)).ToList();
 
-                    CheckResult tempValue = new CheckResult();
-                    foreach (GpuEquivalence gpuEquivalence in EquivalenceNvidia)
-                    {
-                        gpuEquivalenceName = gpuEquivalence.Nvidia;
-                        CardRequierement = SetCard(gpuEquivalenceName);
-
-                        tempValue = IsBetter();
-                        if (tempValue.Result)
-                        {
-                            return tempValue;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Common.LogError(ex, false, $"Error on IsBetter() for Amd vs Nvidia", true, "SystemChecker");
-                }
-
-                logger.Warn($"No equivalence for {Serialization.ToJson(CardPc)} & {Serialization.ToJson(CardRequierement)}");
-                return new CheckResult();
             }
 
             logger.Warn($"No GPU treatment for {Serialization.ToJson(CardPc)} & {Serialization.ToJson(CardRequierement)}");
@@ -555,6 +484,7 @@ namespace SystemChecker.Services
         }
     }
 
+
     public class GpuObject
     {
         public bool IsIntegrate { get; set; }
@@ -572,11 +502,5 @@ namespace SystemChecker.Services
         public int Number { get; set; }
         public long Vram { get; set; }
         public int ResolutionHorizontal { get; set; }
-    }
-
-    public class GpuEquivalence
-    {
-        public string Nvidia { get; set; }
-        public string Amd { get; set; }
     }
 }

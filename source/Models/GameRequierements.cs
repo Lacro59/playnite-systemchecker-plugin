@@ -11,7 +11,7 @@ namespace SystemChecker.Models
         public override List<Requirement> Items { get => _Items; set => SetValue(ref _Items, value); }
 
         [DontSerialize]
-        public override bool HasData => (Items.Count > 0) ? Items.Find(x => x.IsMinimum).HasData : false;
+        public override bool HasData => (Items.Count > 0) && Items.Find(x => x.IsMinimum).HasData;
 
 
         public SourceLink SourcesLink { get; set; }
