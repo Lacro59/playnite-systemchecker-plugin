@@ -19,7 +19,7 @@ using CommonPluginsStores.PCGamingWiki;
 
 namespace SystemChecker.Clients
 {
-    class PCGamingWikiRequierements : RequierementMetadata
+    public class PCGamingWikiRequierements : RequierementMetadata
     {
         private readonly SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
         private readonly SteamApi steamApi;
@@ -225,7 +225,10 @@ namespace SystemChecker.Clients
         private List<string> ReplaceCPU(string data)
         {
             data = data
+                .Replace("(approx)", string.Empty)
+                .Replace("GHz+", "GHz")
                 .Replace("Dual-core CPU (2 GHz or greater speed)", "Dual-core CPU")
+                .Replace("-2XXX @ 2.0 GHz", string.Empty)
                 .Replace("2009 or newer dual-core Intel or AMD", string.Empty)
                 .Replace("2011 or newer Intel Core i3, i5 or i7", string.Empty)
                 .Replace("SSE2 instruction set support", string.Empty)
@@ -314,6 +317,7 @@ namespace SystemChecker.Clients
             data = Regex.Replace(data, "(<[^>]*>)", "");
 
             data = data.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
+                .Replace("Non-Dedicated (shared) video card", string.Empty)
                 .Replace("XNA 4.0 compatible", string.Empty)
                 .Replace("compatible hardware", string.Empty)
                 .Replace("AMD Radeon or Nvidia GeForce recommended", string.Empty)

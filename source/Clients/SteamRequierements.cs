@@ -14,7 +14,7 @@ using SystemChecker.Services;
 
 namespace SystemChecker.Clients
 {
-    class SteamRequierements : RequierementMetadata
+    public class SteamRequierements : RequierementMetadata
     {
         private readonly SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
 
@@ -127,8 +127,10 @@ namespace SystemChecker.Clients
                         .Replace("\t", " ")
                         .Replace("<strong>OS:</strong>", string.Empty)
                         .Replace("<strong>OS: </strong>", string.Empty)
+                        .Replace("(64-BIT Required)", string.Empty)
                         .Replace("(32/64-bit)", string.Empty)
                         .Replace("with Platform Update for  7 ( versions only)", string.Empty)
+                        .Replace("(Vista+ probably works)", string.Empty)
                         .Replace("Win ", string.Empty)
                         .Replace("win ", string.Empty)
                         .Replace("windows", string.Empty)
@@ -140,6 +142,7 @@ namespace SystemChecker.Clients
                         .Replace(", 64-bit", string.Empty)
                         .Replace(", 64bit", string.Empty)
                         .Replace("®", string.Empty)
+                        .Replace("™", string.Empty)
                         .Replace("+", string.Empty)
                         .Replace("and above", string.Empty)
                         .Replace("x32", string.Empty)
@@ -187,6 +190,7 @@ namespace SystemChecker.Clients
                             .Replace("<strong>Processor: </strong>", string.Empty)
                             .Replace("&nbsp;", string.Empty)
                             .Replace("GHz, or better)", "GHz)")
+                            .Replace("More than a Pentium", string.Empty)
                             .Replace("equivalent or higher processor", string.Empty)
                             .Replace("- Low budget CPUs such as Celeron or Duron needs to be at about twice the CPU speed", string.Empty)
                             .Replace(" equivalent or faster processor", string.Empty)
@@ -208,6 +212,8 @@ namespace SystemChecker.Clients
                             .Replace(", ~3.1GHz", string.Empty)
                             .Replace("ghz", "GHz")
                             .Replace("Ghz", "GHz")
+                            .Replace("®", string.Empty)
+                            .Replace("™", string.Empty)
                             .Replace("Processor", string.Empty)
                             .Replace("processor", string.Empty)
                             .Replace("x86-compatible", string.Empty)
@@ -267,8 +273,8 @@ namespace SystemChecker.Clients
                 //< li >< strong > Graphics:</ strong > GeForce GT 440(1024 MB) or equivalent / Radeon HD 6450(512 MB) or equivalent / Iris Pro Graphics 5200(1792 MB) < br ></ li >
                 if (ElementRequirement.InnerHtml.IndexOf("<strong>Graphics") > -1)
                 {
-                    string gpu = ElementRequirement.InnerHtml
-                            .Replace("\t", " ")
+                    string gpu = Regex.Replace(ElementRequirement.InnerHtml, @"with [(]?\d+[ ]?(MB)?(GB)?[)]? (Memory)?(Video RAM)?", string.Empty, RegexOptions.IgnoreCase);
+                    gpu = gpu.Replace("\t", " ")
                             .Replace("<strong>Graphics:</strong>", string.Empty)
                             .Replace("<strong>Graphics: </strong>", string.Empty)
                             .Replace("capable GPU", string.Empty)
@@ -343,6 +349,7 @@ namespace SystemChecker.Clients
                             .Replace(", 2GB", " (2 GB)")
                             .Replace("(2GB)", " (2 GB)")
                             .Replace("(3GB)", " (3 GB)")
+                            .Replace("3GB", " (3 GB)")
                             .Replace("(4GB)", " (4 GB)")
                             .Replace(" 6GB", " (6 GB)")
                             .Replace(" 4GB", " (4 GB)")
@@ -351,6 +358,8 @@ namespace SystemChecker.Clients
                             .Replace(", or ", string.Empty)
                             .Replace("()", string.Empty)
                             .Replace("<br>", string.Empty)
+                            .Replace("®", string.Empty)
+                            .Replace("™", string.Empty)
                             .Replace("  ", " ")
                             .Replace("(Shared Memory is not recommended)", string.Empty)
                             .Replace(". Integrated Intel HD Graphics should work but is not supported; problems are generally solved with a driver update.", string.Empty)
@@ -363,13 +372,19 @@ namespace SystemChecker.Clients
                     }
 
                     gpu = Regex.Replace(gpu, " - ([0-9]) GB", " ($1 GB)");
-                    //gpu = Regex.Replace(gpu, "([0-9])Gb", "($1 GB)");
                     gpu = gpu.Replace(",", "¤").Replace(" or ", "¤").Replace(" OR ", "¤").Replace(" / ", "¤").Replace(" /", "¤").Replace(" | ", "¤");
                     foreach (string sTemp in gpu.Split('¤'))
                     {
                         if (sTemp.Trim() != string.Empty)
                         {
-                            requirement.Gpu.Add(sTemp.Trim());
+                            if (sTemp.ToLower().IndexOf("nvidia") > -1 || sTemp.ToLower().IndexOf("amd") > -1)
+                            {
+                                requirement.Gpu.Add(Regex.Replace(sTemp, @"[(][0-9] GB[)]", string.Empty).Trim());
+                            }
+                            else
+                            {
+                                requirement.Gpu.Add(sTemp.Trim());
+                            }
                         }
                     }
                 }

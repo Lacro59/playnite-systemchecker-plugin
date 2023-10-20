@@ -53,6 +53,9 @@
       <HintPath>packages\AngleSharp.0.9.9\lib\net45\AngleSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="FuzzySharp, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\FuzzySharp.2.0.2\lib\net461\FuzzySharp.dll</HintPath>
+    </Reference>
     <Reference Include="Playnite.SDK, Version=6.9.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\PlayniteSDK.6.9.0\lib\net462\Playnite.SDK.dll</HintPath>
       <Private>False</Private>
@@ -92,12 +95,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Clients\Benchmark.cs" />
     <Compile Include="Controls\PluginButton.xaml.cs">
       <DependentUpon>PluginButton.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\PluginViewItem.xaml.cs">
       <DependentUpon>PluginViewItem.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Models\BenchmarkData.cs" />
     <Compile Include="Models\CheckResult.cs" />
     <Compile Include="Models\CheckSystem.cs" />
     <Compile Include="Models\RequierementsCollection.cs" />

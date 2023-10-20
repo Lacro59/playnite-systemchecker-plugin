@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using SystemChecker.Clients;
 using SystemChecker.Models;
 
 namespace SystemChecker.Services
@@ -68,6 +69,19 @@ namespace SystemChecker.Services
                     //return ProcessorPc.Clock >= ProcessorRequierement.Clock;
                 }
             }
+
+
+            Benchmark benchmark = new Benchmark();
+            bool? isBetter = benchmark.IsBetterCpu(ProcessorPc.Name, ProcessorRequierement.Name);
+            if (isBetter != null)
+            {
+                return new CheckResult
+                {
+                    Result = (bool)isBetter,
+                    SameConstructor = true
+                };
+            }
+
 
             // Intel vs Intel
             if (ProcessorPc.IsIntel && ProcessorRequierement.IsIntel)
@@ -210,11 +224,11 @@ namespace SystemChecker.Services
             return new CheckResult();
         }
 
-        private bool CallIsIntel(string CpuName)
+        public static bool CallIsIntel(string CpuName)
         {
             return CpuName.ToLower().IndexOf("intel") > -1 || Regex.IsMatch(CpuName, "i[0-9]");
         }
-        private bool CallIsAmd(string CpuName)
+        public static bool CallIsAmd(string CpuName)
         {
             return CpuName.ToLower().IndexOf("amd") > -1 || CpuName.ToLower().IndexOf("ryzen") > -1;
         }
@@ -347,6 +361,7 @@ namespace SystemChecker.Services
 
             return new CpuObject
             {
+                Name = CpuName,
                 IsIntel = IsIntel,
                 IsAmd = IsAmd,
                 IsOld = IsOld,
@@ -359,6 +374,7 @@ namespace SystemChecker.Services
 
     public class CpuObject
     {
+        public string Name { get; set; }
         public bool IsIntel { get; set; }
         public bool IsAmd { get; set; }
         public bool IsOld { get; set; }

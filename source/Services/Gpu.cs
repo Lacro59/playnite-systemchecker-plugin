@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Globalization;
 using CommonPluginsShared;
 using SystemChecker.Models;
+using SystemChecker.Clients;
 
 namespace SystemChecker.Services
 {
@@ -191,6 +192,19 @@ namespace SystemChecker.Services
                 }
             }
 
+
+            Benchmark benchmark = new Benchmark();
+            bool? isBetter = benchmark.IsBetterGpu(CardPcName, CardRequierementName);
+            if (isBetter != null)
+            {
+                return new CheckResult
+                {
+                    Result = (bool)isBetter,
+                    SameConstructor = true
+                };
+            }
+
+
             // Nvidia vs Nvidia
             if (CardRequierement.IsNvidia && CardPc.IsNvidia)
             {
@@ -309,10 +323,11 @@ namespace SystemChecker.Services
 
         public static bool CallIsNvidia(string GpuName)
         {
-            return (
-                (GpuName.ToLower().IndexOf("nvidia") > -1 || GpuName.ToLower().IndexOf("geforce") > -1 || GpuName.ToLower().IndexOf("gtx") > -1 || GpuName.ToLower().IndexOf("rtx") > -1) 
-                && GpuName.ToLower().IndexOf("(nvidia)") == -1
-                );
+            return Regex.IsMatch(GpuName, @"nvidia", RegexOptions.IgnoreCase)
+                || Regex.IsMatch(GpuName, @"geforce", RegexOptions.IgnoreCase)
+                || Regex.IsMatch(GpuName, @"rtx", RegexOptions.IgnoreCase)
+                || Regex.IsMatch(GpuName, @"gts", RegexOptions.IgnoreCase)
+                || Regex.IsMatch(GpuName, @"gtx", RegexOptions.IgnoreCase);
         }
         public static bool CallIsAmd(string GpuName)
         {
@@ -363,15 +378,18 @@ namespace SystemChecker.Services
             // Other
             if (GpuName.ToLower().IndexOf("directx") > -1 || Regex.IsMatch(GpuName.ToLower(), "dx[0-9]*"))
             {
+                IsDx = true;
                 int.TryParse(Regex.Replace(GpuName, @"[^\d]", string.Empty).Trim(), out DxVersion);
                 if (DxVersion > 0)
-                {
-                    IsDx = true;
-
+                {                   
                     if (DxVersion > 50)
                     {
                         DxVersion = int.Parse(DxVersion.ToString().Substring(0, DxVersion.ToString().Length - 1));
                     }
+                }
+                else
+                {
+                    DxVersion = 8;
                 }
             }
             if (GpuName.ToLower().IndexOf("pretty much any 3d graphics card") > -1 || GpuName.ToLower().IndexOf("integrat") > -1)
@@ -403,6 +421,10 @@ namespace SystemChecker.Services
                     IsOld = true;
                 }
                 if (Number >= 5000 && GpuName.ToLower().IndexOf("rtx") == -1)
+                {
+                    IsOld = true;
+                }
+                if (Number == 4200 || Number == 4400 || Number == 4600 || Number == 4800)
                 {
                     IsOld = true;
                 }
