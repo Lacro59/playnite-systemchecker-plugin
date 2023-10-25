@@ -420,6 +420,7 @@ namespace SystemChecker
                     }
                 }, globalProgressOptions);
 
+                PluginSettings.Settings.IsPurged = true;
                 SavePluginSettings(PluginSettings.Settings);
             }
         }
