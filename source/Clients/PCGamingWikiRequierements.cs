@@ -315,6 +315,7 @@ namespace SystemChecker.Clients
             data = data.Replace("<br>", "¤");
             data = Regex.Replace(data, "(</[^>]*>)", "");
             data = Regex.Replace(data, "(<[^>]*>)", "");
+            data = Regex.Replace(data, @"[(]\d+x\d+[)]", "");
 
             data = data.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
                 .Replace("Non-Dedicated (shared) video card", string.Empty)
