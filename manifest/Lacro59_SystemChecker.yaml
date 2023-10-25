@@ -58,3 +58,11 @@ Packages:
       - Updated localizations
       - Improved data search
       - Added Playnite search options
+  - Version: 3.1
+    RequiredApiVersion: 6.10.0
+    ReleaseDate: 2023-10-25
+    PackageUrl: https://github.com/Lacro59/playnite-systemchecker-plugin/releases/download/v3.1/playnite-systemchecker-plugin_3_1.pext
+    Changelog:
+      - Updated localizations
+      - Improved data parser
+      - Using a database to compare CPUs and GPUs
