@@ -26,6 +26,7 @@ namespace SystemChecker
     {
         public override Guid Id { get; } = Guid.Parse("e248b230-6edf-41ea-a3c3-7861fa267263");
 
+        private bool preventLibraryUpdatedOnStart { get; set; } = true;
 
         public SystemChecker(IPlayniteAPI api) : base(api)
         {
@@ -385,6 +386,12 @@ namespace SystemChecker
         // Add code to be executed when Playnite is initialized.
         public override void OnApplicationStarted(OnApplicationStartedEventArgs args)
         {
+            Task.Run(() => 
+            {
+                Thread.Sleep(30000);
+                preventLibraryUpdatedOnStart = false;
+            });
+
             // TODO TMP
             if (!PluginSettings.Settings.IsPurged)
             {
@@ -428,7 +435,7 @@ namespace SystemChecker
         // Add code to be executed when library is updated.
         public override void OnLibraryUpdated(OnLibraryUpdatedEventArgs args)
         {
-            if (PluginSettings.Settings.AutoImport)
+            if (PluginSettings.Settings.AutoImport && !preventLibraryUpdatedOnStart)
             {
                 var PlayniteDb = PlayniteApi.Database.Games
                         .Where(x => x.Added != null && x.Added > PluginSettings.Settings.LastAutoLibUpdateAssetsDownload)
