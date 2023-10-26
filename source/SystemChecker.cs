@@ -413,15 +413,15 @@ namespace SystemChecker
                             GameRequierements gameRequierements = PluginDatabase.PurgeGraphicsCardData(values);
                             PluginDatabase.Update(gameRequierements);
                         }
+
+                        PluginSettings.Settings.IsPurged = true;
+                        SavePluginSettings(PluginSettings.Settings);
                     }
                     catch (Exception ex)
                     {
                         Common.LogError(ex, false, true, PluginDatabase.PluginName);
                     }
                 }, globalProgressOptions);
-
-                PluginSettings.Settings.IsPurged = true;
-                SavePluginSettings(PluginSettings.Settings);
             }
         }
 
