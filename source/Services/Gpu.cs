@@ -133,7 +133,7 @@ namespace SystemChecker.Services
             }
 
             // Old card requiered
-            if (CardRequierement.IsOld)
+            if (CardRequierement.IsOld && !CardPc.IsOld)
             {
                 return new CheckResult { Result = true };
             }

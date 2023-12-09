@@ -20,6 +20,7 @@ namespace SystemChecker.Services
         public static CheckSystem CheckConfig(Game game, Requirement requirement, SystemConfiguration systemConfiguration, bool IsInstalled)
         {
             SystemApi.game = game;
+            Common.LogDebug(true, $"CheckConfig() for {game.Name}");
 
             if (requirement != null && systemConfiguration != null)
             {
@@ -27,7 +28,7 @@ namespace SystemChecker.Services
                 bool isCheckCpu = CheckCpu(systemConfiguration, requirement.Cpu);
                 bool isCheckRam = CheckRam(systemConfiguration.Ram, systemConfiguration.RamUsage, requirement.Ram, requirement.RamUsage);
                 bool isCheckGpu = CheckGpu(systemConfiguration, requirement.Gpu);
-                bool isCheckStorage = (IsInstalled) ? IsInstalled : CheckStorage(systemConfiguration.Disks, requirement.Storage); ;
+                bool isCheckStorage = (IsInstalled) ? IsInstalled : CheckStorage(systemConfiguration.Disks, requirement.Storage);
 
                 bool AllOk = (isCheckOs && isCheckCpu && isCheckRam && isCheckGpu && isCheckStorage);
 

@@ -20,27 +20,15 @@ namespace SystemChecker.Controls
         private SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
         internal override IPluginDatabase _PluginDatabase
         {
-            get
-            {
-                return PluginDatabase;
-            }
-            set
-            {
-                PluginDatabase = (SystemCheckerDatabase)_PluginDatabase;
-            }
+            get => PluginDatabase;
+            set => PluginDatabase = (SystemCheckerDatabase)_PluginDatabase;
         }
 
         private PluginViewItemDataContext ControlDataContext = new PluginViewItemDataContext();
         internal override IDataContext _ControlDataContext
         {
-            get
-            {
-                return ControlDataContext;
-            }
-            set
-            {
-                ControlDataContext = (PluginViewItemDataContext)_ControlDataContext;
-            }
+            get => ControlDataContext;           
+            set => ControlDataContext = (PluginViewItemDataContext)_ControlDataContext;
         }
 
         private readonly string IconOk = "\uea50";
