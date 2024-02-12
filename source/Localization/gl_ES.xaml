@@ -31,13 +31,13 @@
     <!-- SystemCheckerSearch -->
 
     <sys:String x:Key="LOCSystemCheckerSearchDescription">Buscar nos datos de SystemChecker</sys:String>
-    <sys:String x:Key="LOCSystemCheckerSearchHint" xml:space="preserve">Parameters:
-    -min		Your PC has minimum requirements
-    -rec		Your PC has recommended requirements
-    -any		Your PC has minimum or recommended requirements
-    -np		You didn't play the game
-    -fav		The game must be a favorite
-    -stores={n}	Filter by store name (ex:-stores=steam / -stores=steam,epic)
-    -status={n}	Filter by status name (ex:-status=played / -status=played,playing)</sys:String>
+    <sys:String x:Key="LOCSystemCheckerSearchHint" xml:space="preserve">Parámetros:
+    -min		O computador ten os requisitos mínimos
+    -rec		O computador ten os requisitos recomendados
+    -any		O computador ten os requisitos mínimos ou recomendados
+    -np		Non xogaches ao xogo
+    -fav		O xogo debe estar nos favoritos
+    -stores={n}	Filtrar polo nome da tenda (exemplos:-stores=steam / -stores=steam,epic)
+    -status={n}	Filtrar polo nome do estado (exemplos:-status=xogado / -status=xogado,xogando)</sys:String>
 
 </ResourceDictionary>
