@@ -11,15 +11,15 @@ namespace SystemChecker.Services
 {
     class SystemApi
     {
-        private static readonly ILogger logger = LogManager.GetLogger();
-        private static IResourceProvider resources = new ResourceProvider();
+        private static ILogger Logger => LogManager.GetLogger();
+        private static IResourceProvider ResourceProvider => new ResourceProvider();
 
-        private static Game game;
+        private static Game Game;
 
 
         public static CheckSystem CheckConfig(Game game, Requirement requirement, SystemConfiguration systemConfiguration, bool IsInstalled)
         {
-            SystemApi.game = game;
+            Game = game;
             Common.LogDebug(true, $"CheckConfig() for {game.Name}");
 
             if (requirement != null && systemConfiguration != null)
@@ -28,9 +28,9 @@ namespace SystemChecker.Services
                 bool isCheckCpu = CheckCpu(systemConfiguration, requirement.Cpu);
                 bool isCheckRam = CheckRam(systemConfiguration.Ram, systemConfiguration.RamUsage, requirement.Ram, requirement.RamUsage);
                 bool isCheckGpu = CheckGpu(systemConfiguration, requirement.Gpu);
-                bool isCheckStorage = (IsInstalled) ? IsInstalled : CheckStorage(systemConfiguration.Disks, requirement.Storage);
+                bool isCheckStorage = IsInstalled ? IsInstalled : CheckStorage(systemConfiguration.Disks, requirement.Storage);
 
-                bool AllOk = (isCheckOs && isCheckCpu && isCheckRam && isCheckGpu && isCheckStorage);
+                bool AllOk = isCheckOs && isCheckCpu && isCheckRam && isCheckGpu && isCheckStorage;
 
                 return new CheckSystem
                 {
@@ -61,18 +61,13 @@ namespace SystemChecker.Services
 
                 foreach (string Os in requierementOs)
                 {
-                    if (systemOs.ToLower().IndexOf("10") > -1)
+                    if (systemOs.Contains(Os, StringComparison.InvariantCultureIgnoreCase))
                     {
                         return true;
                     }
 
-                    if (systemOs.ToLower().IndexOf(Os.ToLower()) > -1)
-                    {
-                        return true;
-                    }
-
-                    Int32.TryParse(Os, out int numberOsRequirement);
-                    Int32.TryParse(Regex.Replace(systemOs, "[^.0-9]", string.Empty).Trim(), out int numberOsPc);
+                    _ = int.TryParse(Regex.Matches(Os, @"\d+")?[0]?.Value ?? "", out int numberOsRequirement);
+                    _ = int.TryParse(Regex.Matches(systemOs, @"\d+")?[0]?.Value ?? "", out int numberOsPc);
                     if (numberOsRequirement != 0 && numberOsPc != 0 && numberOsPc >= numberOsRequirement)
                     {
                         return true;
@@ -81,7 +76,7 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                string message = string.Format(resources.GetString("LOCSystemCheckerTryRefresh"), SystemApi.game?.Name);
+                string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), Game?.Name);
                 Common.LogError(ex, false, message, true, "SystemChecker");
             }
 
@@ -116,7 +111,7 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                string message = string.Format(resources.GetString("LOCSystemCheckerTryRefresh"), SystemApi.game?.Name);
+                string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), Game?.Name);
                 Common.LogError(ex, false, message, true, "SystemChecker");
             }
 
@@ -131,7 +126,7 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                string message = string.Format(resources.GetString("LOCSystemCheckerTryRefresh"), SystemApi.game?.Name);
+                string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), Game?.Name);
                 Common.LogError(ex, false, message, true, "SystemChecker");
             }
 
@@ -152,14 +147,7 @@ namespace SystemChecker.Services
 
                         if (check.Result)
                         {
-                            if (check.SameConstructor)
-                            {
-                                return check.Result;
-                            }
-                            else
-                            {
-                                return !gpuCheck.IsWithNoCard && gpuCheck.CardRequierementIsOld || i <= 0;
-                            }
+                            return check.SameConstructor ? check.Result : (!gpuCheck.IsWithNoCard && gpuCheck.CardRequierementIsOld) || i <= 0;
                         }
                         else if (check.SameConstructor)
                         {
@@ -174,7 +162,7 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                string message = string.Format(resources.GetString("LOCSystemCheckerTryRefresh"), SystemApi.game?.Name);
+                string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), SystemApi.Game?.Name);
                 Common.LogError(ex, false, message, true, "SystemChecker");
             }
 
@@ -200,7 +188,7 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                string message = string.Format(resources.GetString("LOCSystemCheckerTryRefresh"), SystemApi.game?.Name);
+                string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), Game?.Name);
                 Common.LogError(ex, false, message, true, "SystemChecker");
             }
 
