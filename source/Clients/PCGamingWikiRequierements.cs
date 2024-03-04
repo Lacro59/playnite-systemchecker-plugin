@@ -14,57 +14,55 @@ using System.Threading;
 using SystemChecker.Models;
 using SystemChecker.Services;
 using CommonPluginsStores.Steam;
-using CommonPluginsShared.Extensions;
 using CommonPluginsStores.PCGamingWiki;
 
 namespace SystemChecker.Clients
 {
     public class PCGamingWikiRequierements : RequierementMetadata
     {
-        private readonly SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
-        private readonly SteamApi steamApi;
-        private readonly PCGamingWikiApi pcGamingWikiApi;
+        private SystemCheckerDatabase PluginDatabase => SystemChecker.PluginDatabase;
+        private SteamApi SteamApi => new SteamApi("SystemChecker");
+        private PCGamingWikiApi PcGamingWikiApi => new PCGamingWikiApi("SystemChecker");
 
         private int SteamId { get; set; } = 0;
 
 
         public PCGamingWikiRequierements()
         {
-            steamApi = new SteamApi("SystemChecker");
-            pcGamingWikiApi = new PCGamingWikiApi("SystemChecker");
+
         }
 
 
         public override GameRequierements GetRequirements()
         {
-            gameRequierements = SystemChecker.PluginDatabase.GetDefault(_game);
+            GameRequierements = SystemChecker.PluginDatabase.GetDefault(GameContext);
 
-            string UrlPCGamingWiki = pcGamingWikiApi.FindGoodUrl(_game, SteamId);
+            string UrlPCGamingWiki = PcGamingWikiApi.FindGoodUrl(GameContext, SteamId);
 
             if (!UrlPCGamingWiki.IsNullOrEmpty())
             {
-                gameRequierements = GetRequirements(UrlPCGamingWiki);
+                GameRequierements = GetRequirements(UrlPCGamingWiki);
             }
             else
             {
-                logger.Warn($"PCGamingWikiRequierements - Not find for {_game.Name}");
+                logger.Warn($"PCGamingWikiRequierements - Not find for {GameContext.Name}");
             }
 
-            return gameRequierements;
+            return GameRequierements;
         }
 
         public GameRequierements GetRequirements(Game game)
         {
-            _game = game;
+            GameContext = game;
             SteamId = 0;
 
-            if (_game.SourceId != default(Guid) && game.Source.Name.IsEqual("steam"))
+            if (GameContext.SourceId == PlayniteTools.GetPluginId(PlayniteTools.ExternalPlugin.SteamLibrary))
             {
                 SteamId = int.Parse(game.GameId);
             }
             if (SteamId == 0)
             {
-                SteamId = steamApi.GetAppId(game.Name);
+                SteamId = SteamApi.GetAppId(game.Name);
             }
 
             return GetRequirements();
@@ -183,9 +181,9 @@ namespace SystemChecker.Clients
                     Common.LogDebug(true, $"PCGamingWikiRequierements - Minimum: {Serialization.ToJson(Minimum)}");
                     Common.LogDebug(true, $"PCGamingWikiRequierements - Recommanded: {Serialization.ToJson(Recommanded)}");
 
-                    gameRequierements.Items = new List<Requirement> { Minimum, Recommanded };
+                    GameRequierements.Items = new List<Requirement> { Minimum, Recommanded };
 
-                    gameRequierements.SourcesLink = new SourceLink
+                    GameRequierements.SourcesLink = new SourceLink
                     {
                         Name = "PCGamingWiki",
                         GameName = HtmlRequirement.QuerySelector("h1.article-title").InnerHtml,
@@ -194,7 +192,7 @@ namespace SystemChecker.Clients
                 }
                 else
                 {
-                    logger.Warn($"No data find for {_game.Name} in {url}");
+                    logger.Warn($"No data find for {GameContext.Name} in {url}");
                 }
 
             }
@@ -203,7 +201,7 @@ namespace SystemChecker.Clients
                 Common.LogError(ex, false, true, PluginDatabase.PluginName);
             }
 
-            return gameRequierements;
+            return GameRequierements;
         }
 
 
@@ -226,6 +224,7 @@ namespace SystemChecker.Clients
         {
             data = data
                 .Replace("(approx)", string.Empty)
+                .Replace("64 bit processor", string.Empty)
                 .Replace("GHz+", "GHz")
                 .Replace("Dual-core CPU (2 GHz or greater speed)", "Dual-core CPU")
                 .Replace("-2XXX @ 2.0 GHz", string.Empty)
@@ -313,12 +312,12 @@ namespace SystemChecker.Clients
         private List<string> ReplaceGPU(string data)
         {
             data = data.Replace("<br>", "¤");
-            data = Regex.Replace(data, "(</[^>]*>)", "");
-            data = Regex.Replace(data, "(<[^>]*>)", "");
-            data = Regex.Replace(data, @"[(]\d+x\d+[)]", "");
+            data = Regex.Replace(data, "<[^>]*>", string.Empty);
+            data = Regex.Replace(data, @"[(]\d+x\d+[)]", string.Empty);
 
             data = data.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
                 .Replace("Non-Dedicated (shared) video card", string.Empty)
+                .Replace("Onboard graphics chipset", string.Empty)
                 .Replace("XNA 4.0 compatible", string.Empty)
                 .Replace("compatible hardware", string.Empty)
                 .Replace("AMD Radeon or Nvidia GeForce recommended", string.Empty)
@@ -330,6 +329,7 @@ namespace SystemChecker.Clients
                 .Replace("Mobile or dedicated", string.Empty)
                 .Replace("DirectX compatible card", string.Empty)
                 .Replace("or better", string.Empty)
+                .Replace("(shader model 4.0)+", string.Empty)
                 .Replace("of VRAM", "VRAM")
 
                 .Replace("(Shared Memory is not recommended)", string.Empty)
@@ -343,6 +343,8 @@ namespace SystemChecker.Clients
                 .Replace("or higher", string.Empty)
                 .Replace("  ", " ")
                 .Replace(" / ", "¤").Replace(" or ", "¤").Replace(", ", "¤");
+
+            data = Regex.Replace(data, @"DX(\d+)[+]?", "DirectX $1");
 
             return data.Split('¤')
                 .Select(x => x.Trim()).ToList()

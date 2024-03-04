@@ -15,6 +15,6 @@ namespace SystemChecker.Models
         public string StorageUsage { get; set; }
 
         [DontSerialize]
-        public bool HasData => Os.Count > 1 || Cpu.Count > 1 || Gpu.Count > 1 || Ram > 0 || Storage > 0;
+        public bool HasData => Os.Count >= 1 || Cpu.Count >= 1 || Gpu.Count >= 1 || Ram > 0;
     }
 }

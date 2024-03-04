@@ -85,17 +85,14 @@ namespace SystemChecker.Controls
             {
                 if (!(bool)CheckMinimum.AllOk)
                 {
-                    //ControlDataContext.Foreground = Brushes.Red;
                     ControlDataContext.Text = IconKo;
                 }
                 else if ((bool)CheckMinimum.AllOk)
                 {
-                    //ControlDataContext.Foreground = Brushes.Orange;
                     ControlDataContext.Text = IconMinimum;
 
                     if (!systemRecommanded.HasData)
                     {
-                        //ControlDataContext.Foreground = Brushes.Green;
                         ControlDataContext.Text = IconOk;
                     }
                 }
@@ -103,8 +100,12 @@ namespace SystemChecker.Controls
 
             if (systemRecommanded.HasData && (bool)CheckRecommanded.AllOk)
             {
-                //ControlDataContext.Foreground = Brushes.Green;
                 ControlDataContext.Text = IconOk;
+            }
+
+            if (!systemMinimum.HasData && systemRecommanded.HasData && !(bool)CheckRecommanded?.AllOk)
+            {
+                ControlDataContext.Text = IconKo;
             }
         }
     }

@@ -93,7 +93,7 @@ namespace SystemChecker.Views
 
             if (Recommanded.HasData)
             {
-                if (Minimum.Os.Count > 0)
+                if (Recommanded.Os.Count > 0)
                 {
                     RecommandedOs = "Windows " + string.Join(" / ", Recommanded.Os);
                 }

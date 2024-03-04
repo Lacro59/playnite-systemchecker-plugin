@@ -7,13 +7,13 @@ namespace SystemChecker.Models
     {
         internal static readonly ILogger logger = LogManager.GetLogger();
 
-        internal Game _game;
-        internal GameRequierements gameRequierements = new GameRequierements();
+        internal Game GameContext { get; set; }
+        internal GameRequierements GameRequierements { get; set; } = new GameRequierements();
 
 
         public bool IsFind()
         {
-            return gameRequierements.GetMinimum().HasData;
+            return GameRequierements.GetMinimum().HasData;
         }
 
 

@@ -21,27 +21,15 @@ namespace SystemChecker.Controls
         private SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
         internal override IPluginDatabase _PluginDatabase
         {
-            get
-            {
-                return PluginDatabase;
-            }
-            set
-            {
-                PluginDatabase = (SystemCheckerDatabase)_PluginDatabase;
-            }
+            get => PluginDatabase;
+            set => PluginDatabase = (SystemCheckerDatabase)_PluginDatabase;
         }
 
         public PluginButtonDataContext ControlDataContext = new PluginButtonDataContext();
         internal override IDataContext _ControlDataContext
         {
-            get
-            {
-                return ControlDataContext;
-            }
-            set
-            {
-                ControlDataContext = (PluginButtonDataContext)_ControlDataContext;
-            }
+            get => ControlDataContext;
+            set => ControlDataContext = (PluginButtonDataContext)_ControlDataContext;
         }
 
 
@@ -54,9 +42,9 @@ namespace SystemChecker.Controls
         public PluginButton()
         {
             InitializeComponent();
-            this.DataContext = ControlDataContext;
+            DataContext = ControlDataContext;
 
-            Task.Run(() =>
+            _ = Task.Run(() =>
             {
                 // Wait extension database are loaded
                 System.Threading.SpinWait.SpinUntil(() => PluginDatabase.IsLoaded, -1);
@@ -94,16 +82,21 @@ namespace SystemChecker.Controls
                 Requirement systemMinimum = gameRequierements.GetMinimum();
                 Requirement systemRecommanded = gameRequierements.GetRecommanded();
 
-                CheckSystem CheckMinimum = CheckMinimum = SystemApi.CheckConfig(newContext, systemMinimum, systemConfiguration, newContext.IsInstalled);
+                if (systemConfiguration == null)
+                {
+                    return;
+                }
+
+                CheckSystem CheckMinimum = SystemApi.CheckConfig(newContext, systemMinimum, systemConfiguration, newContext.IsInstalled);
                 CheckSystem CheckRecommanded = SystemApi.CheckConfig(newContext, systemRecommanded, systemConfiguration, newContext.IsInstalled);
 
                 if (systemMinimum.HasData)
                 {
-                    if (!(bool)CheckMinimum.AllOk)
+                    if (!(bool)CheckMinimum?.AllOk)
                     {
                         ControlDataContext.Text = IconKo;
                     }
-                    else if ((bool)CheckMinimum.AllOk)
+                    else if ((bool)CheckMinimum?.AllOk)
                     {
                         ControlDataContext.Text = IconMinimum;
 
@@ -114,9 +107,14 @@ namespace SystemChecker.Controls
                     }
                 }
 
-                if (systemRecommanded.HasData && (bool)CheckRecommanded.AllOk)
+                if (systemRecommanded.HasData && (bool)CheckRecommanded?.AllOk)
                 {
                     ControlDataContext.Text = IconOk;
+                }
+
+                if (!systemMinimum.HasData && systemRecommanded.HasData && !(bool)CheckRecommanded?.AllOk)
+                {
+                    ControlDataContext.Text = IconKo;
                 }
             }
         }
@@ -124,9 +122,9 @@ namespace SystemChecker.Controls
         #region Events
         private void PART_PluginButton_Click(object sender, RoutedEventArgs e)
         {
-            var ViewExtension = new SystemCheckerGameView(PluginDatabase.PlayniteApi, PluginDatabase.Paths.PluginUserDataPath, PluginDatabase.GameContext);
+            SystemCheckerGameView ViewExtension = new SystemCheckerGameView(PluginDatabase.PlayniteApi, PluginDatabase.Paths.PluginUserDataPath, PluginDatabase.GameContext);
             Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PluginDatabase.PlayniteApi, PluginDatabase.PluginName, ViewExtension);
-            windowExtension.ShowDialog();
+            _ = windowExtension.ShowDialog();
         }
         #endregion
     }

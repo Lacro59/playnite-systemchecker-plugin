@@ -97,7 +97,7 @@ namespace SystemChecker.Services
             {
                 if (CardPc.IsIntegrate)
                 {
-                    if (CardRequierement.DxVersion < 10)
+                    if (CardRequierement.DxVersion < 12)
                     {
                         IsWithNoCard = true;
                         return new CheckResult { Result = true };

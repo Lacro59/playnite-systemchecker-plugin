@@ -23,7 +23,6 @@ namespace SystemChecker.Clients
         internal static ILogger logger => LogManager.GetLogger();
         private readonly SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
 
-
         #region GPU
         private const string urlVideoCard = @"https://www.videocardbenchmark.net/gpu_list.php";
 
@@ -87,7 +86,7 @@ namespace SystemChecker.Clients
 
             gpu = Regex.Replace(gpu, @";[ ]?\d+[ ]?(MB)?(GB)?", string.Empty, RegexOptions.IgnoreCase).Trim();
 
-            int.TryParse(Regex.Match(gpu, @"\d+").Value, out int val);
+            _ = int.TryParse(Regex.Match(gpu, @"\d+").Value, out int val);
 
             if (isNvidia)
             {
@@ -148,7 +147,6 @@ namespace SystemChecker.Clients
             return gpu.Replace("  ", " ");
         }
         #endregion
-
 
         #region CPU
         private const string urlCpu = @"https://www.cpubenchmark.net/cpu_list.php";
@@ -261,7 +259,6 @@ namespace SystemChecker.Clients
             return cpu.Replace("  ", " ");
         }
         #endregion
-
 
         private List<BenchmarkData> GetData(string url)
         {

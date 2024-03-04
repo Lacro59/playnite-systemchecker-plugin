@@ -54,6 +54,8 @@ namespace SystemChecker.Services
         {
             try
             {
+                List<string> oldOS = new List<string> { "95", "98", "XP", "Millenium", "2000", "Vista" };
+
                 if (requierementOs.Count == 0)
                 {
                     return true;
@@ -62,6 +64,11 @@ namespace SystemChecker.Services
                 foreach (string Os in requierementOs)
                 {
                     if (systemOs.Contains(Os, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        return true;
+                    }
+
+                    if (oldOS.Where(x => Os.Contains(x, StringComparison.InvariantCultureIgnoreCase)).Count() > 0)
                     {
                         return true;
                     }
