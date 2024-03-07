@@ -121,6 +121,11 @@ namespace SystemChecker.Clients
             {
                 Common.LogDebug(true, $"SteamRequierements - {ElementRequirement.InnerHtml}");
 
+                if (ElementRequirement.InnerHtml.Contains("TBD", StringComparison.InvariantCultureIgnoreCase)) 
+                {
+                    continue;
+                }
+
                 //<strong>OS:</strong> Windows XP / 7 / 8 / 8.1 / 10 x32 and x64<br> </ li >
                 if (ElementRequirement.InnerHtml.IndexOf("<strong>OS") > -1)
                 {
@@ -129,6 +134,7 @@ namespace SystemChecker.Clients
                         .Replace("\t", " ")
                         .Replace("os: ", string.Empty)
                         .Replace("os *: ", string.Empty)
+                        .Replace("pc/ms-dos 5.0", string.Empty)
                         .Replace("(64-bit required)", string.Empty)
                         .Replace("(32/64-bit)", string.Empty)
                         .Replace("with platform update for  7 ( versions only)", string.Empty)
@@ -170,9 +176,12 @@ namespace SystemChecker.Clients
                         .Replace("()", string.Empty)
                         .Trim();
 
-                    foreach (string sTemp in os.Replace(",", "¤").Replace(" or ", "¤").Replace("/", "¤").Split('¤'))
+                    if (os.Trim() != "(/)" && !os.Trim().IsNullOrEmpty())
                     {
-                        requirement.Os.Add(sTemp.Trim());
+                        foreach (string sTemp in os.Replace(",", "¤").Replace(" or ", "¤").Replace("/", "¤").Split('¤'))
+                        {
+                            requirement.Os.Add(sTemp.Trim());
+                        }
                     }
                 }
 
@@ -356,6 +365,7 @@ namespace SystemChecker.Clients
                             .Replace("<br>", string.Empty)
                             .Replace("®", string.Empty)
                             .Replace("™", string.Empty)
+                            .Replace(" Compatible", string.Empty)
                             .Replace("  ", " ")
                             .Replace("(Shared Memory is not recommended)", string.Empty)
                             .Replace(". Integrated Intel HD Graphics should work but is not supported; problems are generally solved with a driver update.", string.Empty)
@@ -377,13 +387,17 @@ namespace SystemChecker.Clients
                             {
                                 requirement.Gpu.Add(Regex.Replace(sTemp, @"[(][0-9] GB[)]", string.Empty).Trim());
                             }
-                            else if (Regex.IsMatch(sTemp.ToLower(), @"\d+((.|,)\d+)?[ ]?(mb|gb)") && sTemp.Length < 10)
+                            else if (Regex.IsMatch(sTemp, @"\d+((.|,)\d+)?[ ]?(mb|gb)", RegexOptions.IgnoreCase) && sTemp.Length < 10)
                             {
                                 requirement.Gpu.Add(sTemp.Replace("(", string.Empty).Replace(")", string.Empty).Trim() + " VRAM");
                             }
-                            else if (Regex.IsMatch(sTemp.ToLower(), @"[(]\d+((.|,)\d+)?[ ]?(mb|gb)[)] vram"))
+                            else if (Regex.IsMatch(sTemp, @"[(]\d+((.|,)\d+)?[ ]?(mb|gb)[)] vram", RegexOptions.IgnoreCase))
                             {
                                 requirement.Gpu.Add(sTemp.Replace("(", string.Empty).Replace(")", string.Empty).Trim());
+                            }
+                            else if (Regex.IsMatch(sTemp, @"DirectX \d+[.]\d", RegexOptions.IgnoreCase))
+                            {
+                                requirement.Gpu.Add(Regex.Replace(sTemp, @"[.]\d", string.Empty));
                             }
                             else
                             {

@@ -54,7 +54,7 @@ namespace SystemChecker.Services
         {
             try
             {
-                List<string> oldOS = new List<string> { "95", "98", "XP", "Millenium", "2000", "Vista" };
+                List<string> oldOS = new List<string> { "95", "98", "XP", "Millenium", "ME", "2000", "Vista" };
 
                 if (requierementOs.Count == 0)
                 {

@@ -209,6 +209,7 @@ namespace SystemChecker.Clients
         private List<string> ReplaceOS(string data)
         {
             data = data
+                .Replace("Anything made in the last decade", string.Empty)
                 .Replace("(latest service pack)", string.Empty)
                 .Replace("(1803 or later)", string.Empty)
                 .Replace(" (Only inclusive until patch 1.16.1. Patch 1.17+ Needs XP and greater.)", string.Empty)
@@ -223,6 +224,7 @@ namespace SystemChecker.Clients
         private List<string> ReplaceCPU(string data)
         {
             data = data
+                .Replace("one that works", string.Empty)
                 .Replace("(approx)", string.Empty)
                 .Replace("64 bit processor", string.Empty)
                 .Replace("GHz+", "GHz")
@@ -316,6 +318,7 @@ namespace SystemChecker.Clients
             data = Regex.Replace(data, @"[(]\d+x\d+[)]", string.Empty);
 
             data = data.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
+                .Replace("a toaster - you really shouldn't have trouble", string.Empty)
                 .Replace("Non-Dedicated (shared) video card", string.Empty)
                 .Replace("Onboard graphics chipset", string.Empty)
                 .Replace("XNA 4.0 compatible", string.Empty)
