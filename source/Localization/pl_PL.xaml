@@ -7,11 +7,11 @@
 
     <sys:String x:Key="LOCSystemCheckerCheckConfig">Sprawdź konfigurację</sys:String>
     
-    <sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Refresh your system configuration</sys:String>
+    <sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Odśwież swoją konfigurację systemu</sys:String>
 
     <!-- SystemCheckerSettingsView -->
 
-    <sys:String x:Key="LOCSystemCheckerAddTag">Add a tag to indicate which configuration was successful</sys:String>
+    <sys:String x:Key="LOCSystemCheckerAddTag">Dodaj tag, aby wskazać, która konfiguracja powiodła się</sys:String>
 
     <!-- SystemCheckerGameView -->
 
@@ -26,17 +26,18 @@
 
     <!-- SystemCheckerNotifications -->
 
-    <sys:String x:Key="LOCSystemCheckerTryRefresh">Try to refresh the plugin data for {0}</sys:String>
+    <sys:String x:Key="LOCSystemCheckerTryRefresh">Spróbuj odświeżyć dane wtyczki dla {0}</sys:String>
 
     <!-- SystemCheckerSearch -->
 
-    <sys:String x:Key="LOCSystemCheckerSearchDescription">Search on SystemChecker data</sys:String>
-    <sys:String x:Key="LOCSystemCheckerSearchHint" xml:space="preserve">Parameters:
-    -min                Your PC has minimum requirements
-    -rec                Your PC has recommended requirements
-    -any                Your PC has minimum or recommended requirements
-    -np                 You didn't play the game
-    -fav                The game must be a favorite
-    -stores={n}     Filter by store name (ex:-stores=steam / -stores=steam,epic)</sys:String>
+    <sys:String x:Key="LOCSystemCheckerSearchDescription">Szukaj w danych SystemChecker</sys:String>
+    <sys:String x:Key="LOCSystemCheckerSearchHint" xml:space="preserve">Parametry:
+    -min              Twój komputer spełnia minimalne wymagania
+    -rec               Twój komputer spełnia zalecane wymagania
+    -any               Twój komputer spełnia zalecane lub minimalne wymagania
+    -np                 Nie grałeś w tę grę
+    -fav                Ta gra musi być twoją ulubioną
+    -stores={n}     Filtruj wg nazwy sklepu (np:-stores=steam / -stores=steam,epic)
+    -status={n}     Filtruj wg nazwy statusu (np:-status=played / -status=played,playing)</sys:String>
 
 </ResourceDictionary>
