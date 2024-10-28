@@ -2,6 +2,7 @@
 using CommonPluginsShared.Collections;
 using CommonPluginsShared.Controls;
 using CommonPluginsShared.Interfaces;
+using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
@@ -18,17 +19,13 @@ namespace SystemChecker.Controls
     public partial class PluginViewItem : PluginUserControlExtend
     {
         private SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
-        internal override IPluginDatabase _PluginDatabase
-        {
-            get => PluginDatabase;
-            set => PluginDatabase = (SystemCheckerDatabase)_PluginDatabase;
-        }
+        internal override IPluginDatabase pluginDatabase => PluginDatabase;
 
         private PluginViewItemDataContext ControlDataContext = new PluginViewItemDataContext();
-        internal override IDataContext _ControlDataContext
+        internal override IDataContext controlDataContext
         {
             get => ControlDataContext;           
-            set => ControlDataContext = (PluginViewItemDataContext)_ControlDataContext;
+            set => ControlDataContext = (PluginViewItemDataContext)controlDataContext;
         }
 
         private readonly string IconOk = "\uea50";
@@ -45,14 +42,14 @@ namespace SystemChecker.Controls
             Task.Run(() =>
             {
                 // Wait extension database are loaded
-                System.Threading.SpinWait.SpinUntil(() => PluginDatabase.IsLoaded, -1);
+                _ = System.Threading.SpinWait.SpinUntil(() => PluginDatabase.IsLoaded, -1);
 
                 this.Dispatcher.BeginInvoke((Action)delegate
                 {
                     PluginDatabase.PluginSettings.PropertyChanged += PluginSettings_PropertyChanged;
                     PluginDatabase.Database.ItemUpdated += Database_ItemUpdated;
                     PluginDatabase.Database.ItemCollectionChanged += Database_ItemCollectionChanged;
-                    PluginDatabase.PlayniteApi.Database.Games.ItemUpdated += Games_ItemUpdated;
+                    API.Instance.Database.Games.ItemUpdated += Games_ItemUpdated;
 
                     // Apply settings
                     PluginSettings_PropertyChanged(null, null);
@@ -66,7 +63,7 @@ namespace SystemChecker.Controls
             ControlDataContext.IsActivated = PluginDatabase.PluginSettings.Settings.EnableIntegrationViewItem;
 
             ControlDataContext.Text = IconEmpty;
-            ControlDataContext.Foreground = (SolidColorBrush)resources.GetResource("GlyphBrush");
+            ControlDataContext.Foreground = (SolidColorBrush)ResourceProvider.GetResource("GlyphBrush");
         }
 
 
@@ -113,13 +110,13 @@ namespace SystemChecker.Controls
 
     public class PluginViewItemDataContext : ObservableObject, IDataContext
     {
-        private bool _IsActivated;
-        public bool IsActivated { get => _IsActivated; set => SetValue(ref _IsActivated, value); }
+        private bool _isActivated;
+        public bool IsActivated { get => _isActivated; set => SetValue(ref _isActivated, value); }
 
-        public string _Text;
-        public string Text { get => _Text; set => SetValue(ref _Text, value); }
+        public string _text;
+        public string Text { get => _text; set => SetValue(ref _text, value); }
 
-        public SolidColorBrush _Foreground;
-        public SolidColorBrush Foreground { get => _Foreground; set => SetValue(ref _Foreground, value); }
+        public SolidColorBrush _foreground;
+        public SolidColorBrush Foreground { get => _foreground; set => SetValue(ref _foreground, value); }
     }
 }

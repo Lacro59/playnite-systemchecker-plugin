@@ -18,11 +18,7 @@ namespace SystemChecker.Views
     /// </summary>
     public partial class SystemCheckerGameView : UserControl
     {
-        private static readonly ILogger logger = LogManager.GetLogger();
-        private static IResourceProvider resources = new ResourceProvider();
-        private IPlayniteAPI PlayniteApi;
-
-        private SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
+        private SystemCheckerDatabase PluginDatabase => SystemChecker.PluginDatabase;
 
         public string ScSourceName { get; set; }
 
@@ -56,10 +52,8 @@ namespace SystemChecker.Views
         public string RecommandedCheckStorage { get; set; }
 
 
-        public SystemCheckerGameView(IPlayniteAPI PlayniteApi, string PluginUserDataPath, Game GameSelected)
+        public SystemCheckerGameView(Game gameSelected)
         {
-            this.PlayniteApi = PlayniteApi;
-
             InitializeComponent();
 
             // Local
@@ -73,7 +67,7 @@ namespace SystemChecker.Views
 
 
             // Minimum & Recommanded
-            GameRequierements gameRequierements = PluginDatabase.Get(GameSelected, true);
+            GameRequierements gameRequierements = PluginDatabase.Get(gameSelected, true);
 
             Requirement Minimum = gameRequierements.GetMinimum();
             Requirement Recommanded = gameRequierements.GetRecommanded();
@@ -84,7 +78,7 @@ namespace SystemChecker.Views
                 {
                     MinimumOs = "Windows " + string.Join(" / ", Minimum.Os);
                 }
-                
+
                 MinimumCpu = Minimum.Cpu;
                 MinimumRamUsage = Minimum.RamUsage;
                 MinimumGpu = Minimum.Gpu;
@@ -109,7 +103,7 @@ namespace SystemChecker.Views
             string IsOk = "";
             string IsKo = "";
 
-            CheckSystem CheckMinimum = SystemApi.CheckConfig(GameSelected, Minimum, systemConfiguration, GameSelected.IsInstalled);
+            CheckSystem CheckMinimum = SystemApi.CheckConfig(gameSelected, Minimum, systemConfiguration, gameSelected.IsInstalled);
             if (Minimum.HasData)
             {
                 MinimumCheckOs = IsKo;
@@ -163,7 +157,7 @@ namespace SystemChecker.Views
                 }
             }
 
-            CheckSystem CheckRecommanded = SystemApi.CheckConfig(GameSelected, Recommanded, systemConfiguration, GameSelected.IsInstalled);
+            CheckSystem CheckRecommanded = SystemApi.CheckConfig(gameSelected, Recommanded, systemConfiguration, gameSelected.IsInstalled);
             if (Recommanded.HasData)
             {
                 RecommandedCheckOs = IsKo;

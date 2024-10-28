@@ -1,4 +1,5 @@
-﻿using Playnite.SDK;
+﻿using CommonPluginsShared.Plugins;
+using Playnite.SDK;
 using Playnite.SDK.Data;
 using System;
 using System.Collections.Generic;
@@ -7,47 +8,37 @@ using System.Text;
 
 namespace SystemChecker
 {
-    public class SystemCheckerSettings : ObservableObject
+    public class SystemCheckerSettings : PluginSettings
     {
         #region Settings variables
-        public bool MenuInExtensions { get; set; } = true;
-        public DateTime LastAutoLibUpdateAssetsDownload { get; set; } = DateTime.Now;
+        private bool _enableIntegrationViewItem = true;
+        public bool EnableIntegrationViewItem { get => _enableIntegrationViewItem; set => SetValue(ref _enableIntegrationViewItem, value); }
 
-        public bool EnableTag { get; set; } = false;
-        public bool AutoImport { get; set; } = true;
+        private bool _enableIntegrationButton = true;
+        public bool EnableIntegrationButton { get => _enableIntegrationButton; set => SetValue(ref _enableIntegrationButton, value); }
 
-        private bool _EnableIntegrationViewItem = true;
-        public bool EnableIntegrationViewItem { get => _EnableIntegrationViewItem; set => SetValue(ref _EnableIntegrationViewItem, value); }
-
-        private bool _EnableIntegrationButton = true;
-        public bool EnableIntegrationButton { get => _EnableIntegrationButton; set => SetValue(ref _EnableIntegrationButton, value); }
-
-        private bool _EnableIntegrationButtonDetails = false;
-        public bool EnableIntegrationButtonDetails { get => _EnableIntegrationButtonDetails; set => SetValue(ref _EnableIntegrationButtonDetails, value); }
+        private bool _enableIntegrationButtonDetails = false;
+        public bool EnableIntegrationButtonDetails { get => _enableIntegrationButtonDetails; set => SetValue(ref _enableIntegrationButtonDetails, value); }
         #endregion
 
         // Playnite serializes settings object to a JSON object and saves it as text file.
         // If you want to exclude some property from being saved then use `JsonDontSerialize` ignore attribute.
         #region Variables exposed
-        private bool _HasData = false;
+        private bool _isMinimumOK = false;
         [DontSerialize]
-        public bool HasData { get => _HasData; set => SetValue(ref _HasData, value); }
+        public bool IsMinimumOK { get => _isMinimumOK; set => SetValue(ref _isMinimumOK, value); }
 
-        private bool _IsMinimumOK = false;
+        private bool _isRecommandedOK = false;
         [DontSerialize]
-        public bool IsMinimumOK { get => _IsMinimumOK; set => SetValue(ref _IsMinimumOK, value); }
+        public bool IsRecommandedOK { get => _isRecommandedOK; set => SetValue(ref _isRecommandedOK, value); }
 
-        private bool _IsRecommandedOK = false;
+        private bool _isAllOK = false;
         [DontSerialize]
-        public bool IsRecommandedOK { get => _IsRecommandedOK; set => SetValue(ref _IsRecommandedOK, value); }
+        public bool IsAllOK { get => _isAllOK; set => SetValue(ref _isAllOK, value); }
 
-        private bool _IsAllOK = false;
+        private string _recommandedStorage = string.Empty;
         [DontSerialize]
-        public bool IsAllOK { get => _IsAllOK; set => SetValue(ref _IsAllOK, value); }
-
-        private string _RecommandedStorage = string.Empty;
-        [DontSerialize]
-        public string RecommandedStorage { get => _RecommandedStorage; set => SetValue(ref _RecommandedStorage, value); }
+        public string RecommandedStorage { get => _recommandedStorage; set => SetValue(ref _recommandedStorage, value); }
         #endregion  
 
 
@@ -61,8 +52,8 @@ namespace SystemChecker
         private readonly SystemChecker Plugin;
         private SystemCheckerSettings EditingClone { get; set; }
 
-        private SystemCheckerSettings _Settings;
-        public SystemCheckerSettings Settings { get => _Settings; set => SetValue(ref _Settings, value); }
+        private SystemCheckerSettings _settings;
+        public SystemCheckerSettings Settings { get => _settings; set => SetValue(ref _settings, value); }
 
 
         public SystemCheckerSettingsViewModel(SystemChecker plugin)

@@ -24,7 +24,7 @@ namespace SystemChecker.Clients
         private SteamApi SteamApi => new SteamApi("SystemChecker");
         private PCGamingWikiApi PcGamingWikiApi => new PCGamingWikiApi("SystemChecker");
 
-        private int SteamId { get; set; } = 0;
+        private uint SteamId { get; set; } = 0;
 
 
         public PCGamingWikiRequierements()
@@ -58,7 +58,7 @@ namespace SystemChecker.Clients
 
             if (GameContext.SourceId == PlayniteTools.GetPluginId(PlayniteTools.ExternalPlugin.SteamLibrary))
             {
-                SteamId = int.Parse(game.GameId);
+                SteamId = uint.Parse(game.GameId);
             }
             if (SteamId == 0)
             {

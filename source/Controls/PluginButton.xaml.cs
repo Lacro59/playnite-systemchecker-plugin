@@ -2,6 +2,7 @@
 using CommonPluginsShared.Collections;
 using CommonPluginsShared.Controls;
 using CommonPluginsShared.Interfaces;
+using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
@@ -18,18 +19,14 @@ namespace SystemChecker.Controls
     /// </summary>
     public partial class PluginButton : PluginUserControlExtend
     {
-        private SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
-        internal override IPluginDatabase _PluginDatabase
-        {
-            get => PluginDatabase;
-            set => PluginDatabase = (SystemCheckerDatabase)_PluginDatabase;
-        }
+        private SystemCheckerDatabase PluginDatabase => SystemChecker.PluginDatabase;
+        internal override IPluginDatabase pluginDatabase => PluginDatabase;
 
         public PluginButtonDataContext ControlDataContext = new PluginButtonDataContext();
-        internal override IDataContext _ControlDataContext
+        internal override IDataContext controlDataContext
         {
             get => ControlDataContext;
-            set => ControlDataContext = (PluginButtonDataContext)_ControlDataContext;
+            set => ControlDataContext = (PluginButtonDataContext)controlDataContext;
         }
 
 
@@ -47,14 +44,14 @@ namespace SystemChecker.Controls
             _ = Task.Run(() =>
             {
                 // Wait extension database are loaded
-                System.Threading.SpinWait.SpinUntil(() => PluginDatabase.IsLoaded, -1);
+                _ = System.Threading.SpinWait.SpinUntil(() => PluginDatabase.IsLoaded, -1);
 
                 this.Dispatcher.BeginInvoke((Action)delegate
                 {
                     PluginDatabase.PluginSettings.PropertyChanged += PluginSettings_PropertyChanged;
                     PluginDatabase.Database.ItemUpdated += Database_ItemUpdated;
                     PluginDatabase.Database.ItemCollectionChanged += Database_ItemCollectionChanged;
-                    PluginDatabase.PlayniteApi.Database.Games.ItemUpdated += Games_ItemUpdated;
+                    API.Instance.Database.Games.ItemUpdated += Games_ItemUpdated;
 
                     // Apply settings
                     PluginSettings_PropertyChanged(null, null);
@@ -122,8 +119,8 @@ namespace SystemChecker.Controls
         #region Events
         private void PART_PluginButton_Click(object sender, RoutedEventArgs e)
         {
-            SystemCheckerGameView ViewExtension = new SystemCheckerGameView(PluginDatabase.PlayniteApi, PluginDatabase.Paths.PluginUserDataPath, PluginDatabase.GameContext);
-            Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PluginDatabase.PlayniteApi, PluginDatabase.PluginName, ViewExtension);
+            SystemCheckerGameView ViewExtension = new SystemCheckerGameView(PluginDatabase.GameContext);
+            Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PluginDatabase.PluginName, ViewExtension);
             _ = windowExtension.ShowDialog();
         }
         #endregion
@@ -132,13 +129,13 @@ namespace SystemChecker.Controls
 
     public class PluginButtonDataContext : ObservableObject, IDataContext
     {
-        private bool _IsActivated;
-        public bool IsActivated { get => _IsActivated; set => SetValue(ref _IsActivated, value); }
+        private bool _isActivated;
+        public bool IsActivated { get => _isActivated; set => SetValue(ref _isActivated, value); }
 
-        public bool _DisplayDetails;
-        public bool DisplayDetails { get => _DisplayDetails; set => SetValue(ref _DisplayDetails, value); }
+        public bool _displayDetails;
+        public bool DisplayDetails { get => _displayDetails; set => SetValue(ref _displayDetails, value); }
 
-        public string _Text;
-        public string Text { get => _Text; set => SetValue(ref _Text, value); }
+        public string _text;
+        public string Text { get => _text; set => SetValue(ref _text, value); }
     }
 }

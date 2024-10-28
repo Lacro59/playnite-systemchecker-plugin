@@ -20,15 +20,15 @@ namespace SystemChecker.Services
     {
         public LocalSystem LocalSystem;
 
-        private PCGamingWikiRequierements pCGamingWikiRequierements;
-        private SteamRequierements steamRequierements;
+        private PCGamingWikiRequierements PCGamingWikiRequierements { get; set; }
+        private SteamRequierements SteamRequierements { get; set; }
 
-        public SystemCheckerDatabase(IPlayniteAPI PlayniteApi, SystemCheckerSettingsViewModel PluginSettings, string PluginUserDataPath) : base(PlayniteApi, PluginSettings, "SystemChecker", PluginUserDataPath)
+        public SystemCheckerDatabase(SystemCheckerSettingsViewModel PluginSettings, string PluginUserDataPath) : base(PluginSettings, "SystemChecker", PluginUserDataPath)
         {
             TagBefore = "[SC]";
 
-            pCGamingWikiRequierements = new PCGamingWikiRequierements();
-            steamRequierements = new SteamRequierements();
+            PCGamingWikiRequierements = new PCGamingWikiRequierements();
+            SteamRequierements = new SteamRequierements();
         }
 
 
@@ -40,14 +40,14 @@ namespace SystemChecker.Services
                 stopWatch.Start();
 
                 Database = new RequierementsCollection(Paths.PluginDatabasePath);
-                Database.SetGameInfo<Requirement>(PlayniteApi);
+                Database.SetGameInfo<Requirement>();
 
                 LocalSystem = new LocalSystem(Path.Combine(Paths.PluginUserDataPath, $"Configurations.json"));
                 Database.PC = LocalSystem.GetSystemConfiguration();
 
                 stopWatch.Stop();
                 TimeSpan ts = stopWatch.Elapsed;
-                logger.Info($"LoadDatabase with {Database.Count} items - {string.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10)}");
+                Logger.Info($"LoadDatabase with {Database.Count} items - {string.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10)}");
             }
             catch (Exception ex)
             {
@@ -72,7 +72,7 @@ namespace SystemChecker.Services
 
             if (gameRequierements == null)
             {
-                Game game = PlayniteApi.Database.Games.Get(Id);
+                Game game = API.Instance.Database.Games.Get(Id);
                 if (game != null)
                 {
                     gameRequierements = GetDefault(game);
@@ -93,7 +93,7 @@ namespace SystemChecker.Services
 
         public override GameRequierements GetWeb(Guid Id)
         {
-            Game game = PlayniteApi.Database.Games.Get(Id);
+            Game game = API.Instance.Database.Games.Get(Id);
             GameRequierements gameRequierements = GetDefault(game);
 
             try
@@ -101,24 +101,24 @@ namespace SystemChecker.Services
                 string SourceName = CommonPluginsShared.PlayniteTools.GetSourceName(game);
 
                 // Search datas
-                logger.Info($"Try find with PCGamingWikiRequierements for {game.Name}");
-                gameRequierements = pCGamingWikiRequierements.GetRequirements(game);
+                Logger.Info($"Try find with PCGamingWikiRequierements for {game.Name}");
+                gameRequierements = PCGamingWikiRequierements.GetRequirements(game);
 
-                if (!pCGamingWikiRequierements.IsFind())
+                if (!PCGamingWikiRequierements.IsFind())
                 {
-                    logger.Info($"Try find with SteamRequierements for {game.Name}");
+                    Logger.Info($"Try find with SteamRequierements for {game.Name}");
                     switch (SourceName.ToLower())
                     {
                         case "steam":
-                            gameRequierements = steamRequierements.GetRequirements(game);
+                            gameRequierements = SteamRequierements.GetRequirements(game);
                             break;
 
                         default:
                             SteamApi steamApi = new SteamApi(PluginName);
-                            int SteamID = steamApi.GetAppId(game.Name);
-                            if (SteamID != 0)
+                            uint steamID = steamApi.GetAppId(game.Name);
+                            if (steamID != 0)
                             {
-                                gameRequierements = steamRequierements.GetRequirements(game, (uint)SteamID);
+                                gameRequierements = SteamRequierements.GetRequirements(game, steamID);
                             }
                             break;
                     }
@@ -173,68 +173,72 @@ namespace SystemChecker.Services
 
 
         #region Tag
-        public override void AddTag(Game game, bool noUpdate = false)
+        public override void AddTag(Game game)
         {
-            GetPluginTags();
-            GameRequierements gameRequierements = Get(game, true);
-
-            if (gameRequierements.HasData)
+            GameRequierements item = Get(game, true);
+            if (item.HasData)
             {
                 try
                 {
                     SystemConfiguration systemConfiguration = Database.PC;
-                    Requirement systemMinimum = gameRequierements.GetMinimum();
-                    Requirement systemRecommanded = gameRequierements.GetRecommanded();
+                    Requirement systemMinimum = item.GetMinimum();
+                    Requirement systemRecommanded = item.GetRecommanded();
 
                     CheckSystem CheckMinimum = SystemApi.CheckConfig(game, systemMinimum, systemConfiguration, game.IsInstalled);
                     CheckSystem CheckRecommanded = SystemApi.CheckConfig(game, systemRecommanded, systemConfiguration, game.IsInstalled);
-
 
                     if (!(bool)CheckMinimum.AllOk && !(bool)CheckRecommanded.AllOk)
                     {
                         return;
                     }
 
+                    Guid? tagId = null;
                     // Minimum
-                    Guid? TagId = null;
-
                     if ((bool)CheckMinimum.AllOk)
                     {
-                        TagId = CheckTagExist($"{resources.GetString("LOCSystemCheckerConfigMinimum")}"); 
+                        tagId = CheckTagExist($"{ResourceProvider.GetString("LOCSystemCheckerConfigMinimum")}");
                     }
-
                     // Recommanded
                     if ((bool)CheckRecommanded.AllOk)
                     {
-                        TagId = CheckTagExist($"{resources.GetString("LOCSystemCheckerConfigRecommanded")}");
+                        tagId = CheckTagExist($"{ResourceProvider.GetString("LOCSystemCheckerConfigRecommanded")}");
                     }
 
-                    if (TagId != null)
+                    if (tagId != null)
                     {
                         if (game.TagIds != null)
                         {
-                            game.TagIds.Add((Guid)TagId);
+                            game.TagIds.Add((Guid)tagId);
                         }
                         else
                         {
-                            game.TagIds = new List<Guid> { (Guid)TagId };
-                        }
-
-                        if (!noUpdate)
-                        {
-                            Application.Current.Dispatcher?.Invoke(() =>
-                            {
-                                PlayniteApi.Database.Games.Update(game);
-                                game.OnPropertyChanged();
-                            }, DispatcherPriority.Send);
+                            game.TagIds = new List<Guid> { (Guid)tagId };
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    Common.LogError(ex, false, $"Tag insert error with {game.Name}", true, PluginName, string.Format(resources.GetString("LOCCommonNotificationTagError"), game.Name));
+                    Common.LogError(ex, false, $"Tag insert error with {game.Name}", true, PluginName, string.Format(ResourceProvider.GetString("LOCCommonNotificationTagError"), game.Name));
+                    return;
                 }
             }
+            else if (TagMissing)
+            {
+                if (game.TagIds != null)
+                {
+                    game.TagIds.Add((Guid)AddNoDataTag());
+                }
+                else
+                {
+                    game.TagIds = new List<Guid> { (Guid)AddNoDataTag() };
+                }
+            }
+
+            API.Instance.MainView.UIDispatcher?.Invoke(() =>
+            {
+                API.Instance.Database.Games.Update(game);
+                game.OnPropertyChanged();
+            });
         }
         #endregion
 

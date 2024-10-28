@@ -23,9 +23,9 @@ namespace SystemChecker.Services
 
         public SystemCheckerSearch()
         {
-            Description = resources.GetString("LOCSystemCheckerSearchDescription");
+            Description = ResourceProvider.GetString("LOCSystemCheckerSearchDescription");
             Label = PluginDatabase.PluginName;
-            Hint = resources.GetString("LOCSystemCheckerSearchHint");
+            Hint = ResourceProvider.GetString("LOCSystemCheckerSearchHint");
             Delay = 500;
         }
 
@@ -114,7 +114,7 @@ namespace SystemChecker.Services
 
                         if (isOK)
                         {
-                            searchItems.Add(new GameSearchItem(game, resources.GetString("LOCGameSearchItemActionSwitchTo"), () => API.Instance.MainView.SelectGame(game.Id)));
+                            searchItems.Add(new GameSearchItem(game, ResourceProvider.GetString("LOCGameSearchItemActionSwitchTo"), () => API.Instance.MainView.SelectGame(game.Id)));
                         }
                     });
 
