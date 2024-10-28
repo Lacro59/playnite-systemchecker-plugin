@@ -15,6 +15,7 @@ using SystemChecker.Models;
 using SystemChecker.Services;
 using CommonPluginsStores.Steam;
 using CommonPluginsStores.PCGamingWiki;
+using AngleSharp.Dom;
 
 namespace SystemChecker.Clients
 {
@@ -89,13 +90,13 @@ namespace SystemChecker.Clients
                 HtmlParser parser = new HtmlParser();
                 IHtmlDocument HtmlRequirement = parser.Parse(ResultWeb);
 
-                var systemRequierement = HtmlRequirement.QuerySelector("div.sysreq_Windows");
+                IElement systemRequierement = HtmlRequirement.QuerySelector("div.sysreq_Windows");
                 if (systemRequierement != null)
                 {
                     Requirement Minimum = new Requirement();
                     Requirement Recommanded = new Requirement();
 
-                    foreach (var row in systemRequierement.QuerySelectorAll(".table-sysreqs-body-row"))
+                    foreach (IElement row in systemRequierement.QuerySelectorAll(".table-sysreqs-body-row"))
                     {
                         string dataTitle = row.QuerySelector(".table-sysreqs-body-parameter").InnerHtml.ToLower();
                         string dataMinimum = row.QuerySelector(".table-sysreqs-body-minimum").InnerHtml.Trim();
@@ -291,17 +292,17 @@ namespace SystemChecker.Clients
             {
                 data = data.Substring(0, data.ToLower().IndexOf("mb"));
 
-                double.TryParse(data
+                _ = double.TryParse(data
                     .Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim()
                     .Replace(",", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim(), out hdd);
 
-               return (long)(1024 * 1024 * hdd);
+                return (long)(1024 * 1024 * hdd);
             }
             if (data.Contains("gb", StringComparison.InvariantCultureIgnoreCase))
             {
                 data = data.Substring(0, data.ToLower().IndexOf("gb"));
 
-                double.TryParse(data
+                _ = double.TryParse(data
                     .Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim()
                     .Replace(",", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim(), out hdd);
 
@@ -314,14 +315,16 @@ namespace SystemChecker.Clients
         private List<string> ReplaceGPU(string data)
         {
             data = data.Replace("<br>", "¤");
-            data = Regex.Replace(data, "<[^>]*>", string.Empty);
-            data = Regex.Replace(data, @"[(]\d+x\d+[)]", string.Empty);
+            data = Regex.Replace(data, "<[^>]*>", string.Empty, RegexOptions.IgnoreCase);
+            data = Regex.Replace(data, @"[(]\d+x\d+[)]", string.Empty, RegexOptions.IgnoreCase);
+            data = Regex.Replace(data, @"\(AMD Catalyst \d*\.\d+, nVidia \d*\.\d+\)", string.Empty, RegexOptions.IgnoreCase);
+            data = Regex.Replace(data, @"XNA \d*(\.\d+)? compatible", string.Empty, RegexOptions.IgnoreCase);
+            data = Regex.Replace(data, @"\(shader model \d*(\.\d+)?\)+", string.Empty, RegexOptions.IgnoreCase);
 
             data = data.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
                 .Replace("a toaster - you really shouldn't have trouble", string.Empty)
                 .Replace("Non-Dedicated (shared) video card", string.Empty)
                 .Replace("Onboard graphics chipset", string.Empty)
-                .Replace("XNA 4.0 compatible", string.Empty)
                 .Replace("compatible hardware", string.Empty)
                 .Replace("AMD Radeon or Nvidia GeForce recommended", string.Empty)
                 .Replace("A dedicated GPU (Nvidia or AMD) with at least", string.Empty)
@@ -332,7 +335,6 @@ namespace SystemChecker.Clients
                 .Replace("Mobile or dedicated", string.Empty)
                 .Replace("DirectX compatible card", string.Empty)
                 .Replace("or better", string.Empty)
-                .Replace("(shader model 4.0)+", string.Empty)
                 .Replace("of VRAM", "VRAM")
 
                 .Replace("(Shared Memory is not recommended)", string.Empty)
@@ -344,18 +346,27 @@ namespace SystemChecker.Clients
                 .Replace("+ compatible", string.Empty).Replace("compatible", string.Empty)
                 .Replace("that supports DirectDraw at 640x480 resolution, 256 colors", string.Empty)
                 .Replace("or higher", string.Empty)
+                .Replace("capable GPU", string.Empty)
                 .Replace("  ", " ")
                 .Replace(" / ", "¤").Replace(" or ", "¤").Replace(", ", "¤");
 
             data = Regex.Replace(data, @"DX(\d+)[+]?", "DirectX $1");
 
-            return data.Split('¤')
+            List<string> result = data.Split('¤')
                 .Select(x => x.Trim()).ToList()
                 .Where(x => x.Length > 4)
                 .Where(x => x.ToLower().IndexOf("shader") == -1)
                 .Where(x => x.ToLower().IndexOf("anything") == -1)
                 .Where(x => x.ToLower().IndexOf("any card") == -1)
                 .Where(x => x.Trim() != string.Empty).Where(x => !x.Trim().IsNullOrEmpty()).ToList();
+
+            result = result.Select(x =>
+            {
+                Match match = Regex.Match(x, @"^OpenGL ES \d+(\.\d+)?");
+                return match.Success ? match.Value : x;
+            }).ToList();
+
+            return result;
         }
         #endregion
     }

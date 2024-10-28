@@ -22,7 +22,7 @@ namespace SystemChecker.Services
 
         public bool IsWithNoCard = false;
         public bool IsIntegrate => CardPc.IsIntegrate;
-        public bool CardRequierementIsOld => CardRequierement.IsOld; 
+        public bool CardRequierementIsOld => CardRequierement.IsOld;
 
         public Gpu(SystemConfiguration systemConfiguration, string GpuRequierement)
         {
@@ -31,27 +31,27 @@ namespace SystemChecker.Services
 
 
             // VRAM only
-            double Vram = 0;
-            string TempVram = string.Empty;
+            double vram = 0;
+            string tempVram = string.Empty;
             if (GpuRequierement.ToLower().IndexOf("vram") > -1 && !CallIsNvidia(GpuRequierement) && !CallIsAmd(GpuRequierement))
             {
-                TempVram = GpuRequierement.Replace(".", CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator);
-                TempVram = Regex.Replace(TempVram, "vram", string.Empty, RegexOptions.IgnoreCase);
+                tempVram = GpuRequierement.Replace(".", CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator);
+                tempVram = Regex.Replace(tempVram, "vram", string.Empty, RegexOptions.IgnoreCase);
 
-                if (TempVram.ToLower().IndexOf("mb") > -1 && !CallIsNvidia(GpuRequierement) && !CallIsAmd(GpuRequierement))
+                if (tempVram.ToLower().IndexOf("mb") > -1 && !CallIsNvidia(GpuRequierement) && !CallIsAmd(GpuRequierement))
                 {
-                    double.TryParse(Regex.Replace(TempVram, "mb", string.Empty, RegexOptions.IgnoreCase).Trim(), out Vram);
-                    if (Vram > 0)
+                    _ = double.TryParse(Regex.Replace(tempVram, "mb", string.Empty, RegexOptions.IgnoreCase).Trim(), out vram);
+                    if (vram > 0)
                     {
-                        Vram = Vram * 1024;
+                        vram = vram * 1024;
                     }
                 }
-                if (TempVram.ToLower().IndexOf("gb") > -1 && !CallIsNvidia(GpuRequierement) && !CallIsAmd(GpuRequierement))
+                if (tempVram.ToLower().IndexOf("gb") > -1 && !CallIsNvidia(GpuRequierement) && !CallIsAmd(GpuRequierement))
                 {
-                    double.TryParse(Regex.Replace(TempVram, "gb", string.Empty, RegexOptions.IgnoreCase).Trim(), out Vram);
-                    if (Vram > 0)
+                    _ = double.TryParse(Regex.Replace(tempVram, "gb", string.Empty, RegexOptions.IgnoreCase).Trim(), out vram);
+                    if (vram > 0)
                     {
-                        Vram = Vram * 1024 * 1024;
+                        vram = vram * 1024 * 1024;
                     }
                 }
             }
@@ -81,7 +81,7 @@ namespace SystemChecker.Services
 
 
             CardPc.Vram = systemConfiguration.GpuRam;
-            CardRequierement.Vram = (long)Vram;
+            CardRequierement.Vram = (long)vram;
 
             CardPc.ResolutionHorizontal = (int)systemConfiguration.CurrentHorizontalResolution;
             CardRequierement.ResolutionHorizontal = ResolutionHorizontal;
@@ -260,7 +260,7 @@ namespace SystemChecker.Services
         }
         public static bool CallIsAmd(string GpuName)
         {
-            return ((GpuName.ToLower().IndexOf("amd") > -1 || GpuName.ToLower().IndexOf("radeon") > -1 || GpuName.ToLower().IndexOf("ati ") > -1) 
+            return ((GpuName.ToLower().IndexOf("amd") > -1 || GpuName.ToLower().IndexOf("radeon") > -1 || GpuName.ToLower().IndexOf("ati ") > -1)
                 && GpuName.ToLower().IndexOf("(amd)") == -1);
         }
         public static bool CallIsIntel(string GpuName)
@@ -270,35 +270,33 @@ namespace SystemChecker.Services
 
         private GpuObject SetCard(string GpuName)
         {
-            bool IsIntegrate = false;
-            bool IsNvidia = false;
-            bool IsAmd = false;
-            bool IsOld = false;
-            bool IsM = false;
+            bool isIntegrate = false;
+            bool isNvidia = false;
+            bool isAmd = false;
+            bool isOld = false;
+            bool isM = false;
 
-            bool IsOgl = false;
-            bool IsDx = false;
-            int DxVersion = 0;
-            int OglVersion = 0;
+            bool isOgl = false;
+            bool isDx = false;
+            int dxVersion = 0;
+            int oglVersion = 0;
 
-            string Type = string.Empty;
-            int Number = 0;
+            string type = string.Empty;
 
-            IsIntegrate = GpuName.Contains("intel", StringComparison.InvariantCultureIgnoreCase) || GpuName.Contains("vega", StringComparison.InvariantCultureIgnoreCase);
-            IsNvidia = CallIsNvidia(GpuName);
-            IsAmd = CallIsAmd(GpuName);
+            isIntegrate = GpuName.Contains("intel", StringComparison.InvariantCultureIgnoreCase) || GpuName.Contains("vega", StringComparison.InvariantCultureIgnoreCase);
+            isNvidia = CallIsNvidia(GpuName);
+            isAmd = CallIsAmd(GpuName);
 
-            int.TryParse(Regex.Replace(GpuName.Replace("R5", string.Empty).Replace("R7", string.Empty).Replace("R9", string.Empty), "[^.0-9]", string.Empty).Trim(), out Number);
-
+            _ = int.TryParse(Regex.Replace(GpuName.Replace("R5", string.Empty).Replace("R7", string.Empty).Replace("R9", string.Empty), "[^.0-9]", string.Empty).Trim(), out int Number);
 
             #region Check is mobile version
-            if (Regex.IsMatch("[0-9]m", GpuName.ToLower(), RegexOptions.IgnoreCase))
+            if (Regex.IsMatch(GpuName.ToLower(), "[0-9]m", RegexOptions.IgnoreCase))
             {
-                IsM = true;
+                isM = true;
             }
-            if (Regex.IsMatch("m[0-9]", GpuName.ToLower(), RegexOptions.IgnoreCase))
+            if (Regex.IsMatch(GpuName.ToLower(), "m[0-9]", RegexOptions.IgnoreCase))
             {
-                IsM = true;
+                isM = true;
             }
             #endregion
 
@@ -307,176 +305,176 @@ namespace SystemChecker.Services
             // Other
             if (GpuName.ToLower().IndexOf("directx") > -1 || Regex.IsMatch(GpuName.ToLower(), "dx[0-9]*"))
             {
-                IsDx = true;
-                int.TryParse(Regex.Replace(GpuName, @"[^\d]", string.Empty).Trim(), out DxVersion);
-                if (DxVersion > 0)
-                {                   
-                    if (DxVersion > 50)
+                isDx = true;
+                _ = int.TryParse(Regex.Replace(GpuName, @"[^\d]", string.Empty).Trim(), out dxVersion);
+                if (dxVersion > 0)
+                {
+                    if (dxVersion > 50)
                     {
-                        DxVersion = int.Parse(DxVersion.ToString().Substring(0, DxVersion.ToString().Length - 1));
+                        dxVersion = int.Parse(dxVersion.ToString().Substring(0, dxVersion.ToString().Length - 1));
                     }
                 }
                 else
                 {
-                    DxVersion = 8;
+                    dxVersion = 8;
                 }
             }
             if (GpuName.ToLower().IndexOf("pretty much any 3d graphics card") > -1 || GpuName.ToLower().IndexOf("integrat") > -1)
             {
-                IsOld = true;
+                isOld = true;
             }
             if (GpuName.ToLower().IndexOf("svga") > -1)
             {
-                IsOld = true;
+                isOld = true;
             }
             if (GpuName.ToLower().IndexOf("opengl") > -1 || GpuName.ToLower().IndexOf("open gl") > -1)
             {
-                IsOgl = true;
+                isOgl = true;
                 int.TryParse(
                     GpuName.ToLower().Replace("opengl", string.Empty).Replace("open gl", string.Empty)
                     .Replace(".0", string.Empty).Trim(),
-                    out OglVersion
+                    out oglVersion
                 );
             }
             if (GpuName.ToLower().IndexOf("direct3d") > -1)
             {
-                IsOld = true;
+                isOld = true;
             }
 
-            if (IsNvidia)
+            if (isNvidia)
             {
                 if (GpuName.ToLower().IndexOf("geforce gt") > -1 && GpuName.ToLower().IndexOf("gtx") == -1)
                 {
-                    IsOld = true;
+                    isOld = true;
                 }
                 if (Number >= 5000 && GpuName.ToLower().IndexOf("rtx") == -1)
                 {
-                    IsOld = true;
+                    isOld = true;
                 }
                 if (Number == 4200 || Number == 4400 || Number == 4600 || Number == 4800)
                 {
-                    IsOld = true;
+                    isOld = true;
                 }
                 if (Number < 450)
                 {
-                    IsOld = true;
+                    isOld = true;
                 }
                 if (Regex.IsMatch(GpuName.ToLower(), "geforce[0-9]"))
                 {
-                    IsOld = true;
+                    isOld = true;
                 }
                 if (GpuName.ToLower().IndexOf("geforce fx") > -1)
                 {
-                    IsOld = true;
+                    isOld = true;
                 }
             }
 
-            if (IsAmd)
+            if (isAmd)
             {
                 if (GpuName.ToLower().IndexOf("radeon x") > -1)
                 {
-                    IsOld = true;
+                    isOld = true;
                 }
                 if (GpuName.ToLower().IndexOf("radeon hd") > -1 && Number < 7000)
                 {
-                    IsOld = true;
+                    isOld = true;
                 }
                 if (GpuName.ToLower().IndexOf("radeon r") > -1 && Number < 300)
                 {
-                    IsOld = true;
+                    isOld = true;
                 }
                 if (Regex.IsMatch(GpuName.ToLower(), "radeon [0-9]"))
                 {
-                    IsOld = true;
+                    isOld = true;
                 }
             }
             #endregion
 
 
             #region Type
-            if (!IsOld)
+            if (!isOld)
             {
-                if (IsIntegrate)
+                if (isIntegrate)
                 {
                     if (GpuName.ToLower().IndexOf("uhd") > -1)
                     {
-                        Type = "UHD";
+                        type = "UHD";
                     }
                     if (GpuName.ToLower().IndexOf(" hd") > -1)
                     {
-                        Type = "HD";
+                        type = "HD";
                     }
                 }
 
-                if (IsNvidia)
+                if (isNvidia)
                 {
                     if (GpuName.ToLower().IndexOf("gts") > -1)
                     {
-                        Type = "gts";
+                        type = "gts";
                     }
                     if (GpuName.ToLower().IndexOf("gtx") > -1)
                     {
-                        Type = "GTX";
+                        type = "GTX";
                     }
                     if (GpuName.ToLower().IndexOf("rtx") > -1)
                     {
-                        Type = "RTX";
+                        type = "RTX";
                     }
                 }
 
-                if (IsAmd)
+                if (isAmd)
                 {
                     if (GpuName.ToLower().IndexOf("radeon hd") > -1)
                     {
-                        Type = "Radeon HD";
+                        type = "Radeon HD";
                     }
                     if (GpuName.ToLower().IndexOf("r5") > -1)
                     {
-                        Type = "R5";
+                        type = "R5";
                     }
                     if (GpuName.ToLower().IndexOf("r7") > -1)
                     {
-                        Type = "R7";
+                        type = "R7";
                     }
                     if (GpuName.ToLower().IndexOf("r9") > -1)
                     {
-                        Type = "R9";
+                        type = "R9";
                     }
                     if (GpuName.ToLower().IndexOf("rx") > -1)
                     {
-                        Type = "RX";
+                        type = "RX";
                     }
                 }
             }
             #endregion
 
 
-            if (!IsAmd && !IsNvidia && !IsIntegrate && !IsDx)
+            if (!isAmd && !isNvidia && !isIntegrate && !isDx)
             {
-                IsOld = true;
+                isOld = true;
             }
 
 
             if (GpuName.Contains("(nvidia)", StringComparison.OrdinalIgnoreCase) && GpuName.Contains("(amd)", StringComparison.OrdinalIgnoreCase))
             {
-                IsOld = false;
+                isOld = false;
             }
 
 
             return new GpuObject
             {
-                IsIntegrate = IsIntegrate,
-                IsNvidia = IsNvidia,
-                IsAmd = IsAmd,
-                IsOld = IsOld,
-                IsM = IsM,
+                IsIntegrate = isIntegrate,
+                IsNvidia = isNvidia,
+                IsAmd = isAmd,
+                IsOld = isOld,
+                IsM = isM,
 
-                IsOGL = IsOgl,
-                IsDx = IsDx,
-                DxVersion = DxVersion,
-                OglVersion = OglVersion,
+                IsOGL = isOgl,
+                IsDx = isDx,
+                DxVersion = dxVersion,
+                OglVersion = oglVersion,
 
-                Type = Type,
+                Type = type,
                 Number = Number,
                 Vram = 0,
                 ResolutionHorizontal = 0,

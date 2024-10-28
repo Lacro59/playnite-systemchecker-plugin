@@ -9,17 +9,16 @@ using Playnite.SDK.Models;
 
 namespace SystemChecker.Services
 {
-    class SystemApi
+    public class SystemApi
     {
         private static ILogger Logger => LogManager.GetLogger();
-        private static IResourceProvider ResourceProvider => new ResourceProvider();
-
-        private static Game Game;
+        private static SystemCheckerDatabase PluginDatabase => SystemChecker.PluginDatabase;
+        private static Game GameContext;
 
 
         public static CheckSystem CheckConfig(Game game, Requirement requirement, SystemConfiguration systemConfiguration, bool IsInstalled)
         {
-            Game = game;
+            GameContext = game;
             Common.LogDebug(true, $"CheckConfig() for {game.Name}");
 
             if (requirement != null && systemConfiguration != null)
@@ -83,8 +82,8 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), Game?.Name);
-                Common.LogError(ex, false, message, true, "SystemChecker");
+                string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), GameContext?.Name);
+                Common.LogError(ex, false, message, true, PluginDatabase.PluginName);
             }
 
             return false;
@@ -118,8 +117,8 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), Game?.Name);
-                Common.LogError(ex, false, message, true, "SystemChecker");
+                string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), GameContext?.Name);
+                Common.LogError(ex, false, message, true, PluginDatabase.PluginName);
             }
 
             return false;
@@ -133,8 +132,8 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), Game?.Name);
-                Common.LogError(ex, false, message, true, "SystemChecker");
+                string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), GameContext?.Name);
+                Common.LogError(ex, false, message, true, PluginDatabase.PluginName);
             }
 
             return false;
@@ -169,8 +168,8 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), SystemApi.Game?.Name);
-                Common.LogError(ex, false, message, true, "SystemChecker");
+                string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), GameContext?.Name);
+                Common.LogError(ex, false, message, true, PluginDatabase.PluginName);
             }
 
             return false;
@@ -195,8 +194,8 @@ namespace SystemChecker.Services
             }
             catch (Exception ex)
             {
-                string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), Game?.Name);
-                Common.LogError(ex, false, message, true, "SystemChecker");
+                string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), GameContext?.Name);
+                Common.LogError(ex, false, message, true, PluginDatabase.PluginName);
             }
 
             return false;
