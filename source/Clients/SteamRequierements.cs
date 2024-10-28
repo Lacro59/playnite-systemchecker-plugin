@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using SystemChecker.Models;
 using SystemChecker.Services;
 using CommonPluginsShared.Extensions;
+using AngleSharp.Dom;
 
 namespace SystemChecker.Clients
 {
@@ -53,7 +54,7 @@ namespace SystemChecker.Clients
             try
             {
                 string data = GetSteamData();
-                var parsedData = Serialization.FromJson<Dictionary<string, StoreAppDetailsResult>>(data);
+                Dictionary<string, StoreAppDetailsResult> parsedData = Serialization.FromJson<Dictionary<string, StoreAppDetailsResult>>(data);
 
                 if (parsedData[AppId.ToString()].data != null && Serialization.ToJson(parsedData[AppId.ToString()].data.pc_requirements) != "[]")
                 {
@@ -117,7 +118,7 @@ namespace SystemChecker.Clients
             IHtmlDocument HtmlRequirement = parser.Parse(pc_requirement);
 
             // Only recent game
-            foreach (var ElementRequirement in HtmlRequirement.QuerySelectorAll("li"))
+            foreach (IElement ElementRequirement in HtmlRequirement.QuerySelectorAll("li"))
             {
                 Common.LogDebug(true, $"SteamRequierements - {ElementRequirement.InnerHtml}");
 
@@ -230,12 +231,20 @@ namespace SystemChecker.Clients
                             .Replace(", x86", string.Empty)
                             .Trim();
 
-                    cpu = Regex.Replace(cpu, ", ([0-9])", " $1");
-                    cpu = Regex.Replace(cpu, "([0-9]),([0-9] GHz)", "$1.$2");
-                    cpu = Regex.Replace(cpu, "([0-9])GHz", "$1 GHz");
-                    cpu = Regex.Replace(cpu, "([0-9999])k", "$1K");
-                    cpu = cpu.Replace(",", "¤").Replace(" / ", "¤").Replace(" or ", "¤").Replace(" OR ", "¤")
-                        .Replace(" and ", "¤").Replace(" AND ", "¤").Replace(" | ", "¤");
+                    cpu = Regex.Replace(cpu, @", (\d+)", " $1", RegexOptions.IgnoreCase);
+                    cpu = Regex.Replace(cpu, @"(\d+),(\d+ GHz)", "$1.$2", RegexOptions.IgnoreCase);
+                    cpu = Regex.Replace(cpu, @"(\d+),(\d+) - (\d+ GHz)", "$3", RegexOptions.IgnoreCase);
+                    cpu = Regex.Replace(cpu, @"(\d+)GHz", "$1 GHz", RegexOptions.IgnoreCase);
+                    cpu = Regex.Replace(cpu, @"(\d+)k", "$1K", RegexOptions.IgnoreCase);
+
+                    cpu = cpu.Replace(",", "¤")
+                        .Replace(" / ", "¤")
+                        .Replace(" or ", "¤")
+                        .Replace(" OR ", "¤")
+                        .Replace(" and ", "¤")
+                        .Replace(" AND ", "¤")
+                        .Replace(" | ", "¤");
+
                     foreach (string sTemp in cpu.Split('¤'))
                     {
                         requirement.Cpu.Add(sTemp.Trim());
@@ -274,7 +283,17 @@ namespace SystemChecker.Clients
                 //< li >< strong > Graphics:</ strong > GeForce GT 440(1024 MB) or equivalent / Radeon HD 6450(512 MB) or equivalent / Iris Pro Graphics 5200(1792 MB) < br ></ li >
                 if (ElementRequirement.InnerHtml.IndexOf("<strong>Graphics") > -1)
                 {
-                    string gpu = Regex.Replace(ElementRequirement.InnerHtml, @"with [(]?\d+[ ]?(MB)?(GB)?[)]? (Memory)?(Video RAM)?", string.Empty, RegexOptions.IgnoreCase);
+                    string gpu = Regex.Replace(ElementRequirement.InnerHtml, @"with [(]?\d+[ ]?(MB)?(GB)?[)]? (Memory)?(Video RAM)?", string.Empty, RegexOptions.IgnoreCase);                    
+                    gpu = Regex.Replace(gpu, @"\(GTX \d+ or above required for VR\)", string.Empty, RegexOptions.IgnoreCase);
+                    gpu = Regex.Replace(gpu, @"DirectX \d class GPU with \dGB VRAM \(", string.Empty, RegexOptions.IgnoreCase);
+                    gpu = Regex.Replace(gpu, @"Shader Model \d+(\.\d+)?", string.Empty, RegexOptions.IgnoreCase);
+                    gpu = Regex.Replace(gpu, @"card capable of shader \d+(\.\d+)?", string.Empty, RegexOptions.IgnoreCase);
+                    gpu = Regex.Replace(gpu, @"DX\d+ Compliant with PS\d+(\.\d+)? support", string.Empty, RegexOptions.IgnoreCase);
+                    gpu = Regex.Replace(gpu, @"DX\d+ Compliant", string.Empty, RegexOptions.IgnoreCase);
+                    gpu = Regex.Replace(gpu, @"de \d+ GB", string.Empty, RegexOptions.IgnoreCase);
+                    gpu = Regex.Replace(gpu, @"GPU (\d+)GB VRAM", "GPU $1 GB VRAM", RegexOptions.IgnoreCase);
+                    gpu = Regex.Replace(gpu, @"(,|with)?\s*(\d+)\s*(GB|MB)(\s* system ram)?", " ($2 $3)", RegexOptions.IgnoreCase);
+
                     gpu = gpu.Replace("\t", " ")
                             .Replace("<strong>Graphics:</strong>", string.Empty)
                             .Replace("<strong>Graphics: </strong>", string.Empty)
@@ -282,6 +301,7 @@ namespace SystemChecker.Clients
                             .Replace("\" or similar", string.Empty)
                             .Replace("compatible video card (integrated or dedicated with min 512MB memory)", string.Empty)
                             .Replace("capable GPU", string.Empty)
+                            .Replace("at least ", string.Empty)
                             .Replace(" capable.", string.Empty)
                             .Replace(" or Higher VRAM Graphics Cards", string.Empty)
                             .Replace("VRAM Graphics Cards", "VRAM")
@@ -289,8 +309,6 @@ namespace SystemChecker.Clients
                             .Replace("ATI or NVidia card w/ 1024 MB RAM (NVIDIA GeForce GTX 260 or ATI HD 4890)", "NVIDIA GeForce GTX 260 or ATI HD 4890")
                             .Replace("Video card must be 128 MB or more and should be a DirectX 9-compatible with support for Pixel Shader 2.0b (", string.Empty)
                             .Replace("- *NOT* an Express graphics card).", string.Empty)
-                            .Replace("DirectX 11 class GPU with 1GB VRAM (", string.Empty)
-                            .Replace("(GTX 970 or above required for VR)", string.Empty)
                             .Replace("2GB (GeForce GTX 970 / amd RX 5500 XT)", "GeForce GTX 970 / AMD RX 5500 XT")
                             .Replace(" - anything capable of running OpenGL 4.0 (eg. ATI Radeon HD 57xx or Nvidia GeForce 400 and higher)", string.Empty)
                             .Replace("(AMD or NVIDIA equivalent)", string.Empty)
@@ -301,9 +319,6 @@ namespace SystemChecker.Clients
                             .Replace("or similar (no support for onboard cards)", string.Empty)
                             .Replace("level Graphics Card (requires support for SSE)", string.Empty)
                             .Replace("- Integrated graphics and very low budget cards might not work.", string.Empty)
-                            .Replace("Shader Model 3.0", string.Empty)
-                            .Replace("shader model 3.0", string.Empty)
-                            .Replace("card capable of shader 3.0", string.Empty)
                             .Replace("3D with TnL support and", string.Empty)
                             .Replace(" compatible", string.Empty)
                             .Replace("of addressable memory", string.Empty)
@@ -311,13 +326,7 @@ namespace SystemChecker.Clients
                             .Replace("any", string.Empty)
                             .Replace("/Nvidia", " / Nvidia")
                             .Replace("or AMD equivalent", string.Empty)
-                            .Replace("DX9 Compliant with PS3.0 support", string.Empty)
-                            .Replace("DX9 Compliant", string.Empty)
                             .Replace("(Requires support for SSE)", string.Empty)
-                            .Replace("de 1 GB", string.Empty)
-                            .Replace("de 2 GB", string.Empty)
-                            .Replace("de 3 GB", string.Empty)
-                            .Replace("de 4 GB", string.Empty)
                             .Replace("ATI or NVidia card", "Card")
                             .Replace("w/", "with")
                             .Replace("Graphics: ", string.Empty)
@@ -342,22 +351,6 @@ namespace SystemChecker.Clients
                             .Replace("e.g.", string.Empty)
                             .Replace("Laptop integrated ", string.Empty)
                             .Replace("GPU 1GB VRAM", "GPU 1 GB VRAM")
-                            .Replace("with 3GB system ram", "(3 GB)")
-                            .Replace("with 512MB", "(512 MB)")
-                            .Replace("(1Gb)", "(1 GB)")
-                            .Replace("(1GB)", "(1 GB)")
-                            .Replace(" 1GB", " (1 GB)")
-                            .Replace(", 1 GB", " (1 GB)")
-                            .Replace(", 1GB", " (1 GB)")
-                            .Replace(" 2GB", " (2 GB)")
-                            .Replace(", 2 GB", " (2 GB)")
-                            .Replace(", 2GB", " (2 GB)")
-                            .Replace("(2GB)", " (2 GB)")
-                            .Replace("(3GB)", " (3 GB)")
-                            .Replace("3GB", " (3 GB)")
-                            .Replace("(4GB)", " (4 GB)")
-                            .Replace(" 6GB", " (6 GB)")
-                            .Replace(" 4GB", " (4 GB)")
                             .Replace("8GB Memory 8 GB RAM", "(8 GB)")
                             .Replace(" or more and should be a DirectX 9-compatible with support for Pixel Shader 3.0", string.Empty)
                             .Replace(", or ", string.Empty)
@@ -389,11 +382,15 @@ namespace SystemChecker.Clients
                             }
                             else if (Regex.IsMatch(sTemp, @"\d+((.|,)\d+)?[ ]?(mb|gb)", RegexOptions.IgnoreCase) && sTemp.Length < 10)
                             {
-                                requirement.Gpu.Add(sTemp.Replace("(", string.Empty).Replace(")", string.Empty).Trim() + " VRAM");
+                                requirement.Gpu.Add(sTemp.ToUpper().Replace("(", string.Empty).Replace(")", string.Empty).Trim() + " VRAM");
                             }
                             else if (Regex.IsMatch(sTemp, @"[(]\d+((.|,)\d+)?[ ]?(mb|gb)[)] vram", RegexOptions.IgnoreCase))
                             {
-                                requirement.Gpu.Add(sTemp.Replace("(", string.Empty).Replace(")", string.Empty).Trim());
+                                requirement.Gpu.Add(sTemp.ToUpper().Replace("(", string.Empty).Replace(")", string.Empty).Trim());
+                            }
+                            else if (Regex.IsMatch(sTemp, @"[(]\d+((.|,)\d+)?[ ]?(mb|gb)[)] ram", RegexOptions.IgnoreCase))
+                            {
+                                requirement.Gpu.Add(sTemp.ToUpper().Replace("(", string.Empty).Replace(")", string.Empty).Replace("RAM", "VRAM").Trim());
                             }
                             else if (Regex.IsMatch(sTemp, @"DirectX \d+[.]\d", RegexOptions.IgnoreCase))
                             {

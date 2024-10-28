@@ -224,26 +224,26 @@ namespace SystemChecker.Clients
 
         private List<string> ReplaceCPU(string data)
         {
+            data = Regex.Replace(data, @"\d+ bit processor", string.Empty, RegexOptions.IgnoreCase);
+            data = Regex.Replace(data, @"\d+ or newer dual-core Intel or AMD", string.Empty, RegexOptions.IgnoreCase);
+            data = Regex.Replace(data, @"\d+ or newer Intel Core i3, i5 or i7", string.Empty, RegexOptions.IgnoreCase);
+            data = Regex.Replace(data, @"\(\d+(\.\d+)? GHz if graphics card does not support T&amp;L\)", string.Empty, RegexOptions.IgnoreCase);
+            data = Regex.Replace(data, @"Dual-core CPU \(\d+(\.\d+)? GHz or greater speed\)", "Dual-core CPU", RegexOptions.IgnoreCase);
+            data = Regex.Replace(data, @"\(\d CPUs\), ~\d+(\.\d+)? GHz", string.Empty, RegexOptions.IgnoreCase);
+            data = Regex.Replace(data, @"-\w+ @ \d+(\.\d+)? GHz", string.Empty, RegexOptions.IgnoreCase);
+
             data = data
                 .Replace("one that works", string.Empty)
                 .Replace("(approx)", string.Empty)
-                .Replace("64 bit processor", string.Empty)
                 .Replace("GHz+", "GHz")
-                .Replace("Dual-core CPU (2 GHz or greater speed)", "Dual-core CPU")
-                .Replace("-2XXX @ 2.0 GHz", string.Empty)
-                .Replace("2009 or newer dual-core Intel or AMD", string.Empty)
-                .Replace("2011 or newer Intel Core i3, i5 or i7", string.Empty)
                 .Replace("SSE2 instruction set support", string.Empty)
                 .Replace("(or equivalent)", string.Empty)
                 .Replace("or equivalent", string.Empty)
-                .Replace("(4 CPUs), ~2.4 GHz", string.Empty)
-                .Replace("(4 CPUs), ~3.1 GHz", string.Empty)
                 .Replace("<b>(DXR)</b>", string.Empty)
                 .Replace(" from Intel or AMD at", string.Empty)
                 .Replace("with SSE2 instruction set support", string.Empty)
                 .Replace("faster", string.Empty)
                 .Replace("(and graphics card with T&amp;L)", string.Empty)
-                .Replace("(1.5 GHz if graphics card does not support T&amp;L)", string.Empty)
                 .Replace("or AMD equivalent", string.Empty)
                 .Replace("or better", string.Empty)
                 .Replace("or higher", string.Empty)
@@ -252,7 +252,16 @@ namespace SystemChecker.Clients
                 .Replace("(software)", string.Empty)
                 .Replace(", x86", string.Empty)
                 .Replace(" / ", "¤").Replace("<br>", "¤").Replace(" or ", "¤");
-            return data.Split('¤').Select(x => x.Trim()).Where(x => !x.Trim().IsNullOrEmpty()).ToList();
+
+            List<string> result = data.Split('¤').Select(x => x.Trim()).Where(x => !x.Trim().IsNullOrEmpty()).ToList();
+
+            result = result.Select(x =>
+            {
+                Match match = Regex.Match(x, @"^\d+(\.\d+)? GHz(?=<sup)", RegexOptions.IgnoreCase);
+                return match.Success ? match.Value : x;
+            }).ToList();
+
+            return result;
         }
 
         private long ReplaceRAM(string data)
@@ -315,11 +324,11 @@ namespace SystemChecker.Clients
         private List<string> ReplaceGPU(string data)
         {
             data = data.Replace("<br>", "¤");
-            data = Regex.Replace(data, "<[^>]*>", string.Empty, RegexOptions.IgnoreCase);
+            data = Regex.Replace(data, @"<[^>]*>", string.Empty, RegexOptions.IgnoreCase);
             data = Regex.Replace(data, @"[(]\d+x\d+[)]", string.Empty, RegexOptions.IgnoreCase);
-            data = Regex.Replace(data, @"\(AMD Catalyst \d*\.\d+, nVidia \d*\.\d+\)", string.Empty, RegexOptions.IgnoreCase);
-            data = Regex.Replace(data, @"XNA \d*(\.\d+)? compatible", string.Empty, RegexOptions.IgnoreCase);
-            data = Regex.Replace(data, @"\(shader model \d*(\.\d+)?\)+", string.Empty, RegexOptions.IgnoreCase);
+            data = Regex.Replace(data, @"\(AMD Catalyst \d+\.\d+, nVidia \d+\.\d+\)", string.Empty, RegexOptions.IgnoreCase);
+            data = Regex.Replace(data, @"XNA \d+(\.\d+)? compatible", string.Empty, RegexOptions.IgnoreCase);
+            data = Regex.Replace(data, @"\(shader model \d+(\.\d+)?\)\+", string.Empty, RegexOptions.IgnoreCase);
 
             data = data.Replace("(or equivalent)", string.Empty).Replace("or equivalent", string.Empty)
                 .Replace("a toaster - you really shouldn't have trouble", string.Empty)
@@ -362,7 +371,7 @@ namespace SystemChecker.Clients
 
             result = result.Select(x =>
             {
-                Match match = Regex.Match(x, @"^OpenGL ES \d+(\.\d+)?");
+                Match match = Regex.Match(x, @"^OpenGL ES \d+(\.\d+)?", RegexOptions.IgnoreCase);
                 return match.Success ? match.Value : x;
             }).ToList();
 
