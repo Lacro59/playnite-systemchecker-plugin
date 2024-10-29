@@ -155,17 +155,25 @@ namespace SystemChecker.Services
                     return new CheckResult { Result = true };
                 }
 
-                if (CardRequierement.Number > 999 && CardPc.Number < 1000)
+                if (CardRequierement.Number != 0 && CardPc.Number != 0)
                 {
-                    return new CheckResult { Result = true };
+                    if (CardRequierement.Number > 999 && CardPc.Number < 1000)
+                    {
+                        return new CheckResult { Result = true };
+                    }
+                    if (CardRequierement.Number > 999 && CardPc.Number > 999)
+                    {
+                        return new CheckResult { Result = CardRequierement.Number < CardPc.Number };
+                    }
+                    if (CardRequierement.Number < 1000 && CardPc.Number < 1000)
+                    {
+                        return new CheckResult { Result = CardRequierement.Number < CardPc.Number };
+                    }
                 }
-                if (CardRequierement.Number > 999 && CardPc.Number > 999)
+                else
                 {
-                    return new CheckResult { Result = CardRequierement.Number < CardPc.Number };
-                }
-                if (CardRequierement.Number < 1000 && CardPc.Number < 1000)
-                {
-                    return new CheckResult { Result = CardRequierement.Number < CardPc.Number };
+                    logger.Warn($"No GPU treatment for {CardPcName}: {Serialization.ToJson(CardPc)} & {CardRequierementName}: {Serialization.ToJson(CardRequierement)}");
+                    return new CheckResult { Result = true, SameConstructor = true };
                 }
             }
 
@@ -230,7 +238,7 @@ namespace SystemChecker.Services
 
             }
 
-            logger.Warn($"No GPU treatment for {Serialization.ToJson(CardPc)} & {Serialization.ToJson(CardRequierement)}");
+            logger.Warn($"No GPU treatment for {CardPcName}: {Serialization.ToJson(CardPc)} & {CardRequierementName}: {Serialization.ToJson(CardRequierement)}");
             return new CheckResult();
         }
 

@@ -76,6 +76,7 @@ namespace SystemChecker.Clients
 
             gpu = gpu.Replace("nvidia", string.Empty, StringComparison.InvariantCultureIgnoreCase)
                 .Replace("amd", string.Empty, StringComparison.InvariantCultureIgnoreCase)
+                .Replace("(r)", string.Empty, StringComparison.InvariantCultureIgnoreCase)
                 .Replace("series", string.Empty, StringComparison.InvariantCultureIgnoreCase)
                 .Replace("graphics card", string.Empty, StringComparison.InvariantCultureIgnoreCase)
                 .Replace("graphics", string.Empty, StringComparison.InvariantCultureIgnoreCase)

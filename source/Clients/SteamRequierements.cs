@@ -181,7 +181,10 @@ namespace SystemChecker.Clients
                     {
                         foreach (string sTemp in os.Replace(",", "¤").Replace(" or ", "¤").Replace("/", "¤").Split('¤'))
                         {
-                            requirement.Os.Add(sTemp.Trim());
+                            if (!sTemp.IsNullOrEmpty())
+                            {
+                                requirement.Os.Add(sTemp.Trim());
+                            }
                         }
                     }
                 }
@@ -242,7 +245,10 @@ namespace SystemChecker.Clients
 
                     foreach (string sTemp in cpu.Split('¤'))
                     {
-                        requirement.Cpu.Add(sTemp.Trim());
+                        if (!sTemp.IsNullOrEmpty())
+                        {
+                            requirement.Cpu.Add(sTemp.Trim());
+                        }
                     }
                 }
 
@@ -374,7 +380,7 @@ namespace SystemChecker.Clients
                     gpu = gpu.Replace(",", "¤").Replace(" or ", "¤").Replace(" OR ", "¤").Replace(" / ", "¤").Replace(" /", "¤").Replace(" | ", "¤");
                     foreach (string sTemp in gpu.Split('¤'))
                     {
-                        if (sTemp.Trim() != string.Empty)
+                        if (!sTemp.IsNullOrEmpty())
                         {
                             if (sTemp.ToLower().IndexOf("nvidia") > -1 || sTemp.ToLower().IndexOf("amd") > -1 || sTemp.ToLower().IndexOf("intel") > -1)
                             {
