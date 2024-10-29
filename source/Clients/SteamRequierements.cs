@@ -215,8 +215,6 @@ namespace SystemChecker.Clients
                             .Replace(" or Equivalent", string.Empty)
                             .Replace("4 CPUs", string.Empty)
                             .Replace("(3 GHz Pentium® 4 recommended)", string.Empty)
-                            .Replace(", ~2.4GHz", string.Empty)
-                            .Replace(", ~3.1GHz", string.Empty)
                             .Replace("ghz", "GHz")
                             .Replace("Ghz", "GHz")
                             .Replace("®", string.Empty)
@@ -229,21 +227,18 @@ namespace SystemChecker.Clients
                             .Replace("()", string.Empty)
                             .Replace("<br>", string.Empty)
                             .Replace(", x86", string.Empty)
+                            .Replace("Yes", string.Empty)
+                            .Replace("GHz+", "GHz")
                             .Trim();
 
-                    cpu = Regex.Replace(cpu, @", (\d+)", " $1", RegexOptions.IgnoreCase);
+                    cpu = Regex.Replace(cpu, @", ~?(\d+(\.\d+)?)", " $1", RegexOptions.IgnoreCase);
                     cpu = Regex.Replace(cpu, @"(\d+),(\d+ GHz)", "$1.$2", RegexOptions.IgnoreCase);
                     cpu = Regex.Replace(cpu, @"(\d+),(\d+) - (\d+ GHz)", "$3", RegexOptions.IgnoreCase);
                     cpu = Regex.Replace(cpu, @"(\d+)GHz", "$1 GHz", RegexOptions.IgnoreCase);
                     cpu = Regex.Replace(cpu, @"(\d+)k", "$1K", RegexOptions.IgnoreCase);
+                    cpu = Regex.Replace(cpu, @"(\d+\.\d+)\+ (GHz)", "$1 $2", RegexOptions.IgnoreCase);
 
-                    cpu = cpu.Replace(",", "¤")
-                        .Replace(" / ", "¤")
-                        .Replace(" or ", "¤")
-                        .Replace(" OR ", "¤")
-                        .Replace(" and ", "¤")
-                        .Replace(" AND ", "¤")
-                        .Replace(" | ", "¤");
+                    cpu = Regex.Replace(cpu, @"(,|\/|\sor\s|\sand\s|\|)", "¤", RegexOptions.IgnoreCase);
 
                     foreach (string sTemp in cpu.Split('¤'))
                     {
@@ -293,12 +288,15 @@ namespace SystemChecker.Clients
                     gpu = Regex.Replace(gpu, @"de \d+ GB", string.Empty, RegexOptions.IgnoreCase);
                     gpu = Regex.Replace(gpu, @"GPU (\d+)GB VRAM", "GPU $1 GB VRAM", RegexOptions.IgnoreCase);
                     gpu = Regex.Replace(gpu, @"(,|with)?\s*(\d+)\s*(GB|MB)(\s* system ram)?", " ($2 $3)", RegexOptions.IgnoreCase);
+                    gpu = Regex.Replace(gpu, @"\(A minimum of \(\d+ GB\) of VRAM\)", string.Empty, RegexOptions.IgnoreCase);
 
                     gpu = gpu.Replace("\t", " ")
                             .Replace("<strong>Graphics:</strong>", string.Empty)
                             .Replace("<strong>Graphics: </strong>", string.Empty)
                             .Replace("requires graphics card. minimum GPU needed: \"", string.Empty)
+                            .Replace("(Integrated Graphics)", string.Empty)
                             .Replace("\" or similar", string.Empty)
+                            .Replace("Graphics card supporting", string.Empty)
                             .Replace("compatible video card (integrated or dedicated with min 512MB memory)", string.Empty)
                             .Replace("capable GPU", string.Empty)
                             .Replace("at least ", string.Empty)
@@ -353,6 +351,7 @@ namespace SystemChecker.Clients
                             .Replace("GPU 1GB VRAM", "GPU 1 GB VRAM")
                             .Replace("8GB Memory 8 GB RAM", "(8 GB)")
                             .Replace(" or more and should be a DirectX 9-compatible with support for Pixel Shader 3.0", string.Empty)
+                            .Replace("Yes", string.Empty)
                             .Replace(", or ", string.Empty)
                             .Replace("()", string.Empty)
                             .Replace("<br>", string.Empty)
@@ -370,25 +369,26 @@ namespace SystemChecker.Clients
                         gpu = gpuTmp;
                     }
 
-                    gpu = Regex.Replace(gpu, " - ([0-9]) GB", " ($1 GB)");
+                    gpu = Regex.Replace(gpu, @"(gb|mb)(\))?\s*\+", "$1$2", RegexOptions.IgnoreCase);
+                    gpu = Regex.Replace(gpu, @" - (\d+) (gb|mb)", " ($1 $2)", RegexOptions.IgnoreCase);
                     gpu = gpu.Replace(",", "¤").Replace(" or ", "¤").Replace(" OR ", "¤").Replace(" / ", "¤").Replace(" /", "¤").Replace(" | ", "¤");
                     foreach (string sTemp in gpu.Split('¤'))
                     {
                         if (sTemp.Trim() != string.Empty)
                         {
-                            if (sTemp.ToLower().IndexOf("nvidia") > -1 || sTemp.ToLower().IndexOf("amd") > -1)
+                            if (sTemp.ToLower().IndexOf("nvidia") > -1 || sTemp.ToLower().IndexOf("amd") > -1 || sTemp.ToLower().IndexOf("intel") > -1)
                             {
-                                requirement.Gpu.Add(Regex.Replace(sTemp, @"[(][0-9] GB[)]", string.Empty).Trim());
+                                requirement.Gpu.Add(Regex.Replace(sTemp, @"\(\d+\s*(mb|gb)\)", string.Empty, RegexOptions.IgnoreCase).Trim());
                             }
-                            else if (Regex.IsMatch(sTemp, @"\d+((.|,)\d+)?[ ]?(mb|gb)", RegexOptions.IgnoreCase) && sTemp.Length < 10)
+                            else if (Regex.IsMatch(sTemp, @"\d+((.|,)\d+)?\s*(mb|gb)", RegexOptions.IgnoreCase) && sTemp.Length < 10)
                             {
                                 requirement.Gpu.Add(sTemp.ToUpper().Replace("(", string.Empty).Replace(")", string.Empty).Trim() + " VRAM");
                             }
-                            else if (Regex.IsMatch(sTemp, @"[(]\d+((.|,)\d+)?[ ]?(mb|gb)[)] vram", RegexOptions.IgnoreCase))
+                            else if (Regex.IsMatch(sTemp, @"\(\d+((.|,)\d+)?\s*(mb|gb)\) vram", RegexOptions.IgnoreCase))
                             {
                                 requirement.Gpu.Add(sTemp.ToUpper().Replace("(", string.Empty).Replace(")", string.Empty).Trim());
                             }
-                            else if (Regex.IsMatch(sTemp, @"[(]\d+((.|,)\d+)?[ ]?(mb|gb)[)] ram", RegexOptions.IgnoreCase))
+                            else if (Regex.IsMatch(sTemp, @"\(\d+((.|,)\d+)?\s*(mb|gb)\) ram", RegexOptions.IgnoreCase))
                             {
                                 requirement.Gpu.Add(sTemp.ToUpper().Replace("(", string.Empty).Replace(")", string.Empty).Replace("RAM", "VRAM").Trim());
                             }
