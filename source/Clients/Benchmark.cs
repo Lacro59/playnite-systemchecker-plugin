@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using AngleSharp.Dom;
 using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
@@ -113,8 +112,8 @@ namespace SystemChecker.Clients
                 {
                     gpu = gpu.ToLower().Replace("gt", string.Empty).Replace("geforce", "geforce gt").Trim();
                 }
-                
-                int.TryParse(val.ToString().Substring(1), out int val2);
+
+                _ = int.TryParse(val.ToString().Substring(1), out int val2);
                 if (Regex.IsMatch(gpu, @"geforce \d+", RegexOptions.IgnoreCase)
                     && (!Regex.IsMatch(gpu, @"\d+m", RegexOptions.IgnoreCase) || val2 >= 50)
                     && (!Regex.IsMatch(gpu, @"\d+a", RegexOptions.IgnoreCase) || val2 >= 50)
@@ -286,13 +285,13 @@ namespace SystemChecker.Clients
                                 break;
 
                             case 1:
-                                float.TryParse(td.InnerHtml, out float mark);
+                                _ = float.TryParse(td.InnerHtml, out float mark);
                                 benchmarkData.mark = mark;
                                 idx++;
                                 break;
 
                             case 2:
-                                int.TryParse(td.InnerHtml, out int rank);
+                                _ = int.TryParse(td.InnerHtml, out int rank);
                                 benchmarkData.rank = rank;
                                 idx++;
                                 break;
@@ -350,15 +349,8 @@ namespace SystemChecker.Clients
                         matchPC = FuzzListPC.Where(x => x.Data.name.IsEqual(pc))?.First() ?? null;
                     }
                     catch { }
-                    
-                    if (matchPC != null)
-                    {
-                        foundPC = new List<BenchmarkData>() { matchPC.Data };
-                    }
-                    else
-                    {
-                        foundPC = new List<BenchmarkData>() { FuzzListPC.First().Data };
-                    }
+
+                    foundPC = matchPC != null ? new List<BenchmarkData>() { matchPC.Data } : new List<BenchmarkData>() { FuzzListPC.First().Data };
                 }
                 if (FuzzListCompare.First().MatchPercent >= 95)
                 {
@@ -369,27 +361,19 @@ namespace SystemChecker.Clients
                     }
                     catch { }
 
-                    if (matchCompare != null)
-                    {
-                        foundCompare = new List<BenchmarkData>() { matchCompare.Data };
-                    }
-                    else
-                    {
-                        foundCompare = new List<BenchmarkData>() { FuzzListCompare.First().Data };
-                    }
+                    foundCompare = matchCompare != null
+                        ? new List<BenchmarkData>() { matchCompare.Data }
+                        : new List<BenchmarkData>() { FuzzListCompare.First().Data };
                 }
 
                 Common.LogDebug(true, $"Benchmark - {pc} - {(foundPC?.Count == 0 ? "" : foundPC[0].name)}");
                 Common.LogDebug(true, $"Benchmark - {compare} - {(foundCompare?.Count == 0 ? "" : foundCompare[0].name)}");
 
-                if (foundPC?.Count == 0 || foundCompare?.Count == 0)
-                {
-                    return null;
-                }
-
-                return foundPC[0].mark == 0 || foundCompare[0].mark == 0
+                return foundPC?.Count == 0 || foundCompare?.Count == 0
+                    ? null
+                    : (bool?)(foundPC[0].mark == 0 || foundCompare[0].mark == 0
                     ? foundPC[0].rank <= foundCompare[0].rank
-                    : foundPC[0].mark >= foundCompare[0].mark;
+                    : foundPC[0].mark >= foundCompare[0].mark);
             }
             catch (Exception ex)
             {
