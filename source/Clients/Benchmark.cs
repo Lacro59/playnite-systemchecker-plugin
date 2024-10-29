@@ -20,19 +20,19 @@ namespace SystemChecker.Clients
 {
     public class Benchmark
     {
-        internal static ILogger logger => LogManager.GetLogger();
-        private readonly SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
+        private static ILogger Logger => LogManager.GetLogger();
+        private static SystemCheckerDatabase PluginDatabase => SystemChecker.PluginDatabase;
 
         #region GPU
         private const string urlVideoCard = @"https://www.videocardbenchmark.net/gpu_list.php";
 
-        protected List<BenchmarkData> _VideoCardDataList;
+        private List<BenchmarkData> _videoCardDataList;
         internal List<BenchmarkData> VideoCardDataList
         {
             get
             {
                 string dataPath = Path.Combine(PluginDatabase.Paths.PluginUserDataPath, "VideoCardDataList.json");
-                if (_VideoCardDataList == null)
+                if (_videoCardDataList == null)
                 {
                     // From cache if exists & not expired
                     if (File.Exists(dataPath) && File.GetLastWriteTime(dataPath).AddDays(30) > DateTime.Now)
@@ -53,14 +53,14 @@ namespace SystemChecker.Clients
                         }
                         else
                         {
-                            logger.Warn($"VideoCardDataList is empty");
+                            Logger.Warn($"VideoCardDataList is empty");
                         }
                     }
                 }
-                return _VideoCardDataList;
+                return _videoCardDataList;
             }
 
-            set => _VideoCardDataList = value;
+            set => _videoCardDataList = value;
         }
 
 
@@ -152,13 +152,13 @@ namespace SystemChecker.Clients
         #region CPU
         private const string urlCpu = @"https://www.cpubenchmark.net/cpu_list.php";
 
-        protected List<BenchmarkData> _CpuDataList;
+        private List<BenchmarkData> _cpuDataList;
         internal List<BenchmarkData> CpuDataList
         {
             get
             {
                 string dataPath = Path.Combine(PluginDatabase.Paths.PluginUserDataPath, "CpuDataList.json");
-                if (_CpuDataList == null)
+                if (_cpuDataList == null)
                 {
                     // From cache if exists & not expired
                     if (File.Exists(dataPath) && File.GetLastWriteTime(dataPath).AddDays(30) > DateTime.Now)
@@ -179,14 +179,14 @@ namespace SystemChecker.Clients
                         }
                         else
                         {
-                            logger.Warn($"CpuDataList is empty");
+                            Logger.Warn($"CpuDataList is empty");
                         }
                     }
                 }
-                return _CpuDataList;
+                return _cpuDataList;
             }
 
-            set => _CpuDataList = value;
+            set => _cpuDataList = value;
         }
 
 
@@ -237,7 +237,7 @@ namespace SystemChecker.Clients
                 {
                     cpu = cpu.Replace("core i", "intel core i");
                 }
-                if (cpu.IndexOf("intel core") == -1)
+                if (cpu.IndexOf("intel core") == -1 && cpu.IndexOf("intel xeon") == -1)
                 {
                     cpu = "intel core " + cpu;
                 }
@@ -286,7 +286,7 @@ namespace SystemChecker.Clients
                                 break;
 
                             case 1:
-                                int.TryParse(td.InnerHtml, out int mark);
+                                float.TryParse(td.InnerHtml, out float mark);
                                 benchmarkData.mark = mark;
                                 idx++;
                                 break;
@@ -387,7 +387,9 @@ namespace SystemChecker.Clients
                     return null;
                 }
 
-                return foundPC[0].mark >= foundCompare[0].mark;
+                return foundPC[0].mark == 0 || foundCompare[0].mark == 0
+                    ? foundPC[0].rank <= foundCompare[0].rank
+                    : foundPC[0].mark >= foundCompare[0].mark;
             }
             catch (Exception ex)
             {

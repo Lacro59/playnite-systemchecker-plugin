@@ -10,7 +10,7 @@ namespace SystemChecker.Models
     {
         public string id { get; set; }
         public string name { get; set; }
-        public int mark { get; set; }
+        public float mark { get; set; }
         public int rank { get; set; }
     }
 }
