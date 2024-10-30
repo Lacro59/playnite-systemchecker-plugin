@@ -19,7 +19,7 @@
     <sys:String x:Key="LOCSystemCheckerConfigRecommanded">推荐</sys:String>
 
     <sys:String x:Key="LOCSystemCheckerOS">操作系</sys:String>
-    <sys:String x:Key="LOCSystemCheckerCpu">处</sys:String>
+    <sys:String x:Key="LOCSystemCheckerCpu"></sys:String>
     <sys:String x:Key="LOCSystemCheckerRam">内存</sys:String>
     <sys:String x:Key="LOCSystemCheckerGpu">图形</sys:String>
     <sys:String x:Key="LOCSystemCheckerDisk">存</sys:String>
