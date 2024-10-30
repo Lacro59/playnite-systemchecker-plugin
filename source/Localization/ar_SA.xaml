@@ -7,7 +7,7 @@
 
     <sys:String x:Key="LOCSystemCheckerCheckConfig">فحص</sys:String>
     
-    <sys:String x:Key="LOCSystemCheckerRefreshPcInfo">تحديث إعدادات النظام الخاص </sys:String>
+    <sys:String x:Key="LOCSystemCheckerRefreshPcInfo">تحديث إعدادات النظام الخاص</sys:String>
 
     <!-- SystemCheckerSettingsView -->
 
@@ -15,13 +15,13 @@
 
     <!-- SystemCheckerGameView -->
 
-    <sys:String x:Key="LOCSystemCheckerConfigMinimum">الحد الاد</sys:String>
-    <sys:String x:Key="LOCSystemCheckerConfigRecommanded">الموصى </sys:String>
+    <sys:String x:Key="LOCSystemCheckerConfigMinimum">الحد الا</sys:String>
+    <sys:String x:Key="LOCSystemCheckerConfigRecommanded">الموص</sys:String>
 
     <sys:String x:Key="LOCSystemCheckerOS">نظام التشغ</sys:String>
     <sys:String x:Key="LOCSystemCheckerCpu">المعالج</sys:String>
     <sys:String x:Key="LOCSystemCheckerRam">الذاكر</sys:String>
-    <sys:String x:Key="LOCSystemCheckerGpu">الجراف</sys:String>
+    <sys:String x:Key="LOCSystemCheckerGpu">الجرا</sys:String>
     <sys:String x:Key="LOCSystemCheckerDisk">التخز</sys:String>
 
     <!-- SystemCheckerNotifications -->
