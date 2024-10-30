@@ -83,7 +83,7 @@ namespace SystemChecker.Services
             catch (Exception ex)
             {
                 string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), GameContext?.Name);
-                Common.LogError(ex, false, message, true, PluginDatabase.PluginName);
+                Common.LogError(ex, false, message, true, PluginDatabase.PluginName, message);
             }
 
             return false;
@@ -118,7 +118,7 @@ namespace SystemChecker.Services
             catch (Exception ex)
             {
                 string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), GameContext?.Name);
-                Common.LogError(ex, false, message, true, PluginDatabase.PluginName);
+                Common.LogError(ex, false, message, true, PluginDatabase.PluginName, message);
             }
 
             return false;
@@ -133,7 +133,7 @@ namespace SystemChecker.Services
             catch (Exception ex)
             {
                 string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), GameContext?.Name);
-                Common.LogError(ex, false, message, true, PluginDatabase.PluginName);
+                Common.LogError(ex, false, message, true, PluginDatabase.PluginName, message);
             }
 
             return false;
@@ -169,7 +169,7 @@ namespace SystemChecker.Services
             catch (Exception ex)
             {
                 string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), GameContext?.Name);
-                Common.LogError(ex, false, message, true, PluginDatabase.PluginName);
+                Common.LogError(ex, false, message, true, PluginDatabase.PluginName, message);
             }
 
             return false;
@@ -195,7 +195,7 @@ namespace SystemChecker.Services
             catch (Exception ex)
             {
                 string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), GameContext?.Name);
-                Common.LogError(ex, false, message, true, PluginDatabase.PluginName);
+                Common.LogError(ex, false, message, true, PluginDatabase.PluginName, message);
             }
 
             return false;
