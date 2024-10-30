@@ -78,3 +78,11 @@ Packages:
     PackageUrl: https://github.com/Lacro59/playnite-systemchecker-plugin/releases/download/v3.1.2/playnite-systemchecker-plugin_3_1_2.pext
     Changelog:
       - Fixed minors issue
+  - Version: 3.1.3
+    RequiredApiVersion: 6.11.0
+    ReleaseDate: 2024-10-30
+    PackageUrl: https://github.com/Lacro59/playnite-systemchecker-plugin/releases/download/v3.1.3/playnite-systemchecker-plugin_3_1_3.pext
+    Changelog:
+      - 'Updated: Localizations'
+      - 'Optimized: Parser data'
+      - 'Fixed: Some errors and bad messages'
