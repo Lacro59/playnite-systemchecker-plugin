@@ -209,6 +209,9 @@ namespace SystemChecker.Clients
         #region Parser
         private List<string> ReplaceOS(string data)
         {
+            data = data.Replace("<br>", "¤");
+            data = Regex.Replace(data, @"<[^>]*>", string.Empty, RegexOptions.IgnoreCase);
+
             data = data
                 .Replace("Anything made in the last decade", string.Empty)
                 .Replace("(latest service pack)", string.Empty)
@@ -216,7 +219,7 @@ namespace SystemChecker.Clients
                 .Replace(" (Only inclusive until patch 1.16.1. Patch 1.17+ Needs XP and greater.)", string.Empty)
                 .Replace("Windows", string.Empty)
                 .Replace("10 October 2018 Update", string.Empty)
-                .Replace("<b>(DXR)</b>", string.Empty)
+                .Replace("(DXR)", string.Empty)
                 .Replace("or better", string.Empty)
                 .Replace(",", "¤").Replace(" or ", "¤").Replace("/", "¤");
             return data.Split('¤').Select(x => x.Trim()).Where(x => !x.Trim().IsNullOrEmpty()).ToList();
@@ -224,6 +227,8 @@ namespace SystemChecker.Clients
 
         private List<string> ReplaceCPU(string data)
         {
+            data = data.Replace("<br>", "¤");
+            data = Regex.Replace(data, @"<[^>]*>", string.Empty, RegexOptions.IgnoreCase);
             data = Regex.Replace(data, @"\d+ bit processor", string.Empty, RegexOptions.IgnoreCase);
             data = Regex.Replace(data, @"\d+ or newer dual-core Intel or AMD", string.Empty, RegexOptions.IgnoreCase);
             data = Regex.Replace(data, @"\d+ or newer Intel Core i3, i5 or i7", string.Empty, RegexOptions.IgnoreCase);
@@ -239,7 +244,7 @@ namespace SystemChecker.Clients
                 .Replace("SSE2 instruction set support", string.Empty)
                 .Replace("(or equivalent)", string.Empty)
                 .Replace("or equivalent", string.Empty)
-                .Replace("<b>(DXR)</b>", string.Empty)
+                .Replace("(DXR)", string.Empty)
                 .Replace(" from Intel or AMD at", string.Empty)
                 .Replace("with SSE2 instruction set support", string.Empty)
                 .Replace("faster", string.Empty)
@@ -347,7 +352,7 @@ namespace SystemChecker.Clients
                 .Replace("of VRAM", "VRAM")
 
                 .Replace("(Shared Memory is not recommended)", string.Empty)
-                .Replace("<b>(DXR)</b>", string.Empty)
+                .Replace("(DXR)", string.Empty)
                 .Replace("TnL support", string.Empty)
                 .Replace("Integrated graphics, monitor with resolution of 1280x720.", "1280x720")
                 .Replace("Integrated graphics", string.Empty)
