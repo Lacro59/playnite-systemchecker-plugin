@@ -467,7 +467,20 @@ namespace SystemChecker
                             }
 
                             Thread.Sleep(10);
-                            PluginDatabase.RefreshNoLoader(game.Id);
+                            GameRequierements oldData = PluginDatabase.Get(game.Id, true);
+                            GameRequierements newData = PluginDatabase.RefreshNoLoader(game.Id);
+                            if (newData == null || !newData.HasData)
+                            {
+                                if (oldData != null && oldData.HasData)
+                                {
+                                    PluginDatabase.AddOrUpdate(oldData);
+                                    Logger.Warn($"Failed to fetch new data for {game.Name}. Keeping old data.");
+                                }
+                                else
+                                {
+                                    Logger.Warn($"Failed to fetch data for {game.Name}.");
+                                }
+                            }
 
                             a.CurrentProgressValue++;
                         }
