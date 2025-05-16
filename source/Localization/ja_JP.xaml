@@ -7,26 +7,26 @@
 
     <sys:String x:Key="LOCSystemCheckerCheckConfig">構成を確認</sys:String>
     
-    <sys:String x:Key="LOCSystemCheckerRefreshPcInfo">システム構成を更新</sys:String>
+    <sys:String x:Key="LOCSystemCheckerRefreshPcInfo">ステム構成を更新</sys:String>
 
     <!-- SystemCheckerSettingsView -->
 
-    <sys:String x:Key="LOCSystemCheckerAddTag"></sys:String>
+    <sys:String x:Key="LOCSystemCheckerAddTag">どの設定が成功したかを示すタグを追加</sys:String>
 
     <!-- SystemCheckerGameView -->
 
     <sys:String x:Key="LOCSystemCheckerConfigMinimum">最低要件</sys:String>
-    <sys:String x:Key="LOCSystemCheckerConfigRecommanded"></sys:String>
+    <sys:String x:Key="LOCSystemCheckerConfigRecommanded">推奨要件</sys:String>
 
     <sys:String x:Key="LOCSystemCheckerOS">OS</sys:String>
-    <sys:String x:Key="LOCSystemCheckerCpu">プロセッサー</sys:String>
-    <sys:String x:Key="LOCSystemCheckerRam">メモリ</sys:String>
-    <sys:String x:Key="LOCSystemCheckerGpu">グラフィック</sys:String>
-    <sys:String x:Key="LOCSystemCheckerDisk">ストレージ</sys:String>
+    <sys:String x:Key="LOCSystemCheckerCpu">ロセッサー</sys:String>
+    <sys:String x:Key="LOCSystemCheckerRam">モリ</sys:String>
+    <sys:String x:Key="LOCSystemCheckerGpu">ラフィ</sys:String>
+    <sys:String x:Key="LOCSystemCheckerDisk">トレージ</sys:String>
 
     <!-- SystemCheckerNotifications -->
 
-    <sys:String x:Key="LOCSystemCheckerTryRefresh">{0} のプラグインデータを更新してみてくださ</sys:String>
+    <sys:String x:Key="LOCSystemCheckerTryRefresh">{0} のプラグインデータを更新してください</sys:String>
 
     <!-- SystemCheckerSearch -->
 
