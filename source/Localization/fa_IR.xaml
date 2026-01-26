@@ -3,11 +3,11 @@
 
     <!-- MainView -->
 
-    <sys:String x:Key="LOCSystemChecker">SystemChecker</sys:String>
+    <sys:String x:Key="LOCSystemChecker">وارس سامانه</sys:String>
 
     <sys:String x:Key="LOCSystemCheckerCheckConfig">بررسی پیکربندی</sys:String>
     
-    <sys:String x:Key="LOCSystemCheckerRefreshPcInfo">به‌روزرسانی پیکربندی سیست</sys:String>
+    <sys:String x:Key="LOCSystemCheckerRefreshPcInfo">پیکربندی رایانهٔ خود را به‌روزرسانی کنید</sys:String>
 
     <!-- SystemCheckerSettingsView -->
 
@@ -15,28 +15,29 @@
 
     <!-- SystemCheckerGameView -->
 
-    <sys:String x:Key="LOCSystemCheckerConfigMinimum">حداقل سیستم مورد نیاز</sys:String>
+    <sys:String x:Key="LOCSystemCheckerConfigMinimum">سیستم حداقلی</sys:String>
     <sys:String x:Key="LOCSystemCheckerConfigRecommanded">سیستم پیشنهادی</sys:String>
 
     <sys:String x:Key="LOCSystemCheckerOS">سیستم عا</sys:String>
-    <sys:String x:Key="LOCSystemCheckerCpu">پردازشگر</sys:String>
-    <sys:String x:Key="LOCSystemCheckerRam">حافظ</sys:String>
-    <sys:String x:Key="LOCSystemCheckerGpu">گرافی</sys:String>
+    <sys:String x:Key="LOCSystemCheckerCpu">پردازنده</sys:String>
+    <sys:String x:Key="LOCSystemCheckerRam">حافظه</sys:String>
+    <sys:String x:Key="LOCSystemCheckerGpu">کارت گرافیک</sys:String>
     <sys:String x:Key="LOCSystemCheckerDisk">فضای ذخیره‌سازی</sys:String>
 
     <!-- SystemCheckerNotifications -->
 
-    <sys:String x:Key="LOCSystemCheckerTryRefresh">Try to refresh the plugin data for {0}</sys:String>
+    <sys:String x:Key="LOCSystemCheckerTryRefresh">نوگردانی دادهٔ افزایه برای {0} را بیازمایید</sys:String>
 
     <!-- SystemCheckerSearch -->
 
-    <sys:String x:Key="LOCSystemCheckerSearchDescription">Search on SystemChecker data</sys:String>
-    <sys:String x:Key="LOCSystemCheckerSearchHint" xml:space="preserve">Parameters:
-    -min                Your PC has minimum requirements
-    -rec                Your PC has recommended requirements
-    -any                Your PC has minimum or recommended requirements
-    -np                 You didn't play the game
-    -fav                The game must be a favorite
-    -stores={n}     Filter by store name (ex:-stores=steam / -stores=steam,epic)</sys:String>
+    <sys:String x:Key="LOCSystemCheckerSearchDescription">جستجو در دادهٔ وارس سامانه</sys:String>
+    <sys:String x:Key="LOCSystemCheckerSearchHint" xml:space="preserve">پارامترها:
+    -min                رایانهٔ شما دارای پیش‌نیازهای حداقلی است
+    -rec                 رایانهٔ شما دارای پیش‌نیازهای پیشنهادی است
+    -any                 رایانهٔ شما دارای پیش‌نیازهای حداقلی یا پیشنهادی است
+    -np                  بازی را انجام ندادید
+    -fav                این بازی شاید از دلخواه‌ها باشد
+    -stores={n}     پالایش بر پایهٔ فروشگاه (ex:-stores=steam / -stores=steam,epic)
+    -status={n}	پالایش بر پایهٔ نام وضعیت (ex:-status=played / -status=played,playing)</sys:String>
 
 </ResourceDictionary>
