@@ -15,22 +15,22 @@
 
     <!-- SystemCheckerGameView -->
 
-    <sys:String x:Key="LOCSystemCheckerConfigMinimum">Minimum</sys:String>
-    <sys:String x:Key="LOCSystemCheckerConfigRecommanded">Recommended</sys:String>
+    <sys:String x:Key="LOCSystemCheckerConfigMinimum">Minimi</sys:String>
+    <sys:String x:Key="LOCSystemCheckerConfigRecommanded">Suositeltu</sys:String>
 
-    <sys:String x:Key="LOCSystemCheckerOS">Operating system</sys:String>
-    <sys:String x:Key="LOCSystemCheckerCpu">Processor</sys:String>
-    <sys:String x:Key="LOCSystemCheckerRam">Memory</sys:String>
-    <sys:String x:Key="LOCSystemCheckerGpu">Graphics</sys:String>
-    <sys:String x:Key="LOCSystemCheckerDisk">Storage</sys:String>
+    <sys:String x:Key="LOCSystemCheckerOS">Käyttöjärjestelmä</sys:String>
+    <sys:String x:Key="LOCSystemCheckerCpu">Suoritin</sys:String>
+    <sys:String x:Key="LOCSystemCheckerRam">Muisti</sys:String>
+    <sys:String x:Key="LOCSystemCheckerGpu">Grafiikka</sys:String>
+    <sys:String x:Key="LOCSystemCheckerDisk">Tallennustila</sys:String>
 
     <!-- SystemCheckerNotifications -->
 
-    <sys:String x:Key="LOCSystemCheckerTryRefresh">Try to refresh the plugin data for {0}</sys:String>
+    <sys:String x:Key="LOCSystemCheckerTryRefresh">Yritä päivittää lisäosan tiedot {0} varten</sys:String>
 
     <!-- SystemCheckerSearch -->
 
-    <sys:String x:Key="LOCSystemCheckerSearchDescription">Search on SystemChecker data</sys:String>
+    <sys:String x:Key="LOCSystemCheckerSearchDescription">Etsi SystemCheckerin tiedoista</sys:String>
     <sys:String x:Key="LOCSystemCheckerSearchHint" xml:space="preserve">Parameters:
     -min                Your PC has minimum requirements
     -rec                Your PC has recommended requirements
