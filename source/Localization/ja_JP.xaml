@@ -3,7 +3,7 @@
 
     <!-- MainView -->
 
-    <sys:String x:Key="LOCSystemChecker">SystemChecker</sys:String>
+    <sys:String x:Key="LOCSystemChecker">適合性チェック</sys:String>
 
     <sys:String x:Key="LOCSystemCheckerCheckConfig">構成を確認</sys:String>
     
@@ -31,12 +31,13 @@
     <!-- SystemCheckerSearch -->
 
     <sys:String x:Key="LOCSystemCheckerSearchDescription">SystemChecker データで検索</sys:String>
-    <sys:String x:Key="LOCSystemCheckerSearchHint" xml:space="preserve">Parameters:
-    -min                Your PC has minimum requirements
-    -rec                Your PC has recommended requirements
-    -any                Your PC has minimum or recommended requirements
-    -np                 You didn't play the game
-    -fav                The game must be a favorite
-    -stores={n}     Filter by store name (ex:-stores=steam / -stores=steam,epic)</sys:String>
+    <sys:String x:Key="LOCSystemCheckerSearchHint" xml:space="preserve">パラメータ:
+    -min		お使いのPCは最低動作環境を満たしています
+    -rec		お使いのPCは推奨要件を満たしています
+    -any		お使いのPCは最低要件または推奨要件を満たしています
+    -np		あなたはゲームをプレイしませんでした
+    -fav		ゲームはお気に入りである必要があります
+    -stores={n}    ストア名でフィルタリング（例:-stores=steam / -stores=steam,epic）
+    -status={n}    ステータス名でフィルタリング（例：-status=played / -status=played,playing）</sys:String>
 
 </ResourceDictionary>
