@@ -20,10 +20,10 @@ namespace SystemChecker.Controls
     public partial class PluginButton : PluginUserControlExtend
     {
         private SystemCheckerDatabase PluginDatabase => SystemChecker.PluginDatabase;
-        internal override IPluginDatabase pluginDatabase => PluginDatabase;
+		protected override IPluginDatabase pluginDatabase => PluginDatabase;
 
         public PluginButtonDataContext ControlDataContext = new PluginButtonDataContext();
-        internal override IDataContext controlDataContext
+		protected override IDataContext controlDataContext
         {
             get => ControlDataContext;
             set => ControlDataContext = (PluginButtonDataContext)controlDataContext;

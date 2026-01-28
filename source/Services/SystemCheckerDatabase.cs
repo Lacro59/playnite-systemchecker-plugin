@@ -31,34 +31,6 @@ namespace SystemChecker.Services
             SteamRequierements = new SteamRequierements();
         }
 
-
-        protected override bool LoadDatabase()
-        {
-            try
-            {
-                Stopwatch stopWatch = new Stopwatch();
-                stopWatch.Start();
-
-                Database = new RequierementsCollection(Paths.PluginDatabasePath);
-                Database.SetGameInfo<Requirement>();
-
-                LocalSystem = new LocalSystem(Path.Combine(Paths.PluginUserDataPath, $"Configurations.json"));
-                Database.PC = LocalSystem.GetSystemConfiguration();
-
-                stopWatch.Stop();
-                TimeSpan ts = stopWatch.Elapsed;
-                Logger.Info($"LoadDatabase with {Database.Count} items - {string.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10)}");
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, false, true, PluginName);
-                return false;
-            }
-
-            return true;
-        }
-
-
         public override GameRequierements Get(Guid Id, bool OnlyCache = false, bool Force = false)
         {
             GameRequierements gameRequierements = base.GetOnlyCache(Id);
@@ -114,8 +86,8 @@ namespace SystemChecker.Services
                             break;
 
                         default:
-                            SteamApi steamApi = new SteamApi(PluginName);
-                            uint steamID = steamApi.GetAppId(game.Name);
+                            SteamApi steamApi = new SteamApi(PluginName, CommonPluginsShared.PlayniteTools.ExternalPlugin.SystemChecker);
+                            uint steamID = steamApi.GetAppId(game);
                             if (steamID != 0)
                             {
                                 gameRequierements = SteamRequierements.GetRequirements(game, steamID);

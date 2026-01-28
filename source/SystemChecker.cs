@@ -28,7 +28,7 @@ namespace SystemChecker
 
         private bool PreventLibraryUpdatedOnStart { get; set; } = true;
 
-        public SystemChecker(IPlayniteAPI api) : base(api)
+        public SystemChecker(IPlayniteAPI api) : base(api, "SystemChecker")
         {
             // Custom theme button
             EventManager.RegisterClassHandler(typeof(Button), Button.ClickEvent, new RoutedEventHandler(OnCustomThemeButtonClick));

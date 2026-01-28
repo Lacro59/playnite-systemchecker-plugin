@@ -22,8 +22,8 @@ namespace SystemChecker.Clients
     public class PCGamingWikiRequierements : RequierementMetadata
     {
         private SystemCheckerDatabase PluginDatabase => SystemChecker.PluginDatabase;
-        private SteamApi SteamApi => new SteamApi("SystemChecker");
-        private PCGamingWikiApi PcGamingWikiApi => new PCGamingWikiApi("SystemChecker");
+        private SteamApi SteamApi => new SteamApi(PluginDatabase.PluginName, PlayniteTools.ExternalPlugin.SystemChecker);
+        private PCGamingWikiApi PcGamingWikiApi => new PCGamingWikiApi(PluginDatabase.PluginName, PlayniteTools.ExternalPlugin.SystemChecker);
 
         private uint SteamId { get; set; } = 0;
 
@@ -38,7 +38,7 @@ namespace SystemChecker.Clients
         {
             GameRequierements = SystemChecker.PluginDatabase.GetDefault(GameContext);
 
-            string UrlPCGamingWiki = PcGamingWikiApi.FindGoodUrl(GameContext, SteamId);
+            string UrlPCGamingWiki = PcGamingWikiApi.FindGoodUrl(GameContext);
 
             if (!UrlPCGamingWiki.IsNullOrEmpty())
             {
@@ -63,7 +63,7 @@ namespace SystemChecker.Clients
             }
             if (SteamId == 0)
             {
-                SteamId = SteamApi.GetAppId(game.Name);
+                SteamId = SteamApi.GetAppId(game);
             }
 
             return GetRequirements();
