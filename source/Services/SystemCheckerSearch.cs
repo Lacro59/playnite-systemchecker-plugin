@@ -6,131 +6,182 @@ using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using SystemChecker.Models;
 
 namespace SystemChecker.Services
 {
-    public class SystemCheckerSearch : SearchContext
-    {
-        private static IResourceProvider resources = new ResourceProvider();
-        private readonly SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
+	public class SystemCheckerSearch : SearchContext
+	{
+		private readonly SystemCheckerDatabase _pluginDatabase = SystemChecker.PluginDatabase;
 
+		public SystemCheckerSearch()
+		{
+			Description = ResourceProvider.GetString("LOCSystemCheckerSearchDescription");
+			Label = _pluginDatabase.PluginName;
+			Hint = ResourceProvider.GetString("LOCSystemCheckerSearchHint");
+			Delay = 500;
+		}
 
-        public SystemCheckerSearch()
-        {
-            Description = ResourceProvider.GetString("LOCSystemCheckerSearchDescription");
-            Label = PluginDatabase.PluginName;
-            Hint = ResourceProvider.GetString("LOCSystemCheckerSearchHint");
-            Delay = 500;
-        }
+		public override IEnumerable<SearchItem> GetSearchResults(GetSearchResultsArgs args)
+		{
+			List<SearchItem> searchItems = new List<SearchItem>();
 
-        public override IEnumerable<SearchItem> GetSearchResults(GetSearchResultsArgs args)
-        {
-            List<SearchItem> searchItems = new List<SearchItem>();
+			try
+			{
+				SearchParameters searchParams = ParseSearchParameters(args.SearchTerm);
+				SystemConfiguration systemConfiguration = _pluginDatabase.Database.PC;
 
-            try
-            {
-                // Parameters
-                bool hasMin = false;
-                bool hasRec = false;
-                bool hasAny = false;
-                bool hasNp = false;
-                bool hasFav = false;
-                List<string> stores = new List<string>();
-                List<string> status = new List<string>();
+				IEnumerable<PluginGameRequierements> filteredGames = _pluginDatabase.Database
+					.Where(x => MatchesSearchCriteria(x, searchParams, args.GameFilterSettings));
 
-                args.SearchTerm.Split(' ').ForEach(x => 
-                {
-                    if (!hasMin) hasMin = x.IsEqual("-min");
-                    if (!hasRec) hasRec = x.IsEqual("-rec");
-                    if (!hasAny) hasAny = x.IsEqual("-any");
-                    if (!hasNp) hasNp = x.IsEqual("-np");
-                    if (!hasFav) hasFav = x.IsEqual("-fav");
+				foreach (PluginGameRequierements x in filteredGames)
+				{
+					if (args.CancelToken.IsCancellationRequested)
+					{
+						return null;
+					}
 
-                    if (x.Contains("-stores=", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        stores = x.Replace("-stores=", string.Empty, StringComparison.InvariantCultureIgnoreCase).Split(',').ToList();
-                    }
+					if (IsGameValid(x, searchParams, systemConfiguration, out Game game))
+					{
+						searchItems.Add(new GameSearchItem(
+							game,
+							ResourceProvider.GetString("LOCGameSearchItemActionSwitchTo"),
+							() => API.Instance.MainView.SelectGame(game.Id)
+						));
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Common.LogError(ex, false);
+				return null;
+			}
 
-                    if (x.Contains("-status=", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        status = x.Replace("-status=", string.Empty, StringComparison.InvariantCultureIgnoreCase).Split(',').ToList();
-                    }
-                });
-                
-                string SearchTerm = Regex.Replace(args.SearchTerm, @"-stores=(\w*,)*\w*", string.Empty, RegexOptions.IgnoreCase).Trim();
-                SearchTerm = Regex.Replace(SearchTerm, @"-status=(\w*,)*\w*", string.Empty, RegexOptions.IgnoreCase).Trim();
-                SearchTerm = Regex.Replace(SearchTerm, @"-\w*", string.Empty, RegexOptions.IgnoreCase).Trim();
+			return searchItems;
+		}
 
+		private SearchParameters ParseSearchParameters(string searchTerm)
+		{
+			SearchParameters parameters = new SearchParameters();
+			string[] terms = searchTerm.Split(' ');
 
-                SystemConfiguration systemConfiguration = PluginDatabase.Database.PC;
+			foreach (string term in terms)
+			{
+				if (!parameters.HasMin) parameters.HasMin = term.IsEqual("-min");
+				if (!parameters.HasRec) parameters.HasRec = term.IsEqual("-rec");
+				if (!parameters.HasAny) parameters.HasAny = term.IsEqual("-any");
+				if (!parameters.HasNp) parameters.HasNp = term.IsEqual("-np");
+				if (!parameters.HasFav) parameters.HasFav = term.IsEqual("-fav");
 
+				if (term.Contains("-stores=", StringComparison.InvariantCultureIgnoreCase))
+				{
+					parameters.Stores = term
+						.Replace("-stores=", string.Empty, StringComparison.InvariantCultureIgnoreCase)
+						.Split(',')
+						.ToList();
+				}
 
-                // Search
-                PluginDatabase.Database
-                    .Where(x => x.Name.Contains(SearchTerm, StringComparison.InvariantCultureIgnoreCase)
-                                && !x.IsDeleted
-                                && (args.GameFilterSettings.Uninstalled || x.IsInstalled)
-                                && (args.GameFilterSettings.Hidden || !x.Hidden)
-                                && (!hasNp || x.Playtime == 0)
-                                && (!hasFav || x.Favorite)
-                                && (stores.Count == 0 || stores.Any(y => x.Source?.Name?.Contains(y, StringComparison.InvariantCultureIgnoreCase) ?? false))
-                                && (status.Count == 0 || status.Any(y => x.Game?.CompletionStatus?.Name?.Contains(y, StringComparison.InvariantCultureIgnoreCase) ?? false))
-                                )
-                    .ForEach(x =>
-                    {
-                        Game game = API.Instance.Database.Games.Get(x.Id);
-                        bool isOK = false;
+				if (term.Contains("-status=", StringComparison.InvariantCultureIgnoreCase))
+				{
+					parameters.Status = term
+						.Replace("-status=", string.Empty, StringComparison.InvariantCultureIgnoreCase)
+						.Split(',')
+						.ToList();
+				}
+			}
 
-                        // Calcul if necessary
-                        if (hasMin || hasRec || hasAny)
-                        {
-                            RequirementEntry systemMinimum = x.GetMinimum();
-                            RequirementEntry systemRecommanded = x.GetRecommanded();
+			parameters.CleanSearchTerm = Regex.Replace(searchTerm, @"-stores=(\w*,)*\w*", string.Empty, RegexOptions.IgnoreCase);
+			parameters.CleanSearchTerm = Regex.Replace(parameters.CleanSearchTerm, @"-status=(\w*,)*\w*", string.Empty, RegexOptions.IgnoreCase);
+			parameters.CleanSearchTerm = Regex.Replace(parameters.CleanSearchTerm, @"-\w*", string.Empty, RegexOptions.IgnoreCase).Trim();
 
-                            CheckSystem CheckMinimum = SystemApi.CheckConfig(game, systemMinimum, systemConfiguration, game.IsInstalled);
-                            CheckSystem CheckRecommanded = SystemApi.CheckConfig(game, systemRecommanded, systemConfiguration, game.IsInstalled);
+			return parameters;
+		}
 
-                            if (systemMinimum.HasData && (hasMin || hasAny) && (bool)CheckMinimum.AllOk)
-                            {
-                                isOK = true;
-                            }
+		private bool MatchesSearchCriteria(PluginGameRequierements game, SearchParameters searchParams, GameSearchFilterSettings filterSettings)
+		{
+			if (!game.Name.Contains(searchParams.CleanSearchTerm, StringComparison.InvariantCultureIgnoreCase) || game.IsDeleted)
+			{
+				return false;
+			}
 
-                            if (systemRecommanded.HasData && (bool)CheckRecommanded.AllOk && (hasRec || hasAny))
-                            {
-                                isOK = true;
-                            }
-                        }
-                        else
-                        {
-                            isOK = true;
-                        }
+			if (!filterSettings.Uninstalled && !game.IsInstalled)
+			{
+				return false;
+			}
 
+			if (!filterSettings.Hidden && game.Hidden)
+			{
+				return false;
+			}
 
-                        if (isOK)
-                        {
-                            searchItems.Add(new GameSearchItem(game, ResourceProvider.GetString("LOCGameSearchItemActionSwitchTo"), () => API.Instance.MainView.SelectGame(game.Id)));
-                        }
-                    });
+			if (searchParams.HasNp && game.Playtime != 0)
+			{
+				return false;
+			}
 
-                if (args.CancelToken.IsCancellationRequested)
-                {
-                    return null;
-                }
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, false);
-                return null;
-            }
+			if (searchParams.HasFav && !game.Favorite)
+			{
+				return false;
+			}
 
-            return searchItems;
-        }
-    }
+			if (searchParams.Stores.Count > 0 && !searchParams.Stores.Any(y => game.Source?.Name?.Contains(y, StringComparison.InvariantCultureIgnoreCase) ?? false))
+			{
+				return false;
+			}
+
+			if (searchParams.Status.Count > 0 && !searchParams.Status.Any(y => game.Game?.CompletionStatus?.Name?.Contains(y, StringComparison.InvariantCultureIgnoreCase) ?? false))
+			{
+				return false;
+			}
+
+			return true;
+		}
+
+		private bool IsGameValid(PluginGameRequierements gameReq, SearchParameters searchParams, SystemConfiguration systemConfiguration, out Game game)
+		{
+			game = API.Instance.Database.Games.Get(gameReq.Id);
+
+			if (!searchParams.HasMin && !searchParams.HasRec && !searchParams.HasAny)
+			{
+				return true;
+			}
+
+			RequirementEntry systemMinimum = gameReq.GetMinimum();
+			RequirementEntry systemRecommanded = gameReq.GetRecommanded();
+
+			if (systemMinimum.HasData && (searchParams.HasMin || searchParams.HasAny))
+			{
+				CheckSystem checkMinimum = SystemApi.CheckConfig(game, systemMinimum, systemConfiguration, game.IsInstalled);
+				if ((bool)checkMinimum.AllOk)
+				{
+					return true;
+				}
+			}
+
+			if (systemRecommanded.HasData && (searchParams.HasRec || searchParams.HasAny))
+			{
+				CheckSystem checkRecommanded = SystemApi.CheckConfig(game, systemRecommanded, systemConfiguration, game.IsInstalled);
+				if ((bool)checkRecommanded.AllOk)
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		private class SearchParameters
+		{
+			public bool HasMin { get; set; }
+			public bool HasRec { get; set; }
+			public bool HasAny { get; set; }
+			public bool HasNp { get; set; }
+			public bool HasFav { get; set; }
+			public List<string> Stores { get; set; } = new List<string>();
+			public List<string> Status { get; set; } = new List<string>();
+			public string CleanSearchTerm { get; set; } = string.Empty;
+		}
+	}
 }
