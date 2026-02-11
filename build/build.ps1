@@ -14,7 +14,7 @@ $PlaynitePaths = @(
 $PlaynitePath = $null
 
 foreach ($path in $PlaynitePaths) {
-    if (Test-Path -Path $path) {s
+    if (Test-Path -Path $path) {
         $PlaynitePath = $path
         break
     }
