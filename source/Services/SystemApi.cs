@@ -12,8 +12,8 @@ namespace SystemChecker.Services
 {
     public class SystemApi
     {
-        private static ILogger Logger => LogManager.GetLogger();
-        private static SystemCheckerDatabase PluginDatabase => SystemChecker.PluginDatabase;
+        private static readonly ILogger Logger = LogManager.GetLogger();
+        private static readonly SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
         private static Game GameContext;
 
 

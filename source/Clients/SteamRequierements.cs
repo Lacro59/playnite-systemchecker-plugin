@@ -11,16 +11,16 @@ using static CommonPlayniteShared.PluginLibrary.SteamLibrary.SteamShared.StoreAp
 
 namespace SystemChecker.Clients
 {
-	public class SteamRequierements : RequierementMetadata
+	public class SteamRequierements : RequierementMetadata 
 	{
-		private readonly SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
-		private SteamApi SteamApi => new SteamApi(PluginDatabase.PluginName, PlayniteTools.ExternalPlugin.SystemChecker);
+		private readonly SteamApi _steamApi;
 
 		private uint AppId { get; set; }
 
 
 		public SteamRequierements()
 		{
+			_steamApi = new SteamApi(PluginDatabase.PluginName, PlayniteTools.ExternalPlugin.SystemChecker);
 		}
 
 
@@ -28,11 +28,10 @@ namespace SystemChecker.Clients
 		{
 			PluginGameRequierements = SystemChecker.PluginDatabase.GetDefault(GameContext);
 
-			GameRequirements apiResult = SteamApi.GetGameRequirements(AppId);
-
+			GameRequirements apiResult = _steamApi.GetGameRequirements(AppId);
 			if (apiResult == null)
 			{
-				logger.Warn($"SteamRequierements - No data for {GameContext.Name} (AppId: {AppId})");
+				Logger.Warn($"SteamRequierements - No data for {GameContext.Name} (AppId: {AppId})");
 				return PluginGameRequierements;
 			}
 

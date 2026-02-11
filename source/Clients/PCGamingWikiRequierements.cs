@@ -1,5 +1,4 @@
 ﻿using CommonPluginsShared;
-using CommonPluginsShared.Models;
 using CommonPluginsStores.Models;
 using CommonPluginsStores.PCGamingWiki;
 using CommonPluginsStores.Steam;
@@ -13,14 +12,14 @@ namespace SystemChecker.Clients
 {
 	public class PCGamingWikiRequierements : RequierementMetadata
 	{
-		private SystemCheckerDatabase PluginDatabase => SystemChecker.PluginDatabase;
-		private PCGamingWikiApi PcGamingWikiApi => new PCGamingWikiApi(PluginDatabase.PluginName, PlayniteTools.ExternalPlugin.SystemChecker);
+		private readonly PCGamingWikiApi _pcGamingWikiApi;
 
-		private uint SteamId { get; set; } = 0;
+		private uint SteamAppId { get; set; } = 0;
 
 
 		public PCGamingWikiRequierements()
 		{
+			_pcGamingWikiApi = new PCGamingWikiApi(PluginDatabase.PluginName, PlayniteTools.ExternalPlugin.SystemChecker);
 		}
 
 
@@ -28,7 +27,7 @@ namespace SystemChecker.Clients
 		{
 			PluginGameRequierements = SystemChecker.PluginDatabase.GetDefault(GameContext);
 
-			string url = PcGamingWikiApi.FindGoodUrl(GameContext);
+			string url = _pcGamingWikiApi.FindGoodUrl(GameContext);
 
 			if (!url.IsNullOrEmpty())
 			{
@@ -36,7 +35,7 @@ namespace SystemChecker.Clients
 			}
 			else
 			{
-				logger.Warn($"PCGamingWikiRequierements - Not found for {GameContext.Name}");
+				Logger.Warn($"PCGamingWikiRequierements - Not found for {GameContext.Name}");
 			}
 
 			return PluginGameRequierements;
@@ -45,16 +44,16 @@ namespace SystemChecker.Clients
 		public PluginGameRequierements GetRequirements(Game game)
 		{
 			GameContext = game;
-			SteamId = 0;
+			SteamAppId = 0;
 
 			if (GameContext.SourceId == PlayniteTools.GetPluginId(PlayniteTools.ExternalPlugin.SteamLibrary))
 			{
-				SteamId = uint.Parse(game.GameId);
+				SteamAppId = uint.Parse(game.GameId);
 			}
-			if (SteamId == 0)
+			if (SteamAppId == 0)
 			{
 				SteamApi steamApi = new SteamApi(PluginDatabase.PluginName, PlayniteTools.ExternalPlugin.SystemChecker);
-				SteamId = steamApi.GetAppId(game);
+				SteamAppId = steamApi.GetAppId(game);
 			}
 
 			return GetRequirements();
@@ -62,11 +61,10 @@ namespace SystemChecker.Clients
 
 		public override PluginGameRequierements GetRequirements(string url)
 		{
-			GameRequirements apiResult = PcGamingWikiApi.GetGameRequirements(url);
-
+			GameRequirements apiResult = _pcGamingWikiApi.GetGameRequirements(url);
 			if (apiResult == null)
 			{
-				logger.Warn($"PCGamingWikiRequierements - No data for {GameContext.Name} at {url}");
+				Logger.Warn($"PCGamingWikiRequierements - No data for {GameContext.Name} at {url}");
 				return PluginGameRequierements;
 			}
 

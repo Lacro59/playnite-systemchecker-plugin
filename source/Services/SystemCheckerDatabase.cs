@@ -1,14 +1,15 @@
 ﻿using CommonPluginsShared;
 using CommonPluginsShared.Collections;
+using CommonPluginsStores.Models;
+using CommonPluginsStores.Steam;
 using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using SystemChecker.Clients;
 using SystemChecker.Models;
-using CommonPluginsStores.Steam;
-using CommonPluginsStores.Models;
 
 namespace SystemChecker.Services
 {
@@ -23,8 +24,13 @@ namespace SystemChecker.Services
         {
             TagBefore = "[SC]";
 
-            PCGamingWikiRequierements = new PCGamingWikiRequierements();
-            SteamRequierements = new SteamRequierements();
+			Task.Run(() =>
+			{
+				System.Threading.SpinWait.SpinUntil(() => IsLoaded, -1);
+				PCGamingWikiRequierements = new PCGamingWikiRequierements();
+				SteamRequierements = new SteamRequierements();
+			});
+
         }
 
         public override PluginGameRequierements Get(Guid Id, bool OnlyCache = false, bool Force = false)

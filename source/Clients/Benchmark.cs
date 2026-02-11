@@ -22,8 +22,8 @@ namespace SystemChecker.Clients
 {
 	public class Benchmark
 	{
-		private static ILogger Logger => LogManager.GetLogger();
-		private static SystemCheckerDatabase PluginDatabase => SystemChecker.PluginDatabase;
+		private static readonly ILogger Logger = LogManager.GetLogger();
+		private static readonly SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
 
 		private static FileDataTools FileDataTools => new FileDataTools(PluginDatabase.PluginName, "Benchmark");
 

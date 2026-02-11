@@ -14,12 +14,12 @@ namespace SystemChecker.Services
 {
 	public class SystemCheckerSearch : SearchContext
 	{
-		private readonly SystemCheckerDatabase _pluginDatabase = SystemChecker.PluginDatabase;
+		private readonly SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
 
 		public SystemCheckerSearch()
 		{
 			Description = ResourceProvider.GetString("LOCSystemCheckerSearchDescription");
-			Label = _pluginDatabase.PluginName;
+			Label = PluginDatabase.PluginName;
 			Hint = ResourceProvider.GetString("LOCSystemCheckerSearchHint");
 			Delay = 500;
 		}
@@ -31,9 +31,9 @@ namespace SystemChecker.Services
 			try
 			{
 				SearchParameters searchParams = ParseSearchParameters(args.SearchTerm);
-				SystemConfiguration systemConfiguration = _pluginDatabase.Database.PC;
+				SystemConfiguration systemConfiguration = PluginDatabase.Database.PC;
 
-				IEnumerable<PluginGameRequierements> filteredGames = _pluginDatabase.Database
+				IEnumerable<PluginGameRequierements> filteredGames = PluginDatabase.Database
 					.Where(x => MatchesSearchCriteria(x, searchParams, args.GameFilterSettings));
 
 				foreach (PluginGameRequierements x in filteredGames)
