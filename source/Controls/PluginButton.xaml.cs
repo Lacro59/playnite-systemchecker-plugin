@@ -2,6 +2,7 @@
 using CommonPluginsShared.Collections;
 using CommonPluginsShared.Controls;
 using CommonPluginsShared.Interfaces;
+using CommonPluginsStores.Models;
 using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;
@@ -71,13 +72,13 @@ namespace SystemChecker.Controls
 
         public override void SetData(Game newContext, PluginDataBaseGameBase PluginGameData)
         {
-            GameRequierements gameRequierements = (GameRequierements)PluginGameData;
+            PluginGameRequierements gameRequierements = (PluginGameRequierements)PluginGameData;
 
             if (ControlDataContext.DisplayDetails)
             {
                 SystemConfiguration systemConfiguration = PluginDatabase.Database.PC;
-                Requirement systemMinimum = gameRequierements.GetMinimum();
-                Requirement systemRecommanded = gameRequierements.GetRecommanded();
+                RequirementEntry systemMinimum = gameRequierements.GetMinimum();
+                RequirementEntry systemRecommanded = gameRequierements.GetRecommanded();
 
                 if (systemConfiguration == null)
                 {

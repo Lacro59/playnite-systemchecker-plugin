@@ -1,4 +1,5 @@
 ﻿using CommonPluginsShared;
+using CommonPluginsStores.Models;
 using Playnite.SDK;
 using Playnite.SDK.Data;
 using Playnite.SDK.Models;
@@ -67,10 +68,10 @@ namespace SystemChecker.Views
 
 
             // Minimum & Recommanded
-            GameRequierements gameRequierements = PluginDatabase.Get(gameSelected, true);
+            PluginGameRequierements gameRequierements = PluginDatabase.Get(gameSelected, true);
 
-            Requirement Minimum = gameRequierements.GetMinimum();
-            Requirement Recommanded = gameRequierements.GetRecommanded();
+            RequirementEntry Minimum = gameRequierements.GetMinimum();
+            RequirementEntry Recommanded = gameRequierements.GetRecommanded();
 
             if (Minimum.HasData)
             {

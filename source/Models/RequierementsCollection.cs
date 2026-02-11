@@ -11,7 +11,7 @@ using CommonPluginsShared;
 
 namespace SystemChecker.Models
 {
-    public class RequierementsCollection : PluginItemCollection<GameRequierements>
+    public class RequierementsCollection : PluginItemCollection<PluginGameRequierements>
     {
         public SystemConfiguration PC { get; set; }
 

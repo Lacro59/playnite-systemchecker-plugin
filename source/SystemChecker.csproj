@@ -123,9 +123,8 @@
     <Compile Include="Clients\PCGamingWikiRequierements.cs" />
     <Compile Include="Clients\SteamRequierements.cs" />
     <Compile Include="Services\SystemApi.cs" />
-    <Compile Include="Models\GameRequierements.cs" />
+    <Compile Include="Models\PluginGameRequierements.cs" />
     <Compile Include="Models\RequierementMetadata.cs" />
-    <Compile Include="Models\Requirement.cs" />
     <Compile Include="Services\SystemCheckerDatabase.cs" />
     <Compile Include="Services\SystemCheckerSearch.cs" />
     <Compile Include="SystemChecker.cs" />

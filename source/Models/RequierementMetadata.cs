@@ -8,17 +8,16 @@ namespace SystemChecker.Models
         internal static readonly ILogger logger = LogManager.GetLogger();
 
         internal Game GameContext { get; set; }
-        internal GameRequierements GameRequierements { get; set; } = new GameRequierements();
+        internal PluginGameRequierements PluginGameRequierements { get; set; } = new PluginGameRequierements();
 
 
         public bool IsFind()
         {
-            return GameRequierements.GetMinimum().HasData;
+            return PluginGameRequierements.GetMinimum().HasData;
         }
 
+        public abstract PluginGameRequierements GetRequirements();
 
-        public abstract GameRequierements GetRequirements();
-
-        public abstract GameRequierements GetRequirements(string url);
+        public abstract PluginGameRequierements GetRequirements(string url);
     }
 }

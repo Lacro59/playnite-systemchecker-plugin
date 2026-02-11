@@ -108,7 +108,7 @@ namespace SystemChecker
         {
             Game gameMenu = args.Games.First();
             List<Guid> ids = args.Games.Select(x => x.Id).ToList();
-            GameRequierements gameRequierements = PluginDatabase.Get(gameMenu, true);
+            PluginGameRequierements gameRequierements = PluginDatabase.Get(gameMenu, true);
 
             List<GameMenuItem> gameMenuItems = new List<GameMenuItem>();
 
@@ -407,9 +407,9 @@ namespace SystemChecker
                         // Wait extension database are loaded
                         _ = SpinWait.SpinUntil(() => PluginDatabase.IsLoaded, -1);
 
-                        foreach (GameRequierements values in PluginDatabase.Database.Items.Values)
+                        foreach (PluginGameRequierements values in PluginDatabase.Database.Items.Values)
                         {
-                            GameRequierements gameRequierements = PluginDatabase.PurgeGraphicsCardData(values);
+                            PluginGameRequierements gameRequierements = PluginDatabase.PurgeGraphicsCardData(values);
                             PluginDatabase.Update(gameRequierements);
                         }
 

@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using SystemChecker.Models;
 using CommonPluginsShared;
 using Playnite.SDK.Models;
+using CommonPluginsStores.Models;
 
 namespace SystemChecker.Services
 {
@@ -16,18 +17,18 @@ namespace SystemChecker.Services
         private static Game GameContext;
 
 
-        public static CheckSystem CheckConfig(Game game, Requirement requirement, SystemConfiguration systemConfiguration, bool IsInstalled)
+        public static CheckSystem CheckConfig(Game game, RequirementEntry requirementEntry, SystemConfiguration systemConfiguration, bool IsInstalled)
         {
             GameContext = game;
             Common.LogDebug(true, $"CheckConfig() for {game.Name}");
 
-            if (requirement != null && systemConfiguration != null)
+            if (requirementEntry != null && systemConfiguration != null)
             {
-                bool isCheckOs = CheckOS(systemConfiguration.Os, requirement.Os);
-                bool isCheckCpu = CheckCpu(systemConfiguration, requirement.Cpu);
-                bool isCheckRam = CheckRam(systemConfiguration.Ram, systemConfiguration.RamUsage, requirement.Ram, requirement.RamUsage);
-                bool isCheckGpu = CheckGpu(systemConfiguration, requirement.Gpu);
-                bool isCheckStorage = IsInstalled ? IsInstalled : CheckStorage(systemConfiguration.Disks, requirement.Storage);
+                bool isCheckOs = CheckOS(systemConfiguration.Os, requirementEntry.Os);
+                bool isCheckCpu = CheckCpu(systemConfiguration, requirementEntry.Cpu);
+                bool isCheckRam = CheckRam(systemConfiguration.Ram, systemConfiguration.RamUsage, requirementEntry.Ram, requirementEntry.RamUsage);
+                bool isCheckGpu = CheckGpu(systemConfiguration, requirementEntry.Gpu);
+                bool isCheckStorage = IsInstalled ? IsInstalled : CheckStorage(systemConfiguration.Disks, requirementEntry.Storage);
 
                 bool AllOk = isCheckOs && isCheckCpu && isCheckRam && isCheckGpu && isCheckStorage;
 

@@ -4,19 +4,15 @@ using Playnite.SDK;
 using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Windows;
-using System.Windows.Threading;
 using SystemChecker.Clients;
 using SystemChecker.Models;
-using CommonPluginsStores;
-using System.Diagnostics;
 using CommonPluginsStores.Steam;
+using CommonPluginsStores.Models;
 
 namespace SystemChecker.Services
 {
-    public class SystemCheckerDatabase : PluginDatabaseObject<SystemCheckerSettingsViewModel, RequierementsCollection, GameRequierements, Requirement>
+    public class SystemCheckerDatabase : PluginDatabaseObject<SystemCheckerSettingsViewModel, RequierementsCollection, PluginGameRequierements, RequirementEntry>
     {
         public LocalSystem LocalSystem;
 
@@ -31,9 +27,9 @@ namespace SystemChecker.Services
             SteamRequierements = new SteamRequierements();
         }
 
-        public override GameRequierements Get(Guid Id, bool OnlyCache = false, bool Force = false)
+        public override PluginGameRequierements Get(Guid Id, bool OnlyCache = false, bool Force = false)
         {
-            GameRequierements gameRequierements = base.GetOnlyCache(Id);
+            PluginGameRequierements gameRequierements = base.GetOnlyCache(Id);
 
             // Get from web
             if ((gameRequierements == null && !OnlyCache) || Force)
@@ -55,18 +51,18 @@ namespace SystemChecker.Services
             return gameRequierements;
         }
 
-        public override GameRequierements GetDefault(Game game)
+        public override PluginGameRequierements GetDefault(Game game)
         {
-            GameRequierements gameRequierements = base.GetDefault(game);
-            gameRequierements.Items = new List<Requirement> { new Requirement { IsMinimum = true }, new Requirement() };
+            PluginGameRequierements gameRequierements = base.GetDefault(game);
+            gameRequierements.Items = new List<RequirementEntry> { new RequirementEntry { IsMinimum = true }, new RequirementEntry() };
 
             return gameRequierements;
         }
 
-        public override GameRequierements GetWeb(Guid Id)
+        public override PluginGameRequierements GetWeb(Guid Id)
         {
             Game game = API.Instance.Database.Games.Get(Id);
-            GameRequierements gameRequierements = GetDefault(game);
+            PluginGameRequierements gameRequierements = GetDefault(game);
 
             try
             {
@@ -108,10 +104,10 @@ namespace SystemChecker.Services
         }
 
 
-        private GameRequierements NormalizeRecommanded(GameRequierements gameRequierements)
+        private PluginGameRequierements NormalizeRecommanded(PluginGameRequierements gameRequierements)
         {
-            Requirement Minimum = gameRequierements.GetMinimum();
-            Requirement Recommanded = gameRequierements.GetRecommanded();
+            RequirementEntry Minimum = gameRequierements.GetMinimum();
+            RequirementEntry Recommanded = gameRequierements.GetRecommanded();
 
             if (Minimum.HasData && Recommanded.HasData)
             {
@@ -130,31 +126,30 @@ namespace SystemChecker.Services
                 if (Recommanded.Ram == 0)
                 {
                     Recommanded.Ram = Minimum.Ram;
-                    Recommanded.RamUsage = Minimum.RamUsage;
                 }
                 if (Recommanded.Storage == 0)
                 {
                     Recommanded.Storage = Minimum.Storage;
-                    Recommanded.StorageUsage = Minimum.StorageUsage;
                 }
             }
 
-            gameRequierements.Items = new List<Requirement> { Minimum, Recommanded };
+            gameRequierements.Items = new List<RequirementEntry> { Minimum, Recommanded };
             return gameRequierements;
         }
 
 
         #region Tag
+
         public override void AddTag(Game game)
         {
-            GameRequierements item = Get(game, true);
+            PluginGameRequierements item = Get(game, true);
             if (item.HasData)
             {
                 try
                 {
                     SystemConfiguration systemConfiguration = Database.PC;
-                    Requirement systemMinimum = item.GetMinimum();
-                    Requirement systemRecommanded = item.GetRecommanded();
+                    RequirementEntry systemMinimum = item.GetMinimum();
+                    RequirementEntry systemRecommanded = item.GetRecommanded();
 
                     CheckSystem CheckMinimum = SystemApi.CheckConfig(game, systemMinimum, systemConfiguration, game.IsInstalled);
                     CheckSystem CheckRecommanded = SystemApi.CheckConfig(game, systemRecommanded, systemConfiguration, game.IsInstalled);
@@ -212,12 +207,13 @@ namespace SystemChecker.Services
                 game.OnPropertyChanged();
             });
         }
+
         #endregion
 
 
         public override void SetThemesResources(Game game)
         {
-            GameRequierements gameRequierements = Get(game, true);
+            PluginGameRequierements gameRequierements = Get(game, true);
 
             if (gameRequierements == null)
             {
@@ -231,8 +227,8 @@ namespace SystemChecker.Services
             }
 
             SystemConfiguration systemConfiguration = Database.PC;
-            Requirement systemMinimum = gameRequierements.GetMinimum();
-            Requirement systemRecommanded = gameRequierements.GetRecommanded();
+            RequirementEntry systemMinimum = gameRequierements.GetMinimum();
+            RequirementEntry systemRecommanded = gameRequierements.GetRecommanded();
 
             CheckSystem CheckMinimum = SystemApi.CheckConfig(game, systemMinimum, systemConfiguration, game.IsInstalled);
             CheckSystem CheckRecommanded = SystemApi.CheckConfig(game, systemRecommanded, systemConfiguration, game.IsInstalled);
@@ -261,10 +257,10 @@ namespace SystemChecker.Services
         }
 
 
-        public GameRequierements PurgeGraphicsCardData(GameRequierements gameRequierements)
+        public PluginGameRequierements PurgeGraphicsCardData(PluginGameRequierements gameRequierements)
         {
-            Requirement Minimum = gameRequierements.GetMinimum();
-            Requirement Recommanded = gameRequierements.GetRecommanded();
+            RequirementEntry Minimum = gameRequierements.GetMinimum();
+            RequirementEntry Recommanded = gameRequierements.GetRecommanded();
 
             if (Minimum.HasData && Minimum.Gpu.Count > 1 && Minimum.Gpu.FindAll(x => Gpu.CallIsNvidia(x) || Gpu.CallIsAmd(x) || Gpu.CallIsIntel(x)).Count > 0)
             {
@@ -276,7 +272,7 @@ namespace SystemChecker.Services
                 Recommanded.Gpu = Recommanded.Gpu.FindAll(x => Gpu.CallIsNvidia(x) || Gpu.CallIsAmd(x) || Gpu.CallIsIntel(x)).ToList();
             }
 
-            gameRequierements.Items = new List<Requirement> { Minimum, Recommanded };
+            gameRequierements.Items = new List<RequirementEntry> { Minimum, Recommanded };
             return gameRequierements;
         }
     }

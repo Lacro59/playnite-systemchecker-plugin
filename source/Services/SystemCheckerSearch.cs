@@ -1,5 +1,6 @@
 ﻿using CommonPluginsShared;
 using CommonPluginsShared.Extensions;
+using CommonPluginsStores.Models;
 using Playnite.SDK;
 using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
@@ -90,8 +91,8 @@ namespace SystemChecker.Services
                         // Calcul if necessary
                         if (hasMin || hasRec || hasAny)
                         {
-                            Requirement systemMinimum = x.GetMinimum();
-                            Requirement systemRecommanded = x.GetRecommanded();
+                            RequirementEntry systemMinimum = x.GetMinimum();
+                            RequirementEntry systemRecommanded = x.GetRecommanded();
 
                             CheckSystem CheckMinimum = SystemApi.CheckConfig(game, systemMinimum, systemConfiguration, game.IsInstalled);
                             CheckSystem CheckRecommanded = SystemApi.CheckConfig(game, systemRecommanded, systemConfiguration, game.IsInstalled);
