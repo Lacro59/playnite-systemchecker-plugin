@@ -10,38 +10,38 @@ using SystemChecker.Services;
 
 namespace SystemChecker.Clients
 {
-	public class PCGamingWikiRequierements : RequierementMetadata
+	public class PCGamingWikiRequirements : RequirementMetadata
 	{
 		private readonly PCGamingWikiApi _pcGamingWikiApi;
 
 		private uint SteamAppId { get; set; } = 0;
 
 
-		public PCGamingWikiRequierements()
+		public PCGamingWikiRequirements()
 		{
 			_pcGamingWikiApi = new PCGamingWikiApi(PluginDatabase.PluginName, PlayniteTools.ExternalPlugin.SystemChecker);
 		}
 
 
-		public override PluginGameRequierements GetRequirements()
+		public override PluginGameRequirements GetRequirements()
 		{
-			PluginGameRequierements = SystemChecker.PluginDatabase.GetDefault(GameContext);
+			PluginGameRequirements = SystemChecker.PluginDatabase.GetDefault(GameContext);
 
 			string url = _pcGamingWikiApi.FindGoodUrl(GameContext);
 
 			if (!url.IsNullOrEmpty())
 			{
-				PluginGameRequierements = GetRequirements(url);
+				PluginGameRequirements = GetRequirements(url);
 			}
 			else
 			{
-				Logger.Warn($"PCGamingWikiRequierements - Not found for {GameContext.Name}");
+				Logger.Warn($"PCGamingWikiRequirements - Not found for {GameContext.Name}");
 			}
 
-			return PluginGameRequierements;
+			return PluginGameRequirements;
 		}
 
-		public PluginGameRequierements GetRequirements(Game game)
+		public PluginGameRequirements GetRequirements(Game game)
 		{
 			GameContext = game;
 			SteamAppId = 0;
@@ -59,19 +59,19 @@ namespace SystemChecker.Clients
 			return GetRequirements();
 		}
 
-		public override PluginGameRequierements GetRequirements(string url)
+		public override PluginGameRequirements GetRequirements(string url)
 		{
 			GameRequirements apiResult = _pcGamingWikiApi.GetGameRequirements(url);
 			if (apiResult == null)
 			{
-				Logger.Warn($"PCGamingWikiRequierements - No data for {GameContext.Name} at {url}");
-				return PluginGameRequierements;
+				Logger.Warn($"PCGamingWikiRequirements - No data for {GameContext.Name} at {url}");
+				return PluginGameRequirements;
 			}
 
-			PluginGameRequierements.Items = new List<RequirementEntry> { apiResult.Minimum, apiResult.Recommended };
-			PluginGameRequierements.SourcesLink = apiResult.SourceLink;
+			PluginGameRequirements.Items = new List<RequirementEntry> { apiResult.Minimum, apiResult.Recommended };
+			PluginGameRequirements.SourcesLink = apiResult.SourceLink;
 
-			return PluginGameRequierements;
+			return PluginGameRequirements;
 		}
 	}
 }

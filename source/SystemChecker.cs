@@ -108,13 +108,13 @@ namespace SystemChecker
         {
             Game gameMenu = args.Games.First();
             List<Guid> ids = args.Games.Select(x => x.Id).ToList();
-            PluginGameRequierements gameRequierements = PluginDatabase.Get(gameMenu, true);
+            PluginGameRequirements pluginGameRequirements = PluginDatabase.Get(gameMenu, true);
 
             List<GameMenuItem> gameMenuItems = new List<GameMenuItem>();
 
-            if (gameRequierements.HasData)
+            if (pluginGameRequirements.HasData)
             {
-                // Show requierements for the selected game
+                // Show requirements for the selected game
                 gameMenuItems.Add(new GameMenuItem
                 {
                     MenuSection = ResourceProvider.GetString("LOCSystemChecker"),
@@ -137,7 +137,7 @@ namespace SystemChecker
             }
 
 
-            // Delete & download requierements data for the selected game
+            // Delete & download requirements data for the selected game
             gameMenuItems.Add(new GameMenuItem
             {
                 MenuSection = ResourceProvider.GetString("LOCSystemChecker"),
@@ -156,7 +156,7 @@ namespace SystemChecker
             });
 
 
-            if (gameRequierements.HasData)
+            if (pluginGameRequirements.HasData)
             {
                 gameMenuItems.Add(new GameMenuItem
                 {
@@ -407,10 +407,10 @@ namespace SystemChecker
                         // Wait extension database are loaded
                         _ = SpinWait.SpinUntil(() => PluginDatabase.IsLoaded, -1);
 
-                        foreach (PluginGameRequierements values in PluginDatabase.Database.Items.Values)
+                        foreach (PluginGameRequirements values in PluginDatabase.Database.Items.Values)
                         {
-                            PluginGameRequierements gameRequierements = PluginDatabase.PurgeGraphicsCardData(values);
-                            PluginDatabase.Update(gameRequierements);
+                            PluginGameRequirements pkuginGameRequirements = PluginDatabase.PurgeGraphicsCardData(values);
+                            PluginDatabase.Update(pkuginGameRequirements);
                         }
 
                         PluginSettings.Settings.IsPurged = true;

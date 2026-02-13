@@ -6,10 +6,10 @@ using System.Collections.Generic;
 
 namespace SystemChecker.Models
 {
-    public class PluginGameRequierements : PluginDataBaseGame<RequirementEntry>
+    public class PluginGameRequirements : PluginDataBaseGame<RequirementEntry>
     {
         [DontSerialize]
-        public override bool HasData => (Items?.Count > 0) && (Items.Find(x => x.IsMinimum).HasData || Items.Find(x => !x.IsMinimum).HasData);
+        public override bool HasData => (Items?.Count > 0) && ((Items.Find(x => x.IsMinimum)?.HasData ?? false) || (Items.Find(x => !x.IsMinimum)?.HasData ?? false));
 
         public SourceLink SourcesLink { get; set; }
 

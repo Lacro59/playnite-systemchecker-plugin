@@ -51,64 +51,23 @@ namespace SystemChecker.Controls
 			});
 		}
 
-		#region StaticEvents
-
 		/// <summary>
 		/// Attaches static event handlers specific to SystemChecker plugin.
-		/// Shares the same event handlers as PluginButton to avoid duplication.
+		/// Uses AttachPluginEvents to ensure handlers are attached only once globally.
+		/// Shares the same event handlers as PluginButton since they use the same plugin key.
 		/// </summary>
 		protected override void AttachStaticEvents()
 		{
 			base.AttachStaticEvents();
 
-			PluginDatabase.PluginSettings.PropertyChanged += OnStaticPluginSettingsChanged;
-			PluginDatabase.Database.ItemUpdated += OnStaticDatabaseItemUpdated;
-			PluginDatabase.Database.ItemCollectionChanged += OnStaticDatabaseCollectionChanged;
-		}
-
-		/// <summary>
-		/// Static event handler for plugin settings changes
-		/// </summary>
-		private static void OnStaticPluginSettingsChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-		{
-			NotifyAllInstances(instance =>
+			AttachPluginEvents(PluginDatabase.PluginName, () =>
 			{
-				if (instance is PluginViewItem viewItem)
-				{
-					viewItem.PluginSettings_PropertyChanged(sender, e);
-				}
+				PluginDatabase.PluginSettings.PropertyChanged += CreatePluginSettingsHandler();
+				PluginDatabase.Database.ItemUpdated += CreateDatabaseItemUpdatedHandler<PluginGameRequirements>();
+				PluginDatabase.Database.ItemCollectionChanged += CreateDatabaseCollectionChangedHandler<PluginGameRequirements>();
 			});
 		}
 
-		/// <summary>
-		/// Static event handler for database item updates with generic type handling
-		/// </summary>
-		private static void OnStaticDatabaseItemUpdated(object sender, object e)
-		{
-			NotifyAllInstances(instance =>
-			{
-				if (instance is PluginViewItem viewItem)
-				{
-					viewItem.HandleDatabaseItemUpdated(sender, e);
-				}
-			});
-		}
-
-		/// <summary>
-		/// Static event handler for database collection changes with generic type handling
-		/// </summary>
-		private static void OnStaticDatabaseCollectionChanged(object sender, object e)
-		{
-			NotifyAllInstances(instance =>
-			{
-				if (instance is PluginViewItem viewItem)
-				{
-					viewItem.HandleDatabaseCollectionChanged(sender, e);
-				}
-			});
-		}
-
-		#endregion
 
 		public override void SetDefaultDataContext()
 		{
@@ -119,7 +78,7 @@ namespace SystemChecker.Controls
 
 		public override void SetData(Game newContext, PluginDataBaseGameBase PluginGameData)
 		{
-			PluginGameRequierements gameRequierements = (PluginGameRequierements)PluginGameData;
+			PluginGameRequirements pluginGameRequirements = (PluginGameRequirements)PluginGameData;
 			SystemConfiguration systemConfiguration = PluginDatabase.Database.PC;
 
 			if (systemConfiguration == null)
@@ -127,8 +86,8 @@ namespace SystemChecker.Controls
 				return;
 			}
 
-			RequirementEntry systemMinimum = gameRequierements.GetMinimum();
-			RequirementEntry systemRecommanded = gameRequierements.GetRecommanded();
+			RequirementEntry systemMinimum = pluginGameRequirements.GetMinimum();
+			RequirementEntry systemRecommanded = pluginGameRequirements.GetRecommanded();
 
 			bool hasMinimum = systemMinimum.HasData;
 			bool hasRecommanded = systemRecommanded.HasData;

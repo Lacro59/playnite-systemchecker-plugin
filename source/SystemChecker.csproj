@@ -108,7 +108,7 @@
     <Compile Include="Models\BenchmarkData.cs" />
     <Compile Include="Models\CheckResult.cs" />
     <Compile Include="Models\CheckSystem.cs" />
-    <Compile Include="Models\RequierementsCollection.cs" />
+    <Compile Include="Models\RequirementsCollection.cs" />
     <Compile Include="playnite-plugincommon\CommonPluginsControls\PlayniteControls\NumericBox.xaml.cs">
       <DependentUpon>NumericBox.xaml</DependentUpon>
     </Compile>
@@ -120,11 +120,11 @@
     </Compile>
     <Compile Include="Services\Cpu.cs" />
     <Compile Include="Services\Gpu.cs" />
-    <Compile Include="Clients\PCGamingWikiRequierements.cs" />
-    <Compile Include="Clients\SteamRequierements.cs" />
+    <Compile Include="Clients\PCGamingWikiRequirements.cs" />
+    <Compile Include="Clients\SteamRequirements.cs" />
     <Compile Include="Services\SystemApi.cs" />
-    <Compile Include="Models\PluginGameRequierements.cs" />
-    <Compile Include="Models\RequierementMetadata.cs" />
+    <Compile Include="Models\PluginGameRequirements.cs" />
+    <Compile Include="Models\RequirementMetadata.cs" />
     <Compile Include="Services\SystemCheckerDatabase.cs" />
     <Compile Include="Services\SystemCheckerSearch.cs" />
     <Compile Include="SystemChecker.cs" />

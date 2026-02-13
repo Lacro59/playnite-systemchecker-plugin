@@ -33,10 +33,10 @@ namespace SystemChecker.Services
 				SearchParameters searchParams = ParseSearchParameters(args.SearchTerm);
 				SystemConfiguration systemConfiguration = PluginDatabase.Database.PC;
 
-				IEnumerable<PluginGameRequierements> filteredGames = PluginDatabase.Database
+				IEnumerable<PluginGameRequirements> filteredGames = PluginDatabase.Database
 					.Where(x => MatchesSearchCriteria(x, searchParams, args.GameFilterSettings));
 
-				foreach (PluginGameRequierements x in filteredGames)
+				foreach (PluginGameRequirements x in filteredGames)
 				{
 					if (args.CancelToken.IsCancellationRequested)
 					{
@@ -99,7 +99,7 @@ namespace SystemChecker.Services
 			return parameters;
 		}
 
-		private bool MatchesSearchCriteria(PluginGameRequierements game, SearchParameters searchParams, GameSearchFilterSettings filterSettings)
+		private bool MatchesSearchCriteria(PluginGameRequirements game, SearchParameters searchParams, GameSearchFilterSettings filterSettings)
 		{
 			if (!game.Name.Contains(searchParams.CleanSearchTerm, StringComparison.InvariantCultureIgnoreCase) || game.IsDeleted)
 			{
@@ -139,7 +139,7 @@ namespace SystemChecker.Services
 			return true;
 		}
 
-		private bool IsGameValid(PluginGameRequierements gameReq, SearchParameters searchParams, SystemConfiguration systemConfiguration, out Game game)
+		private bool IsGameValid(PluginGameRequirements gameReq, SearchParameters searchParams, SystemConfiguration systemConfiguration, out Game game)
 		{
 			game = API.Instance.Database.Games.Get(gameReq.Id);
 

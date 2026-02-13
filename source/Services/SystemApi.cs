@@ -50,18 +50,18 @@ namespace SystemChecker.Services
             return new CheckSystem();
         }
 
-        private static bool CheckOS(string systemOs, List<string> requierementOs)
+        private static bool CheckOS(string systemOs, List<string> requirementOs)
         {
             try
             {
                 List<string> oldOS = new List<string> { "95", "98", "XP", "Millenium", "ME", "2000", "Vista" };
 
-                if (requierementOs.Count == 0)
+                if (requirementOs.Count == 0)
                 {
                     return true;
                 }
 
-                foreach (string Os in requierementOs)
+                foreach (string Os in requirementOs)
                 {
                     if (systemOs.Contains(Os, StringComparison.InvariantCultureIgnoreCase))
                     {
@@ -90,13 +90,13 @@ namespace SystemChecker.Services
             return false;
         }
 
-        private static bool CheckCpu(SystemConfiguration systemConfiguration, List<string> requierementCpu)
+        private static bool CheckCpu(SystemConfiguration systemConfiguration, List<string> requirementCpu)
         {
             try
             {
-                if (requierementCpu.Count > 0)
+                if (requirementCpu.Count > 0)
                 {
-                    foreach (string cpu in requierementCpu)
+                    foreach (string cpu in requirementCpu)
                     {
                         Cpu cpuCheck = new Cpu(systemConfiguration, cpu);
                         CheckResult check = cpuCheck.IsBetter();
@@ -125,11 +125,11 @@ namespace SystemChecker.Services
             return false;
         }
 
-        private static bool CheckRam(double systemRam, string systemRamUsage, double requierementRam, string requierementRamUsage)
+        private static bool CheckRam(double systemRam, string systemRamUsage, double requirementRam, string requirementRamUsage)
         {
             try
             {
-                return systemRamUsage == requierementRamUsage || systemRam >= requierementRam;
+                return systemRamUsage == requirementRamUsage || systemRam >= requirementRam;
             }
             catch (Exception ex)
             {
@@ -140,21 +140,21 @@ namespace SystemChecker.Services
             return false;
         }
 
-        private static bool CheckGpu(SystemConfiguration systemConfiguration, List<string> requierementGpu)
+        private static bool CheckGpu(SystemConfiguration systemConfiguration, List<string> requirementGpu)
         {
             try
             {
-                if (requierementGpu.Count > 0)
+                if (requirementGpu.Count > 0)
                 {
-                    for (int i = 0; i < requierementGpu.Count; i++)
+                    for (int i = 0; i < requirementGpu.Count; i++)
                     {
-                        string gpu = requierementGpu[i];
+                        string gpu = requirementGpu[i];
                         Gpu gpuCheck = new Gpu(systemConfiguration, gpu);
                         CheckResult check = gpuCheck.IsBetter();
 
                         if (check.Result)
                         {
-                            return check.SameConstructor ? check.Result : (!gpuCheck.IsWithNoCard && gpuCheck.CardRequierementIsOld) || i <= 0;
+                            return check.SameConstructor ? check.Result : (!gpuCheck.IsWithNoCard && gpuCheck.CardRequirementIsOld) || i <= 0;
                         }
                         else if (check.SameConstructor)
                         {

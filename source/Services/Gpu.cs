@@ -17,28 +17,28 @@ namespace SystemChecker.Services
 
         private string CardPcName { get; set; }
         private GpuObject CardPc { get; set; }
-        private string CardRequierementName { get; set; }
-        private GpuObject CardRequierement { get; set; }
+        private string CardRequirementName { get; set; }
+        private GpuObject CardRequirement { get; set; }
 
         public bool IsWithNoCard = false;
         public bool IsIntegrate => CardPc.IsIntegrate;
-        public bool CardRequierementIsOld => CardRequierement.IsOld;
+        public bool CardRequirementIsOld => CardRequirement.IsOld;
 
-        public Gpu(SystemConfiguration systemConfiguration, string GpuRequierement)
+        public Gpu(SystemConfiguration systemConfiguration, string gpuRequirement)
         {
             CardPcName = DeleteInfo(systemConfiguration.GpuName);
-            CardRequierementName = DeleteInfo(GpuRequierement);
+            CardRequirementName = DeleteInfo(gpuRequirement);
 
 
             // VRAM only
             double vram = 0;
             string tempVram = string.Empty;
-            if (GpuRequierement.ToLower().IndexOf("vram") > -1 && !CallIsNvidia(GpuRequierement) && !CallIsAmd(GpuRequierement))
+            if (gpuRequirement.ToLower().IndexOf("vram") > -1 && !CallIsNvidia(gpuRequirement) && !CallIsAmd(gpuRequirement))
             {
-                tempVram = GpuRequierement.Replace(".", CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator);
+                tempVram = gpuRequirement.Replace(".", CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator);
                 tempVram = Regex.Replace(tempVram, "vram", string.Empty, RegexOptions.IgnoreCase);
 
-                if (tempVram.ToLower().IndexOf("mb") > -1 && !CallIsNvidia(GpuRequierement) && !CallIsAmd(GpuRequierement))
+                if (tempVram.ToLower().IndexOf("mb") > -1 && !CallIsNvidia(gpuRequirement) && !CallIsAmd(gpuRequirement))
                 {
                     _ = double.TryParse(Regex.Replace(tempVram, "mb", string.Empty, RegexOptions.IgnoreCase).Trim(), out vram);
                     if (vram > 0)
@@ -46,7 +46,7 @@ namespace SystemChecker.Services
                         vram = vram * 1024;
                     }
                 }
-                if (tempVram.ToLower().IndexOf("gb") > -1 && !CallIsNvidia(GpuRequierement) && !CallIsAmd(GpuRequierement))
+                if (tempVram.ToLower().IndexOf("gb") > -1 && !CallIsNvidia(gpuRequirement) && !CallIsAmd(gpuRequirement))
                 {
                     _ = double.TryParse(Regex.Replace(tempVram, "gb", string.Empty, RegexOptions.IgnoreCase).Trim(), out vram);
                     if (vram > 0)
@@ -58,46 +58,46 @@ namespace SystemChecker.Services
 
             // Rezolution only
             int ResolutionHorizontal = 0;
-            if (GpuRequierement.ToLower().IndexOf("1280×720") > -1 || GpuRequierement.ToLower().IndexOf("1280 × 720") > -1)
+            if (gpuRequirement.ToLower().IndexOf("1280×720") > -1 || gpuRequirement.ToLower().IndexOf("1280 × 720") > -1)
             {
                 ResolutionHorizontal = 1280;
             }
-            if (GpuRequierement.ToLower().IndexOf("1368×") > -1 || GpuRequierement.ToLower().IndexOf("1368 ×") > -1)
+            if (gpuRequirement.ToLower().IndexOf("1368×") > -1 || gpuRequirement.ToLower().IndexOf("1368 ×") > -1)
             {
                 ResolutionHorizontal = 1368;
             }
-            if (GpuRequierement.ToLower().IndexOf("1600×") > -1 || GpuRequierement.ToLower().IndexOf("1600 ×") > -1)
+            if (gpuRequirement.ToLower().IndexOf("1600×") > -1 || gpuRequirement.ToLower().IndexOf("1600 ×") > -1)
             {
                 ResolutionHorizontal = 1600;
             }
-            if (GpuRequierement.ToLower().IndexOf("1920×") > -1 || GpuRequierement.ToLower().IndexOf("1920 ×") > -1)
+            if (gpuRequirement.ToLower().IndexOf("1920×") > -1 || gpuRequirement.ToLower().IndexOf("1920 ×") > -1)
             {
                 ResolutionHorizontal = 1920;
             }
 
 
             CardPc = SetCard(DeleteInfo(systemConfiguration.GpuName));
-            CardRequierement = SetCard(DeleteInfo(GpuRequierement));
+            CardRequirement = SetCard(DeleteInfo(gpuRequirement));
 
 
             CardPc.Vram = systemConfiguration.GpuRam;
-            CardRequierement.Vram = (long)vram;
+            CardRequirement.Vram = (long)vram;
 
             CardPc.ResolutionHorizontal = (int)systemConfiguration.CurrentHorizontalResolution;
-            CardRequierement.ResolutionHorizontal = ResolutionHorizontal;
+            CardRequirement.ResolutionHorizontal = ResolutionHorizontal;
         }
 
         public CheckResult IsBetter()
         {
             Common.LogDebug(true, $"Gpu.IsBetter - CardPc({CardPcName}): {Serialization.ToJson(CardPc)}");
-            Common.LogDebug(true, $"Gpu.IsBetter - CardRequierement({CardRequierementName}): {Serialization.ToJson(CardRequierement)}");
+            Common.LogDebug(true, $"Gpu.IsBetter - CardRequirement({CardRequirementName}): {Serialization.ToJson(CardRequirement)}");
 
             // DirectX
-            if (CardRequierement.IsDx)
+            if (CardRequirement.IsDx)
             {
                 if (CardPc.IsIntegrate)
                 {
-                    if (CardRequierement.DxVersion < 12)
+                    if (CardRequirement.DxVersion < 12)
                     {
                         IsWithNoCard = true;
                         return new CheckResult { Result = true };
@@ -111,21 +111,21 @@ namespace SystemChecker.Services
             }
 
             // OpenGL
-            if (CardRequierement.IsOGL && CardRequierement.OglVersion < 4)
+            if (CardRequirement.IsOGL && CardRequirement.OglVersion < 4)
             {
                 IsWithNoCard = true;
                 return new CheckResult { Result = true };
             }
 
             // No card defined
-            if (!CardRequierement.IsIntegrate && !CardRequierement.IsNvidia && !CardRequierement.IsAmd)
+            if (!CardRequirement.IsIntegrate && !CardRequirement.IsNvidia && !CardRequirement.IsAmd)
             {
-                if (CardRequierement.Vram != 0 && CardRequierement.Vram <= CardPc.Vram)
+                if (CardRequirement.Vram != 0 && CardRequirement.Vram <= CardPc.Vram)
                 {
                     IsWithNoCard = true;
                     return new CheckResult { Result = true };
                 }
-                if (CardRequierement.ResolutionHorizontal != 0 && CardRequierement.ResolutionHorizontal <= CardPc.ResolutionHorizontal)
+                if (CardRequirement.ResolutionHorizontal != 0 && CardRequirement.ResolutionHorizontal <= CardPc.ResolutionHorizontal)
                 {
                     IsWithNoCard = true;
                     return new CheckResult { Result = true };
@@ -133,53 +133,53 @@ namespace SystemChecker.Services
             }
 
             // Old card requiered
-            if (CardRequierement.IsOld && !CardPc.IsOld)
+            if (CardRequirement.IsOld && !CardPc.IsOld)
             {
                 return new CheckResult { Result = true };
             }
 
             // Integrate
-            if (CardRequierement.IsIntegrate && (CardPc.IsNvidia || CardPc.IsAmd) && !CardPc.IsOld)
+            if (CardRequirement.IsIntegrate && (CardPc.IsNvidia || CardPc.IsAmd) && !CardPc.IsOld)
             {
                 return new CheckResult { Result = true };
             }
-            if (CardRequierement.IsIntegrate && CardPc.IsIntegrate)
+            if (CardRequirement.IsIntegrate && CardPc.IsIntegrate)
             {
-                if (CardRequierement.Type == CardPc.Type)
+                if (CardRequirement.Type == CardPc.Type)
                 {
-                    return new CheckResult { Result = CardRequierement.Number <= CardPc.Number };
+                    return new CheckResult { Result = CardRequirement.Number <= CardPc.Number };
                 }
 
-                if (CardRequierement.Type == "HD" && CardPc.Type == "UHD")
+                if (CardRequirement.Type == "HD" && CardPc.Type == "UHD")
                 {
                     return new CheckResult { Result = true };
                 }
 
-                if (CardRequierement.Number != 0 && CardPc.Number != 0)
+                if (CardRequirement.Number != 0 && CardPc.Number != 0)
                 {
-                    if (CardRequierement.Number > 999 && CardPc.Number < 1000)
+                    if (CardRequirement.Number > 999 && CardPc.Number < 1000)
                     {
                         return new CheckResult { Result = true };
                     }
-                    if (CardRequierement.Number > 999 && CardPc.Number > 999)
+                    if (CardRequirement.Number > 999 && CardPc.Number > 999)
                     {
-                        return new CheckResult { Result = CardRequierement.Number < CardPc.Number };
+                        return new CheckResult { Result = CardRequirement.Number < CardPc.Number };
                     }
-                    if (CardRequierement.Number < 1000 && CardPc.Number < 1000)
+                    if (CardRequirement.Number < 1000 && CardPc.Number < 1000)
                     {
-                        return new CheckResult { Result = CardRequierement.Number < CardPc.Number };
+                        return new CheckResult { Result = CardRequirement.Number < CardPc.Number };
                     }
                 }
                 else
                 {
-                    logger.Warn($"No GPU treatment for {CardPcName}: {Serialization.ToJson(CardPc)} & {CardRequierementName}: {Serialization.ToJson(CardRequierement)}");
+                    logger.Warn($"No GPU treatment for {CardPcName}: {Serialization.ToJson(CardPc)} & {CardRequirementName}: {Serialization.ToJson(CardRequirement)}");
                     return new CheckResult { Result = true, SameConstructor = true };
                 }
             }
 
 
             Benchmark benchmark = new Benchmark();
-            bool? isBetter = benchmark.IsBetterGpu(CardPcName, CardRequierementName);
+            bool? isBetter = benchmark.IsBetterGpu(CardPcName, CardRequirementName);
             if (isBetter != null)
             {
                 return new CheckResult
@@ -191,25 +191,25 @@ namespace SystemChecker.Services
 
 
             // Nvidia vs Nvidia
-            if (CardRequierement.IsNvidia && CardPc.IsNvidia)
+            if (CardRequirement.IsNvidia && CardPc.IsNvidia)
             {
-                return new CheckResult { SameConstructor = true, Result = CardRequierement.Number <= CardPc.Number };
+                return new CheckResult { SameConstructor = true, Result = CardRequirement.Number <= CardPc.Number };
             }
 
             // Amd vs Amd
-            if (CardRequierement.IsAmd && CardPc.IsAmd)
+            if (CardRequirement.IsAmd && CardPc.IsAmd)
             {
-                if (CardRequierement.Type == CardPc.Type)
+                if (CardRequirement.Type == CardPc.Type)
                 {
-                    return new CheckResult { SameConstructor = true, Result = CardRequierement.Number <= CardPc.Number };
+                    return new CheckResult { SameConstructor = true, Result = CardRequirement.Number <= CardPc.Number };
                 }
 
-                if (CardRequierement.Type == "Radeon HD" && CardRequierement.Type != CardPc.Type)
+                if (CardRequirement.Type == "Radeon HD" && CardRequirement.Type != CardPc.Type)
                 {
                     return new CheckResult { SameConstructor = true, Result = true };
                 }
 
-                switch (CardRequierement.Type + CardPc.Type)
+                switch (CardRequirement.Type + CardPc.Type)
                 {
                     case "R5R7":
                         return new CheckResult { SameConstructor = true, Result = true };
@@ -227,18 +227,18 @@ namespace SystemChecker.Services
             }
 
             // Nvidia vs Amd
-            if (CardRequierement.IsNvidia && CardPc.IsAmd)
+            if (CardRequirement.IsNvidia && CardPc.IsAmd)
             {
 
             }
 
             // Amd vs Nvidia
-            if (CardRequierement.IsAmd && CardPc.IsNvidia)
+            if (CardRequirement.IsAmd && CardPc.IsNvidia)
             {
 
             }
 
-            logger.Warn($"No GPU treatment for {CardPcName}: {Serialization.ToJson(CardPc)} & {CardRequierementName}: {Serialization.ToJson(CardRequierement)}");
+            logger.Warn($"No GPU treatment for {CardPcName}: {Serialization.ToJson(CardPc)} & {CardRequirementName}: {Serialization.ToJson(CardRequirement)}");
             return new CheckResult();
         }
 

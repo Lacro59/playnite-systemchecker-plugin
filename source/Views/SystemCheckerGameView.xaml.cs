@@ -68,10 +68,10 @@ namespace SystemChecker.Views
 
 
             // Minimum & Recommanded
-            PluginGameRequierements gameRequierements = PluginDatabase.Get(gameSelected, true);
+            PluginGameRequirements pluginGameRequirements = PluginDatabase.Get(gameSelected, true);
 
-            RequirementEntry Minimum = gameRequierements.GetMinimum();
-            RequirementEntry Recommanded = gameRequierements.GetRecommanded();
+            RequirementEntry Minimum = pluginGameRequirements.GetMinimum();
+            RequirementEntry Recommanded = pluginGameRequirements.GetRecommanded();
 
             if (Minimum.HasData)
             {
@@ -218,10 +218,10 @@ namespace SystemChecker.Views
             Common.LogDebug(true, $"CheckRecommanded" + Serialization.ToJson(CheckRecommanded));
 
 
-            if (gameRequierements.SourcesLink != null)
+            if (pluginGameRequirements.SourcesLink != null)
             {
-                PART_SourceLabel.Text = gameRequierements.SourcesLink.GameName + " (" + gameRequierements.SourcesLink.Name + ")";
-                PART_SourceLink.Tag = gameRequierements.SourcesLink.Url;
+                PART_SourceLabel.Text = pluginGameRequirements.SourcesLink.GameName + " (" + pluginGameRequirements.SourcesLink.Name + ")";
+                PART_SourceLink.Tag = pluginGameRequirements.SourcesLink.Url;
             }
 
 

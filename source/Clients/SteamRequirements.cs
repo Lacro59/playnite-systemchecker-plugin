@@ -11,44 +11,44 @@ using static CommonPlayniteShared.PluginLibrary.SteamLibrary.SteamShared.StoreAp
 
 namespace SystemChecker.Clients
 {
-	public class SteamRequierements : RequierementMetadata 
+	public class SteamRequirements : RequirementMetadata 
 	{
 		private readonly SteamApi _steamApi;
 
 		private uint AppId { get; set; }
 
 
-		public SteamRequierements()
+		public SteamRequirements()
 		{
 			_steamApi = new SteamApi(PluginDatabase.PluginName, PlayniteTools.ExternalPlugin.SystemChecker);
 		}
 
 
-		public override PluginGameRequierements GetRequirements()
+		public override PluginGameRequirements GetRequirements()
 		{
-			PluginGameRequierements = SystemChecker.PluginDatabase.GetDefault(GameContext);
+			PluginGameRequirements = SystemChecker.PluginDatabase.GetDefault(GameContext);
 
 			GameRequirements apiResult = _steamApi.GetGameRequirements(AppId);
 			if (apiResult == null)
 			{
-				Logger.Warn($"SteamRequierements - No data for {GameContext.Name} (AppId: {AppId})");
-				return PluginGameRequierements;
+				Logger.Warn($"SteamRequirements - No data for {GameContext.Name} (AppId: {AppId})");
+				return PluginGameRequirements;
 			}
 
-			PluginGameRequierements.Items = new List<RequirementEntry> { apiResult.Minimum, apiResult.Recommended };
-			PluginGameRequierements.SourcesLink = apiResult.SourceLink;
+			PluginGameRequirements.Items = new List<RequirementEntry> { apiResult.Minimum, apiResult.Recommended };
+			PluginGameRequirements.SourcesLink = apiResult.SourceLink;
 
-			return PluginGameRequierements;
+			return PluginGameRequirements;
 		}
 
-		public PluginGameRequierements GetRequirements(Game game, uint appId = 0)
+		public PluginGameRequirements GetRequirements(Game game, uint appId = 0)
 		{
 			GameContext = game;
 			AppId = appId != 0 ? appId : uint.Parse(GameContext.GameId);
 			return GetRequirements();
 		}
 
-		public override PluginGameRequierements GetRequirements(string url)
+		public override PluginGameRequirements GetRequirements(string url)
 		{
 			throw new System.NotImplementedException();
 		}

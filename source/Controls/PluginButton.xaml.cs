@@ -52,63 +52,23 @@ namespace SystemChecker.Controls
 			});
 		}
 
-		#region StaticEvents
-
 		/// <summary>
-		/// Attaches static event handlers specific to SystemChecker plugin
+		/// Attaches static event handlers specific to SystemChecker plugin.
+		/// Uses AttachPluginEvents to ensure handlers are attached only once globally.
 		/// </summary>
 		protected override void AttachStaticEvents()
 		{
 			base.AttachStaticEvents();
 
-			PluginDatabase.PluginSettings.PropertyChanged += OnStaticPluginSettingsChanged;
-			PluginDatabase.Database.ItemUpdated += OnStaticDatabaseItemUpdated;
-			PluginDatabase.Database.ItemCollectionChanged += OnStaticDatabaseCollectionChanged;
-		}
-
-		/// <summary>
-		/// Static event handler for plugin settings changes
-		/// </summary>
-		private static void OnStaticPluginSettingsChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-		{
-			NotifyAllInstances(instance =>
+			AttachPluginEvents(PluginDatabase.PluginName, () =>
 			{
-				if (instance is PluginButton button)
-				{
-					button.PluginSettings_PropertyChanged(sender, e);
-				}
+				PluginDatabase.PluginSettings.PropertyChanged += CreatePluginSettingsHandler();
+
+				// Attach with the correct generic type from PluginDatabase
+				PluginDatabase.Database.ItemUpdated += CreateDatabaseItemUpdatedHandler<PluginGameRequirements>();
+				PluginDatabase.Database.ItemCollectionChanged += CreateDatabaseCollectionChangedHandler<PluginGameRequirements>();
 			});
 		}
-
-		/// <summary>
-		/// Static event handler for database item updates with generic type handling
-		/// </summary>
-		private static void OnStaticDatabaseItemUpdated(object sender, object e)
-		{
-			NotifyAllInstances(instance =>
-			{
-				if (instance is PluginButton button)
-				{
-					button.HandleDatabaseItemUpdated(sender, e);
-				}
-			});
-		}
-
-		/// <summary>
-		/// Static event handler for database collection changes with generic type handling
-		/// </summary>
-		private static void OnStaticDatabaseCollectionChanged(object sender, object e)
-		{
-			NotifyAllInstances(instance =>
-			{
-				if (instance is PluginButton button)
-				{
-					button.HandleDatabaseCollectionChanged(sender, e);
-				}
-			});
-		}
-
-		#endregion
 
 		public override void SetDefaultDataContext()
 		{
@@ -124,7 +84,7 @@ namespace SystemChecker.Controls
 				return;
 			}
 
-			PluginGameRequierements gameRequierements = (PluginGameRequierements)PluginGameData;
+			PluginGameRequirements pluginGameRequirements = (PluginGameRequirements)PluginGameData;
 			SystemConfiguration systemConfiguration = PluginDatabase.Database.PC;
 
 			if (systemConfiguration == null)
@@ -132,8 +92,8 @@ namespace SystemChecker.Controls
 				return;
 			}
 
-			RequirementEntry systemMinimum = gameRequierements.GetMinimum();
-			RequirementEntry systemRecommanded = gameRequierements.GetRecommanded();
+			RequirementEntry systemMinimum = pluginGameRequirements.GetMinimum();
+			RequirementEntry systemRecommanded = pluginGameRequirements.GetRecommanded();
 
 			bool hasMinimum = systemMinimum.HasData;
 			bool hasRecommanded = systemRecommanded.HasData;

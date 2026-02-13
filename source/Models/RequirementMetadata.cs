@@ -4,22 +4,22 @@ using SystemChecker.Services;
 
 namespace SystemChecker.Models
 {
-    public abstract class RequierementMetadata
+    public abstract class RequirementMetadata
     {
         internal static readonly ILogger Logger = LogManager.GetLogger();
 		internal static readonly SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
 
 		internal Game GameContext { get; set; }
-        internal PluginGameRequierements PluginGameRequierements { get; set; } = new PluginGameRequierements();
+        internal PluginGameRequirements PluginGameRequirements { get; set; } = new PluginGameRequirements();
 
 
         public bool IsFind()
         {
-            return PluginGameRequierements.GetMinimum().HasData;
+            return PluginGameRequirements.GetMinimum().HasData;
         }
 
-        public abstract PluginGameRequierements GetRequirements();
+        public abstract PluginGameRequirements GetRequirements();
 
-        public abstract PluginGameRequierements GetRequirements(string url);
+        public abstract PluginGameRequirements GetRequirements(string url);
     }
 }
