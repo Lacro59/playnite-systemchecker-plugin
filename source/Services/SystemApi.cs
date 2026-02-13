@@ -26,9 +26,6 @@ namespace SystemChecker.Services
 
 		public static CheckSystem CheckConfig(Game game, RequirementEntry requirementEntry, SystemConfiguration systemConfiguration, bool IsInstalled)
 		{
-#if DEBUG
-			Stopwatch globalTimer = Stopwatch.StartNew();
-#endif
 			GameContext = game;
 			Common.LogDebug(true, $"CheckConfig() for {game.Name}");
 
@@ -38,22 +35,11 @@ namespace SystemChecker.Services
 				return new CheckSystem();
 			}
 
-#if DEBUG
-			bool isCheckOs = MeasureExecution("CheckOS", () => CheckOS(systemConfiguration.Os, requirementEntry.Os));
-			bool isCheckCpu = MeasureExecution("CheckCpu", () => CheckCpu(systemConfiguration, requirementEntry.Cpu));
-			bool isCheckRam = MeasureExecution("CheckRam", () => CheckRam(systemConfiguration.Ram, systemConfiguration.RamUsage, requirementEntry.Ram, requirementEntry.RamUsage));
-			bool isCheckGpu = MeasureExecution("CheckGpu", () => CheckGpu(systemConfiguration, requirementEntry.Gpu));
-			bool isCheckStorage = MeasureExecution("CheckStorage", () => IsInstalled || CheckStorage(systemConfiguration.Disks, requirementEntry.Storage));
-
-			globalTimer.Stop();
-			Common.LogDebug(true, $"CheckConfig() total execution time: {globalTimer.ElapsedMilliseconds}ms");
-#else
             bool isCheckOs = CheckOS(systemConfiguration.Os, requirementEntry.Os);
             bool isCheckCpu = CheckCpu(systemConfiguration, requirementEntry.Cpu);
             bool isCheckRam = CheckRam(systemConfiguration.Ram, systemConfiguration.RamUsage, requirementEntry.Ram, requirementEntry.RamUsage);
             bool isCheckGpu = CheckGpu(systemConfiguration, requirementEntry.Gpu);
             bool isCheckStorage = IsInstalled || CheckStorage(systemConfiguration.Disks, requirementEntry.Storage);
-#endif
 
 			return new CheckSystem
 			{
@@ -65,17 +51,6 @@ namespace SystemChecker.Services
 				AllOk = isCheckOs && isCheckCpu && isCheckRam && isCheckGpu && isCheckStorage
 			};
 		}
-
-#if DEBUG
-		private static T MeasureExecution<T>(string methodName, Func<T> action)
-		{
-			Stopwatch timer = Stopwatch.StartNew();
-			T result = action();
-			timer.Stop();
-			Common.LogDebug(true, $"{methodName} executed in {timer.ElapsedMilliseconds}ms ({timer.ElapsedTicks} ticks)");
-			return result;
-		}
-#endif
 
 		private static bool CheckOS(string systemOs, List<string> requirementOs)
 		{
