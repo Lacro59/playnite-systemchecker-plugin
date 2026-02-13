@@ -39,10 +39,8 @@ namespace SystemChecker.Controls
 			InitializeComponent();
 			this.DataContext = ControlDataContext;
 
-			_ = Task.Run(() =>
+			Task.Run(() =>
 			{
-				_ = System.Threading.SpinWait.SpinUntil(() => PluginDatabase.IsLoaded, -1);
-
 				this.Dispatcher.BeginInvoke((Action)delegate
 				{
 					InitializeStaticEvents();

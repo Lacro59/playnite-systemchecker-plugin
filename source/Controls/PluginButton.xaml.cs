@@ -40,10 +40,8 @@ namespace SystemChecker.Controls
 			InitializeComponent();
 			DataContext = ControlDataContext;
 
-			_ = Task.Run(() =>
+			Task.Run(() =>
 			{
-				_ = System.Threading.SpinWait.SpinUntil(() => PluginDatabase.IsLoaded, -1);
-
 				this.Dispatcher.BeginInvoke((Action)delegate
 				{
 					InitializeStaticEvents();
@@ -63,8 +61,6 @@ namespace SystemChecker.Controls
 			AttachPluginEvents(PluginDatabase.PluginName, () =>
 			{
 				PluginDatabase.PluginSettings.PropertyChanged += CreatePluginSettingsHandler();
-
-				// Attach with the correct generic type from PluginDatabase
 				PluginDatabase.Database.ItemUpdated += CreateDatabaseItemUpdatedHandler<PluginGameRequirements>();
 				PluginDatabase.Database.ItemCollectionChanged += CreateDatabaseCollectionChangedHandler<PluginGameRequirements>();
 			});
@@ -153,7 +149,7 @@ namespace SystemChecker.Controls
 		{
 			SystemCheckerGameView viewExtension = new SystemCheckerGameView(PluginDatabase.GameContext);
 			Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PluginDatabase.PluginName, viewExtension);
-			_ = windowExtension.ShowDialog();
+			windowExtension.ShowDialog();
 		}
 
 		#endregion

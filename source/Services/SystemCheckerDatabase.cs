@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using SystemChecker.Clients;
 using SystemChecker.Models;
@@ -24,20 +25,31 @@ namespace SystemChecker.Services
         public SystemCheckerDatabase(SystemCheckerSettingsViewModel pluginSettings, string pluginUserDataPath) : base(pluginSettings, "SystemChecker", pluginUserDataPath)
         {
             TagBefore = "[SC]";
+		}
 
-			Task.Run(() =>
+		protected override void LoadMoreData()
+		{
+			try
 			{
-				System.Threading.SpinWait.SpinUntil(() => IsLoaded, -1);
+				Logger.Info("LoadMoreData started");
 
 				PCGamingWikiRequirements = new PCGamingWikiRequirements();
 				SteamRequirements = new SteamRequirements();
 
 				LocalSystem = new LocalSystem(Path.Combine(Paths.PluginUserDataPath, "Configurations.json"));
-				Database.PC = LocalSystem.GetSystemConfiguration();
-			});
+				_database.PC = LocalSystem.GetSystemConfiguration();
+
+				Logger.Info($"LoadMoreData completed");
+			}
+			catch (Exception ex)
+			{
+				Logger.Error(ex, "Error in LoadMoreData");
+				throw; // Re-throw to make LoadDatabase fail
+			}
 		}
 
-        public override PluginGameRequirements Get(Guid id, bool onlyCache = false, bool force = false)
+
+		public override PluginGameRequirements Get(Guid id, bool onlyCache = false, bool force = false)
         {
             PluginGameRequirements pluginGameRequirements = base.GetOnlyCache(id);
 
