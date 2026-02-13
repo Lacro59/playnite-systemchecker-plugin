@@ -331,8 +331,7 @@ namespace SystemChecker
                 {
                     Task.Run(() =>
                     {
-                        _ = SpinWait.SpinUntil(() => PluginDatabase.IsLoaded, -1);
-                        Application.Current.Dispatcher.BeginInvoke((Action)delegate
+                        API.Instance.MainView.UIDispatcher.BeginInvoke((Action)delegate
                         {
                             if (args.NewValue?.Count == 1)
                             {
@@ -404,9 +403,6 @@ namespace SystemChecker
                 {
                     try
                     {
-                        // Wait extension database are loaded
-                        _ = SpinWait.SpinUntil(() => PluginDatabase.IsLoaded, -1);
-
                         foreach (PluginGameRequirements values in PluginDatabase.Database.Items.Values)
                         {
                             PluginGameRequirements pkuginGameRequirements = PluginDatabase.PurgeGraphicsCardData(values);
