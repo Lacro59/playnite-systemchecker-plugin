@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 using SystemChecker.Models;
 using SystemChecker.Services;
 using SystemChecker.Views;
@@ -39,15 +40,7 @@ namespace SystemChecker.Controls
 		{
 			InitializeComponent();
 			DataContext = ControlDataContext;
-
-			Task.Run(() =>
-			{
-				this.Dispatcher.BeginInvoke((Action)delegate
-				{
-					InitializeStaticEvents();
-					PluginSettings_PropertyChanged(null, null);
-				});
-			});
+			Loaded += OnLoaded;
 		}
 
 		/// <summary>
@@ -109,7 +102,7 @@ namespace SystemChecker.Controls
 
 			string newIcon = DetermineIcon(hasMinimum, hasRecommanded, checkMinimum, checkRecommanded);
 
-			if (ControlDataContext.Text != newIcon)
+			if (GameContext?.Id == CurrentGame.Id && ControlDataContext.Text != newIcon)
 			{
 				ControlDataContext.Text = newIcon;
 			}

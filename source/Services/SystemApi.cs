@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 using SystemChecker.Models;
 using CommonPluginsShared;
 using Playnite.SDK.Models;
@@ -10,196 +11,230 @@ using CommonPluginsStores.Models;
 
 namespace SystemChecker.Services
 {
-    public class SystemApi
-    {
-        private static readonly ILogger Logger = LogManager.GetLogger();
-        private static readonly SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
-        private static Game GameContext;
+	public class SystemApi
+	{
+		private static readonly ILogger Logger = LogManager.GetLogger();
+		private static readonly SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
+		private static Game GameContext;
 
+		private static readonly Regex NumberExtractor = new Regex(@"\d+", RegexOptions.Compiled);
 
-        public static CheckSystem CheckConfig(Game game, RequirementEntry requirementEntry, SystemConfiguration systemConfiguration, bool IsInstalled)
-        {
-            GameContext = game;
-            Common.LogDebug(true, $"CheckConfig() for {game.Name}");
+		private static readonly HashSet<string> OldOsList = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+		{
+			"95", "98", "XP", "Millenium", "ME", "2000", "Vista"
+		};
 
-            if (requirementEntry != null && systemConfiguration != null)
-            {
-                bool isCheckOs = CheckOS(systemConfiguration.Os, requirementEntry.Os);
-                bool isCheckCpu = CheckCpu(systemConfiguration, requirementEntry.Cpu);
-                bool isCheckRam = CheckRam(systemConfiguration.Ram, systemConfiguration.RamUsage, requirementEntry.Ram, requirementEntry.RamUsage);
-                bool isCheckGpu = CheckGpu(systemConfiguration, requirementEntry.Gpu);
-                bool isCheckStorage = IsInstalled ? IsInstalled : CheckStorage(systemConfiguration.Disks, requirementEntry.Storage);
+		public static CheckSystem CheckConfig(Game game, RequirementEntry requirementEntry, SystemConfiguration systemConfiguration, bool IsInstalled)
+		{
+#if DEBUG
+			Stopwatch globalTimer = Stopwatch.StartNew();
+#endif
+			GameContext = game;
+			Common.LogDebug(true, $"CheckConfig() for {game.Name}");
 
-                bool AllOk = isCheckOs && isCheckCpu && isCheckRam && isCheckGpu && isCheckStorage;
+			if (requirementEntry == null || systemConfiguration == null)
+			{
+				Common.LogDebug(true, "CheckConfig() with null requirement and/or systemConfiguration");
+				return new CheckSystem();
+			}
 
-                return new CheckSystem
-                {
-                    CheckOs = isCheckOs,
-                    CheckCpu = isCheckCpu,
-                    CheckRam = isCheckRam,
-                    CheckGpu = isCheckGpu,
-                    CheckStorage = isCheckStorage,
-                    AllOk = AllOk
-                };
-            }
-            else
-            {
-                Common.LogDebug(true, $"CheckConfig() with null requirement and/or systemConfiguration");
-            }
+#if DEBUG
+			bool isCheckOs = MeasureExecution("CheckOS", () => CheckOS(systemConfiguration.Os, requirementEntry.Os));
+			bool isCheckCpu = MeasureExecution("CheckCpu", () => CheckCpu(systemConfiguration, requirementEntry.Cpu));
+			bool isCheckRam = MeasureExecution("CheckRam", () => CheckRam(systemConfiguration.Ram, systemConfiguration.RamUsage, requirementEntry.Ram, requirementEntry.RamUsage));
+			bool isCheckGpu = MeasureExecution("CheckGpu", () => CheckGpu(systemConfiguration, requirementEntry.Gpu));
+			bool isCheckStorage = MeasureExecution("CheckStorage", () => IsInstalled || CheckStorage(systemConfiguration.Disks, requirementEntry.Storage));
 
-            return new CheckSystem();
-        }
+			globalTimer.Stop();
+			Common.LogDebug(true, $"CheckConfig() total execution time: {globalTimer.ElapsedMilliseconds}ms");
+#else
+            bool isCheckOs = CheckOS(systemConfiguration.Os, requirementEntry.Os);
+            bool isCheckCpu = CheckCpu(systemConfiguration, requirementEntry.Cpu);
+            bool isCheckRam = CheckRam(systemConfiguration.Ram, systemConfiguration.RamUsage, requirementEntry.Ram, requirementEntry.RamUsage);
+            bool isCheckGpu = CheckGpu(systemConfiguration, requirementEntry.Gpu);
+            bool isCheckStorage = IsInstalled || CheckStorage(systemConfiguration.Disks, requirementEntry.Storage);
+#endif
 
-        private static bool CheckOS(string systemOs, List<string> requirementOs)
-        {
-            try
-            {
-                List<string> oldOS = new List<string> { "95", "98", "XP", "Millenium", "ME", "2000", "Vista" };
+			return new CheckSystem
+			{
+				CheckOs = isCheckOs,
+				CheckCpu = isCheckCpu,
+				CheckRam = isCheckRam,
+				CheckGpu = isCheckGpu,
+				CheckStorage = isCheckStorage,
+				AllOk = isCheckOs && isCheckCpu && isCheckRam && isCheckGpu && isCheckStorage
+			};
+		}
 
-                if (requirementOs.Count == 0)
-                {
-                    return true;
-                }
+#if DEBUG
+		private static T MeasureExecution<T>(string methodName, Func<T> action)
+		{
+			Stopwatch timer = Stopwatch.StartNew();
+			T result = action();
+			timer.Stop();
+			Common.LogDebug(true, $"{methodName} executed in {timer.ElapsedMilliseconds}ms ({timer.ElapsedTicks} ticks)");
+			return result;
+		}
+#endif
 
-                foreach (string Os in requirementOs)
-                {
-                    if (systemOs.Contains(Os, StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        return true;
-                    }
+		private static bool CheckOS(string systemOs, List<string> requirementOs)
+		{
+			if (requirementOs.Count == 0)
+			{
+				return true;
+			}
 
-                    if (oldOS.Where(x => Os.Contains(x, StringComparison.InvariantCultureIgnoreCase)).Count() > 0)
-                    {
-                        return true;
-                    }
+			try
+			{
+				int numberOsPc = 0;
+				bool systemOsParsed = false;
 
-                    _ = int.TryParse(Regex.Matches(Os, @"\d+")?[0]?.Value ?? "", out int numberOsRequirement);
-                    _ = int.TryParse(Regex.Matches(systemOs, @"\d+")?[0]?.Value ?? "", out int numberOsPc);
-                    if (numberOsRequirement != 0 && numberOsPc != 0 && numberOsPc >= numberOsRequirement)
-                    {
-                        return true;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), GameContext?.Name);
-                Common.LogError(ex, false, message, true, PluginDatabase.PluginName, message);
-            }
+				foreach (string os in requirementOs)
+				{
+					if (systemOs.IndexOf(os, StringComparison.OrdinalIgnoreCase) >= 0)
+					{
+						return true;
+					}
 
-            return false;
-        }
+					if (OldOsList.Any(oldOs => os.IndexOf(oldOs, StringComparison.OrdinalIgnoreCase) >= 0))
+					{
+						return true;
+					}
 
-        private static bool CheckCpu(SystemConfiguration systemConfiguration, List<string> requirementCpu)
-        {
-            try
-            {
-                if (requirementCpu.Count > 0)
-                {
-                    foreach (string cpu in requirementCpu)
-                    {
-                        Cpu cpuCheck = new Cpu(systemConfiguration, cpu);
-                        CheckResult check = cpuCheck.IsBetter();
+					if (!systemOsParsed)
+					{
+						Match systemMatch = NumberExtractor.Match(systemOs);
+						if (systemMatch.Success)
+						{
+							int.TryParse(systemMatch.Value, out numberOsPc);
+						}
+						systemOsParsed = true;
+					}
 
-                        if (check.Result)
-                        {
-                            return true;
-                        }
-                        else if (check.SameConstructor)
-                        {
-                            return check.Result;
-                        }
-                    }
-                }
-                else
-                {
-                    return true;
-                }
-            }
-            catch (Exception ex)
-            {
-                string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), GameContext?.Name);
-                Common.LogError(ex, false, message, true, PluginDatabase.PluginName, message);
-            }
+					if (numberOsPc > 0)
+					{
+						Match requirementMatch = NumberExtractor.Match(os);
+						if (requirementMatch.Success && int.TryParse(requirementMatch.Value, out int numberOsRequirement))
+						{
+							if (numberOsPc >= numberOsRequirement)
+							{
+								return true;
+							}
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				LogError(ex, "CheckOS");
+			}
 
-            return false;
-        }
+			return false;
+		}
 
-        private static bool CheckRam(double systemRam, string systemRamUsage, double requirementRam, string requirementRamUsage)
-        {
-            try
-            {
-                return systemRamUsage == requirementRamUsage || systemRam >= requirementRam;
-            }
-            catch (Exception ex)
-            {
-                string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), GameContext?.Name);
-                Common.LogError(ex, false, message, true, PluginDatabase.PluginName, message);
-            }
+		private static bool CheckCpu(SystemConfiguration systemConfiguration, List<string> requirementCpu)
+		{
+			if (requirementCpu.Count == 0)
+			{
+				return true;
+			}
 
-            return false;
-        }
+			try
+			{
+				foreach (string cpu in requirementCpu)
+				{
+					Cpu cpuCheck = new Cpu(systemConfiguration, cpu);
+					CheckResult check = cpuCheck.IsBetter();
 
-        private static bool CheckGpu(SystemConfiguration systemConfiguration, List<string> requirementGpu)
-        {
-            try
-            {
-                if (requirementGpu.Count > 0)
-                {
-                    for (int i = 0; i < requirementGpu.Count; i++)
-                    {
-                        string gpu = requirementGpu[i];
-                        Gpu gpuCheck = new Gpu(systemConfiguration, gpu);
-                        CheckResult check = gpuCheck.IsBetter();
+					if (check.SameConstructor || check.Result)
+					{
+						return check.Result;
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				LogError(ex, "CheckCpu");
+			}
 
-                        if (check.Result)
-                        {
-                            return check.SameConstructor ? check.Result : (!gpuCheck.IsWithNoCard && gpuCheck.CardRequirementIsOld) || i <= 0;
-                        }
-                        else if (check.SameConstructor)
-                        {
-                            return check.Result;
-                        }
-                    }
-                }
-                else
-                {
-                    return true;
-                }
-            }
-            catch (Exception ex)
-            {
-                string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), GameContext?.Name);
-                Common.LogError(ex, false, message, true, PluginDatabase.PluginName, message);
-            }
+			return false;
+		}
 
-            return false;
-        }
+		private static bool CheckRam(double systemRam, string systemRamUsage, double requirementRam, string requirementRamUsage)
+		{
+			try
+			{
+				return systemRamUsage == requirementRamUsage || systemRam >= requirementRam;
+			}
+			catch (Exception ex)
+			{
+				LogError(ex, "CheckRam");
+				return false;
+			}
+		}
 
-        private static bool CheckStorage(List<SystemDisk> systemDisks, double Storage)
-        {
-            if (Storage == 0)
-            {
-                return true;
-            }
+		private static bool CheckGpu(SystemConfiguration systemConfiguration, List<string> requirementGpu)
+		{
+			if (requirementGpu.Count == 0)
+			{
+				return true;
+			}
 
-            try
-            {
-                foreach (SystemDisk Disk in systemDisks)
-                {
-                    if (Disk.FreeSpace >= Storage)
-                    {
-                        return true;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), GameContext?.Name);
-                Common.LogError(ex, false, message, true, PluginDatabase.PluginName, message);
-            }
+			try
+			{
+				for (int i = 0; i < requirementGpu.Count; i++)
+				{
+					Gpu gpuCheck = new Gpu(systemConfiguration, requirementGpu[i]);
+					CheckResult check = gpuCheck.IsBetter();
 
-            return false;
-        }
-    }
+					if (check.Result)
+					{
+						return check.SameConstructor || (!gpuCheck.IsWithNoCard && gpuCheck.CardRequirementIsOld) || i == 0;
+					}
+
+					if (check.SameConstructor)
+					{
+						return false;
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				LogError(ex, "CheckGpu");
+			}
+
+			return false;
+		}
+
+		private static bool CheckStorage(List<SystemDisk> systemDisks, double storage)
+		{
+			if (storage == 0)
+			{
+				return true;
+			}
+
+			try
+			{
+				foreach (SystemDisk disk in systemDisks)
+				{
+					if (disk.FreeSpace >= storage)
+					{
+						return true;
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				LogError(ex, "CheckStorage");
+			}
+
+			return false;
+		}
+
+		private static void LogError(Exception ex, string methodName)
+		{
+			string message = string.Format(ResourceProvider.GetString("LOCSystemCheckerTryRefresh"), GameContext?.Name);
+			Common.LogError(ex, false, message, true, PluginDatabase.PluginName, message);
+		}
+	}
 }

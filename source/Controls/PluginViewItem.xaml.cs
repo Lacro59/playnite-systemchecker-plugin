@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using System.Windows.Threading;
 using SystemChecker.Models;
 using SystemChecker.Services;
 
@@ -37,16 +38,8 @@ namespace SystemChecker.Controls
 		public PluginViewItem()
 		{
 			InitializeComponent();
-			this.DataContext = ControlDataContext;
-
-			Task.Run(() =>
-			{
-				this.Dispatcher.BeginInvoke((Action)delegate
-				{
-					InitializeStaticEvents();
-					PluginSettings_PropertyChanged(null, null);
-				});
-			});
+			DataContext = ControlDataContext;
+			Loaded += OnLoaded;
 		}
 
 		/// <summary>
@@ -65,7 +58,6 @@ namespace SystemChecker.Controls
 				PluginDatabase.Database.ItemCollectionChanged += CreateDatabaseCollectionChangedHandler<PluginGameRequirements>();
 			});
 		}
-
 
 		public override void SetDefaultDataContext()
 		{
@@ -94,18 +86,18 @@ namespace SystemChecker.Controls
 			{
 				return;
 			}
-
+			
 			CheckSystem checkMinimum = hasMinimum
 				? SystemApi.CheckConfig(newContext, systemMinimum, systemConfiguration, newContext.IsInstalled)
 				: null;
-
+			
 			CheckSystem checkRecommanded = hasRecommanded
 				? SystemApi.CheckConfig(newContext, systemRecommanded, systemConfiguration, newContext.IsInstalled)
 				: null;
 
 			string newIcon = DetermineIcon(hasMinimum, hasRecommanded, checkMinimum, checkRecommanded);
 
-			if (ControlDataContext.Text != newIcon)
+			if (GameContext?.Id == CurrentGame.Id && ControlDataContext.Text != newIcon)
 			{
 				ControlDataContext.Text = newIcon;
 			}
