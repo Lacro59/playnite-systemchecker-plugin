@@ -1,5 +1,7 @@
 ﻿using CommonPluginsShared;
 using CommonPluginsShared.Collections;
+using CommonPluginsShared.Interfaces;
+using CommonPluginsShared.Services;
 using CommonPluginsStores.Models;
 using CommonPluginsStores.Steam;
 using Playnite.SDK;
@@ -19,12 +21,13 @@ namespace SystemChecker.Services
     {
         public LocalSystem LocalSystem;
 
-        private PCGamingWikiRequirements PCGamingWikiRequirements { get; set; }
+		private PCGamingWikiRequirements PCGamingWikiRequirements { get; set; }
         private SteamRequirements SteamRequirements { get; set; }
 
         public SystemCheckerDatabase(SystemCheckerSettingsViewModel pluginSettings, string pluginUserDataPath) : base(pluginSettings, "SystemChecker", pluginUserDataPath)
         {
             TagBefore = "[SC]";
+            WindowPluginService = new WindowPluginService(PluginName);
 		}
 
 		protected override void LoadMoreData()
