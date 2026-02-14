@@ -146,7 +146,7 @@ namespace SystemChecker.Controls
 				ShowMaximizeButton = false,
 				ShowCloseButton = true,
 				CanBeResizable = false,
-				Height = 600,
+				MinHeight = 500,
 				Width = 1000
 			};
 

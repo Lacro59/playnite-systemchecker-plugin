@@ -69,7 +69,7 @@ namespace SystemChecker
                         ShowMaximizeButton = false,
                         ShowCloseButton = true,
                         CanBeResizable = false,
-                        Height = 600,
+                        MinHeight = 500,
                         Width = 1000
                     };
 
@@ -137,7 +137,7 @@ namespace SystemChecker
                             ShowMaximizeButton = false,
                             ShowCloseButton = true,
                             CanBeResizable = false,
-                            Height = 600,
+                            MinHeight = 500,
                             Width = 1000
                         };
 
