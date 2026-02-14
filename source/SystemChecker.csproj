@@ -105,10 +105,15 @@
     <Compile Include="Controls\PluginViewItem.xaml.cs">
       <DependentUpon>PluginViewItem.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\StatusIcon.cs" />
+    <Compile Include="Converters\StatusToColorConverter.cs" />
     <Compile Include="Models\BenchmarkData.cs" />
     <Compile Include="Models\CheckResult.cs" />
     <Compile Include="Models\CheckSystem.cs" />
     <Compile Include="Models\RequirementsCollection.cs" />
+    <Compile Include="playnite-plugincommon\CommonPluginsControls\Controls\SourceLinkControl.xaml.cs">
+      <DependentUpon>SourceLinkControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="playnite-plugincommon\CommonPluginsControls\PlayniteControls\NumericBox.xaml.cs">
       <DependentUpon>NumericBox.xaml</DependentUpon>
     </Compile>
@@ -132,6 +137,7 @@
     <Compile Include="Services\SystemCheckerSearch.cs" />
     <Compile Include="SystemChecker.cs" />
     <Compile Include="SystemCheckerSettings.cs" />
+    <Compile Include="ViewModels\SystemCheckerGameViewModel.cs" />
     <Compile Include="Views\SystemCheckerGameView.xaml.cs">
       <DependentUpon>SystemCheckerGameView.xaml</DependentUpon>
     </Compile>
@@ -349,6 +355,10 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Include="playnite-plugincommon\CommonPluginsControls\Controls\SourceLinkControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="playnite-plugincommon\CommonPluginsControls\PlayniteControls\NumericBox.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

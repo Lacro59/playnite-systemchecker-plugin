@@ -140,8 +140,18 @@ namespace SystemChecker.Controls
 
 		private void PART_PluginButton_Click(object sender, RoutedEventArgs e)
 		{
+			WindowOptions windowOptions = new WindowOptions
+			{
+				ShowMinimizeButton = false,
+				ShowMaximizeButton = false,
+				ShowCloseButton = true,
+				CanBeResizable = false,
+				Height = 600,
+				Width = 1000
+			};
+
 			SystemCheckerGameView viewExtension = new SystemCheckerGameView(PluginDatabase.GameContext);
-			Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PluginDatabase.PluginName, viewExtension);
+			Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PluginDatabase.PluginName, viewExtension, windowOptions);
 			windowExtension.ShowDialog();
 		}
 

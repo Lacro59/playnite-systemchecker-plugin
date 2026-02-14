@@ -63,10 +63,20 @@ namespace SystemChecker
                 string ButtonName = ((Button)sender).Name;
                 if (ButtonName == "PART_CustomSysCheckerButton")
                 {
+                    WindowOptions windowOptions = new WindowOptions
+                    {
+                        ShowMinimizeButton = false,
+                        ShowMaximizeButton = false,
+                        ShowCloseButton = true,
+                        CanBeResizable = false,
+                        Height = 600,
+                        Width = 1000
+                    };
+
                     PluginDatabase.IsViewOpen = true;
                     SystemCheckerGameView viewExtension = new SystemCheckerGameView(PluginDatabase.GameContext);
-                    Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PluginDatabase.PluginName, viewExtension);
-                    _ = windowExtension.ShowDialog();
+                    Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PluginDatabase.PluginName, viewExtension, windowOptions);
+                    windowExtension.ShowDialog();
                     PluginDatabase.IsViewOpen = false;
                 }
             }
@@ -121,10 +131,20 @@ namespace SystemChecker
                     Description = ResourceProvider.GetString("LOCSystemCheckerCheckConfig"),
                     Action = (gameMenuItem) =>
                     {
+                        WindowOptions windowOptions = new WindowOptions
+                        {
+                            ShowMinimizeButton = false,
+                            ShowMaximizeButton = false,
+                            ShowCloseButton = true,
+                            CanBeResizable = false,
+                            Height = 600,
+                            Width = 1000
+                        };
+
                         PluginDatabase.IsViewOpen = true;
                         var viewExtension = new SystemCheckerGameView(gameMenu);
-                        Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PluginDatabase.PluginName, viewExtension);
-                        _ = windowExtension.ShowDialog();
+                        Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PluginDatabase.PluginName, viewExtension, windowOptions);
+                        windowExtension.ShowDialog();
                         PluginDatabase.IsViewOpen = false;
                     }
                 });
@@ -276,7 +296,7 @@ namespace SystemChecker
 
                     var viewExtension = new ListWithNoData(PluginDatabase);
                     Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(ResourceProvider.GetString("LOCSystemChecker"), viewExtension, windowOptions);
-                    _ = windowExtension.ShowDialog();
+                    windowExtension.ShowDialog();
                 }
             });
 
