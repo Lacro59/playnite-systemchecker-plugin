@@ -16,6 +16,10 @@ namespace SystemChecker.Services
 	{
 		private readonly SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
 
+		private static readonly Regex StoresRegex = new Regex(@"-stores=([\w*,]*\w*)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+		private static readonly Regex StatusRegex = new Regex(@"-status=([\w*,]*\w*)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+		private static readonly Regex FlagsRegex = new Regex(@"-\w+", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
 		public SystemCheckerSearch()
 		{
 			Description = ResourceProvider.GetString("LOCSystemCheckerSearchDescription");
@@ -32,18 +36,19 @@ namespace SystemChecker.Services
 			{
 				SearchParameters searchParams = ParseSearchParameters(args.SearchTerm);
 				SystemConfiguration systemConfiguration = PluginDatabase.Database.PC;
+				GameSearchFilterSettings filterSettings = args.GameFilterSettings;
 
 				IEnumerable<PluginGameRequirements> filteredGames = PluginDatabase.Database
-					.Where(x => MatchesSearchCriteria(x, searchParams, args.GameFilterSettings));
+					.Where(x => MatchesSearchCriteria(x, searchParams, filterSettings));
 
-				foreach (PluginGameRequirements x in filteredGames)
+				foreach (PluginGameRequirements gameReq in filteredGames)
 				{
 					if (args.CancelToken.IsCancellationRequested)
 					{
 						return null;
 					}
 
-					if (IsGameValid(x, searchParams, systemConfiguration, out Game game))
+					if (IsGameValid(gameReq, searchParams, systemConfiguration, out Game game))
 					{
 						searchItems.Add(new GameSearchItem(
 							game,
@@ -65,75 +70,152 @@ namespace SystemChecker.Services
 		private SearchParameters ParseSearchParameters(string searchTerm)
 		{
 			SearchParameters parameters = new SearchParameters();
-			string[] terms = searchTerm.Split(' ');
+			string[] terms = searchTerm.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
 			foreach (string term in terms)
 			{
-				if (!parameters.HasMin) parameters.HasMin = term.IsEqual("-min");
-				if (!parameters.HasRec) parameters.HasRec = term.IsEqual("-rec");
-				if (!parameters.HasAny) parameters.HasAny = term.IsEqual("-any");
-				if (!parameters.HasNp) parameters.HasNp = term.IsEqual("-np");
-				if (!parameters.HasFav) parameters.HasFav = term.IsEqual("-fav");
-
-				if (term.Contains("-stores=", StringComparison.InvariantCultureIgnoreCase))
+				if (term.Length > 1 && term[0] == '-')
 				{
-					parameters.Stores = term
-						.Replace("-stores=", string.Empty, StringComparison.InvariantCultureIgnoreCase)
-						.Split(',')
-						.ToList();
+					string flag = term.ToLowerInvariant();
+					switch (flag)
+					{
+						case "-min":
+							parameters.HasMin = true;
+							continue;
+						case "-rec":
+							parameters.HasRec = true;
+							continue;
+						case "-any":
+							parameters.HasAny = true;
+							continue;
+						case "-np":
+							parameters.HasNp = true;
+							continue;
+						case "-fav":
+							parameters.HasFav = true;
+							continue;
+					}
 				}
 
-				if (term.Contains("-status=", StringComparison.InvariantCultureIgnoreCase))
+				// Check for stores parameter
+				if (term.StartsWith("-stores=", StringComparison.OrdinalIgnoreCase))
 				{
-					parameters.Status = term
-						.Replace("-status=", string.Empty, StringComparison.InvariantCultureIgnoreCase)
-						.Split(',')
-						.ToList();
+					string storesValue = term.Substring(8); // "-stores=".Length
+					if (!string.IsNullOrEmpty(storesValue))
+					{
+						parameters.Stores = storesValue.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+					}
+					continue;
+				}
+
+				// Check for status parameter
+				if (term.StartsWith("-status=", StringComparison.OrdinalIgnoreCase))
+				{
+					string statusValue = term.Substring(8); // "-status=".Length
+					if (!string.IsNullOrEmpty(statusValue))
+					{
+						parameters.Status = statusValue.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+					}
+					continue;
 				}
 			}
 
-			parameters.CleanSearchTerm = Regex.Replace(searchTerm, @"-stores=(\w*,)*\w*", string.Empty, RegexOptions.IgnoreCase);
-			parameters.CleanSearchTerm = Regex.Replace(parameters.CleanSearchTerm, @"-status=(\w*,)*\w*", string.Empty, RegexOptions.IgnoreCase);
-			parameters.CleanSearchTerm = Regex.Replace(parameters.CleanSearchTerm, @"-\w*", string.Empty, RegexOptions.IgnoreCase).Trim();
+			// Clean search term using pre-compiled regex (much faster)
+			string cleaned = StoresRegex.Replace(searchTerm, string.Empty);
+			cleaned = StatusRegex.Replace(cleaned, string.Empty);
+			cleaned = FlagsRegex.Replace(cleaned, string.Empty).Trim();
+			parameters.CleanSearchTerm = cleaned;
 
 			return parameters;
 		}
 
 		private bool MatchesSearchCriteria(PluginGameRequirements game, SearchParameters searchParams, GameSearchFilterSettings filterSettings)
 		{
-			if (!game.Name.Contains(searchParams.CleanSearchTerm, StringComparison.InvariantCultureIgnoreCase) || game.IsDeleted)
+			// Early exit for deleted games
+			if (game.IsDeleted)
 			{
 				return false;
 			}
 
+			// Check name match first (most likely to fail)
+			if (!string.IsNullOrEmpty(searchParams.CleanSearchTerm) &&
+				!game.Name.Contains(searchParams.CleanSearchTerm, StringComparison.OrdinalIgnoreCase))
+			{
+				return false;
+			}
+
+			// Check install status
 			if (!filterSettings.Uninstalled && !game.IsInstalled)
 			{
 				return false;
 			}
 
+			// Check hidden status
 			if (!filterSettings.Hidden && game.Hidden)
 			{
 				return false;
 			}
 
+			// Check not played filter
 			if (searchParams.HasNp && game.Playtime != 0)
 			{
 				return false;
 			}
 
+			// Check favorite filter
 			if (searchParams.HasFav && !game.Favorite)
 			{
 				return false;
 			}
 
-			if (searchParams.Stores.Count > 0 && !searchParams.Stores.Any(y => game.Source?.Name?.Contains(y, StringComparison.InvariantCultureIgnoreCase) ?? false))
+			// Check stores filter
+			if (searchParams.Stores.Count > 0)
 			{
-				return false;
+				string sourceName = game.Source?.Name;
+				if (string.IsNullOrEmpty(sourceName))
+				{
+					return false;
+				}
+
+				bool storeMatched = false;
+				foreach (string store in searchParams.Stores)
+				{
+					if (sourceName.IndexOf(store, StringComparison.OrdinalIgnoreCase) >= 0)
+					{
+						storeMatched = true;
+						break;
+					}
+				}
+
+				if (!storeMatched)
+				{
+					return false;
+				}
 			}
 
-			if (searchParams.Status.Count > 0 && !searchParams.Status.Any(y => game.Game?.CompletionStatus?.Name?.Contains(y, StringComparison.InvariantCultureIgnoreCase) ?? false))
+			// Check completion status filter
+			if (searchParams.Status.Count > 0)
 			{
-				return false;
+				string completionStatusName = game.Game?.CompletionStatus?.Name;
+				if (string.IsNullOrEmpty(completionStatusName))
+				{
+					return false;
+				}
+
+				bool statusMatched = false;
+				foreach (string status in searchParams.Status)
+				{
+					if (completionStatusName.IndexOf(status, StringComparison.OrdinalIgnoreCase) >= 0)
+					{
+						statusMatched = true;
+						break;
+					}
+				}
+
+				if (!statusMatched)
+				{
+					return false;
+				}
 			}
 
 			return true;
@@ -143,6 +225,7 @@ namespace SystemChecker.Services
 		{
 			game = API.Instance.Database.Games.Get(gameReq.Id);
 
+			// If no system requirement filters, accept all
 			if (!searchParams.HasMin && !searchParams.HasRec && !searchParams.HasAny)
 			{
 				return true;
@@ -151,6 +234,7 @@ namespace SystemChecker.Services
 			RequirementEntry systemMinimum = gameReq.GetMinimum();
 			RequirementEntry systemRecommended = gameReq.GetRecommended();
 
+			// Check minimum requirements
 			if (systemMinimum.HasData && (searchParams.HasMin || searchParams.HasAny))
 			{
 				CheckSystem checkMinimum = SystemApi.CheckConfig(game, systemMinimum, systemConfiguration, game.IsInstalled);
@@ -160,6 +244,7 @@ namespace SystemChecker.Services
 				}
 			}
 
+			// Check recommended requirements
 			if (systemRecommended.HasData && (searchParams.HasRec || searchParams.HasAny))
 			{
 				CheckSystem checkRecommended = SystemApi.CheckConfig(game, systemRecommended, systemConfiguration, game.IsInstalled);
