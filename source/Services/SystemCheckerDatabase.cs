@@ -21,38 +21,38 @@ namespace SystemChecker.Services
     {
         public LocalSystem LocalSystem;
 
-		private PCGamingWikiRequirements PCGamingWikiRequirements { get; set; }
+        private PCGamingWikiRequirements PCGamingWikiRequirements { get; set; }
         private SteamRequirements SteamRequirements { get; set; }
 
         public SystemCheckerDatabase(SystemCheckerSettingsViewModel pluginSettings, string pluginUserDataPath) : base(pluginSettings, "SystemChecker", pluginUserDataPath)
         {
             TagBefore = "[SC]";
             WindowPluginService = new WindowPluginService(PluginName);
-		}
+        }
 
-		protected override void LoadMoreData()
-		{
-			try
-			{
-				Logger.Info("LoadMoreData started");
+        protected override void LoadMoreData()
+        {
+            try
+            {
+                Logger.Info("LoadMoreData started");
 
-				PCGamingWikiRequirements = new PCGamingWikiRequirements();
-				SteamRequirements = new SteamRequirements();
+                PCGamingWikiRequirements = new PCGamingWikiRequirements();
+                SteamRequirements = new SteamRequirements();
 
-				LocalSystem = new LocalSystem(Path.Combine(Paths.PluginUserDataPath, "Configurations.json"));
-				_database.PC = LocalSystem.GetSystemConfiguration();
+                LocalSystem = new LocalSystem(Path.Combine(Paths.PluginUserDataPath, "Configurations.json"));
+                _database.PC = LocalSystem.GetSystemConfiguration();
 
-				Logger.Info($"LoadMoreData completed");
-			}
-			catch (Exception ex)
-			{
-				Logger.Error(ex, "Error in LoadMoreData");
-				throw; // Re-throw to make LoadDatabase fail
-			}
-		}
+                Logger.Info($"LoadMoreData completed");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error in LoadMoreData");
+                throw; // Re-throw to make LoadDatabase fail
+            }
+        }
 
 
-		public override PluginGameRequirements Get(Guid id, bool onlyCache = false, bool force = false)
+        public override PluginGameRequirements Get(Guid id, bool onlyCache = false, bool force = false)
         {
             PluginGameRequirements pluginGameRequirements = base.GetOnlyCache(id);
 

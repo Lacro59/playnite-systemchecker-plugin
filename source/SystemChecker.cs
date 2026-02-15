@@ -28,8 +28,13 @@ namespace SystemChecker
 
         private bool PreventLibraryUpdatedOnStart { get; set; } = true;
 
+        private SystemCheckerMenus _menus;
+
         public SystemChecker(IPlayniteAPI api) : base(api, "SystemChecker")
         {
+            // Menus
+            _menus = new SystemCheckerMenus(PluginSettings, PluginDatabase);
+
             // Custom theme button
             EventManager.RegisterClassHandler(typeof(Button), Button.ClickEvent, new RoutedEventHandler(OnCustomThemeButtonClick));
 
@@ -64,8 +69,8 @@ namespace SystemChecker
                 string btName = ((Button)sender).Name;
                 if (btName == "PART_CustomSysCheckerButton")
                 {
-					PluginDatabase.WindowPluginService.ShowPluginGameDataWindow(PluginDatabase.GameContext);
-				}
+                    PluginDatabase.WindowPluginService.ShowPluginGameDataWindow(PluginDatabase.GameContext);
+                }
             }
             catch (Exception ex)
             {
@@ -107,209 +112,13 @@ namespace SystemChecker
         // To add new game menu items override GetGameMenuItems
         public override IEnumerable<GameMenuItem> GetGameMenuItems(GetGameMenuItemsArgs args)
         {
-            Game gameMenu = args.Games.First();
-            List<Guid> ids = args.Games.Select(x => x.Id).ToList();
-            PluginGameRequirements pluginGameRequirements = PluginDatabase.Get(gameMenu, true);
-
-            List<GameMenuItem> gameMenuItems = new List<GameMenuItem>();
-
-            if (pluginGameRequirements.HasData)
-            {
-                // Show requirements for the selected game
-                gameMenuItems.Add(new GameMenuItem
-                {
-                    MenuSection = ResourceProvider.GetString("LOCSystemChecker"),
-                    Description = ResourceProvider.GetString("LOCSystemCheckerCheckConfig"),
-                    Action = (gameMenuItem) =>
-                    {
-						PluginDatabase.WindowPluginService.ShowPluginGameDataWindow(gameMenu);
-					}
-                });
-
-                gameMenuItems.Add(new GameMenuItem
-                {
-                    MenuSection = ResourceProvider.GetString("LOCSystemChecker"),
-                    Description = "-"
-                });
-            }
-
-
-            // Delete & download requirements data for the selected game
-            gameMenuItems.Add(new GameMenuItem
-            {
-                MenuSection = ResourceProvider.GetString("LOCSystemChecker"),
-                Description = ResourceProvider.GetString("LOCCommonRefreshGameData"),
-                Action = (gameMenuItem) =>
-                {
-                    if (ids.Count == 1)
-                    {
-                        PluginDatabase.Refresh(gameMenu.Id);
-                    }
-                    else
-                    {
-                        PluginDatabase.Refresh(ids);
-                    }
-                }
-            });
-
-
-            if (pluginGameRequirements.HasData)
-            {
-                gameMenuItems.Add(new GameMenuItem
-                {
-                    MenuSection = ResourceProvider.GetString("LOCSystemChecker"),
-                    Description = ResourceProvider.GetString("LOCCommonDeleteGameData"),
-                    Action = (mainMenuItem) =>
-                    {
-                        if (ids.Count == 1)
-                        {
-                            PluginDatabase.Remove(gameMenu);
-                        }
-                        else
-                        {
-                            PluginDatabase.Remove(ids);
-                        }
-                    }
-                });
-            }
-
-#if DEBUG
-            gameMenuItems.Add(new GameMenuItem
-            {
-                MenuSection = ResourceProvider.GetString("LOCSystemChecker"),
-                Description = "-"
-            });
-            gameMenuItems.Add(new GameMenuItem
-            {
-                MenuSection = ResourceProvider.GetString("LOCSystemChecker"),
-                Description = "Test",
-                Action = (mainMenuItem) => { }
-            });
-#endif
-
-            return gameMenuItems;
+            return _menus.GetGameMenuItems(args);
         }
 
         // To add new main menu items override GetMainMenuItems
         public override IEnumerable<MainMenuItem> GetMainMenuItems(GetMainMenuItemsArgs args)
         {
-            string MenuInExtensions = string.Empty;
-            if (PluginSettings.Settings.MenuInExtensions)
-            {
-                MenuInExtensions = "@";
-            }
-
-            List<MainMenuItem> mainMenuItems = new List<MainMenuItem>
-            {
-                // Download missing data for all game in database
-                new MainMenuItem
-                {
-                    MenuSection = MenuInExtensions + ResourceProvider.GetString("LOCSystemChecker"),
-                    Description = ResourceProvider.GetString("LOCCommonDownloadPluginData"),
-                    Action = (mainMenuItem) =>
-                    {
-                        PluginDatabase.GetSelectData();
-                    }
-                }
-            };
-
-            if (PluginDatabase.PluginSettings.Settings.EnableTag)
-            {
-                mainMenuItems.Add(new MainMenuItem
-                {
-                    MenuSection = MenuInExtensions + ResourceProvider.GetString("LOCSystemChecker"),
-                    Description = "-"
-                });
-
-                // Add tag for selected game in database if data exists
-                mainMenuItems.Add(new MainMenuItem
-                {
-                    MenuSection = MenuInExtensions + ResourceProvider.GetString("LOCSystemChecker"),
-                    Description = ResourceProvider.GetString("LOCCommonAddTPlugin"),
-                    Action = (mainMenuItem) =>
-                    {
-                        PluginDatabase.AddTagSelectData();
-                    }
-                });
-                // Add tag for all games
-                mainMenuItems.Add(new MainMenuItem
-                {
-                    MenuSection = MenuInExtensions + ResourceProvider.GetString("LOCSystemChecker"),
-                    Description = ResourceProvider.GetString("LOCCommonAddAllTags"),
-                    Action = (mainMenuItem) =>
-                    {
-                        PluginDatabase.AddTagAllGame();
-                    }
-                });
-                // Remove tag for all game in database
-                mainMenuItems.Add(new MainMenuItem
-                {
-                    MenuSection = MenuInExtensions + ResourceProvider.GetString("LOCSystemChecker"),
-                    Description = ResourceProvider.GetString("LOCCommonRemoveAllTags"),
-                    Action = (mainMenuItem) =>
-                    {
-                        PluginDatabase.RemoveTagAllGame();
-                    }
-                });
-            }
-
-            mainMenuItems.Add(new MainMenuItem
-            {
-                MenuSection = MenuInExtensions + ResourceProvider.GetString("LOCSystemChecker"),
-                Description = "-"
-            });
-            mainMenuItems.Add(new MainMenuItem
-            {
-                MenuSection = MenuInExtensions + ResourceProvider.GetString("LOCSystemChecker"),
-                Description = ResourceProvider.GetString("LOCCommonViewNoData"),
-                Action = (mainMenuItem) =>
-                {
-                    var windowOptions = new WindowOptions
-                    {
-                        ShowMinimizeButton = false,
-                        ShowMaximizeButton = false,
-                        ShowCloseButton = true
-                    };
-
-                    var viewExtension = new ListWithNoData(PluginDatabase);
-                    Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(ResourceProvider.GetString("LOCSystemChecker"), viewExtension, windowOptions);
-                    windowExtension.ShowDialog();
-                }
-            });
-
-            mainMenuItems.Add(new MainMenuItem
-            {
-                MenuSection = MenuInExtensions + ResourceProvider.GetString("LOCSystemChecker"),
-                Description = "-"
-            });
-
-
-            // Delete database
-            mainMenuItems.Add(new MainMenuItem
-            {
-                MenuSection = MenuInExtensions + ResourceProvider.GetString("LOCSystemChecker"),
-                Description = ResourceProvider.GetString("LOCCommonDeletePluginData"),
-                Action = (mainMenuItem) =>
-                {
-                    PluginDatabase.ClearDatabase();
-                }
-            });
-
-#if DEBUG
-            mainMenuItems.Add(new MainMenuItem
-            {
-                MenuSection = MenuInExtensions + ResourceProvider.GetString("LOCSystemChecker"),
-                Description = "-"
-            });
-            mainMenuItems.Add(new MainMenuItem
-            {
-                MenuSection = MenuInExtensions + ResourceProvider.GetString("LOCSystemChecker"),
-                Description = "Test",
-                Action = (mainMenuItem) => { }
-            });
-#endif
-
-            return mainMenuItems;
+            return _menus.GetMainMenuItems(args);
         }
 
         #endregion
@@ -385,7 +194,7 @@ namespace SystemChecker
         // Add code to be executed when Playnite is initialized.
         public override void OnApplicationStarted(OnApplicationStartedEventArgs args)
         {
-            Task.Run(() => 
+            Task.Run(() =>
             {
                 Thread.Sleep(30000);
                 PreventLibraryUpdatedOnStart = false;
