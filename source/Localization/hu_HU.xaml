@@ -16,7 +16,7 @@
     <!-- SystemCheckerGameView -->
 
     <sys:String x:Key="LOCSystemCheckerConfigMinimum">Minimum</sys:String>
-    <sys:String x:Key="LOCSystemCheckerConfigRecommanded">Ajánlott</sys:String>
+    <sys:String x:Key="LOCSystemCheckerConfigRecommended">Recommended</sys:String>
 
     <sys:String x:Key="LOCSystemCheckerOS">Operációs rendszer</sys:String>
     <sys:String x:Key="LOCSystemCheckerCpu">Processzor</sys:String>
