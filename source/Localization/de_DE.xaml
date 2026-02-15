@@ -16,7 +16,7 @@
     <!-- SystemCheckerGameView -->
 
     <sys:String x:Key="LOCSystemCheckerConfigMinimum">Minimum</sys:String>
-    <sys:String x:Key="LOCSystemCheckerConfigRecommanded">Empfohlen</sys:String>
+    <sys:String x:Key="LOCSystemCheckerConfigRecommended">Empfohlen</sys:String>
 
     <sys:String x:Key="LOCSystemCheckerOS">Betriebssystem</sys:String>
     <sys:String x:Key="LOCSystemCheckerCpu">Prozessor</sys:String>
