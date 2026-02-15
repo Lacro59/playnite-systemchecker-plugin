@@ -33,7 +33,7 @@ namespace SystemChecker
         public SystemChecker(IPlayniteAPI api) : base(api, "SystemChecker")
         {
             // Menus
-            _menus = new SystemCheckerMenus(PluginSettings, PluginDatabase);
+            _menus = new SystemCheckerMenus(PluginSettings.Settings, PluginDatabase);
 
             // Custom theme button
             EventManager.RegisterClassHandler(typeof(Button), Button.ClickEvent, new RoutedEventHandler(OnCustomThemeButtonClick));

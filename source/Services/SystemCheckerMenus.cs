@@ -10,31 +10,41 @@ using SystemChecker.Services;
 using SystemChecker.Views;
 using SystemChecker.Models;
 using CommonPluginsControls.Views;
+using CommonPluginsShared.Collections;
+using CommonPluginsShared.Plugins;
+using CommonPluginsShared.Interfaces;
 
 namespace SystemChecker.Services
 {
-    public class SystemCheckerMenus
+    /// <summary>
+    /// Manages the context menus for the SystemChecker plugin.
+    /// Handles the creation and logic of both Game Menu items and Main Menu items.
+    /// </summary>
+    public class SystemCheckerMenus : PluginMenus
     {
-        private readonly SystemCheckerSettingsViewModel _settings;
-        private readonly SystemCheckerDatabase _database;
-
-        public SystemCheckerMenus(SystemCheckerSettingsViewModel settings, SystemCheckerDatabase database)
+        public SystemCheckerMenus(PluginSettings settings, IPluginDatabase database) : base(settings, database)
         {
-            _settings = settings;
-            _database = database;
         }
 
+        /// <summary>
+        /// Gets the list of menu items for the Game Menu (accessible via right-click on a game).
+        /// </summary>
+        /// <param name="args">Arguments containing information about the selected games.</param>
+        /// <returns>A list of <see cref="GameMenuItem"/>.</returns>
         public IEnumerable<GameMenuItem> GetGameMenuItems(GetGameMenuItemsArgs args)
         {
+            // Only support single game selection for most features currently
             Game gameMenu = args.Games.First();
             List<Guid> ids = args.Games.Select(x => x.Id).ToList();
-            PluginGameRequirements pluginGameRequirements = _database.Get(gameMenu, true);
+
+            // Retrieve cached requirements data for the selected game
+            PluginDataBaseGameBase pluginGameRequirements = _database.Get(gameMenu, true);
 
             List<GameMenuItem> gameMenuItems = new List<GameMenuItem>();
 
+            // Add "Check Configuration" option if data exists
             if (pluginGameRequirements.HasData)
             {
-                // Show requirements for the selected game
                 gameMenuItems.Add(new GameMenuItem
                 {
                     MenuSection = ResourceProvider.GetString("LOCSystemChecker"),
@@ -60,7 +70,7 @@ namespace SystemChecker.Services
             }
 
 
-            // Delete & download requirements data for the selected game
+            // Option to refresh (delete & download) requirements data
             gameMenuItems.Add(new GameMenuItem
             {
                 MenuSection = ResourceProvider.GetString("LOCSystemChecker"),
@@ -73,12 +83,14 @@ namespace SystemChecker.Services
                     }
                     else
                     {
+                        // Bulk refresh for multiple selected games
                         _database.Refresh(ids);
                     }
                 }
             });
 
 
+            // Option to delete data, visible only if data exists
             if (pluginGameRequirements.HasData)
             {
                 gameMenuItems.Add(new GameMenuItem
@@ -93,6 +105,7 @@ namespace SystemChecker.Services
                         }
                         else
                         {
+                            // Bulk remove for multiple selected games
                             _database.Remove(ids);
                         }
                     }
@@ -116,17 +129,22 @@ namespace SystemChecker.Services
             return gameMenuItems;
         }
 
+        /// <summary>
+        /// Gets the list of menu items for the Main Menu (accessible via the main Playnite menu).
+        /// </summary>
+        /// <param name="args">Arguments for main menu items.</param>
+        /// <returns>A list of <see cref="MainMenuItem"/>.</returns>
         public IEnumerable<MainMenuItem> GetMainMenuItems(GetMainMenuItemsArgs args)
         {
             string MenuInExtensions = string.Empty;
-            if (_settings.Settings.MenuInExtensions)
+            if (_settings.MenuInExtensions)
             {
                 MenuInExtensions = "@";
             }
 
             List<MainMenuItem> mainMenuItems = new List<MainMenuItem>
             {
-                // Download missing data for all game in database
+                // Download missing data for all games in the database
                 new MainMenuItem
                 {
                     MenuSection = MenuInExtensions + ResourceProvider.GetString("LOCSystemChecker"),
@@ -138,7 +156,8 @@ namespace SystemChecker.Services
                 }
             };
 
-            if (_settings.Settings.EnableTag)
+            // Tag management options (if enabled in settings)
+            if (_settings.EnableTag)
             {
                 mainMenuItems.Add(new MainMenuItem
                 {
@@ -146,7 +165,7 @@ namespace SystemChecker.Services
                     Description = "-"
                 });
 
-                // Add tag for selected game in database if data exists
+                // Add tag for selected games in database (games with existing data)
                 mainMenuItems.Add(new MainMenuItem
                 {
                     MenuSection = MenuInExtensions + ResourceProvider.GetString("LOCSystemChecker"),
@@ -156,7 +175,7 @@ namespace SystemChecker.Services
                         _database.AddTagSelectData();
                     }
                 });
-                // Add tag for all games
+                // Add tag for ALL games
                 mainMenuItems.Add(new MainMenuItem
                 {
                     MenuSection = MenuInExtensions + ResourceProvider.GetString("LOCSystemChecker"),
@@ -166,7 +185,7 @@ namespace SystemChecker.Services
                         _database.AddTagAllGame();
                     }
                 });
-                // Remove tag for all game in database
+                // Remove tag for ALL games
                 mainMenuItems.Add(new MainMenuItem
                 {
                     MenuSection = MenuInExtensions + ResourceProvider.GetString("LOCSystemChecker"),
@@ -183,6 +202,8 @@ namespace SystemChecker.Services
                 MenuSection = MenuInExtensions + ResourceProvider.GetString("LOCSystemChecker"),
                 Description = "-"
             });
+
+            // View list of games with no data
             mainMenuItems.Add(new MainMenuItem
             {
                 MenuSection = MenuInExtensions + ResourceProvider.GetString("LOCSystemChecker"),
@@ -209,7 +230,7 @@ namespace SystemChecker.Services
             });
 
 
-            // Delete database
+            // Option to purge the entire database
             mainMenuItems.Add(new MainMenuItem
             {
                 MenuSection = MenuInExtensions + ResourceProvider.GetString("LOCSystemChecker"),
