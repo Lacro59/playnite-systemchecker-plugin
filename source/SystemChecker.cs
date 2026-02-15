@@ -56,6 +56,7 @@ namespace SystemChecker
 
 
         #region Custom event
+
         public void OnCustomThemeButtonClick(object sender, RoutedEventArgs e)
         {
             try
@@ -71,10 +72,12 @@ namespace SystemChecker
                 Common.LogError(ex, false, true, PluginDatabase.PluginName);
             }
         }
+
         #endregion
 
 
         #region Theme integration
+
         public override IEnumerable<TopPanelItem> GetTopPanelItems()
         {
             yield break;
@@ -95,10 +98,12 @@ namespace SystemChecker
 
             return null;
         }
+
         #endregion
 
 
         #region Menus
+
         // To add new game menu items override GetGameMenuItems
         public override IEnumerable<GameMenuItem> GetGameMenuItems(GetGameMenuItemsArgs args)
         {
@@ -306,10 +311,12 @@ namespace SystemChecker
 
             return mainMenuItems;
         }
+
         #endregion
 
 
         #region Game event
+
         public override void OnGameSelected(OnGameSelectedEventArgs args)
         {
             try
@@ -369,10 +376,12 @@ namespace SystemChecker
         {
 
         }
+
         #endregion
 
 
         #region Application event
+
         // Add code to be executed when Playnite is initialized.
         public override void OnApplicationStarted(OnApplicationStartedEventArgs args)
         {
@@ -381,35 +390,6 @@ namespace SystemChecker
                 Thread.Sleep(30000);
                 PreventLibraryUpdatedOnStart = false;
             });
-
-            // TODO TMP
-            if (!PluginSettings.Settings.IsPurged)
-            {
-                GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions($"SystemChecker - {ResourceProvider.GetString("LOCSettingsUpdating")}")
-                {
-                    Cancelable = true,
-                    IsIndeterminate = true
-                };
-
-                PlayniteApi.Dialogs.ActivateGlobalProgress((a) =>
-                {
-                    try
-                    {
-                        foreach (PluginGameRequirements values in PluginDatabase.Database.Items.Values)
-                        {
-                            PluginGameRequirements pkuginGameRequirements = PluginDatabase.PurgeGraphicsCardData(values);
-                            PluginDatabase.Update(pkuginGameRequirements);
-                        }
-
-                        PluginSettings.Settings.IsPurged = true;
-                        SavePluginSettings(PluginSettings.Settings);
-                    }
-                    catch (Exception ex)
-                    {
-                        Common.LogError(ex, false, true, PluginDatabase.PluginName);
-                    }
-                }, globalProgressOptions);
-            }
         }
 
         // Add code to be executed when Playnite is shutting down.
@@ -417,6 +397,7 @@ namespace SystemChecker
         {
 
         }
+
         #endregion
 
 
@@ -477,6 +458,7 @@ namespace SystemChecker
 
 
         #region Settings
+
         public override ISettings GetSettings(bool firstRunSettings)
         {
             return PluginSettings;
@@ -486,6 +468,7 @@ namespace SystemChecker
         {
             return new SystemCheckerSettingsView();
         }
+
         #endregion
     }
 }

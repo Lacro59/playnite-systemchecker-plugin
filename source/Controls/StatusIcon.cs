@@ -20,8 +20,7 @@ namespace SystemChecker.Controls
 
         private static void OnStatusChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            StatusIcon icon = d as StatusIcon;
-            if (icon != null)
+            if (d is StatusIcon icon)
             {
                 icon.UpdateIcon();
             }

@@ -12,7 +12,7 @@ namespace SystemChecker.ViewModels
     public class SystemCheckerGameViewModel : ObservableObject
     {
         private SystemCheckerDatabase PluginDatabase => SystemChecker.PluginDatabase;
-        private Game _game;
+        private readonly Game _game;
 
         #region Local System Properties
 

@@ -11,6 +11,7 @@ namespace SystemChecker
     public class SystemCheckerSettings : PluginSettings
     {
         #region Settings variables
+
         private bool _enableIntegrationViewItem = true;
         public bool EnableIntegrationViewItem { get => _enableIntegrationViewItem; set => SetValue(ref _enableIntegrationViewItem, value); }
 
@@ -19,11 +20,13 @@ namespace SystemChecker
 
         private bool _enableIntegrationButtonDetails = false;
         public bool EnableIntegrationButtonDetails { get => _enableIntegrationButtonDetails; set => SetValue(ref _enableIntegrationButtonDetails, value); }
+        
         #endregion
 
         // Playnite serializes settings object to a JSON object and saves it as text file.
         // If you want to exclude some property from being saved then use `JsonDontSerialize` ignore attribute.
         #region Variables exposed
+
         private bool _isMinimumOK = false;
         [DontSerialize]
         public bool IsMinimumOK { get => _isMinimumOK; set => SetValue(ref _isMinimumOK, value); }
@@ -39,11 +42,8 @@ namespace SystemChecker
         private string _recommendedStorage = string.Empty;
         [DontSerialize]
         public string RecommendedStorage { get => _recommendedStorage; set => SetValue(ref _recommendedStorage, value); }
-        #endregion  
-
-
-        // TODO TMP
-        public bool IsPurged { get; set; } = false;
+        
+        #endregion
     }
 
 
