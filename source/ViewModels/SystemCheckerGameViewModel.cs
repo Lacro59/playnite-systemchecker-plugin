@@ -54,20 +54,20 @@ namespace SystemChecker.ViewModels
 
         #region Recommended Requirements Properties
 
-        private string _recommandedOs;
-        public string RecommandedOs { get => _recommandedOs; set => SetValue(ref _recommandedOs, value); }
+        private string _recommendedOs;
+        public string RecommendedOs { get => _recommendedOs; set => SetValue(ref _recommendedOs, value); }
 
-        private ObservableCollection<string> _recommandedCpu;
-        public ObservableCollection<string> RecommandedCpu { get => _recommandedCpu; set => SetValue(ref _recommandedCpu, value); }
+        private ObservableCollection<string> _recommendedCpu;
+        public ObservableCollection<string> RecommendedCpu { get => _recommendedCpu; set => SetValue(ref _recommendedCpu, value); }
 
-        private string _recommandedRamUsage;
-        public string RecommandedRamUsage { get => _recommandedRamUsage; set => SetValue(ref _recommandedRamUsage, value); }
+        private string _recommendedRamUsage;
+        public string RecommendedRamUsage { get => _recommendedRamUsage; set => SetValue(ref _recommendedRamUsage, value); }
 
-        private ObservableCollection<string> _recommandedGpu;
-        public ObservableCollection<string> RecommandedGpu { get => _recommandedGpu; set => SetValue(ref _recommandedGpu, value); }
+        private ObservableCollection<string> _recommendedGpu;
+        public ObservableCollection<string> RecommendedGpu { get => _recommendedGpu; set => SetValue(ref _recommendedGpu, value); }
 
-        private string _recommandedStorage;
-        public string RecommandedStorage { get => _recommandedStorage; set => SetValue(ref _recommandedStorage, value); }
+        private string _recommendedStorage;
+        public string RecommendedStorage { get => _recommendedStorage; set => SetValue(ref _recommendedStorage, value); }
 
         #endregion
 
@@ -88,20 +88,20 @@ namespace SystemChecker.ViewModels
         private string _minimumCheckStorage;
         public string MinimumCheckStorage { get => _minimumCheckStorage; set => SetValue(ref _minimumCheckStorage, value); }
 
-        private string _recommandedCheckOs;
-        public string RecommandedCheckOs { get => _recommandedCheckOs; set => SetValue(ref _recommandedCheckOs, value); }
+        private string _recommendedCheckOs;
+        public string RecommendedCheckOs { get => _recommendedCheckOs; set => SetValue(ref _recommendedCheckOs, value); }
 
-        private string _recommandedCheckCpu;
-        public string RecommandedCheckCpu { get => _recommandedCheckCpu; set => SetValue(ref _recommandedCheckCpu, value); }
+        private string _recommendedCheckCpu;
+        public string RecommendedCheckCpu { get => _recommendedCheckCpu; set => SetValue(ref _recommendedCheckCpu, value); }
 
-        private string _recommandedCheckRam;
-        public string RecommandedCheckRam { get => _recommandedCheckRam; set => SetValue(ref _recommandedCheckRam, value); }
+        private string _recommendedCheckRam;
+        public string RecommendedCheckRam { get => _recommendedCheckRam; set => SetValue(ref _recommendedCheckRam, value); }
 
-        private string _recommandedCheckGpu;
-        public string RecommandedCheckGpu { get => _recommandedCheckGpu; set => SetValue(ref _recommandedCheckGpu, value); }
+        private string _recommendedCheckGpu;
+        public string RecommendedCheckGpu { get => _recommendedCheckGpu; set => SetValue(ref _recommendedCheckGpu, value); }
 
-        private string _recommandedCheckStorage;
-        public string RecommandedCheckStorage { get => _recommandedCheckStorage; set => SetValue(ref _recommandedCheckStorage, value); }
+        private string _recommendedCheckStorage;
+        public string RecommendedCheckStorage { get => _recommendedCheckStorage; set => SetValue(ref _recommendedCheckStorage, value); }
 
         #endregion
 
@@ -122,8 +122,8 @@ namespace SystemChecker.ViewModels
             _localDisks = new ObservableCollection<SystemDisk>();
             _minimumCpu = new ObservableCollection<string>();
             _minimumGpu = new ObservableCollection<string>();
-            _recommandedCpu = new ObservableCollection<string>();
-            _recommandedGpu = new ObservableCollection<string>();
+            _recommendedCpu = new ObservableCollection<string>();
+            _recommendedGpu = new ObservableCollection<string>();
 
             LoadGameData();
         }
@@ -156,7 +156,7 @@ namespace SystemChecker.ViewModels
             PluginGameRequirements pluginGameRequirements = PluginDatabase.Get(_game, true);
 
             RequirementEntry minimum = pluginGameRequirements.GetMinimum();
-            RequirementEntry recommanded = pluginGameRequirements.GetRecommanded();
+            RequirementEntry recommended = pluginGameRequirements.GetRecommended();
 
             // Load minimum requirements
             if (minimum.HasData)
@@ -190,34 +190,34 @@ namespace SystemChecker.ViewModels
             }
 
             // Load recommended requirements
-            if (recommanded.HasData)
+            if (recommended.HasData)
             {
-                if (recommanded.Os.Count > 0)
+                if (recommended.Os.Count > 0)
                 {
-                    RecommandedOs = "Windows " + string.Join(" / ", recommanded.Os);
+                    RecommendedOs = "Windows " + string.Join(" / ", recommended.Os);
                 }
 
-                if (recommanded.Cpu != null && recommanded.Cpu.Count > 0)
+                if (recommended.Cpu != null && recommended.Cpu.Count > 0)
                 {
-                    RecommandedCpu.Clear();
-                    foreach (var cpu in recommanded.Cpu)
+                    RecommendedCpu.Clear();
+                    foreach (var cpu in recommended.Cpu)
                     {
-                        RecommandedCpu.Add(cpu);
+                        RecommendedCpu.Add(cpu);
                     }
                 }
 
-                RecommandedRamUsage = recommanded.RamUsage;
+                RecommendedRamUsage = recommended.RamUsage;
 
-                if (recommanded.Gpu != null && recommanded.Gpu.Count > 0)
+                if (recommended.Gpu != null && recommended.Gpu.Count > 0)
                 {
-                    RecommandedGpu.Clear();
-                    foreach (var gpu in recommanded.Gpu)
+                    RecommendedGpu.Clear();
+                    foreach (var gpu in recommended.Gpu)
                     {
-                        RecommandedGpu.Add(gpu);
+                        RecommendedGpu.Add(gpu);
                     }
                 }
 
-                RecommandedStorage = recommanded.StorageUsage;
+                RecommendedStorage = recommended.StorageUsage;
             }
 
             // Check system configuration
@@ -258,43 +258,43 @@ namespace SystemChecker.ViewModels
                 }
             }
 
-            CheckSystem checkRecommanded = SystemApi.CheckConfig(_game, recommanded, systemConfiguration, _game.IsInstalled);
-            if (recommanded.HasData)
+            CheckSystem checkRecommended = SystemApi.CheckConfig(_game, recommended, systemConfiguration, _game.IsInstalled);
+            if (recommended.HasData)
             {
-                RecommandedCheckOs = checkRecommanded.CheckOs ? isOk : isKo;
-                if (recommanded.Os.Count == 0)
+                RecommendedCheckOs = checkRecommended.CheckOs ? isOk : isKo;
+                if (recommended.Os.Count == 0)
                 {
-                    RecommandedCheckOs = string.Empty;
+                    RecommendedCheckOs = string.Empty;
                 }
 
-                RecommandedCheckCpu = checkRecommanded.CheckCpu ? isOk : isKo;
-                if (recommanded.Cpu.Count == 0)
+                RecommendedCheckCpu = checkRecommended.CheckCpu ? isOk : isKo;
+                if (recommended.Cpu.Count == 0)
                 {
-                    RecommandedCheckCpu = string.Empty;
+                    RecommendedCheckCpu = string.Empty;
                 }
 
-                RecommandedCheckRam = checkRecommanded.CheckRam ? isOk : isKo;
-                if (recommanded.Ram == 0)
+                RecommendedCheckRam = checkRecommended.CheckRam ? isOk : isKo;
+                if (recommended.Ram == 0)
                 {
-                    RecommandedCheckRam = string.Empty;
+                    RecommendedCheckRam = string.Empty;
                 }
 
-                RecommandedCheckGpu = checkRecommanded.CheckGpu ? isOk : isKo;
-                if (recommanded.Gpu.Count == 0)
+                RecommendedCheckGpu = checkRecommended.CheckGpu ? isOk : isKo;
+                if (recommended.Gpu.Count == 0)
                 {
-                    RecommandedCheckGpu = string.Empty;
+                    RecommendedCheckGpu = string.Empty;
                 }
 
-                RecommandedCheckStorage = checkRecommanded.CheckStorage ? isOk : isKo;
-                if (recommanded.Storage == 0)
+                RecommendedCheckStorage = checkRecommended.CheckStorage ? isOk : isKo;
+                if (recommended.Storage == 0)
                 {
-                    RecommandedCheckStorage = string.Empty;
+                    RecommendedCheckStorage = string.Empty;
                 }
             }
 
             // Logging
             Common.LogDebug(true, $"CheckMinimum: {Serialization.ToJson(checkMinimum)}");
-            Common.LogDebug(true, $"CheckRecommanded: {Serialization.ToJson(checkRecommanded)}");
+            Common.LogDebug(true, $"CheckRecommended: {Serialization.ToJson(checkRecommended)}");
 
             // Source link
             if (pluginGameRequirements.SourcesLink != null)

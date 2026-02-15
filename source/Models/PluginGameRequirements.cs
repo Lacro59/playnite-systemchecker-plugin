@@ -20,10 +20,10 @@ namespace SystemChecker.Models
             return Minimum;
         }
 
-        public RequirementEntry GetRecommanded()
+        public RequirementEntry GetRecommended()
         {
-            RequirementEntry Recommanded = (Items?.Find(x => x.IsMinimum == false)) ?? new RequirementEntry();
-            return Recommanded;
+            RequirementEntry Recommended = (Items?.Find(x => x.IsMinimum == false)) ?? new RequirementEntry();
+            return Recommended;
         }
     }
 }

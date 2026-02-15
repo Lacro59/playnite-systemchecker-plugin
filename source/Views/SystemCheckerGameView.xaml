@@ -106,7 +106,7 @@
                 <Border Grid.Column="4"/>
 
                 <Border Grid.Column="5" Style="{StaticResource HeaderCardStyle}" Background="#166534">
-                    <TextBlock Text="{DynamicResource LOCSystemCheckerConfigRecommanded}" 
+                    <TextBlock Text="{DynamicResource LOCSystemCheckerConfigRecommended}" 
                                Style="{StaticResource HeaderTextStyle}"/>
                 </Border>
             </Grid>
@@ -151,14 +151,14 @@
                                 Width="24" Height="24" 
                                 HorizontalAlignment="Center" 
                                 VerticalAlignment="Center"
-                                Visibility="{Binding RecommandedOs, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
-                            <controls:StatusIcon Status="{Binding RecommandedCheckOs}"/>
+                                Visibility="{Binding RecommendedOs, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
+                            <controls:StatusIcon Status="{Binding RecommendedCheckOs}"/>
                         </Canvas>
 
                         <TextBlock Grid.Column="5" 
-                                   Text="{Binding RecommandedOs}" 
+                                   Text="{Binding RecommendedOs}" 
                                    Style="{StaticResource ValueTextStyle}"
-                                   Visibility="{Binding RecommandedOs, Converter={StaticResource NullOrEmptyToVisibilityConverter}}"/>
+                                   Visibility="{Binding RecommendedOs, Converter={StaticResource NullOrEmptyToVisibilityConverter}}"/>
                     </Grid>
                 </Border>
 
@@ -205,14 +205,14 @@
                                 Width="24" Height="24" 
                                 HorizontalAlignment="Center" 
                                 VerticalAlignment="Center"
-                                Visibility="{Binding RecommandedCpu, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
-                            <controls:StatusIcon Status="{Binding RecommandedCheckCpu}"/>
+                                Visibility="{Binding RecommendedCpu, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
+                            <controls:StatusIcon Status="{Binding RecommendedCheckCpu}"/>
                         </Canvas>
 
                         <ItemsControl Grid.Column="5" 
-                                      ItemsSource="{Binding RecommandedCpu}" 
+                                      ItemsSource="{Binding RecommendedCpu}" 
                                       BorderThickness="0"
-                                      Visibility="{Binding RecommandedCpu, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
+                                      Visibility="{Binding RecommendedCpu, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding}" Style="{StaticResource ValueTextStyle}" Margin="0,2"/>
@@ -259,14 +259,14 @@
                                 Width="24" Height="24" 
                                 HorizontalAlignment="Center" 
                                 VerticalAlignment="Center"
-                                Visibility="{Binding RecommandedRamUsage, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
-                            <controls:StatusIcon Status="{Binding RecommandedCheckRam}"/>
+                                Visibility="{Binding RecommendedRamUsage, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
+                            <controls:StatusIcon Status="{Binding RecommendedCheckRam}"/>
                         </Canvas>
 
                         <TextBlock Grid.Column="5" 
-                                   Text="{Binding RecommandedRamUsage}" 
+                                   Text="{Binding RecommendedRamUsage}" 
                                    Style="{StaticResource ValueTextStyle}"
-                                   Visibility="{Binding RecommandedRamUsage, Converter={StaticResource NullOrEmptyToVisibilityConverter}}"/>
+                                   Visibility="{Binding RecommendedRamUsage, Converter={StaticResource NullOrEmptyToVisibilityConverter}}"/>
                     </Grid>
                 </Border>
 
@@ -313,14 +313,14 @@
                                 Width="24" Height="24" 
                                 HorizontalAlignment="Center" 
                                 VerticalAlignment="Center"
-                                Visibility="{Binding RecommandedGpu, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
-                            <controls:StatusIcon Status="{Binding RecommandedCheckGpu}"/>
+                                Visibility="{Binding RecommendedGpu, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
+                            <controls:StatusIcon Status="{Binding RecommendedCheckGpu}"/>
                         </Canvas>
 
                         <ItemsControl Grid.Column="5" 
-                                      ItemsSource="{Binding RecommandedGpu}" 
+                                      ItemsSource="{Binding RecommendedGpu}" 
                                       BorderThickness="0"
-                                      Visibility="{Binding RecommandedGpu, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
+                                      Visibility="{Binding RecommendedGpu, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding}" Style="{StaticResource ValueTextStyle}" Margin="0,2"/>
@@ -375,14 +375,14 @@
                                 Width="24" Height="24" 
                                 HorizontalAlignment="Center" 
                                 VerticalAlignment="Center"
-                                Visibility="{Binding RecommandedStorage, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
-                            <controls:StatusIcon Status="{Binding RecommandedCheckStorage}"/>
+                                Visibility="{Binding RecommendedStorage, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
+                            <controls:StatusIcon Status="{Binding RecommendedCheckStorage}"/>
                         </Canvas>
 
                         <TextBlock Grid.Column="5" 
-                                   Text="{Binding RecommandedStorage}" 
+                                   Text="{Binding RecommendedStorage}" 
                                    Style="{StaticResource ValueTextStyle}"
-                                   Visibility="{Binding RecommandedStorage, Converter={StaticResource NullOrEmptyToVisibilityConverter}}"/>
+                                   Visibility="{Binding RecommendedStorage, Converter={StaticResource NullOrEmptyToVisibilityConverter}}"/>
                     </Grid>
                 </Border>
 

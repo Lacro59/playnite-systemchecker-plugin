@@ -28,17 +28,17 @@ namespace SystemChecker
         [DontSerialize]
         public bool IsMinimumOK { get => _isMinimumOK; set => SetValue(ref _isMinimumOK, value); }
 
-        private bool _isRecommandedOK = false;
+        private bool _isRecommendedOK = false;
         [DontSerialize]
-        public bool IsRecommandedOK { get => _isRecommandedOK; set => SetValue(ref _isRecommandedOK, value); }
+        public bool IsRecommendedOK { get => _isRecommendedOK; set => SetValue(ref _isRecommendedOK, value); }
 
         private bool _isAllOK = false;
         [DontSerialize]
         public bool IsAllOK { get => _isAllOK; set => SetValue(ref _isAllOK, value); }
 
-        private string _recommandedStorage = string.Empty;
+        private string _recommendedStorage = string.Empty;
         [DontSerialize]
-        public string RecommandedStorage { get => _recommandedStorage; set => SetValue(ref _recommandedStorage, value); }
+        public string RecommendedStorage { get => _recommendedStorage; set => SetValue(ref _recommendedStorage, value); }
         #endregion  
 
 

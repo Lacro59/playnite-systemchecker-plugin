@@ -77,12 +77,12 @@ namespace SystemChecker.Controls
 			}
 
 			RequirementEntry systemMinimum = pluginGameRequirements.GetMinimum();
-			RequirementEntry systemRecommanded = pluginGameRequirements.GetRecommanded();
+			RequirementEntry systemRecommended = pluginGameRequirements.GetRecommended();
 
 			bool hasMinimum = systemMinimum.HasData;
-			bool hasRecommanded = systemRecommanded.HasData;
+			bool hasRecommended = systemRecommended.HasData;
 
-			if (!hasMinimum && !hasRecommanded)
+			if (!hasMinimum && !hasRecommended)
 			{
 				return;
 			}
@@ -91,11 +91,11 @@ namespace SystemChecker.Controls
 				? SystemApi.CheckConfig(newContext, systemMinimum, systemConfiguration, newContext.IsInstalled)
 				: null;
 			
-			CheckSystem checkRecommanded = hasRecommanded
-				? SystemApi.CheckConfig(newContext, systemRecommanded, systemConfiguration, newContext.IsInstalled)
+			CheckSystem checkRecommended = hasRecommended
+				? SystemApi.CheckConfig(newContext, systemRecommended, systemConfiguration, newContext.IsInstalled)
 				: null;
 
-			string newIcon = DetermineIcon(hasMinimum, hasRecommanded, checkMinimum, checkRecommanded);
+			string newIcon = DetermineIcon(hasMinimum, hasRecommended, checkMinimum, checkRecommended);
 
 			if (GameContext?.Id == CurrentGame.Id && ControlDataContext.Text != newIcon)
 			{
@@ -106,7 +106,7 @@ namespace SystemChecker.Controls
 		/// <summary>
 		/// Determines which icon to display based on system requirements check results
 		/// </summary>
-		private string DetermineIcon(bool hasMinimum, bool hasRecommanded, CheckSystem checkMinimum, CheckSystem checkRecommanded)
+		private string DetermineIcon(bool hasMinimum, bool hasRecommended, CheckSystem checkMinimum, CheckSystem checkRecommended)
 		{
 			if (hasMinimum)
 			{
@@ -115,17 +115,17 @@ namespace SystemChecker.Controls
 					return IconKo;
 				}
 
-				if (hasRecommanded)
+				if (hasRecommended)
 				{
-					return (checkRecommanded?.AllOk ?? false) ? IconOk : IconMinimum;
+					return (checkRecommended?.AllOk ?? false) ? IconOk : IconMinimum;
 				}
 
 				return IconOk;
 			}
 
-			if (hasRecommanded)
+			if (hasRecommended)
 			{
-				return (checkRecommanded?.AllOk ?? false) ? IconOk : IconKo;
+				return (checkRecommended?.AllOk ?? false) ? IconOk : IconKo;
 			}
 
 			return IconEmpty;

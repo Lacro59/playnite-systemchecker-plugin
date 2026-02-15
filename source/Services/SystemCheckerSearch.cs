@@ -149,7 +149,7 @@ namespace SystemChecker.Services
 			}
 
 			RequirementEntry systemMinimum = gameReq.GetMinimum();
-			RequirementEntry systemRecommanded = gameReq.GetRecommanded();
+			RequirementEntry systemRecommended = gameReq.GetRecommended();
 
 			if (systemMinimum.HasData && (searchParams.HasMin || searchParams.HasAny))
 			{
@@ -160,10 +160,10 @@ namespace SystemChecker.Services
 				}
 			}
 
-			if (systemRecommanded.HasData && (searchParams.HasRec || searchParams.HasAny))
+			if (systemRecommended.HasData && (searchParams.HasRec || searchParams.HasAny))
 			{
-				CheckSystem checkRecommanded = SystemApi.CheckConfig(game, systemRecommanded, systemConfiguration, game.IsInstalled);
-				if ((bool)checkRecommanded.AllOk)
+				CheckSystem checkRecommended = SystemApi.CheckConfig(game, systemRecommended, systemConfiguration, game.IsInstalled);
+				if ((bool)checkRecommended.AllOk)
 				{
 					return true;
 				}

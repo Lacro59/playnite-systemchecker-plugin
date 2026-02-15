@@ -117,7 +117,7 @@ namespace SystemChecker.Services
                     }
                 }
 
-                pluginGameRequirements = NormalizeRecommanded(pluginGameRequirements);
+                pluginGameRequirements = NormalizeRecommended(pluginGameRequirements);
                 pluginGameRequirements = PurgeGraphicsCardData(pluginGameRequirements);
             }
             catch (Exception ex)
@@ -128,36 +128,36 @@ namespace SystemChecker.Services
             return pluginGameRequirements;
         }
 
-        private PluginGameRequirements NormalizeRecommanded(PluginGameRequirements pluginGameRequirements)
+        private PluginGameRequirements NormalizeRecommended(PluginGameRequirements pluginGameRequirements)
         {
             RequirementEntry Minimum = pluginGameRequirements.GetMinimum();
-            RequirementEntry Recommanded = pluginGameRequirements.GetRecommanded();
+            RequirementEntry Recommended = pluginGameRequirements.GetRecommended();
 
-            if (Minimum.HasData && Recommanded.HasData)
+            if (Minimum.HasData && Recommended.HasData)
             {
-                if (Recommanded.Os.Count == 0)
+                if (Recommended.Os.Count == 0)
                 {
-                    Recommanded.Os = Minimum.Os;
+                    Recommended.Os = Minimum.Os;
                 }
-                if (Recommanded.Cpu.Count == 0)
+                if (Recommended.Cpu.Count == 0)
                 {
-                    Recommanded.Cpu = Minimum.Cpu;
+                    Recommended.Cpu = Minimum.Cpu;
                 }
-                if (Recommanded.Gpu.Count == 0)
+                if (Recommended.Gpu.Count == 0)
                 {
-                    Recommanded.Gpu = Minimum.Gpu;
+                    Recommended.Gpu = Minimum.Gpu;
                 }
-                if (Recommanded.Ram == 0)
+                if (Recommended.Ram == 0)
                 {
-                    Recommanded.Ram = Minimum.Ram;
+                    Recommended.Ram = Minimum.Ram;
                 }
-                if (Recommanded.Storage == 0)
+                if (Recommended.Storage == 0)
                 {
-                    Recommanded.Storage = Minimum.Storage;
+                    Recommended.Storage = Minimum.Storage;
                 }
             }
 
-            pluginGameRequirements.Items = new List<RequirementEntry> { Minimum, Recommanded };
+            pluginGameRequirements.Items = new List<RequirementEntry> { Minimum, Recommended };
             return pluginGameRequirements;
         }
 
@@ -172,12 +172,12 @@ namespace SystemChecker.Services
                 {
                     SystemConfiguration systemConfiguration = Database.PC;
                     RequirementEntry systemMinimum = item.GetMinimum();
-                    RequirementEntry systemRecommanded = item.GetRecommanded();
+                    RequirementEntry systemRecommended = item.GetRecommended();
 
                     CheckSystem CheckMinimum = SystemApi.CheckConfig(game, systemMinimum, systemConfiguration, game.IsInstalled);
-                    CheckSystem CheckRecommanded = SystemApi.CheckConfig(game, systemRecommanded, systemConfiguration, game.IsInstalled);
+                    CheckSystem CheckRecommended = SystemApi.CheckConfig(game, systemRecommended, systemConfiguration, game.IsInstalled);
 
-                    if (!(bool)CheckMinimum.AllOk && !(bool)CheckRecommanded.AllOk)
+                    if (!(bool)CheckMinimum.AllOk && !(bool)CheckRecommended.AllOk)
                     {
                         return;
                     }
@@ -188,10 +188,10 @@ namespace SystemChecker.Services
                     {
                         tagId = CheckTagExist($"{ResourceProvider.GetString("LOCSystemCheckerConfigMinimum")}");
                     }
-                    // Recommanded
-                    if ((bool)CheckRecommanded.AllOk)
+                    // Recommended
+                    if ((bool)CheckRecommended.AllOk)
                     {
-                        tagId = CheckTagExist($"{ResourceProvider.GetString("LOCSystemCheckerConfigRecommanded")}");
+                        tagId = CheckTagExist($"{ResourceProvider.GetString("LOCSystemCheckerConfigRecommended")}");
                     }
 
                     if (tagId != null)
@@ -241,24 +241,24 @@ namespace SystemChecker.Services
             {
                 PluginSettings.Settings.HasData = false;
                 PluginSettings.Settings.IsMinimumOK = false;
-                PluginSettings.Settings.IsRecommandedOK = false;
+                PluginSettings.Settings.IsRecommendedOK = false;
                 PluginSettings.Settings.IsAllOK = false;
-                PluginSettings.Settings.RecommandedStorage = string.Empty;
+                PluginSettings.Settings.RecommendedStorage = string.Empty;
 
                 return;
             }
 
             SystemConfiguration systemConfiguration = Database.PC;
             RequirementEntry systemMinimum = pluginGameRequirements.GetMinimum();
-            RequirementEntry systemRecommanded = pluginGameRequirements.GetRecommanded();
+            RequirementEntry systemRecommended = pluginGameRequirements.GetRecommended();
 
             CheckSystem checkMinimum = SystemApi.CheckConfig(game, systemMinimum, systemConfiguration, game.IsInstalled);
-            CheckSystem checkRecommanded = SystemApi.CheckConfig(game, systemRecommanded, systemConfiguration, game.IsInstalled);
+            CheckSystem checkRecommended = SystemApi.CheckConfig(game, systemRecommended, systemConfiguration, game.IsInstalled);
 
 
             PluginSettings.Settings.HasData = pluginGameRequirements.HasData;
             PluginSettings.Settings.IsMinimumOK = false;
-            PluginSettings.Settings.IsRecommandedOK = false;
+            PluginSettings.Settings.IsRecommendedOK = false;
             PluginSettings.Settings.IsAllOK = false;
 
             if (systemMinimum.HasData)
@@ -266,34 +266,34 @@ namespace SystemChecker.Services
                 PluginSettings.Settings.IsMinimumOK = checkMinimum.AllOk ?? false;
                 PluginSettings.Settings.IsAllOK = checkMinimum.AllOk ?? false;
 
-                PluginSettings.Settings.RecommandedStorage = systemMinimum.Storage != 0 ? Tools.SizeSuffix(systemMinimum.Storage) : string.Empty;
+                PluginSettings.Settings.RecommendedStorage = systemMinimum.Storage != 0 ? Tools.SizeSuffix(systemMinimum.Storage) : string.Empty;
             }
 
-            if (systemRecommanded.HasData && (checkRecommanded.AllOk ?? false))
+            if (systemRecommended.HasData && (checkRecommended.AllOk ?? false))
             {
-                PluginSettings.Settings.IsRecommandedOK = checkRecommanded.AllOk ?? false;
-                PluginSettings.Settings.IsAllOK = checkRecommanded.AllOk ?? false;
+                PluginSettings.Settings.IsRecommendedOK = checkRecommended.AllOk ?? false;
+                PluginSettings.Settings.IsAllOK = checkRecommended.AllOk ?? false;
 
-                PluginSettings.Settings.RecommandedStorage = systemRecommanded.Storage != 0 ? Tools.SizeSuffix(systemRecommanded.Storage) : string.Empty;
+                PluginSettings.Settings.RecommendedStorage = systemRecommended.Storage != 0 ? Tools.SizeSuffix(systemRecommended.Storage) : string.Empty;
             }
         }
 
         public PluginGameRequirements PurgeGraphicsCardData(PluginGameRequirements pluginGameRequirements)
         {
             RequirementEntry Minimum = pluginGameRequirements.GetMinimum();
-            RequirementEntry Recommanded = pluginGameRequirements.GetRecommanded();
+            RequirementEntry Recommended = pluginGameRequirements.GetRecommended();
 
             if (Minimum.HasData && Minimum.Gpu.Count > 1 && Minimum.Gpu.FindAll(x => Gpu.CallIsNvidia(x) || Gpu.CallIsAmd(x) || Gpu.CallIsIntel(x)).Count > 0)
             {
                 Minimum.Gpu = Minimum.Gpu.FindAll(x => Gpu.CallIsNvidia(x) || Gpu.CallIsAmd(x) || Gpu.CallIsIntel(x)).ToList();
             }
 
-            if (Recommanded.HasData && Recommanded.Gpu.Count > 1 && Recommanded.Gpu.FindAll(x => Gpu.CallIsNvidia(x) || Gpu.CallIsAmd(x) || Gpu.CallIsIntel(x)).Count > 0)
+            if (Recommended.HasData && Recommended.Gpu.Count > 1 && Recommended.Gpu.FindAll(x => Gpu.CallIsNvidia(x) || Gpu.CallIsAmd(x) || Gpu.CallIsIntel(x)).Count > 0)
             {
-                Recommanded.Gpu = Recommanded.Gpu.FindAll(x => Gpu.CallIsNvidia(x) || Gpu.CallIsAmd(x) || Gpu.CallIsIntel(x)).ToList();
+                Recommended.Gpu = Recommended.Gpu.FindAll(x => Gpu.CallIsNvidia(x) || Gpu.CallIsAmd(x) || Gpu.CallIsIntel(x)).ToList();
             }
 
-            pluginGameRequirements.Items = new List<RequirementEntry> { Minimum, Recommanded };
+            pluginGameRequirements.Items = new List<RequirementEntry> { Minimum, Recommended };
             return pluginGameRequirements;
         }
     }
