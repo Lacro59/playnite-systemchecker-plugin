@@ -23,20 +23,5 @@ namespace SystemChecker.Views
         {
             get { return _viewModel; }
         }
-
-        private void PART_SourceLink_Click(object sender, RoutedEventArgs e)
-        {
-            if (!string.IsNullOrEmpty(_viewModel.SourceUrl))
-            {
-                try
-                {
-                    Process.Start(_viewModel.SourceUrl);
-                }
-                catch (Exception ex)
-                {
-                    // Log error if needed
-                }
-            }
-        }
     }
 }
