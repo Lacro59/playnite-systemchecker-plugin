@@ -16,7 +16,7 @@
     <!-- SystemCheckerGameView -->
 
     <sys:String x:Key="LOCSystemCheckerConfigMinimum">الحد الا</sys:String>
-    <sys:String x:Key="LOCSystemCheckerConfigRecommanded">الموص</sys:String>
+    <sys:String x:Key="LOCSystemCheckerConfigRecommended">Recommended</sys:String>
 
     <sys:String x:Key="LOCSystemCheckerOS">نظام التشغ</sys:String>
     <sys:String x:Key="LOCSystemCheckerCpu">المعالج</sys:String>
