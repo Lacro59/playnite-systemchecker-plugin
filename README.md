@@ -28,8 +28,7 @@ A powerful Playnite extension that automatically checks game system requirements
 - **Automatic Requirements Detection**: Retrieves game system requirements from [PCGamingWiki](https://www.pcgamingwiki.com/wiki/Home) and Steam
 - **Real-time Compatibility Check**: Compares your PC configuration against game requirements
 - **Visual Indicators**: See at a glance which games your system can run
-- **Auto-tagging**: Automatically tag games based on compatibility (e.g., "Can Run", "Cannot Run")
-- **Multi-source Support**: Fetches data from both PCGamingWiki and Steam for comprehensive coverage
+- **Auto-tagging**: Automatically tag games based on compatibility
 - **Theme Integration**: Seamlessly integrate system checker data into custom Playnite themes
   - Display compatibility in Details View
   - Display compatibility in Grid View
@@ -101,6 +100,30 @@ To manually check a specific game:
 1. Right-click on a game in your library
 2. Select `Extensions` → `System Checker` → 
 
+## 🔍 Global Search
+
+System Checker integrates with Playnite's global search feature (accessible via `Ctrl+F` or the search bar), allowing you to quickly find games based on system requirements compatibility.
+
+**Important**: Search parameters are **filters that complement the name search**. When you use parameters, the plugin first filters by game name, then applies the additional filters.
+
+For example:
+- `rpg -min` → Finds games with "rpg" in their name **AND** that meet minimum requirements
+- `-min` → Finds all games that meet minimum requirements (no name filter)
+
+You can use the following parameters to filter games:
+
+| Parameter | Description |
+|-----------|-------------|
+| `-min` | Games that meet minimum requirements |
+| `-rec` | Games that meet recommended requirements |
+| `-any` | Games that meet either minimum or recommended requirements |
+| `-np` | Games with no playtime (never played) |
+| `-fav` | Filter by favorite games only |
+| `-stores=` | Filter by specific stores (comma-separated) |
+| `-status=` | Filter by completion status (comma-separated) |
+
+> **Note**: All search filters can be combined. The game name search is case-insensitive.
+
 ## ⚙️ Configuration
 
 ### General Settings
@@ -171,7 +194,7 @@ Help translate System Checker into your language!
 
 Translations are managed through [Crowdin](https://crowdin.com/project/playnite-extensions). Simply:
 1. Visit the project page
-2. Select your language (or request a new one)
+2. Select your language
 3. Start translating
 
 Your contributions help make this plugin accessible to users worldwide!
