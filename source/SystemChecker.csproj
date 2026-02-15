@@ -111,6 +111,7 @@
     <Compile Include="Models\CheckResult.cs" />
     <Compile Include="Models\CheckSystem.cs" />
     <Compile Include="Models\RequirementsCollection.cs" />
+    <Compile Include="Models\SearchParameters.cs" />
     <Compile Include="playnite-plugincommon\CommonPluginsControls\Controls\SourceLinkControl.xaml.cs">
       <DependentUpon>SourceLinkControl.xaml</DependentUpon>
     </Compile>
