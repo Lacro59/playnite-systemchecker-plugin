@@ -37,7 +37,10 @@ namespace SystemChecker.Services
 		public Cpu(SystemConfiguration systemConfiguration, string cpuRequirement)
 		{
 			ProcessorPc = SetProcessor(systemConfiguration.Cpu);
+			ProcessorPc = SetProcessor(systemConfiguration.Cpu);
 			ProcessorRequirement = SetProcessor(cpuRequirement);
+
+			PerformCheck();
 		}
 
 		protected override CheckResult PerformCheck()
@@ -247,79 +250,79 @@ namespace SystemChecker.Services
 
 		private CpuObject SetProcessor(string cpuName)
 		{
-			bool IsIntel = CallIsIntel(cpuName);
-			bool IsAmd = CallIsAmd(cpuName);
-			bool IsOld = false;
-			string Type = string.Empty;
-			int Version = 0;
-			double Clock = 0;
+			bool isIntel = CallIsIntel(cpuName);
+			bool isAmd = CallIsAmd(cpuName);
+			bool isOld = false;
+			string type = string.Empty;
+			int version = 0;
+			double clock = 0;
 
 			string cpuLower = cpuName.ToLower();
 
-			if (IsIntel)
+			if (isIntel)
 			{
 				Match typeMatch = IntelTypeRegex.Match(cpuName);
 				if (typeMatch.Success)
 				{
-					Type = typeMatch.Value.Trim();
+					type = typeMatch.Value.Trim();
 
 					Match versionMatch = IntelVersionRegex.Match(cpuName);
 					if (versionMatch.Success)
 					{
-						int.TryParse(versionMatch.Value.Replace(Type + "-", string.Empty).Trim(), out Version);
+						int.TryParse(versionMatch.Value.Replace(type + "-", string.Empty).Trim(), out version);
 					}
 
-					if (Version == 0)
+					if (version == 0)
 					{
 						Match fourDigitsMatch = FourDigitsRegex.Match(cpuName);
 						if (fourDigitsMatch.Success)
 						{
-							int.TryParse(fourDigitsMatch.Value.Trim(), out Version);
+							int.TryParse(fourDigitsMatch.Value.Trim(), out version);
 						}
 					}
 				}
 
-				IsOld = !IntelTypeRegex.IsMatch(cpuName);
+				isOld = !IntelTypeRegex.IsMatch(cpuName);
 			}
 
-			if (IsAmd)
+			if (isAmd)
 			{
 				if (cpuLower.IndexOf("ryzen") > -1)
 				{
 					Match ryzenMatch = RyzenTypeRegex.Match(cpuName);
 					if (ryzenMatch.Success)
 					{
-						Type = ryzenMatch.Value.Trim();
+						type = ryzenMatch.Value.Trim();
 
-						if (RyzenGRegex.IsMatch(cpuName)) Type += " G";
-						else if (RyzenXTRegex.IsMatch(cpuName)) Type += " XT";
-						else if (RyzenXRegex.IsMatch(cpuName)) Type += " X";
-						else if (RyzenURegex.IsMatch(cpuName)) Type += " U";
+						if (RyzenGRegex.IsMatch(cpuName)) type += " G";
+						else if (RyzenXTRegex.IsMatch(cpuName)) type += " XT";
+						else if (RyzenXRegex.IsMatch(cpuName)) type += " X";
+						else if (RyzenURegex.IsMatch(cpuName)) type += " U";
 					}
 				}
 				else if (cpuLower.IndexOf("athlon") > -1)
 				{
-					Type = "Athlon";
+					type = "Athlon";
 
-					if (cpuLower.IndexOf("ge") > -1) Type += " GE";
-					else if (cpuLower.IndexOf("g") > -1) Type += " G";
+					if (cpuLower.IndexOf("ge") > -1) type += " GE";
+					else if (cpuLower.IndexOf("g") > -1) type += " G";
 				}
 
 				Match fourDigitsMatch = FourDigitsRegex.Match(cpuName);
 				if (fourDigitsMatch.Success)
 				{
-					int.TryParse(fourDigitsMatch.Value.Trim(), out Version);
+					int.TryParse(fourDigitsMatch.Value.Trim(), out version);
 				}
 				else
 				{
 					Match threeDigitsMatch = ThreeDigitsRegex.Match(cpuName);
 					if (threeDigitsMatch.Success)
 					{
-						int.TryParse(threeDigitsMatch.Value.Trim(), out Version);
+						int.TryParse(threeDigitsMatch.Value.Trim(), out version);
 					}
 				}
 
-				IsOld = cpuLower.IndexOf("ryzen") == -1;
+				isOld = cpuLower.IndexOf("ryzen") == -1;
 			}
 
 			Match clockMatch = ClockGhzRegex.Match(cpuName);
@@ -329,10 +332,10 @@ namespace SystemChecker.Services
 					.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)
 					.Replace(",", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)
 					.Trim();
-				double.TryParse(clockStr, out Clock);
+				double.TryParse(clockStr, out clock);
 			}
 
-			if (Clock == 0)
+			if (clock == 0)
 			{
 				clockMatch = ClockGhzRegex2.Match(cpuName);
 				if (clockMatch.Success)
@@ -341,11 +344,11 @@ namespace SystemChecker.Services
 						.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)
 						.Replace(",", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)
 						.Trim();
-					double.TryParse(clockStr, out Clock);
+					double.TryParse(clockStr, out clock);
 				}
 			}
 
-			if (Clock == 0)
+			if (clock == 0)
 			{
 				clockMatch = ClockMhzRegex.Match(cpuName);
 				if (clockMatch.Success)
@@ -354,14 +357,14 @@ namespace SystemChecker.Services
 						.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)
 						.Replace(",", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)
 						.Trim();
-					if (double.TryParse(clockStr, out Clock) && Clock != 0)
+					if (double.TryParse(clockStr, out clock) && clock != 0)
 					{
-						Clock /= 1000;
+						clock /= 1000;
 					}
 				}
 			}
 
-			if (Clock == 0)
+			if (clock == 0)
 			{
 				clockMatch = ClockMhzRegex2.Match(cpuName);
 				if (clockMatch.Success)
@@ -370,9 +373,9 @@ namespace SystemChecker.Services
 						.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)
 						.Replace(",", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)
 						.Trim();
-					if (double.TryParse(clockStr, out Clock) && Clock != 0)
+					if (double.TryParse(clockStr, out clock) && clock != 0)
 					{
-						Clock /= 1000;
+						clock /= 1000;
 					}
 				}
 			}
@@ -381,23 +384,23 @@ namespace SystemChecker.Services
 				|| cpuLower.IndexOf("dual core") > -1
 				|| cpuLower.IndexOf("quad core") > -1)
 			{
-				IsOld = true;
+				isOld = true;
 			}
 
-			if (Version == 0)
+			if (version == 0)
 			{
-				IsOld = true;
+				isOld = true;
 			}
 
 			return new CpuObject
 			{
 				Name = cpuName,
-				IsIntel = IsIntel,
-				IsAmd = IsAmd,
-				IsOld = IsOld,
-				Type = Type,
-				Version = Version,
-				Clock = Clock
+				IsIntel = isIntel,
+				IsAmd = isAmd,
+				IsOld = isOld,
+				Type = type,
+				Version = version,
+				Clock = clock
 			};
 		}
 	}

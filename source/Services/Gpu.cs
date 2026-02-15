@@ -66,22 +66,22 @@ namespace SystemChecker.Services
 				}
 			}
 
-			int ResolutionHorizontal = 0;
+			int resolutionHorizontal = 0;
 			if (gpuLower.IndexOf("1280") > -1 && (gpuLower.IndexOf("×720") > -1 || gpuLower.IndexOf("× 720") > -1))
 			{
-				ResolutionHorizontal = 1280;
+				resolutionHorizontal = 1280;
 			}
 			else if (gpuLower.IndexOf("1368×") > -1 || gpuLower.IndexOf("1368 ×") > -1)
 			{
-				ResolutionHorizontal = 1368;
+				resolutionHorizontal = 1368;
 			}
 			else if (gpuLower.IndexOf("1600×") > -1 || gpuLower.IndexOf("1600 ×") > -1)
 			{
-				ResolutionHorizontal = 1600;
+				resolutionHorizontal = 1600;
 			}
 			else if (gpuLower.IndexOf("1920×") > -1 || gpuLower.IndexOf("1920 ×") > -1)
 			{
-				ResolutionHorizontal = 1920;
+				resolutionHorizontal = 1920;
 			}
 
 			CardPc = SetCard(DeleteInfo(systemConfiguration.GpuName));
@@ -90,7 +90,7 @@ namespace SystemChecker.Services
 			CardPc.Vram = systemConfiguration.GpuRam;
 			CardRequirement.Vram = (long)vram;
 			CardPc.ResolutionHorizontal = (int)systemConfiguration.CurrentHorizontalResolution;
-			CardRequirement.ResolutionHorizontal = ResolutionHorizontal;
+			CardRequirement.ResolutionHorizontal = resolutionHorizontal;
 		}
 
 		protected override CheckResult PerformCheck()
