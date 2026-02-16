@@ -1,12 +1,9 @@
-﻿using CommonPluginsShared;
+using CommonPluginsControls.Views;
+using CommonPluginsShared;
+using CommonPluginsShared.Interfaces;
 using CommonPluginsShared.Services;
 using Playnite.SDK;
 using Playnite.SDK.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using SystemChecker.Views;
 
@@ -14,13 +11,21 @@ namespace SystemChecker.Services
 {
     public class WindowPluginService : IWindowPluginService
 	{
-		public ILogger Logger = LogManager.GetLogger();
+		private static readonly ILogger Logger = LogManager.GetLogger();
 
 		public string PluginName { get; private set; }
 
-		public WindowPluginService(string pluginName)
+        public IPluginDatabase PluginDatabase { get; private set; }
+
+		public WindowPluginService(string pluginName, IPluginDatabase pluginDatabase)
 		{
 			PluginName = pluginName;
+            PluginDatabase = pluginDatabase;
+
+            if (PluginDatabase == null)
+            {
+                Logger.Warn("WindowPluginService created with a null PluginDatabase instance.");
+            }
 		}
 
 		public void ShowPluginGameDataWindow(Game gameContext)
@@ -42,5 +47,25 @@ namespace SystemChecker.Services
 				windowOptions);
 			windowExtension.ShowDialog();
 		}
-	}
+
+		public void ShowPluginGameNoDataWindow()
+		{
+			WindowOptions windowOptions = new WindowOptions
+			{
+				ShowMinimizeButton = false,
+				ShowMaximizeButton = false,
+				ShowCloseButton = true,
+				CanBeResizable = false,
+				Height = 700,
+				Width = 1000
+			};
+
+			var viewExtension = new ListWithNoData(PluginDatabase);
+			Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(
+				PluginName,
+				viewExtension,
+				windowOptions);
+			windowExtension.ShowDialog();
+		}
+    }
 }

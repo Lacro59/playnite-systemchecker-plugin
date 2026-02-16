@@ -1,4 +1,4 @@
-﻿using CommonPluginsShared;
+using CommonPluginsShared;
 using CommonPluginsShared.Collections;
 using CommonPluginsShared.Interfaces;
 using CommonPluginsShared.Services;
@@ -27,7 +27,7 @@ namespace SystemChecker.Services
         public SystemCheckerDatabase(SystemCheckerSettingsViewModel pluginSettings, string pluginUserDataPath) : base(pluginSettings, "SystemChecker", pluginUserDataPath)
         {
             TagBefore = "[SC]";
-            WindowPluginService = new WindowPluginService(PluginName);
+            WindowPluginService = new WindowPluginService(PluginName, this);
         }
 
         protected override void LoadMoreData()

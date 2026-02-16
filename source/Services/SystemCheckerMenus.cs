@@ -210,16 +210,7 @@ namespace SystemChecker.Services
                 Description = ResourceProvider.GetString("LOCCommonViewNoData"),
                 Action = (mainMenuItem) =>
                 {
-                    var windowOptions = new WindowOptions
-                    {
-                        ShowMinimizeButton = false,
-                        ShowMaximizeButton = false,
-                        ShowCloseButton = true
-                    };
-
-                    var viewExtension = new ListWithNoData(_database);
-                    Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(ResourceProvider.GetString("LOCSystemChecker"), viewExtension, windowOptions);
-                    windowExtension.ShowDialog();
+                    _database.WindowPluginService.ShowPluginGameNoDataWindow();
                 }
             });
 
