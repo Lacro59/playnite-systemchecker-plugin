@@ -174,35 +174,35 @@ namespace SystemChecker.Services
                     RequirementEntry systemMinimum = item.GetMinimum();
                     RequirementEntry systemRecommended = item.GetRecommended();
 
-                    CheckSystem CheckMinimum = SystemApi.CheckConfig(game, systemMinimum, systemConfiguration, game.IsInstalled);
-                    CheckSystem CheckRecommended = SystemApi.CheckConfig(game, systemRecommended, systemConfiguration, game.IsInstalled);
+                    CheckSystem checkMinimum = SystemApi.CheckConfig(game, systemMinimum, systemConfiguration, game.IsInstalled);
+                    CheckSystem checkRecommended = SystemApi.CheckConfig(game, systemRecommended, systemConfiguration, game.IsInstalled);
 
-                    if (!(bool)CheckMinimum.AllOk && !(bool)CheckRecommended.AllOk)
+                    if (!(checkMinimum.AllOk ?? false) && !(checkRecommended.AllOk ?? false))
                     {
                         return;
                     }
 
                     Guid? tagId = null;
                     // Minimum
-                    if ((bool)CheckMinimum.AllOk)
+                    if (checkMinimum.AllOk ?? false)
                     {
                         tagId = CheckTagExist($"{ResourceProvider.GetString("LOCSystemCheckerConfigMinimum")}");
                     }
                     // Recommended
-                    if ((bool)CheckRecommended.AllOk)
+                    if (checkRecommended.AllOk ?? false)
                     {
                         tagId = CheckTagExist($"{ResourceProvider.GetString("LOCSystemCheckerConfigRecommended")}");
                     }
 
                     if (tagId != null)
                     {
-                        if (game.TagIds != null)
+                        if (game.TagIds == null)
                         {
-                            game.TagIds.Add((Guid)tagId);
+                            game.TagIds = new List<Guid> { tagId.Value };
                         }
-                        else
+                        else if (!game.TagIds.Contains(tagId.Value))
                         {
-                            game.TagIds = new List<Guid> { (Guid)tagId };
+                            game.TagIds.Add(tagId.Value);
                         }
                     }
                 }
@@ -214,21 +214,33 @@ namespace SystemChecker.Services
             }
             else if (TagMissing)
             {
-                if (game.TagIds != null)
+                Guid? noDataTagId = AddNoDataTag();
+                if (noDataTagId != null)
                 {
-                    game.TagIds.Add((Guid)AddNoDataTag());
-                }
-                else
-                {
-                    game.TagIds = new List<Guid> { (Guid)AddNoDataTag() };
+                    if (game.TagIds == null)
+                    {
+                        game.TagIds = new List<Guid> { noDataTagId.Value };
+                    }
+                    else if (!game.TagIds.Contains(noDataTagId.Value))
+                    {
+                        game.TagIds.Add(noDataTagId.Value);
+                    }
                 }
             }
 
-            API.Instance.MainView.UIDispatcher?.Invoke(() =>
+            API.Instance.Database.Games.BeginBufferUpdate();
+            try
             {
-                API.Instance.Database.Games.Update(game);
-                game.OnPropertyChanged();
-            });
+                API.Instance.MainView.UIDispatcher?.Invoke(() =>
+                {
+                    API.Instance.Database.Games.Update(game);
+                    game.OnPropertyChanged();
+                });
+            }
+            finally
+            {
+                API.Instance.Database.Games.EndBufferUpdate();
+            }
         }
 
         #endregion
