@@ -67,336 +67,340 @@
         </Style>
     </UserControl.Resources>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-        <Grid Margin="20">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+    <Border BorderThickness="0,1,0,0"
+            BorderBrush="{DynamicResource NormalBorderBrush}">
+        
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <Grid Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-            <!-- Header Section - Aligned with content columns -->
-            <Grid Grid.Row="0" Margin="0,0,0,20">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="160"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="50"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="50"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+                <!-- Header Section - Aligned with content columns -->
+                <Grid Grid.Row="0" Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="160"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="50"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="50"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                <!-- Empty space for section title column -->
-                <Border Grid.Column="0"/>
+                    <!-- Empty space for section title column -->
+                    <Border Grid.Column="0"/>
 
-                <Border Grid.Column="1" Style="{StaticResource HeaderCardStyle}" Background="#3B4E7A">
-                    <TextBlock Text="{DynamicResource LOCMenuConfigurationTitle}" 
+                    <Border Grid.Column="1" Style="{StaticResource HeaderCardStyle}" Background="#3B4E7A">
+                        <TextBlock Text="{DynamicResource LOCMenuConfigurationTitle}" 
                                Style="{StaticResource HeaderTextStyle}"/>
-                </Border>
+                    </Border>
 
-                <!-- Empty space for icon -->
-                <Border Grid.Column="2"/>
+                    <!-- Empty space for icon -->
+                    <Border Grid.Column="2"/>
 
-                <Border Grid.Column="3" Style="{StaticResource HeaderCardStyle}" Background="#1E3A8A">
-                    <TextBlock Text="{DynamicResource LOCSystemCheckerConfigMinimum}" 
+                    <Border Grid.Column="3" Style="{StaticResource HeaderCardStyle}" Background="#1E3A8A">
+                        <TextBlock Text="{DynamicResource LOCSystemCheckerConfigMinimum}" 
                                Style="{StaticResource HeaderTextStyle}"/>
-                </Border>
+                    </Border>
 
-                <!-- Empty space for icon -->
-                <Border Grid.Column="4"/>
+                    <!-- Empty space for icon -->
+                    <Border Grid.Column="4"/>
 
-                <Border Grid.Column="5" Style="{StaticResource HeaderCardStyle}" Background="#166534">
-                    <TextBlock Text="{DynamicResource LOCSystemCheckerConfigRecommended}" 
+                    <Border Grid.Column="5" Style="{StaticResource HeaderCardStyle}" Background="#166534">
+                        <TextBlock Text="{DynamicResource LOCSystemCheckerConfigRecommended}" 
                                Style="{StaticResource HeaderTextStyle}"/>
-                </Border>
-            </Grid>
+                    </Border>
+                </Grid>
 
-            <!-- Main Content -->
-            <StackPanel Grid.Row="1">
+                <!-- Main Content -->
+                <StackPanel Grid.Row="1">
 
-                <!-- OS Section -->
-                <Border Style="{StaticResource CardStyle}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="160"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+                    <!-- OS Section -->
+                    <Border Style="{StaticResource CardStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="160"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
 
-                        <TextBlock Grid.Column="0" 
+                            <TextBlock Grid.Column="0" 
                                    Text="{DynamicResource LOCSystemCheckerOS}" 
                                    Style="{StaticResource SectionTitleStyle}"/>
 
-                        <TextBlock Grid.Column="1" 
+                            <TextBlock Grid.Column="1" 
                                    Text="{Binding LocalOs}" 
                                    Style="{StaticResource ValueTextStyle}"/>
 
-                        <Canvas Grid.Column="2" 
+                            <Canvas Grid.Column="2" 
                                 Width="24" Height="24" 
                                 HorizontalAlignment="Center" 
                                 VerticalAlignment="Center"
                                 Visibility="{Binding MinimumOs, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
-                            <controls:StatusIcon Status="{Binding MinimumCheckOs}"/>
-                        </Canvas>
+                                <controls:StatusIcon Status="{Binding MinimumCheckOs}"/>
+                            </Canvas>
 
-                        <TextBlock Grid.Column="3" 
+                            <TextBlock Grid.Column="3" 
                                    Text="{Binding MinimumOs}" 
                                    Style="{StaticResource ValueTextStyle}"
                                    Visibility="{Binding MinimumOs, Converter={StaticResource NullOrEmptyToVisibilityConverter}}"/>
 
-                        <Canvas Grid.Column="4" 
+                            <Canvas Grid.Column="4" 
                                 Width="24" Height="24" 
                                 HorizontalAlignment="Center" 
                                 VerticalAlignment="Center"
                                 Visibility="{Binding RecommendedOs, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
-                            <controls:StatusIcon Status="{Binding RecommendedCheckOs}"/>
-                        </Canvas>
+                                <controls:StatusIcon Status="{Binding RecommendedCheckOs}"/>
+                            </Canvas>
 
-                        <TextBlock Grid.Column="5" 
+                            <TextBlock Grid.Column="5" 
                                    Text="{Binding RecommendedOs}" 
                                    Style="{StaticResource ValueTextStyle}"
                                    Visibility="{Binding RecommendedOs, Converter={StaticResource NullOrEmptyToVisibilityConverter}}"/>
-                    </Grid>
-                </Border>
+                        </Grid>
+                    </Border>
 
-                <!-- CPU Section -->
-                <Border Style="{StaticResource CardStyle}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="160"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+                    <!-- CPU Section -->
+                    <Border Style="{StaticResource CardStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="160"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
 
-                        <TextBlock Grid.Column="0" 
+                            <TextBlock Grid.Column="0" 
                                    Text="{DynamicResource LOCSystemCheckerCpu}" 
                                    Style="{StaticResource SectionTitleStyle}"/>
 
-                        <TextBlock Grid.Column="1" 
+                            <TextBlock Grid.Column="1" 
                                    Text="{Binding LocalCpu}" 
                                    Style="{StaticResource ValueTextStyle}"/>
 
-                        <Canvas Grid.Column="2" 
+                            <Canvas Grid.Column="2" 
                                 Width="24" Height="24" 
                                 HorizontalAlignment="Center" 
                                 VerticalAlignment="Center"
                                 Visibility="{Binding MinimumCpu, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
-                            <controls:StatusIcon Status="{Binding MinimumCheckCpu}"/>
-                        </Canvas>
+                                <controls:StatusIcon Status="{Binding MinimumCheckCpu}"/>
+                            </Canvas>
 
-                        <ItemsControl Grid.Column="3" 
+                            <ItemsControl Grid.Column="3" 
                                       ItemsSource="{Binding MinimumCpu}" 
                                       BorderThickness="0"
                                       Visibility="{Binding MinimumCpu, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding}" Style="{StaticResource ValueTextStyle}" Margin="0,2"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" Style="{StaticResource ValueTextStyle}" Margin="0,2"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
 
-                        <Canvas Grid.Column="4" 
+                            <Canvas Grid.Column="4" 
                                 Width="24" Height="24" 
                                 HorizontalAlignment="Center" 
                                 VerticalAlignment="Center"
                                 Visibility="{Binding RecommendedCpu, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
-                            <controls:StatusIcon Status="{Binding RecommendedCheckCpu}"/>
-                        </Canvas>
+                                <controls:StatusIcon Status="{Binding RecommendedCheckCpu}"/>
+                            </Canvas>
 
-                        <ItemsControl Grid.Column="5" 
+                            <ItemsControl Grid.Column="5" 
                                       ItemsSource="{Binding RecommendedCpu}" 
                                       BorderThickness="0"
                                       Visibility="{Binding RecommendedCpu, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding}" Style="{StaticResource ValueTextStyle}" Margin="0,2"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </Grid>
-                </Border>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" Style="{StaticResource ValueTextStyle}" Margin="0,2"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </Border>
 
-                <!-- RAM Section -->
-                <Border Style="{StaticResource CardStyle}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="160"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+                    <!-- RAM Section -->
+                    <Border Style="{StaticResource CardStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="160"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
 
-                        <TextBlock Grid.Column="0" 
+                            <TextBlock Grid.Column="0" 
                                    Text="{DynamicResource LOCSystemCheckerRam}" 
                                    Style="{StaticResource SectionTitleStyle}"/>
 
-                        <TextBlock Grid.Column="1" 
+                            <TextBlock Grid.Column="1" 
                                    Text="{Binding LocalRamUsage}" 
                                    Style="{StaticResource ValueTextStyle}"/>
 
-                        <Canvas Grid.Column="2" 
+                            <Canvas Grid.Column="2" 
                                 Width="24" Height="24" 
                                 HorizontalAlignment="Center" 
                                 VerticalAlignment="Center"
                                 Visibility="{Binding MinimumRamUsage, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
-                            <controls:StatusIcon Status="{Binding MinimumCheckRam}"/>
-                        </Canvas>
+                                <controls:StatusIcon Status="{Binding MinimumCheckRam}"/>
+                            </Canvas>
 
-                        <TextBlock Grid.Column="3" 
+                            <TextBlock Grid.Column="3" 
                                    Text="{Binding MinimumRamUsage}" 
                                    Style="{StaticResource ValueTextStyle}"
                                    Visibility="{Binding MinimumRamUsage, Converter={StaticResource NullOrEmptyToVisibilityConverter}}"/>
 
-                        <Canvas Grid.Column="4" 
+                            <Canvas Grid.Column="4" 
                                 Width="24" Height="24" 
                                 HorizontalAlignment="Center" 
                                 VerticalAlignment="Center"
                                 Visibility="{Binding RecommendedRamUsage, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
-                            <controls:StatusIcon Status="{Binding RecommendedCheckRam}"/>
-                        </Canvas>
+                                <controls:StatusIcon Status="{Binding RecommendedCheckRam}"/>
+                            </Canvas>
 
-                        <TextBlock Grid.Column="5" 
+                            <TextBlock Grid.Column="5" 
                                    Text="{Binding RecommendedRamUsage}" 
                                    Style="{StaticResource ValueTextStyle}"
                                    Visibility="{Binding RecommendedRamUsage, Converter={StaticResource NullOrEmptyToVisibilityConverter}}"/>
-                    </Grid>
-                </Border>
+                        </Grid>
+                    </Border>
 
-                <!-- GPU Section -->
-                <Border Style="{StaticResource CardStyle}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="160"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+                    <!-- GPU Section -->
+                    <Border Style="{StaticResource CardStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="160"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
 
-                        <TextBlock Grid.Column="0" 
+                            <TextBlock Grid.Column="0" 
                                    Text="{DynamicResource LOCSystemCheckerGpu}" 
                                    Style="{StaticResource SectionTitleStyle}"/>
 
-                        <TextBlock Grid.Column="1" 
+                            <TextBlock Grid.Column="1" 
                                    Text="{Binding LocalGpu}" 
                                    Style="{StaticResource ValueTextStyle}"/>
 
-                        <Canvas Grid.Column="2" 
+                            <Canvas Grid.Column="2" 
                                 Width="24" Height="24" 
                                 HorizontalAlignment="Center" 
                                 VerticalAlignment="Center"
                                 Visibility="{Binding MinimumGpu, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
-                            <controls:StatusIcon Status="{Binding MinimumCheckGpu}"/>
-                        </Canvas>
+                                <controls:StatusIcon Status="{Binding MinimumCheckGpu}"/>
+                            </Canvas>
 
-                        <ItemsControl Grid.Column="3" 
+                            <ItemsControl Grid.Column="3" 
                                       ItemsSource="{Binding MinimumGpu}" 
                                       BorderThickness="0"
                                       Visibility="{Binding MinimumGpu, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding}" Style="{StaticResource ValueTextStyle}" Margin="0,2"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" Style="{StaticResource ValueTextStyle}" Margin="0,2"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
 
-                        <Canvas Grid.Column="4" 
+                            <Canvas Grid.Column="4" 
                                 Width="24" Height="24" 
                                 HorizontalAlignment="Center" 
                                 VerticalAlignment="Center"
                                 Visibility="{Binding RecommendedGpu, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
-                            <controls:StatusIcon Status="{Binding RecommendedCheckGpu}"/>
-                        </Canvas>
+                                <controls:StatusIcon Status="{Binding RecommendedCheckGpu}"/>
+                            </Canvas>
 
-                        <ItemsControl Grid.Column="5" 
+                            <ItemsControl Grid.Column="5" 
                                       ItemsSource="{Binding RecommendedGpu}" 
                                       BorderThickness="0"
                                       Visibility="{Binding RecommendedGpu, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding}" Style="{StaticResource ValueTextStyle}" Margin="0,2"/>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </Grid>
-                </Border>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" Style="{StaticResource ValueTextStyle}" Margin="0,2"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </Border>
 
-                <!-- Storage/Disk Section -->
-                <Border Style="{StaticResource CardStyle}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="160"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+                    <!-- Storage/Disk Section -->
+                    <Border Style="{StaticResource CardStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="160"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
 
-                        <TextBlock Grid.Column="0" 
+                            <TextBlock Grid.Column="0" 
                                    Text="{DynamicResource LOCSystemCheckerDisk}" 
                                    Style="{StaticResource SectionTitleStyle}"/>
 
-                        <ItemsControl Grid.Column="1" ItemsSource="{Binding LocalDisks}" BorderThickness="0">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" Margin="0,2">
-                                        <TextBlock Text="{Binding Drive}" Style="{StaticResource ValueTextStyle}" FontWeight="SemiBold" Margin="0,0,8,0"/>
-                                        <TextBlock Text="{Binding Name}" Style="{StaticResource ValueTextStyle}" Margin="0,0,8,0"/>
-                                        <TextBlock Text="{Binding FreeSpaceUsage}" Style="{StaticResource ValueTextStyle}"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                            <ItemsControl Grid.Column="1" ItemsSource="{Binding LocalDisks}" BorderThickness="0">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                                            <TextBlock Text="{Binding Drive}" Style="{StaticResource ValueTextStyle}" FontWeight="SemiBold" Margin="0,0,8,0"/>
+                                            <TextBlock Text="{Binding Name}" Style="{StaticResource ValueTextStyle}" Margin="0,0,8,0"/>
+                                            <TextBlock Text="{Binding FreeSpaceUsage}" Style="{StaticResource ValueTextStyle}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
 
-                        <Canvas Grid.Column="2" 
+                            <Canvas Grid.Column="2" 
                                 Width="24" Height="24" 
                                 HorizontalAlignment="Center" 
                                 VerticalAlignment="Center"
                                 Visibility="{Binding MinimumStorage, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
-                            <controls:StatusIcon Status="{Binding MinimumCheckStorage}"/>
-                        </Canvas>
+                                <controls:StatusIcon Status="{Binding MinimumCheckStorage}"/>
+                            </Canvas>
 
-                        <TextBlock Grid.Column="3" 
+                            <TextBlock Grid.Column="3" 
                                    Text="{Binding MinimumStorage}" 
                                    Style="{StaticResource ValueTextStyle}"
                                    Visibility="{Binding MinimumStorage, Converter={StaticResource NullOrEmptyToVisibilityConverter}}"/>
 
-                        <Canvas Grid.Column="4" 
+                            <Canvas Grid.Column="4" 
                                 Width="24" Height="24" 
                                 HorizontalAlignment="Center" 
                                 VerticalAlignment="Center"
                                 Visibility="{Binding RecommendedStorage, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
-                            <controls:StatusIcon Status="{Binding RecommendedCheckStorage}"/>
-                        </Canvas>
+                                <controls:StatusIcon Status="{Binding RecommendedCheckStorage}"/>
+                            </Canvas>
 
-                        <TextBlock Grid.Column="5" 
+                            <TextBlock Grid.Column="5" 
                                    Text="{Binding RecommendedStorage}" 
                                    Style="{StaticResource ValueTextStyle}"
                                    Visibility="{Binding RecommendedStorage, Converter={StaticResource NullOrEmptyToVisibilityConverter}}"/>
-                    </Grid>
-                </Border>
+                        </Grid>
+                    </Border>
 
-            </StackPanel>
+                </StackPanel>
 
-            <!-- Footer -->
-            <!-- Footer -->
-            <pcontrols:SourceLinkControl Grid.Row="2"
+                <!-- Footer -->
+                <!-- Footer -->
+                <pcontrols:SourceLinkControl Grid.Row="2"
                             Margin="8,20,8,0"
                             LabelText="{DynamicResource LOCSourceLabel}"
                             SourceLabel="{Binding SourceLabel}"
                             SourceUrl="{Binding SourceUrl}"/>
 
 
-        </Grid>
-    </ScrollViewer>
+            </Grid>
+        </ScrollViewer>
+    </Border>
 </UserControl>
