@@ -111,6 +111,11 @@ namespace SystemChecker.Services
 						return new CheckResult { Result = true };
 					}
 				}
+				else
+				{
+					IsWithNoCard = true;
+					return new CheckResult { Result = true };
+				}
 			}
 
 			if (CardRequirement.IsOGL && CardRequirement.OglVersion < 4)
