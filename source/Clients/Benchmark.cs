@@ -29,7 +29,7 @@ namespace SystemChecker.Clients
 		#region Constants
 
 		private const string UrlVideoCard = @"https://www.videocardbenchmark.net/gpu_list.php";
-		private const string UrlCpu = @"https://www.cpubenchmark.net/cpu_list.php";
+		private const string UrlCpu = @"https://www.cpubenchmark.net/cpu-list/all";
 
 		private const int CacheExpirationMinutes = 43200; // 30 days
 		private const int FuzzyMatchThreshold = 95;
