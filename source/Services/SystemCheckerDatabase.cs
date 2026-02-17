@@ -2,6 +2,7 @@ using CommonPluginsShared;
 using CommonPluginsShared.Collections;
 using CommonPluginsShared.Interfaces;
 using CommonPluginsShared.Services;
+using CommonPluginsShared.Utilities;
 using CommonPluginsStores.Models;
 using CommonPluginsStores.Steam;
 using Playnite.SDK;
@@ -278,7 +279,7 @@ namespace SystemChecker.Services
                 PluginSettings.Settings.IsMinimumOK = checkMinimum.AllOk ?? false;
                 PluginSettings.Settings.IsAllOK = checkMinimum.AllOk ?? false;
 
-                PluginSettings.Settings.RecommendedStorage = systemMinimum.Storage != 0 ? Tools.SizeSuffix(systemMinimum.Storage) : string.Empty;
+                PluginSettings.Settings.RecommendedStorage = systemMinimum.Storage != 0 ? UtilityTools.SizeSuffix(systemMinimum.Storage) : string.Empty;
             }
 
             if (systemRecommended.HasData && (checkRecommended.AllOk ?? false))
@@ -286,7 +287,7 @@ namespace SystemChecker.Services
                 PluginSettings.Settings.IsRecommendedOK = checkRecommended.AllOk ?? false;
                 PluginSettings.Settings.IsAllOK = checkRecommended.AllOk ?? false;
 
-                PluginSettings.Settings.RecommendedStorage = systemRecommended.Storage != 0 ? Tools.SizeSuffix(systemRecommended.Storage) : string.Empty;
+                PluginSettings.Settings.RecommendedStorage = systemRecommended.Storage != 0 ? UtilityTools.SizeSuffix(systemRecommended.Storage) : string.Empty;
             }
         }
 
