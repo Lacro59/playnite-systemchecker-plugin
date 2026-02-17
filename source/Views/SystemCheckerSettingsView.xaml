@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:AttachedProperties="clr-namespace:CommonPluginsShared.Controls"
-             xmlns:pcmd="clr-namespace:CommonPluginsShared"
+             xmlns:uiServices="clr-namespace:CommonPluginsShared.UI"
              xmlns:SystemChecker="clr-namespace:SystemChecker"
              mc:Ignorable="d" d:DesignWidth="650"
              d:DataContext="{d:DesignInstance SystemChecker:SystemCheckerSettingsViewModel}">
@@ -27,7 +27,7 @@
                     </Grid.RowDefinitions>
 
                     <CheckBox Grid.Column="0" Grid.Row="0" IsChecked="{Binding Settings.MenuInExtensions}" VerticalAlignment="Center"
-                              Command="{x:Static pcmd:Commands.RestartRequired}" 
+                              Command="{x:Static uiServices:CommandsHelper.RestartRequired}" 
                               CommandParameter="{Binding RelativeSource={RelativeSource Self}}">
                         <Label Content="{DynamicResource LOCCommonMenuInExtensions}" />
                     </CheckBox>
