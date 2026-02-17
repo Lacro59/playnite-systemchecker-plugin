@@ -1,4 +1,5 @@
 ﻿using CommonPluginsShared;
+using CommonPluginsShared.IO;
 using Playnite.SDK;
 using System;
 using System.Collections.Generic;
@@ -14,10 +15,10 @@ namespace SystemChecker.Services
 	{
 		private static readonly ILogger _logger = LogManager.GetLogger();
 		private static readonly SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
-		private static readonly FileDataTools _fileTools = new FileDataTools(PluginDatabase.PluginName, "CheckData");
+		private static readonly FileDataService _fileDataService = new FileDataService(PluginDatabase.PluginName, "CheckData");
 		private static readonly object _cacheLock = new object();
 		private static Dictionary<string, CheckData> _cache;
-		private static string _cacheFilePath;
+		private static readonly string _cacheFilePath;
 		private static DateTime _lastCleanup = DateTime.Now;
 
 		private const int ExpirationDays = 5;
@@ -39,7 +40,7 @@ namespace SystemChecker.Services
 			{
 				try
 				{
-					var loadedCache = _fileTools.LoadData<Dictionary<string, CheckData>>(_cacheFilePath, -1);
+					var loadedCache = _fileDataService.LoadData<Dictionary<string, CheckData>>(_cacheFilePath, -1);
 
 					if (loadedCache != null)
 					{
@@ -77,7 +78,7 @@ namespace SystemChecker.Services
 		{
 			try
 			{
-				_fileTools.SaveData(_cacheFilePath, _cache);
+				_fileDataService.SaveData(_cacheFilePath, _cache);
 			}
 			catch (Exception ex)
 			{

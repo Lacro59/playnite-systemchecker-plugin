@@ -3,6 +3,7 @@ using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
 using CommonPluginsShared;
 using CommonPluginsShared.Extensions;
+using CommonPluginsShared.IO;
 using CommonPluginsStores.Models;
 using FuzzySharp;
 using Playnite.SDK;
@@ -42,7 +43,7 @@ namespace SystemChecker.Clients
 
 		private static readonly ILogger Logger = LogManager.GetLogger();
 		private static readonly SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
-		private static FileDataTools FileDataTools => new FileDataTools(PluginDatabase.PluginName, "Benchmark");
+		private static FileDataService FileDataTools => new FileDataService(PluginDatabase.PluginName, "Benchmark");
 
 		// Compiled regex patterns for better performance
 		private static readonly Regex RegexMemorySize = new Regex(@";[ ]?\d+[ ]?(MB)?(GB)?", RegexOptions.IgnoreCase | RegexOptions.Compiled);
