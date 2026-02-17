@@ -3,7 +3,6 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using System.Diagnostics;
 using SystemChecker.Models;
 using CommonPluginsShared;
 using Playnite.SDK.Models;

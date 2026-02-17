@@ -1,7 +1,5 @@
 using CommonPluginsShared;
 using CommonPluginsShared.Collections;
-using CommonPluginsShared.Interfaces;
-using CommonPluginsShared.Services;
 using CommonPluginsShared.SystemInfo;
 using CommonPluginsShared.Utilities;
 using CommonPluginsStores.Models;
@@ -12,8 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using SystemChecker.Clients;
 using SystemChecker.Models;
 

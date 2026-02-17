@@ -2,7 +2,6 @@
 using CommonPluginsShared.Models;
 using CommonPluginsStores.Models;
 using Playnite.SDK.Data;
-using System.Collections.Generic;
 
 namespace SystemChecker.Models
 {

@@ -1,5 +1,4 @@
-﻿using CommonPluginsControls.Views;
-using CommonPluginsShared;
+﻿using CommonPluginsShared;
 using CommonPluginsShared.PlayniteExtended;
 using Playnite.SDK;
 using Playnite.SDK.Events;
@@ -8,15 +7,12 @@ using Playnite.SDK.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using SystemChecker.Controls;
-using SystemChecker.Models;
 using SystemChecker.Services;
 using SystemChecker.Views;
 

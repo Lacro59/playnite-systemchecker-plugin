@@ -1,15 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
 using Playnite.SDK;
 using Playnite.SDK.Plugins;
 using Playnite.SDK.Models;
 using CommonPluginsShared;
-using SystemChecker.Services;
-using SystemChecker.Views;
-using SystemChecker.Models;
-using CommonPluginsControls.Views;
 using CommonPluginsShared.Collections;
 using CommonPluginsShared.Plugins;
 using CommonPluginsShared.Interfaces;

@@ -1,12 +1,9 @@
 ﻿using CommonPluginsShared;
 using CommonPluginsShared.SystemInfo;
-using Playnite.SDK;
 using Playnite.SDK.Data;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
-using SystemChecker.Clients;
 using SystemChecker.Models;
 
 namespace SystemChecker.Services
