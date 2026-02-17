@@ -8,6 +8,7 @@ using SystemChecker.Models;
 using CommonPluginsShared;
 using Playnite.SDK.Models;
 using CommonPluginsStores.Models;
+using CommonPluginsShared.SystemInfo;
 
 namespace SystemChecker.Services
 {

@@ -1,5 +1,6 @@
 ﻿using CommonPluginsShared;
 using CommonPluginsShared.Extensions;
+using CommonPluginsShared.SystemInfo;
 using CommonPluginsStores.Models;
 using Playnite.SDK;
 using Playnite.SDK.Models;

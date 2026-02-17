@@ -7,6 +7,7 @@ using System.Globalization;
 using CommonPluginsShared;
 using SystemChecker.Models;
 using SystemChecker.Clients;
+using CommonPluginsShared.SystemInfo;
 
 namespace SystemChecker.Services
 {

@@ -2,6 +2,7 @@ using CommonPluginsShared;
 using CommonPluginsShared.Collections;
 using CommonPluginsShared.Interfaces;
 using CommonPluginsShared.Services;
+using CommonPluginsShared.SystemInfo;
 using CommonPluginsShared.Utilities;
 using CommonPluginsStores.Models;
 using CommonPluginsStores.Steam;
@@ -20,7 +21,7 @@ namespace SystemChecker.Services
 {
     public class SystemCheckerDatabase : PluginDatabaseObject<SystemCheckerSettingsViewModel, RequirementsCollection, PluginGameRequirements, RequirementEntry>
     {
-        public LocalSystem LocalSystem;
+        public SystemConfigurationManager SystemConfigurationManager;
 
         private PCGamingWikiRequirements PCGamingWikiRequirements { get; set; }
         private SteamRequirements SteamRequirements { get; set; }
@@ -40,8 +41,8 @@ namespace SystemChecker.Services
                 PCGamingWikiRequirements = new PCGamingWikiRequirements();
                 SteamRequirements = new SteamRequirements();
 
-                LocalSystem = new LocalSystem(Path.Combine(Paths.PluginUserDataPath, "Configurations.json"));
-                _database.PC = LocalSystem.GetSystemConfiguration();
+                SystemConfigurationManager = new SystemConfigurationManager(Path.Combine(Paths.PluginUserDataPath, "Configurations.json"));
+                _database.PC = SystemConfigurationManager.GetSystemConfiguration();
 
                 Logger.Info($"LoadMoreData completed");
             }
