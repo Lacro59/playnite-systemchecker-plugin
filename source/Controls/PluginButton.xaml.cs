@@ -32,11 +32,6 @@ namespace SystemChecker.Controls
 			set => ControlDataContext = (PluginButtonDataContext)value;
 		}
 
-		private readonly string IconOk = "\uea50";
-		private readonly string IconKo = "\uea52";
-		private readonly string IconMinimum = "\uea51";
-		private readonly string IconEmpty = "\uea53";
-
 		public PluginButton()
 		{
 			InitializeComponent();
@@ -64,77 +59,21 @@ namespace SystemChecker.Controls
 		{
 			ControlDataContext.IsActivated = PluginDatabase.PluginSettings.Settings.EnableIntegrationButton;
 			ControlDataContext.DisplayDetails = PluginDatabase.PluginSettings.Settings.EnableIntegrationButtonDetails;
-			ControlDataContext.Text = IconEmpty;
+			ControlDataContext.Text = PluginControlHelper.IconEmpty;
 		}
 
-		public override void SetData(Game newContext, PluginDataBaseGameBase PluginGameData)
+		public override void SetData(Game newContext, PluginDataBaseGameBase pluginGameData)
 		{
 			if (!ControlDataContext.DisplayDetails)
 			{
 				return;
 			}
 
-			PluginGameRequirements pluginGameRequirements = (PluginGameRequirements)PluginGameData;
-			SystemConfiguration systemConfiguration = PluginDatabase.Database.PC;
-
-			if (systemConfiguration == null)
-			{
-				return;
-			}
-
-			RequirementEntry systemMinimum = pluginGameRequirements.GetMinimum();
-			RequirementEntry systemRecommended = pluginGameRequirements.GetRecommended();
-
-			bool hasMinimum = systemMinimum.HasData;
-			bool hasRecommended = systemRecommended.HasData;
-
-			if (!hasMinimum && !hasRecommended)
-			{
-				return;
-			}
-
-			CheckSystem checkMinimum = hasMinimum
-				? SystemApi.CheckConfig(newContext, systemMinimum, systemConfiguration, newContext.IsInstalled)
-				: null;
-
-			CheckSystem checkRecommended = hasRecommended
-				? SystemApi.CheckConfig(newContext, systemRecommended, systemConfiguration, newContext.IsInstalled)
-				: null;
-
-			string newIcon = DetermineIcon(hasMinimum, hasRecommended, checkMinimum, checkRecommended);
-
-			if (GameContext?.Id == CurrentGame.Id && ControlDataContext.Text != newIcon)
+			string newIcon = PluginControlHelper.ResolveIcon(newContext, pluginGameData, PluginDatabase);
+			if (newIcon != null && GameContext?.Id == CurrentGame.Id && ControlDataContext.Text != newIcon)
 			{
 				ControlDataContext.Text = newIcon;
 			}
-		}
-
-		/// <summary>
-		/// Determines which icon to display based on system requirements check results
-		/// </summary>
-		private string DetermineIcon(bool hasMinimum, bool hasRecommended, CheckSystem checkMinimum, CheckSystem checkRecommended)
-		{
-			if (hasMinimum)
-			{
-				if (!(checkMinimum?.AllOk ?? false))
-				{
-					return IconKo;
-				}
-
-				if (hasRecommended)
-				{
-					return (checkRecommended?.AllOk ?? false) ? IconOk : IconMinimum;
-				}
-
-				return IconOk;
-			}
-
-			if (hasRecommended)
-			{
-				return (checkRecommended?.AllOk ?? false) ? IconOk : IconKo;
-			}
-
-			return IconEmpty;
 		}
 
 		#region Events
