@@ -29,8 +29,7 @@
         ViewColumnValueText, SectionHeaderText all satisfy this requirement).
     -->
 
-    <Border BorderThickness="0,1,0,0"
-            BorderBrush="{DynamicResource NormalBorderBrush}">
+    <Border Style="{StaticResource TopSeparatorBorder}">
 
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
             <Grid Margin="20">
