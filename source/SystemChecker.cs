@@ -55,7 +55,6 @@ namespace SystemChecker
             };
         }
 
-
         #region Custom event
 
         public void OnCustomThemeButtonClick(object sender, RoutedEventArgs e)
@@ -75,7 +74,6 @@ namespace SystemChecker
         }
 
         #endregion
-
 
         #region Theme integration
 
@@ -102,7 +100,6 @@ namespace SystemChecker
 
         #endregion
 
-
         #region Menus
 
         // To add new game menu items override GetGameMenuItems
@@ -118,7 +115,6 @@ namespace SystemChecker
         }
 
         #endregion
-
 
         #region Game event
 
@@ -183,7 +179,6 @@ namespace SystemChecker
         }
 
         #endregion
-
 
         #region Application event
 
@@ -260,7 +255,6 @@ namespace SystemChecker
                 SavePluginSettings(PluginSettings.Settings);
             }
         }
-
 
         #region Settings
 
