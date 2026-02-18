@@ -233,7 +233,7 @@ namespace SystemChecker.Services
 				return;
 			}
 
-			HardwareCacheData cacheData = _fileDataService.LoadData<HardwareCacheData>(_cacheFilePath, 0);
+			HardwareCacheData cacheData = _fileDataService.LoadData<HardwareCacheData>(_cacheFilePath, -1);
 
 			if (cacheData == null)
 			{
