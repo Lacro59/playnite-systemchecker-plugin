@@ -3,12 +3,16 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <!-- General -->
-    <sys:String x:Key="LOCSystemChecker">System Checker</sys:String>
+    <sys:String x:Key="LOCSystemChecker">SystemChecker</sys:String>
     <sys:String x:Key="LOCSystemCheckerCheckConfig">Check System Requirements</sys:String>
     <sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Refresh System Information</sys:String>
 
     <!-- Settings -->
     <sys:String x:Key="LOCSystemCheckerAddTag">Add tag indicating supported configuration</sys:String>
+    <sys:String x:Key="LOCSystemCheckerTagSectionTitle">Tag management</sys:String>
+    <sys:String x:Key="LOCSystemCheckerDataSectionTitle">Data management</sys:String>
+    <sys:String x:Key="LOCSystemCheckerClearAllDescription">Permanently deletes all cached system check data for every game. This action cannot be undone.</sys:String>
+    <sys:String x:Key="LOCSystemCheckerClearAllConfirm">Are you sure you want to delete all plugin data? This action cannot be undone.</sys:String>
 
     <!-- Game Details View -->
     <sys:String x:Key="LOCSystemCheckerConfigMinimum">Minimum</sys:String>
@@ -22,6 +26,9 @@
 
     <!-- Notifications -->
     <sys:String x:Key="LOCSystemCheckerTryRefresh">Try to refresh plugin data for {0}</sys:String>
+    <sys:String x:Key="LOCSystemCheckerAddTagError">An error occurred while adding tags. Please try again.</sys:String>
+    <sys:String x:Key="LOCSystemCheckerRemoveTagError">An error occurred while removing tags. Please try again.</sys:String>
+    <sys:String x:Key="LOCSystemCheckerClearAllError">An error occurred while clearing plugin data. Please try again.</sys:String>
 
     <!-- Search -->
     <sys:String x:Key="LOCSystemCheckerSearchDescription">Search System Checker data</sys:String>

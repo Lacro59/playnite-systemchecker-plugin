@@ -29,12 +29,12 @@ namespace SystemChecker.Views
         #region Tag
         private void ButtonAddTag_Click(object sender, RoutedEventArgs e)
         {
-            PluginDatabase.AddTagAllGame();
+            PluginDatabase.AddTagAllGames();
         }
 
         private void ButtonRemoveTag_Click(object sender, RoutedEventArgs e)
         {
-            PluginDatabase.RemoveTagAllGame();
+            PluginDatabase.RemoveTagAllGames();
         }
         #endregion
 

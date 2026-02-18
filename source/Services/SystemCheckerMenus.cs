@@ -177,7 +177,7 @@ namespace SystemChecker.Services
                     Description = ResourceProvider.GetString("LOCCommonAddAllTags"),
                     Action = (mainMenuItem) =>
                     {
-                        _database.AddTagAllGame();
+                        _database.AddTagAllGames();
                     }
                 });
                 // Remove tag for ALL games
@@ -187,7 +187,7 @@ namespace SystemChecker.Services
                     Description = ResourceProvider.GetString("LOCCommonRemoveAllTags"),
                     Action = (mainMenuItem) =>
                     {
-                        _database.RemoveTagAllGame();
+                        _database.RemoveTagAllGames();
                     }
                 });
             }
