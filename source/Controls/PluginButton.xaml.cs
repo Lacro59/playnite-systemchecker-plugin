@@ -2,15 +2,11 @@
 using CommonPluginsShared.Collections;
 using CommonPluginsShared.Controls;
 using CommonPluginsShared.Interfaces;
-using CommonPluginsShared.SystemInfo;
 using CommonPluginsStores.Models;
 using Playnite.SDK;
 using Playnite.SDK.Models;
-using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
 using SystemChecker.Models;
 using SystemChecker.Services;
 using SystemChecker.Views;
@@ -40,8 +36,9 @@ namespace SystemChecker.Controls
 		}
 
 		/// <summary>
-		/// Attaches static event handlers specific to SystemChecker plugin.
-		/// Uses AttachPluginEvents to ensure handlers are attached only once globally.
+		/// Attaches static event handlers for the SystemChecker plugin.
+		/// Plugin-specific handlers are guarded by <see cref="AttachPluginEvents"/> to prevent
+		/// double-subscription when multiple instances of this control exist simultaneously.
 		/// </summary>
 		protected override void AttachStaticEvents()
 		{
@@ -62,6 +59,10 @@ namespace SystemChecker.Controls
 			ControlDataContext.Text = PluginControlHelper.IconEmpty;
 		}
 
+		/// <summary>
+		/// Updates the button icon based on the game's system requirements.
+		/// At this point the game context has already been validated by <see cref="PluginUserControlExtend.UpdateDataAsync"/>.
+		/// </summary>
 		public override void SetData(Game newContext, PluginDataBaseGameBase pluginGameData)
 		{
 			if (!ControlDataContext.DisplayDetails)
@@ -70,7 +71,7 @@ namespace SystemChecker.Controls
 			}
 
 			string newIcon = PluginControlHelper.ResolveIcon(newContext, pluginGameData, PluginDatabase);
-			if (newIcon != null && GameContext?.Id == CurrentGame.Id && ControlDataContext.Text != newIcon)
+			if (newIcon != null && ControlDataContext.Text != newIcon)
 			{
 				ControlDataContext.Text = newIcon;
 			}
