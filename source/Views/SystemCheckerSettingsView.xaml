@@ -48,7 +48,7 @@
                     <Border Style="{StaticResource SectionBorder}">
                         <StackPanel>
                             <TextBlock Style="{DynamicResource SectionHeaderText}"
-                                       Text="{DynamicResource LOCSystemCheckerTagSectionTitle}" />
+                                       Text="{DynamicResource LOCCommonTagSectionTitle}" />
 
                             <!--
                                 DockPanel replaces the former broken Grid with Grid.Column="2" on a Grid
@@ -75,7 +75,7 @@
                                           IsChecked="{Binding Settings.EnableTag}"
                                           VerticalAlignment="Center">
                                     <TextBlock Style="{DynamicResource BaseTextBlockStyle}"
-                                               Text="{DynamicResource LOCSystemCheckerAddTag}" />
+                                               Text="{DynamicResource LOCCommonAddTag}" />
                                 </CheckBox>
                             </DockPanel>
 
@@ -92,13 +92,13 @@
                     <Border Style="{StaticResource SectionBorder}">
                         <StackPanel>
                             <TextBlock Style="{DynamicResource SectionHeaderText}"
-                                       Text="{DynamicResource LOCSystemCheckerDataSectionTitle}" />
+                                       Text="{DynamicResource LOCCommonDataSectionTitle}" />
 
                             <TextBlock Style="{DynamicResource BaseTextBlockStyle}"
                                        Foreground="{DynamicResource TextBrushDarker}"
                                        TextWrapping="Wrap"
                                        Margin="0,0,0,10"
-                                       Text="{DynamicResource LOCSystemCheckerClearAllDescription}" />
+                                       Text="{DynamicResource LOCCommonClearAllDescription}" />
 
                             <!-- Clear all data — WarningButton signals destructive intent -->
                             <Button Style="{StaticResource WarningButton}"

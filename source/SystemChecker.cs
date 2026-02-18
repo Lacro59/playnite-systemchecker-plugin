@@ -24,7 +24,7 @@ namespace SystemChecker
 
         private bool PreventLibraryUpdatedOnStart { get; set; } = true;
 
-        private SystemCheckerMenus _menus;
+        private readonly SystemCheckerMenus _menus;
 
         public SystemChecker(IPlayniteAPI api) : base(api, "SystemChecker")
         {
