@@ -2,7 +2,7 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <!-- General -->
-    <sys:String x:Key="LOCSystemChecker">SystemChecker</sys:String>
+    <sys:String x:Key="LOCSystemChecker">System-Checker</sys:String>
     <sys:String x:Key="LOCSystemCheckerCheckConfig">Systemvoraussetzungen prüfen</sys:String>
     <sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Systeminformationen aktualisieren</sys:String>
 
@@ -18,9 +18,9 @@
 
     <!-- Notifications -->
     <sys:String x:Key="LOCSystemCheckerTryRefresh">Versuche die Plugin-Daten für {0} zu aktualisieren</sys:String>
-    <sys:String x:Key="LOCSystemCheckerAddTagError">An error occurred while adding tags. Please try again.</sys:String>
-    <sys:String x:Key="LOCSystemCheckerRemoveTagError">An error occurred while removing tags. Please try again.</sys:String>
-    <sys:String x:Key="LOCSystemCheckerClearAllError">An error occurred while clearing plugin data. Please try again.</sys:String>
+    <sys:String x:Key="LOCSystemCheckerAddTagError">Beim Hinzufügen von Tags ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</sys:String>
+    <sys:String x:Key="LOCSystemCheckerRemoveTagError">Beim Entfernen der Tags ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</sys:String>
+    <sys:String x:Key="LOCSystemCheckerClearAllError">Beim Löschen der Plugin-Daten ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</sys:String>
 
     <!-- Search -->
     <sys:String x:Key="LOCSystemCheckerSearchDescription">Systemprüfdaten durchsuchen</sys:String>
