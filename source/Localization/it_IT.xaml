@@ -34,10 +34,10 @@
     -status={n}	Filter by play status (e.g. -status=played / -status=played,playing)</sys:String>
 
     <!-- Search Results -->
-    <sys:String x:Key="LOCSystemCheckerSearchMeetsMinimum">✅ Meets minimum requirements</sys:String>
-    <sys:String x:Key="LOCSystemCheckerSearchMeetsRecommended">✅ Meets recommended requirements</sys:String>
-    <sys:String x:Key="LOCSystemCheckerSearchBelowMinimum">⚠️ Below minimum requirements</sys:String>
-    <sys:String x:Key="LOCSystemCheckerSearchNoData">ℹ️ No requirements data available</sys:String>
-    <sys:String x:Key="LOCSystemCheckerSearchSecondaryAction">View Details</sys:String>
+    <sys:String x:Key="LOCSystemCheckerSearchMeetsMinimum">✅ Soddisfa i requisiti minimi</sys:String>
+    <sys:String x:Key="LOCSystemCheckerSearchMeetsRecommended">✅ Soddisfa i requisiti raccomandati</sys:String>
+    <sys:String x:Key="LOCSystemCheckerSearchBelowMinimum">⚠️ Sotto i requisiti minimi</sys:String>
+    <sys:String x:Key="LOCSystemCheckerSearchNoData">ℹ️ Non sono disponibili dati sui requisiti</sys:String>
+    <sys:String x:Key="LOCSystemCheckerSearchSecondaryAction">Visualizza dettagli</sys:String>
 
 </ResourceDictionary>
