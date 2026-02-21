@@ -64,7 +64,7 @@ namespace SystemChecker
                 string btName = ((Button)sender).Name;
                 if (btName == "PART_CustomSysCheckerButton")
                 {
-                    PluginDatabase.WindowPluginService.ShowPluginGameDataWindow(PluginDatabase.GameContext);
+                    PluginDatabase.PluginWindows.ShowPluginGameDataWindow(PluginDatabase.GameContext);
                 }
             }
             catch (Exception ex)

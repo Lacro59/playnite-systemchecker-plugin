@@ -81,7 +81,7 @@ namespace SystemChecker.Controls
 
 		private void PART_PluginButton_Click(object sender, RoutedEventArgs e)
 		{
-			PluginDatabase.WindowPluginService.ShowPluginGameDataWindow(CurrentGame);
+			PluginDatabase.PluginWindows.ShowPluginGameDataWindow(CurrentGame);
 		}
 
 		#endregion

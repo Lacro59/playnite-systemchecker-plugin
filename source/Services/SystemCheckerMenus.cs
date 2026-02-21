@@ -48,7 +48,7 @@ namespace SystemChecker.Services
                     {
                         try
                         {
-                            _database.WindowPluginService.ShowPluginGameDataWindow(gameMenu);
+                            _database.PluginWindows.ShowPluginGameDataWindow(gameMenu);
                         }
                         catch (Exception ex)
                         {
@@ -205,7 +205,7 @@ namespace SystemChecker.Services
                 Description = ResourceProvider.GetString("LOCCommonViewNoData"),
                 Action = (mainMenuItem) =>
                 {
-                    _database.WindowPluginService.ShowPluginGameNoDataWindow();
+                    _database.PluginWindows.ShowPluginGameNoDataWindow();
                 }
             });
 

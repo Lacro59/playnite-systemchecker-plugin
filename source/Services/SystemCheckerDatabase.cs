@@ -30,7 +30,7 @@ namespace SystemChecker.Services
 			: base(pluginSettings, "SystemChecker", pluginUserDataPath)
 		{
 			TagBefore = "[SC]";
-			WindowPluginService = new WindowPluginService(PluginName, this);
+			PluginWindows = new SystemCheckWindows(PluginName, this);
 		}
 
 		#region Initialisation

@@ -122,7 +122,7 @@ namespace SystemChecker.Services
 			{
 				SecondaryAction = new SearchItemAction(
 					ResourceProvider.GetString("LOCSystemCheckerSearchSecondaryAction"),
-					() => _pluginDatabase.WindowPluginService.ShowPluginGameDataWindow(game)),
+					() => _pluginDatabase.PluginWindows.ShowPluginGameDataWindow(game)),
 				Description = requirementStatus,
 				Icon = game.Icon
 			};

@@ -1,6 +1,7 @@
 using CommonPluginsControls.Views;
 using CommonPluginsShared;
 using CommonPluginsShared.Interfaces;
+using CommonPluginsShared.Plugins;
 using CommonPluginsShared.Services;
 using Playnite.SDK;
 using Playnite.SDK.Models;
@@ -9,26 +10,13 @@ using SystemChecker.Views;
 
 namespace SystemChecker.Services
 {
-    public class WindowPluginService : IWindowPluginService
+    public class SystemCheckWindows : PluginWindows
 	{
-		private static readonly ILogger Logger = LogManager.GetLogger();
-
-		public string PluginName { get; private set; }
-
-        public IPluginDatabase PluginDatabase { get; private set; }
-
-		public WindowPluginService(string pluginName, IPluginDatabase pluginDatabase)
+		public SystemCheckWindows(string pluginName, IPluginDatabase pluginDatabase) : base(pluginName, pluginDatabase)
 		{
-			PluginName = pluginName;
-            PluginDatabase = pluginDatabase;
-
-            if (PluginDatabase == null)
-            {
-                Logger.Warn("WindowPluginService created with a null PluginDatabase instance.");
-            }
 		}
 
-		public void ShowPluginGameDataWindow(Game gameContext)
+		public override void ShowPluginGameDataWindow(Game gameContext)
 		{
 			WindowOptions windowOptions = new WindowOptions
 			{
@@ -48,7 +36,7 @@ namespace SystemChecker.Services
 			windowExtension.ShowDialog();
 		}
 
-		public void ShowPluginGameNoDataWindow()
+		public override void ShowPluginGameNoDataWindow()
 		{
 			WindowOptions windowOptions = new WindowOptions
 			{
