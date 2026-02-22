@@ -25,6 +25,7 @@ namespace SystemChecker.Services
 
 		private PCGamingWikiRequirements _pcGamingWikiRequirements;
 		private SteamRequirements _steamRequirements;
+		private SteamApi _steamApi;
 
 		public SystemCheckerDatabase(SystemCheckerSettingsViewModel pluginSettings, string pluginUserDataPath)
 			: base(pluginSettings, "SystemChecker", pluginUserDataPath)
@@ -44,6 +45,7 @@ namespace SystemChecker.Services
 
 				_pcGamingWikiRequirements = new PCGamingWikiRequirements();
 				_steamRequirements = new SteamRequirements();
+				_steamApi = new SteamApi(PluginName, PlayniteTools.ExternalPlugin.SystemChecker);
 
 				SystemConfigurationManager = new SystemConfigurationManager(
 					Path.Combine(Paths.PluginUserDataPath, "Configurations.json"));
@@ -141,8 +143,7 @@ namespace SystemChecker.Services
 				return _steamRequirements.GetRequirements(game);
 			}
 
-			SteamApi steamApi = new SteamApi(PluginName, CommonPluginsShared.PlayniteTools.ExternalPlugin.SystemChecker);
-			uint steamId = steamApi.GetAppId(game);
+			uint steamId = _steamApi.GetAppId(game);
 
 			return steamId != 0
 				? _steamRequirements.GetRequirements(game, steamId)

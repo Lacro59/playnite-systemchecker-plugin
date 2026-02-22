@@ -15,16 +15,10 @@ namespace SystemChecker.Clients
 	public class PCGamingWikiRequirements : RequirementMetadata
 	{
 		private readonly PCGamingWikiApi _pcGamingWikiApi;
-		private readonly SteamApi _steamApi;
-
-		/// <summary>Steam AppId resolved during <see cref="GetRequirements(Game)"/>. 0 when unavailable.</summary>
-		private uint _steamAppId;
-
 
 		public PCGamingWikiRequirements()
 		{
 			_pcGamingWikiApi = new PCGamingWikiApi(PluginDatabase.PluginName, PlayniteTools.ExternalPlugin.SystemChecker);
-			_steamApi = new SteamApi(PluginDatabase.PluginName, PlayniteTools.ExternalPlugin.SystemChecker);
 		}
 
 
@@ -40,8 +34,6 @@ namespace SystemChecker.Clients
 		public PluginGameRequirements GetRequirements(Game game)
 		{
 			Initialize(game);
-			_steamAppId = ResolveSteamAppId(game);
-
 			return GetRequirements();
 		}
 
@@ -77,27 +69,6 @@ namespace SystemChecker.Clients
 		{
 			var apiResult = _pcGamingWikiApi.GetGameRequirements(url);
 			return BuildRequirementsFromApiResult(apiResult, nameof(PCGamingWikiRequirements), $"url: {url}");
-		}
-
-
-		// -----------------------------------------------------------------------
-		//  Private helpers
-		// -----------------------------------------------------------------------
-
-		/// <summary>
-		/// Resolves the Steam AppId for <paramref name="game"/>.
-		/// Reads <see cref="Game.GameId"/> directly when the source is the Steam library;
-		/// otherwise queries <see cref="SteamApi"/> for a cross-library match.
-		/// </summary>
-		/// <returns>Resolved AppId, or 0 when none is found.</returns>
-		private uint ResolveSteamAppId(Game game)
-		{
-			if (game.SourceId == PlayniteTools.GetPluginId(PlayniteTools.ExternalPlugin.SteamLibrary))
-			{
-				return uint.Parse(game.GameId);
-			}
-
-			return _steamApi.GetAppId(game);
 		}
 	}
 }
