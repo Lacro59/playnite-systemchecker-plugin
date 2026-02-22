@@ -5,12 +5,12 @@
 * [X] PluginSettingsViewModel
 * [X] PluginMenus
 * [X] PluginWindows
-* [ ] PluginExportCsv
+* [ ] ~~PluginExportCsv~~
 
 ## Modernize UI
 
-* [ ] SystemCheckerGameView
-* [ ] SystemCheckerSettingsView
+* [X] SystemCheckerGameView
+* [X] SystemCheckerSettingsView
 
 ## Modernize Control
 
@@ -23,3 +23,5 @@
 * [X] PluginUserControlExtend
 
 ## Tests
+
+* [ ] EpicRequirements
