@@ -1,21 +1,20 @@
 ﻿using CommonPluginsShared;
-using CommonPluginsShared.Models;
-using CommonPluginsStores.Models;
 using CommonPluginsStores.Steam;
-using CommonPluginsStores.Steam.Models;
 using Playnite.SDK.Models;
-using System.Collections.Generic;
+using System;
 using SystemChecker.Models;
-using SystemChecker.Services;
-using static CommonPlayniteShared.PluginLibrary.SteamLibrary.SteamShared.StoreAppDetailsResult.AppDetails;
 
 namespace SystemChecker.Clients
 {
-	public class SteamRequirements : RequirementMetadata 
+	/// <summary>
+	/// Retrieves system requirements directly from the Steam store API.
+	/// </summary>
+	public class SteamRequirements : RequirementMetadata
 	{
 		private readonly SteamApi _steamApi;
 
-		private uint AppId { get; set; }
+		/// <summary>Steam AppId for the current <see cref="RequirementMetadata.GameContext"/>.</summary>
+		private uint _appId;
 
 
 		public SteamRequirements()
@@ -24,33 +23,51 @@ namespace SystemChecker.Clients
 		}
 
 
-		public override PluginGameRequirements GetRequirements()
-		{
-			PluginGameRequirements = SystemChecker.PluginDatabase.GetDefault(GameContext);
+		// -----------------------------------------------------------------------
+		//  Public entry-point
+		// -----------------------------------------------------------------------
 
-			GameRequirements apiResult = _steamApi.GetGameRequirements(AppId);
-			if (apiResult == null)
-			{
-				Logger.Warn($"SteamRequirements - No data for {GameContext.Name} (AppId: {AppId})");
-				return PluginGameRequirements;
-			}
-
-			PluginGameRequirements.Items = new List<RequirementEntry> { apiResult.Minimum, apiResult.Recommended };
-			PluginGameRequirements.SourcesLink = apiResult.SourceLink;
-
-			return PluginGameRequirements;
-		}
-
+		/// <summary>
+		/// Fetches requirements for <paramref name="game"/> using the provided <paramref name="appId"/>.
+		/// When <paramref name="appId"/> is 0, <see cref="Game.GameId"/> is parsed as the AppId.
+		/// </summary>
+		/// <param name="game">Target game. Must not be <see langword="null"/>.</param>
+		/// <param name="appId">
+		/// Explicit Steam AppId override. Pass 0 (default) to use <see cref="Game.GameId"/>.
+		/// </param>
 		public PluginGameRequirements GetRequirements(Game game, uint appId = 0)
 		{
-			GameContext = game;
-			AppId = appId != 0 ? appId : uint.Parse(GameContext.GameId);
+			Initialize(game);
+			_appId = appId != 0 ? appId : uint.Parse(game.GameId);
+
 			return GetRequirements();
 		}
 
+
+		// -----------------------------------------------------------------------
+		//  RequirementMetadata overrides
+		// -----------------------------------------------------------------------
+
+		/// <inheritdoc/>
+		/// <remarks>
+		/// Caller must have invoked <see cref="GetRequirements(Game, uint)"/> first to set context.
+		/// </remarks>
+		public override PluginGameRequirements GetRequirements()
+		{
+			ResetRequirements();
+
+			var apiResult = _steamApi.GetGameRequirements(_appId);
+			return BuildRequirementsFromApiResult(apiResult, nameof(SteamRequirements), $"AppId: {_appId}");
+		}
+
+		/// <inheritdoc/>
+		/// <exception cref="NotSupportedException">
+		/// Always thrown. Steam requirements are identified by AppId, not by URL.
+		/// </exception>
 		public override PluginGameRequirements GetRequirements(string url)
 		{
-			throw new System.NotImplementedException();
+			throw new NotSupportedException(
+				$"{nameof(SteamRequirements)} does not support URL-based retrieval. Use {nameof(GetRequirements)}(Game, uint) instead.");
 		}
 	}
 }
