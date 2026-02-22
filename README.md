@@ -8,7 +8,7 @@
 
 # System Checker for Playnite
 
-A powerful Playnite extension that automatically checks game system requirements against your PC configuration, helping you determine if your system can run your games.
+A Playnite extension that automatically checks game system requirements against your PC configuration, helping you determine if your system can run your games.
 
 ## 📋 Table of Contents
 
