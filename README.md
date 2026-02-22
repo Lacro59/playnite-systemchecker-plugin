@@ -1,27 +1,14 @@
 [![Crowdin](https://badges.crowdin.net/playnite-extensions/localized.svg)](https://crowdin.com/project/playnite-extensions)
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/Lacro59/playnite-systemchecker-plugin?cacheSeconds=5000&logo=github)](https://github.com/Lacro59/playnite-systemchecker-plugin/releases/latest)
-[![GitHub Release Date](https://img.shields.io/github/release-date/Lacro59/playnite-systemchecker-plugin?cacheSeconds=5000)](https://github.com/Lacro59/playnite-systemchecker-plugin/releases/latest)
-[![Github Lastest Releases](https://img.shields.io/github/downloads/Lacro59/playnite-systemchecker-plugin/latest/total.svg)]()
-[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/Lacro59/playnite-systemchecker-plugin)](https://github.com/Lacro59/playnite-systemchecker-plugin/graphs/commit-activity)
-[![GitHub contributors](https://img.shields.io/github/contributors/Lacro59/playnite-systemchecker-plugin?cacheSeconds=5000)](https://github.com/Lacro59/playnite-systemchecker-plugin/graphs/contributors)
-[![GitHub](https://img.shields.io/github/license/Lacro59/playnite-systemchecker-plugin?cacheSeconds=50000)](https://github.com/Lacro59/playnite-systemchecker-plugin/blob/master/LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/Lacro59/playnite-systemchecker-plugin?logo=github&color=8A2BE2)](https://github.com/Lacro59/playnite-systemchecker-plugin/releases/latest)
+[![GitHub Release Date](https://img.shields.io/github/release-date/Lacro59/playnite-systemchecker-plugin?logo=github)](https://github.com/Lacro59/playnite-systemchecker-plugin/releases/latest)
+[![GitHub downloads](https://img.shields.io/github/downloads/Lacro59/playnite-systemchecker-plugin/total?logo=github)](https://github.com/Lacro59/playnite-systemchecker-plugin/releases)
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/Lacro59/playnite-systemchecker-plugin/devel?logo=github)](https://github.com/Lacro59/playnite-systemchecker-plugin/graphs/commit-activity)
+[![GitHub contributors](https://img.shields.io/github/contributors/Lacro59/playnite-systemchecker-plugin?logo=github)](https://github.com/Lacro59/playnite-systemchecker-plugin/graphs/contributors)
+[![GitHub license](https://img.shields.io/github/license/Lacro59/playnite-systemchecker-plugin?logo=github)](https://github.com/Lacro59/playnite-systemchecker-plugin/blob/master/LICENSE)
 
 # System Checker for Playnite
 
-A powerful Playnite extension that automatically checks game system requirements against your PC configuration, helping you determine if your system can run your games.
-
-## 📋 Table of Contents
-
-- [Features](#-features)
-- [Screenshots](#-screenshots)
-- [Installation](#-installation)
-- [Usage](#-usage)
-- [Configuration](#-configuration)
-- [Theme Integration](#-theme-integration)
-- [Contributing](#-contributing)
-- [Translation](#-translation)
-- [Support](#-support)
-- [License](#-license)
+A Playnite extension that automatically checks game system requirements against your PC configuration.
 
 ## ✨ Features
 
@@ -61,44 +48,6 @@ A powerful Playnite extension that automatically checks game system requirements
     <img alt="System requirements in game details" src="https://github.com/Lacro59/playnite-systemchecker-plugin/blob/master/wiki/control_01.jpg?raw=true" height="200px">
   </picture>
 </a>
-
-## 📥 Installation
-
-### From Playnite Add-ons Browser (Recommended)
-
-1. Open Playnite
-2. Press `F9` or go to `Add-ons...` from the main menu
-3. Go to `Browse` tab
-4. Search for "System Checker"
-5. Click `Install`
-
-### Manual Installation
-
-1. Download the latest `.pext` file from the [releases page](https://github.com/Lacro59/playnite-systemchecker-plugin/releases/latest)
-2. Drag and drop the file into Playnite
-3. Restart Playnite
-
-## 🚀 Usage
-
-### Initial Setup
-
-1. After installation, open Playnite settings (`F4`)
-2. Navigate to `Extensions` → `System Checker`
-3. Configure your PC specifications (if not auto-detected)
-4. Choose your preferred data sources (PCGamingWiki, Steam, or both)
-
-### Checking Games
-
-The plugin will automatically:
-- Fetch system requirements when you add new games
-- Compare requirements against your PC configuration
-- Display compatibility status in supported views
-
-### Manual Check
-
-To manually check a specific game:
-1. Right-click on a game in your library
-2. Select `Extensions` → `System Checker` → 
 
 ## 🔍 Global Search
 
@@ -142,85 +91,34 @@ Configure your system specifications:
 
 > **Note**: The plugin can auto-detect most specifications, but manual configuration ensures accuracy.
 
-### Display Options
+## 📥 Installation
 
-- **Show in Game List**: Display compatibility indicators in list views
-- **Show in Game Details**: Display detailed requirements in game details page
-- **Indicator Style**: Choose how compatibility is displayed
+### From Playnite Add-ons Browser (Recommended)
 
-## 🎨 Theme Integration
+Please refer to the [Official Playnite Add-on Installation Guide](https://api.playnite.link/docs/manual/features/extensionsSupport/installingExtensions.html).
 
-The extension provides custom controls that theme developers can integrate into their themes.
+### Manual Installation
 
-For theme developers, detailed integration instructions are available in the [wiki](https://github.com/Lacro59/playnite-systemchecker-plugin/wiki/Addition-in-a-custom-theme).
+1. Download the latest `.pext` file from the [releases page](https://github.com/Lacro59/playnite-systemchecker-plugin/releases/latest)
+2. Drag and drop the file into Playnite
+3. Restart Playnite
 
-## 🤝 Contributing
+## 🤝 Contributing & Feedback
+Contributions are welcome! Please follow the templates provided below:
 
-Contributions are welcome! Here's how you can help:
-
-### Reporting Bugs
-
-1. Check if the issue already exists in the [Issues](https://github.com/Lacro59/playnite-systemchecker-plugin/issues) section
-2. If not, create a new issue with:
-   - A clear description of the problem
-   - Steps to reproduce
-   - Expected vs actual behavior
-   - Your Playnite and plugin version
-
-### Feature Requests
-
-Open an issue with the `enhancement` label and describe:
-- The feature you'd like to see
-- Why it would be useful
-- Any implementation ideas you might have
-
-### Pull Requests
-
-> **Important**: The `master` branch represents the current released version. All contributions should be made to the `devel` branch.
-
-1. Fork the repository
-2. Create a feature branch from `devel` (`git checkout devel && git checkout -b feature/amazing-feature`)
-3. Make your changes and commit them (`git commit -m 'Add amazing feature'`)
-4. Push to your fork (`git push origin feature/amazing-feature`)
-5. Open a Pull Request **targeting the `devel` branch**
-
-#### Branch Structure
-- `master` - Current released version (stable)
-- `devel` - Development branch for upcoming releases (all PRs go here)
-
-## 🌍 Translation
-
-Help translate System Checker into your language! 
-
-Translations are managed through [Crowdin](https://crowdin.com/project/playnite-extensions). Simply:
-1. Visit the project page
-2. Select your language
-3. Start translating
-
-Your contributions help make this plugin accessible to users worldwide!
+* 🐛 **[Reporting Bugs](https://github.com/Lacro59/playnite-systemchecker-plugin/issues/new?template=bug_report.md)**: Check existing issues first.
+* ✨ **[Feature Requests](https://github.com/Lacro59/playnite-systemchecker-plugin/issues/new?template=feature_request.md)**: Suggest new ideas.
+* 💻 **[Pull Requests](https://github.com/Lacro59/playnite-systemchecker-plugin/pulls)**: Submit PRs to the `devel` branch only.
+* 🌍 **[Translation](https://crowdin.com/project/playnite-extensions)**: Help us localize the plugin via Crowdin.
 
 ## 💝 Support
+If you find this plugin useful, feel free to support its development:
 
-### Getting Help
+[![Support me on Ko-fi](https://img.shields.io/badge/Support%20me-Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/lacro59)
 
-- **Documentation**: Check the [Wiki](https://github.com/Lacro59/playnite-systemchecker-plugin/wiki) for detailed guides
-- **Issues**: Report bugs or request features on [GitHub Issues](https://github.com/Lacro59/playnite-systemchecker-plugin/issues)
-- **Discussions**: Ask questions on the [Playnite Forum](https://playnite.link/wiki/)
-
-### Support the Project
-
-If you find this plugin useful, consider supporting:
-- **Playnite**: [Patreon](https://www.patreon.com/playnite) - Support the main application
-- **PCGamingWiki**: [Donate](https://www.pcgamingwiki.com/wiki/PCGamingWiki:Donate) - Support the data source
-- **This Plugin**: <a href='https://ko-fi.com/lacro59'><img height='22' src='https://storage.ko-fi.com/cdn/brandasset/v2/support_me_on_kofi_dark.png' alt='Buy Me a Coffee at ko-fi.com' /></a>
+*You can also support the ecosystem:*
+- **Playnite**: [Patreon](https://www.patreon.com/playnite).
+- **PCGamingWiki**: [Donate](https://www.pcgamingwiki.com/wiki/PCGamingWiki:Donate).
 
 ## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/Lacro59/playnite-systemchecker-plugin/blob/master/LICENSE) file for details.
-
----
-
-**Acknowledgments**
-- Icons by [Freepik](https://www.flaticon.com/authors/freepik)
-- Game data from [PCGamingWiki](https://www.pcgamingwiki.com/wiki/Home) and Steam
-- Built for [Playnite](https://playnite.link)
+This project is licensed under the MIT License.
