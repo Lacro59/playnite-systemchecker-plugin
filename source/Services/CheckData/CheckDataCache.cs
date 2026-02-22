@@ -26,7 +26,7 @@ namespace SystemChecker.Services
 
 		static CheckDataCache()
 		{
-			_cacheFilePath = Path.Combine(PluginDatabase.Paths.PluginUserDataPath, "CheckCache.json");
+			_cacheFilePath = Path.Combine(PluginDatabase.Paths.PluginCachePath, "CheckData.json");
 			LoadCache();
 			CleanExpiredEntries();
 		}

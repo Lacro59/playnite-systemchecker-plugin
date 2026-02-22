@@ -156,7 +156,7 @@ namespace SystemChecker.Services
 				{
 					// Initialize services and paths
 					_fileDataService = new FileDataService(PluginDatabase.PluginName, "SystemApi");
-					_cacheFilePath = Path.Combine(PluginDatabase.Paths.PluginUserDataPath, "SystemCheckCache.json");
+					_cacheFilePath = Path.Combine(PluginDatabase.Paths.PluginCachePath, "SystemCheck.json");
 					_currentSystemFingerprint = GenerateSystemFingerprint();
 
 					// Load existing cache from disk
