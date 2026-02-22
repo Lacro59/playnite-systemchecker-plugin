@@ -26,7 +26,7 @@ namespace SystemChecker.Services
         /// </summary>
         /// <param name="args">Arguments containing information about the selected games.</param>
         /// <returns>A list of <see cref="GameMenuItem"/>.</returns>
-        public IEnumerable<GameMenuItem> GetGameMenuItems(GetGameMenuItemsArgs args)
+        public override IEnumerable<GameMenuItem> GetGameMenuItems(GetGameMenuItemsArgs args)
         {
             // Only support single game selection for most features currently
             Game gameMenu = args.Games.First();
@@ -129,7 +129,7 @@ namespace SystemChecker.Services
         /// </summary>
         /// <param name="args">Arguments for main menu items.</param>
         /// <returns>A list of <see cref="MainMenuItem"/>.</returns>
-        public IEnumerable<MainMenuItem> GetMainMenuItems(GetMainMenuItemsArgs args)
+        public override IEnumerable<MainMenuItem> GetMainMenuItems(GetMainMenuItemsArgs args)
         {
             string MenuInExtensions = string.Empty;
             if (_settings.MenuInExtensions)

@@ -22,10 +22,6 @@ namespace SystemChecker
     {
         public override Guid Id { get; } = Guid.Parse("e248b230-6edf-41ea-a3c3-7861fa267263");
 
-        private bool PreventLibraryUpdatedOnStart { get; set; } = true;
-
-        private readonly SystemCheckerMenus _menus;
-
         public SystemChecker(IPlayniteAPI api) : base(api, "SystemChecker")
         {
             // Menus
@@ -114,68 +110,61 @@ namespace SystemChecker
             return _menus.GetMainMenuItems(args);
         }
 
-        #endregion
+		#endregion
 
-        #region Game event
+		#region Game event
 
-        public override void OnGameSelected(OnGameSelectedEventArgs args)
+		public override void OnGameSelected(OnGameSelectedEventArgs args)
+		{
+			try
+			{
+				if (args.NewValue?.Count != 1)
+				{
+					return;
+				}
+
+				Game selectedGame = args.NewValue[0];
+
+				API.Instance.MainView.UIDispatcher.BeginInvoke((Action)delegate
+				{
+					if (!PluginDatabase.IsLoaded)
+					{
+						return;
+					}
+
+					PluginDatabase.GameContext = selectedGame;
+					PluginDatabase.SetThemesResources(selectedGame);
+				});
+			}
+			catch (Exception ex)
+			{
+				Common.LogError(ex, false, true, PluginDatabase.PluginName);
+			}
+		}
+
+		// Add code to be executed when game is finished installing.
+		public override void OnGameInstalled(OnGameInstalledEventArgs args)
         {
-            try
-            {
-                if (args.NewValue?.Count == 1 && PluginDatabase.IsLoaded)
-                {
-                    PluginDatabase.GameContext = args.NewValue[0];
-                    PluginDatabase.SetThemesResources(PluginDatabase.GameContext);
-                }
-                else
-                {
-                    Task.Run(() =>
-                    {
-                        API.Instance.MainView.UIDispatcher.BeginInvoke((Action)delegate
-                        {
-                            if (args.NewValue?.Count == 1)
-                            {
-                                PluginDatabase.GameContext = args.NewValue[0];
-                                PluginDatabase.SetThemesResources(PluginDatabase.GameContext);
-                            }
-                        });
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, false, true, PluginDatabase.PluginName);
-            }
-        }
-
-        // Add code to be executed when game is finished installing.
-        public override void OnGameInstalled(OnGameInstalledEventArgs args)
-        {
-
         }
 
         // Add code to be executed when game is uninstalled.
         public override void OnGameUninstalled(OnGameUninstalledEventArgs args)
         {
-
         }
 
         // Add code to be executed when game is preparing to be started.
         public override void OnGameStarting(OnGameStartingEventArgs args)
         {
-
         }
 
         // Add code to be executed when game is started running.
         public override void OnGameStarted(OnGameStartedEventArgs args)
         {
-
         }
 
         // Add code to be executed when game is preparing to be started.
         public override void OnGameStopped(OnGameStoppedEventArgs args)
         {
-
         }
 
         #endregion
@@ -188,14 +177,13 @@ namespace SystemChecker
             Task.Run(() =>
             {
                 Thread.Sleep(30000);
-                PreventLibraryUpdatedOnStart = false;
+                _preventLibraryUpdatedOnStart = false;
             });
         }
 
         // Add code to be executed when Playnite is shutting down.
         public override void OnApplicationStopped(OnApplicationStoppedEventArgs args)
         {
-
         }
 
         #endregion
@@ -204,7 +192,7 @@ namespace SystemChecker
         // Add code to be executed when library is updated.
         public override void OnLibraryUpdated(OnLibraryUpdatedEventArgs args)
         {
-            if (PluginSettings.Settings.AutoImport && !PreventLibraryUpdatedOnStart)
+            if (PluginSettings.Settings.AutoImport && !_preventLibraryUpdatedOnStart)
             {
                 var PlayniteDb = PlayniteApi.Database.Games
                         .Where(x => x.Added != null && x.Added > PluginSettings.Settings.LastAutoLibUpdateAssetsDownload)
