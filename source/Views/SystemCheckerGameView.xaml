@@ -6,7 +6,9 @@
         xmlns:converters="clr-namespace:SystemChecker.Converters"
         xmlns:controls="clr-namespace:SystemChecker.Controls"
         xmlns:pconverters="clr-namespace:CommonPluginsShared.Converters" 
-        xmlns:pcontrols="clr-namespace:CommonPluginsControls.Controls"
+        xmlns:pcontrols="clr-namespace:CommonPluginsControls.Controls" 
+        xmlns:viewmodels="clr-namespace:SystemChecker.ViewModels" 
+        d:DataContext="{d:DesignInstance Type=viewmodels:SystemCheckerGameViewModel}"
         mc:Ignorable="d" 
         Background="{DynamicResource WindowBackgourndBrush}"
         d:DesignHeight="600" d:DesignWidth="1000">
@@ -15,19 +17,6 @@
         <converters:StatusToColorConverter x:Key="StatusToColorConverter"/>
         <pconverters:NullOrEmptyToVisibilityConverter x:Key="NullOrEmptyToVisibilityConverter"/>
     </UserControl.Resources>
-
-    <!--
-        Styles used (all from Common.xaml) :
-          ViewPluginCard        - data row cards with drop shadow
-          ViewColumnLabelText   - column label (OS, CPU, RAM...)
-          ViewColumnValueText   - data value text
-          SectionHeaderText     - column header titles (Configuration, Minimum, Recommended)
-
-        Per the UI styling rules every TextBlock MUST explicitly declare
-        Style="{DynamicResource BaseTextBlockStyle}" as a base, or use a
-        style that is already BasedOn BaseTextBlockStyle (ViewColumnLabelText,
-        ViewColumnValueText, SectionHeaderText all satisfy this requirement).
-    -->
 
     <Border Style="{StaticResource TopSeparatorBorder}">
 
@@ -41,9 +30,6 @@
 
                 <!-- ═══════════════════════════════════════════════
                      COLUMN HEADERS
-                     Uses ViewPluginCard (Common) with an inline
-                     Background color specific to each column.
-                     SectionHeaderText (Common) for the text.
                 ════════════════════════════════════════════════ -->
                 <Grid Grid.Row="0" Margin="0,0,0,20">
                     <Grid.ColumnDefinitions>
@@ -88,11 +74,6 @@
 
                 <!-- ═══════════════════════════════════════════════
                      MAIN CONTENT
-                     Each row  = ViewPluginCard (Common).
-                     Labels    = ViewColumnLabelText (Common).
-                     Values    = ViewColumnValueText (Common).
-                     Every TextBlock uses a style BasedOn
-                     BaseTextBlockStyle as required by the guidelines.
                 ════════════════════════════════════════════════ -->
                 <StackPanel Grid.Row="1">
 

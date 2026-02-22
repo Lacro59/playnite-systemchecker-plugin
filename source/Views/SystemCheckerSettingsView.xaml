@@ -1,13 +1,4 @@
-﻿<!--
-    SystemCheckerSettingsView.xaml
-    Modernized settings view for the SystemChecker plugin.
-    - Uses Common.xaml shared styles (SectionBorder, ModernCheckBox, PrimaryButton, WarningButton, SectionHeaderText)
-    - All strings use DynamicResource localization keys (no hardcoded text)
-    - Buttons are bound to RelayCommands in the ViewModel (no code-behind handlers)
-    - DockPanel replaces the broken Grid.Column="2" layout for tag buttons
-    - TabControl structure preserved as requested
--->
-<UserControl x:Class="SystemChecker.Views.SystemCheckerSettingsView"
+﻿<UserControl x:Class="SystemChecker.Views.SystemCheckerSettingsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
