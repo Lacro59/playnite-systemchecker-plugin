@@ -137,7 +137,7 @@ namespace SystemChecker.ViewModels
             }
 
             // Load local system configuration
-            SystemConfiguration systemConfiguration = PluginDatabase.Database.PC;
+            SystemConfiguration systemConfiguration = PluginDatabase.PC;
 
             LocalOs = systemConfiguration.Os;
             LocalCpu = systemConfiguration.Cpu;

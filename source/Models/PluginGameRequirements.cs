@@ -1,6 +1,7 @@
 ﻿using CommonPluginsShared.Collections;
 using CommonPluginsShared.Models;
 using CommonPluginsStores.Models;
+using LiteDB;
 using Playnite.SDK.Data;
 
 namespace SystemChecker.Models
@@ -16,6 +17,7 @@ namespace SystemChecker.Models
 		/// Not serialised — recomputed on each access.
 		/// </summary>
 		[DontSerialize]
+		[BsonIgnore]
 		public override bool HasData
 		{
 			get

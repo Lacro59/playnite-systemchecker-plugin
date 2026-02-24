@@ -47,7 +47,7 @@ namespace SystemChecker.Controls
 			PluginDataBaseGameBase pluginGameData,
 			SystemCheckerDatabase pluginDatabase)
 		{
-			SystemConfiguration systemConfiguration = pluginDatabase.Database.PC;
+			SystemConfiguration systemConfiguration = pluginDatabase.PC;
 			if (systemConfiguration == null)
 			{
 				return null;

@@ -70,8 +70,8 @@ namespace SystemChecker.Controls
 #endif
 
 				PluginDatabase.PluginSettings.PropertyChanged += CreatePluginSettingsHandler();
-				PluginDatabase.Database.ItemUpdated += CreateDatabaseItemUpdatedHandler<PluginGameRequirements>();
-				PluginDatabase.Database.ItemCollectionChanged += CreateDatabaseCollectionChangedHandler<PluginGameRequirements>();
+				PluginDatabase.DatabaseItemUpdated += CreateDatabaseItemUpdatedHandler<PluginGameRequirements>();
+				PluginDatabase.DatabaseItemCollectionChanged += CreateDatabaseCollectionChangedHandler<PluginGameRequirements>();
 			});
 
 #if DEBUG

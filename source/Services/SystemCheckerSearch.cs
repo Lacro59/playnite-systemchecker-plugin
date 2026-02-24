@@ -78,11 +78,12 @@ namespace SystemChecker.Services
 			try
 			{
 				SearchParameters searchParams = ParseSearchParameters(args.SearchTerm);
-				SystemConfiguration systemConfiguration = _pluginDatabase.Database.PC;
+				SystemConfiguration systemConfiguration = _pluginDatabase.PC;
 				GameSearchFilterSettings filterSettings = args.GameFilterSettings;
 
-				IEnumerable<PluginGameRequirements> filteredGames = _pluginDatabase.Database
-					.Where(x => MatchesSearchCriteria(x, searchParams, filterSettings));
+				IEnumerable<PluginGameRequirements> filteredGames = _pluginDatabase.GetGamesList()
+					.Select(game => _pluginDatabase.GetOnlyCache(game.Id))
+					.Where(x => x != null && MatchesSearchCriteria(x, searchParams, filterSettings));
 
 				foreach (PluginGameRequirements gameReq in filteredGames)
 				{

@@ -15,13 +15,15 @@ using SystemChecker.Models;
 
 namespace SystemChecker.Services
 {
-	public class SystemCheckerDatabase : PluginDatabaseObject<SystemCheckerSettingsViewModel, RequirementsCollection, PluginGameRequirements, RequirementEntry>
+	public class SystemCheckerDatabase : PluginDatabaseObject<SystemCheckerSettingsViewModel, PluginGameRequirements, RequirementEntry>
 	{
 		/// <summary>
 		/// Exposes the active system configuration manager for external consumers
 		/// (e.g. the settings UI or diagnostic views).
 		/// </summary>
 		public SystemConfigurationManager SystemConfigurationManager { get; private set; }
+
+		public SystemConfiguration PC { get; private set; }
 
 		private PCGamingWikiRequirements _pcGamingWikiRequirements;
 		private SteamRequirements _steamRequirements;
@@ -50,7 +52,7 @@ namespace SystemChecker.Services
 				SystemConfigurationManager = new SystemConfigurationManager(
 					Path.Combine(Paths.PluginUserDataPath, "Configurations.json"));
 
-				_database.PC = SystemConfigurationManager.GetSystemConfiguration();
+				PC = SystemConfigurationManager.GetSystemConfiguration();
 
 				Logger.Info("LoadMoreData completed.");
 			}
@@ -233,7 +235,7 @@ namespace SystemChecker.Services
 			{
 				try
 				{
-					SystemConfiguration systemConfig = Database.PC;
+					SystemConfiguration systemConfig = PC;
 					CheckSystem checkMinimum = SystemApi.CheckConfig(game, item.GetMinimum(), systemConfig, game.IsInstalled);
 					CheckSystem checkRecommended = SystemApi.CheckConfig(game, item.GetRecommended(), systemConfig, game.IsInstalled);
 
@@ -312,7 +314,7 @@ namespace SystemChecker.Services
 				return;
 			}
 
-			SystemConfiguration systemConfig = Database.PC;
+			SystemConfiguration systemConfig = PC;
 			CheckSystem checkMinimum = SystemApi.CheckConfig(game, requirements.GetMinimum(), systemConfig, game.IsInstalled);
 			CheckSystem checkRecommended = SystemApi.CheckConfig(game, requirements.GetRecommended(), systemConfig, game.IsInstalled);
 

@@ -68,9 +68,9 @@ namespace SystemChecker.Controls
 				timer.Step("registering plugin-specific handlers");
 #endif
 
-				PluginDatabase.PluginSettings.PropertyChanged += CreatePluginSettingsHandler();
-				PluginDatabase.Database.ItemUpdated += CreateDatabaseItemUpdatedHandler<PluginGameRequirements>();
-				PluginDatabase.Database.ItemCollectionChanged += CreateDatabaseCollectionChangedHandler<PluginGameRequirements>();
+				PluginDatabase.PluginSettings.PropertyChanged += CreatePluginSettingsHandler(); 
+				PluginDatabase.DatabaseItemUpdated += CreateDatabaseItemUpdatedHandler<PluginGameRequirements>();
+				PluginDatabase.DatabaseItemCollectionChanged += CreateDatabaseCollectionChangedHandler<PluginGameRequirements>();
 			});
 
 #if DEBUG
