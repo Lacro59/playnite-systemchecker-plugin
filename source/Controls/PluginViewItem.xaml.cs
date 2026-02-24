@@ -2,7 +2,6 @@
 using CommonPluginsShared.Collections;
 using CommonPluginsShared.Controls;
 using CommonPluginsShared.Interfaces;
-using CommonPluginsStores.Models;
 using Playnite.SDK;
 using Playnite.SDK.Models;
 using System.Collections.Generic;
@@ -29,33 +28,70 @@ namespace SystemChecker.Controls
 
 		public PluginViewItem()
 		{
+#if DEBUG
+			var timer = new DebugTimer("PluginViewItem.ctor");
+#endif
+
 			InitializeComponent();
+
+#if DEBUG
+			timer.Step("InitializeComponent done");
+#endif
+
 			DataContext = ControlDataContext;
 			Loaded += OnLoaded;
+
+#if DEBUG
+			timer.Stop();
+#endif
 		}
 
 		/// <summary>
 		/// Attaches static event handlers for the SystemChecker plugin.
-		/// Shares the same plugin key as <see cref="PluginButton"/>, so <see cref="AttachPluginEvents"/>
-		/// will no-op for whichever control type loads second — preventing duplicate subscriptions.
+		/// Shares the same plugin key as <see cref="PluginButton"/>, so
+		/// <see cref="PluginUserControlExtendBase.AttachPluginEvents"/> will no-op for whichever control type loads second — preventing duplicate subscriptions.
 		/// </summary>
 		protected override void AttachStaticEvents()
 		{
+#if DEBUG
+			var timer = new DebugTimer("PluginViewItem.AttachStaticEvents");
+#endif
+
 			base.AttachStaticEvents();
+
+#if DEBUG
+			timer.Step("base done");
+#endif
 
 			AttachPluginEvents(PluginDatabase.PluginName, () =>
 			{
+#if DEBUG
+				timer.Step("registering plugin-specific handlers");
+#endif
+
 				PluginDatabase.PluginSettings.PropertyChanged += CreatePluginSettingsHandler();
 				PluginDatabase.Database.ItemUpdated += CreateDatabaseItemUpdatedHandler<PluginGameRequirements>();
 				PluginDatabase.Database.ItemCollectionChanged += CreateDatabaseCollectionChangedHandler<PluginGameRequirements>();
 			});
+
+#if DEBUG
+			timer.Stop();
+#endif
 		}
 
 		public override void SetDefaultDataContext()
 		{
+#if DEBUG
+			var timer = new DebugTimer("PluginViewItem.SetDefaultDataContext");
+#endif
+
 			ControlDataContext.IsActivated = PluginDatabase.PluginSettings.Settings.EnableIntegrationViewItem;
 			ControlDataContext.Text = PluginControlHelper.IconEmpty;
 			ControlDataContext.Foreground = (SolidColorBrush)ResourceProvider.GetResource("GlyphBrush");
+
+#if DEBUG
+			timer.Stop(string.Format("IsActivated={0}", ControlDataContext.IsActivated));
+#endif
 		}
 
 		/// <summary>
@@ -64,11 +100,24 @@ namespace SystemChecker.Controls
 		/// </summary>
 		public override void SetData(Game newContext, PluginDataBaseGameBase pluginGameData)
 		{
+#if DEBUG
+			var timer = new DebugTimer(string.Format("PluginViewItem.SetData(game='{0}')", newContext?.Name ?? "null"));
+#endif
+
 			string newIcon = PluginControlHelper.ResolveIcon(newContext, pluginGameData, PluginDatabase);
+
+#if DEBUG
+			timer.Step(string.Format("ResolveIcon done, icon='{0}'", newIcon));
+#endif
+
 			if (newIcon != null && ControlDataContext.Text != newIcon)
 			{
 				ControlDataContext.Text = newIcon;
 			}
+
+#if DEBUG
+			timer.Stop();
+#endif
 		}
 	}
 
