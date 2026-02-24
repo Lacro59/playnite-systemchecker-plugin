@@ -27,7 +27,7 @@
                             <!-- Menu placement toggle — requires restart -->
                             <CheckBox Style="{StaticResource ModernCheckBox}"
                                       IsChecked="{Binding Settings.MenuInExtensions}"
-                                      Command="{x:Static uiServices:CommandsNavigation.RestartRequired}"
+                                      Command="{x:Static uiServices:CommandsSettings.CmdRestartRequired}"
                                       CommandParameter="{Binding RelativeSource={RelativeSource Self}}">
                                 <TextBlock Style="{DynamicResource BaseTextBlockStyle}"
                                            Text="{DynamicResource LOCCommonMenuInExtensions}" />
