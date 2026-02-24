@@ -99,7 +99,26 @@
                         </StackPanel>
                     </Border>
 
-                </StackPanel>
+					<!-- SECTION: Cache management — non-destructive, no data loss -->
+					<Border Style="{StaticResource SectionBorder}">
+						<StackPanel>
+							<TextBlock Style="{DynamicResource SectionHeaderText}"
+                                Text="{DynamicResource LOCCommonCacheSectionTitle}" />
+
+							<TextBlock Style="{DynamicResource BaseTextBlockStyle}"
+                               Foreground="{DynamicResource TextBrushDarker}"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,10"
+                               Text="{DynamicResource LOCCommonClearCacheDescription}" />
+
+							<Button Style="{StaticResource WarningButton}"
+                                Content="{DynamicResource LOCCommonClearCache}"
+                                HorizontalAlignment="Right"
+                                Command="{Binding CmdClearCache}" />
+						</StackPanel>
+					</Border>
+
+				</StackPanel>
             </ScrollViewer>
         </TabItem>
 

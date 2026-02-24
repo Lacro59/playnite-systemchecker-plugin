@@ -42,10 +42,7 @@ namespace SystemChecker.Controls
 		/// The icon glyph string if evaluation succeeded; <c>null</c> if requirements
 		/// are unavailable or PC configuration is missing.
 		/// </returns>
-		public static string ResolveIcon(
-			Game game,
-			PluginDataBaseGameBase pluginGameData,
-			SystemCheckerDatabase pluginDatabase)
+		public static string ResolveIcon(Game game, PluginDataBaseGameBase pluginGameData, SystemCheckerDatabase pluginDatabase)
 		{
 			SystemConfiguration systemConfiguration = pluginDatabase.PC;
 			if (systemConfiguration == null)
