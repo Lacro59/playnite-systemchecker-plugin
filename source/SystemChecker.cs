@@ -69,17 +69,18 @@ namespace SystemChecker
             }
         }
 
-        #endregion
+		#endregion
 
-        #region Theme integration
+		#region Theme integration
 
-        public override IEnumerable<TopPanelItem> GetTopPanelItems()
+		/// <inheritdoc />
+		public override IEnumerable<TopPanelItem> GetTopPanelItems()
         {
             yield break;
         }
 
-        // List custom controls
-        public override Control GetGameViewControl(GetGameViewControlArgs args)
+		/// <inheritdoc />
+		public override Control GetGameViewControl(GetGameViewControlArgs args)
         {
             if (args.Name == "PluginButton")
             {
@@ -94,18 +95,18 @@ namespace SystemChecker
             return null;
         }
 
-        #endregion
+		#endregion
 
-        #region Menus
+		#region Menus
 
-        // To add new game menu items override GetGameMenuItems
-        public override IEnumerable<GameMenuItem> GetGameMenuItems(GetGameMenuItemsArgs args)
+		/// <inheritdoc />
+		public override IEnumerable<GameMenuItem> GetGameMenuItems(GetGameMenuItemsArgs args)
         {
             return _menus.GetGameMenuItems(args);
         }
 
-        // To add new main menu items override GetMainMenuItems
-        public override IEnumerable<MainMenuItem> GetMainMenuItems(GetMainMenuItemsArgs args)
+		/// <inheritdoc />
+		public override IEnumerable<MainMenuItem> GetMainMenuItems(GetMainMenuItemsArgs args)
         {
             return _menus.GetMainMenuItems(args);
         }
@@ -114,6 +115,7 @@ namespace SystemChecker
 
 		#region Game event
 
+		/// <inheritdoc />
 		public override void OnGameSelected(OnGameSelectedEventArgs args)
 		{
 			try
@@ -142,37 +144,37 @@ namespace SystemChecker
 			}
 		}
 
-		// Add code to be executed when game is finished installing.
+		/// <inheritdoc />
 		public override void OnGameInstalled(OnGameInstalledEventArgs args)
         {
         }
 
-        // Add code to be executed when game is uninstalled.
-        public override void OnGameUninstalled(OnGameUninstalledEventArgs args)
+		/// <inheritdoc />
+		public override void OnGameUninstalled(OnGameUninstalledEventArgs args)
         {
         }
 
-        // Add code to be executed when game is preparing to be started.
-        public override void OnGameStarting(OnGameStartingEventArgs args)
+		/// <inheritdoc />
+		public override void OnGameStarting(OnGameStartingEventArgs args)
         {
         }
 
-        // Add code to be executed when game is started running.
-        public override void OnGameStarted(OnGameStartedEventArgs args)
+		/// <inheritdoc />
+		public override void OnGameStarted(OnGameStartedEventArgs args)
         {
         }
 
-        // Add code to be executed when game is preparing to be started.
-        public override void OnGameStopped(OnGameStoppedEventArgs args)
+		/// <inheritdoc />
+		public override void OnGameStopped(OnGameStoppedEventArgs args)
         {
         }
 
-        #endregion
+		#endregion
 
-        #region Application event
+		#region Application event
 
-        // Add code to be executed when Playnite is initialized.
-        public override void OnApplicationStarted(OnApplicationStartedEventArgs args)
+		/// <inheritdoc />
+		public override void OnApplicationStarted(OnApplicationStartedEventArgs args)
         {
             Task.Run(() =>
             {
@@ -181,20 +183,19 @@ namespace SystemChecker
             });
         }
 
-        // Add code to be executed when Playnite is shutting down.
-        public override void OnApplicationStopped(OnApplicationStoppedEventArgs args)
+		/// <inheritdoc />
+		public override void OnApplicationStopped(OnApplicationStoppedEventArgs args)
         {
         }
 
-        #endregion
+		#endregion
 
-
-        // Add code to be executed when library is updated.
-        public override void OnLibraryUpdated(OnLibraryUpdatedEventArgs args)
+		/// <inheritdoc />
+		public override void OnLibraryUpdated(OnLibraryUpdatedEventArgs args)
         {
             if (PluginSettings.Settings.AutoImport && !_preventLibraryUpdatedOnStart)
             {
-                var PlayniteDb = PlayniteApi.Database.Games
+                var playniteDb = PlayniteApi.Database.Games
                         .Where(x => x.Added != null && x.Added > PluginSettings.Settings.LastAutoLibUpdateAssetsDownload)
                         .ToList();
 
@@ -211,15 +212,15 @@ namespace SystemChecker
                         Stopwatch stopWatch = new Stopwatch();
                         stopWatch.Start();
 
-                        a.ProgressMaxValue = (double)PlayniteDb.Count();
+                        a.ProgressMaxValue = (double)playniteDb.Count();
 
-                        string CancelText = string.Empty;
+                        string cancelText = string.Empty;
 
-                        foreach (Game game in PlayniteDb)
+                        foreach (Game game in playniteDb)
                         {
                             if (a.CancelToken.IsCancellationRequested)
                             {
-                                CancelText = " canceled";
+								cancelText = " canceled";
                                 break;
                             }
 
@@ -231,7 +232,7 @@ namespace SystemChecker
 
                         stopWatch.Stop();
                         TimeSpan ts = stopWatch.Elapsed;
-                        Logger.Info($"Task OnLibraryUpdated(){CancelText} - {string.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10)} for {a.CurrentProgressValue}/{(double)PlayniteDb.Count()} items");
+                        Logger.Info($"Task OnLibraryUpdated(){cancelText} - {string.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10)} for {a.CurrentProgressValue}/{(double)playniteDb.Count()} items");
                     }
                     catch (Exception ex)
                     {
@@ -244,14 +245,16 @@ namespace SystemChecker
             }
         }
 
-        #region Settings
+		#region Settings
 
-        public override ISettings GetSettings(bool firstRunSettings)
+		/// <inheritdoc />
+		public override ISettings GetSettings(bool firstRunSettings)
         {
             return PluginSettings;
         }
 
-        public override UserControl GetSettingsView(bool firstRunSettings)
+		/// <inheritdoc />
+		public override UserControl GetSettingsView(bool firstRunSettings)
         {
             return new SystemCheckerSettingsView();
         }
