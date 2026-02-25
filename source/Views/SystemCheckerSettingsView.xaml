@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:AttachedProperties="clr-namespace:CommonPluginsShared.Controls"
-             xmlns:uiServices="clr-namespace:CommonPluginsShared.UI"
+             xmlns:uiServices="clr-namespace:CommonPluginsShared.Commands"
              xmlns:SystemChecker="clr-namespace:SystemChecker"
              mc:Ignorable="d" d:DesignWidth="650"
              d:DataContext="{d:DesignInstance SystemChecker:SystemCheckerSettingsViewModel}">
@@ -27,7 +27,7 @@
                             <!-- Menu placement toggle — requires restart -->
                             <CheckBox Style="{StaticResource ModernCheckBox}"
                                       IsChecked="{Binding Settings.MenuInExtensions}"
-                                      Command="{x:Static uiServices:CommandsSettings.CmdRestartRequired}"
+                                      Command="{x:Static uiServices:CommandsPlugin.CmdRestartRequired}"
                                       CommandParameter="{Binding RelativeSource={RelativeSource Self}}">
                                 <TextBlock Style="{DynamicResource BaseTextBlockStyle}"
                                            Text="{DynamicResource LOCCommonMenuInExtensions}" />
