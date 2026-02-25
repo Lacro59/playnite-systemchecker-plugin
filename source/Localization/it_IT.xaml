@@ -3,27 +3,27 @@
 
     <!-- General -->
     <sys:String x:Key="LOCSystemChecker">SystemChecker</sys:String>
-    <sys:String x:Key="LOCSystemCheckerCheckConfig">Check System Requirements</sys:String>
-    <sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Refresh System Information</sys:String>
+    <sys:String x:Key="LOCSystemCheckerCheckConfig">Verifica Requisiti Di Sistema</sys:String>
+    <sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Aggiorna Informazioni Di Sistema</sys:String>
 
     <!-- Game Details View -->
     <sys:String x:Key="LOCSystemCheckerConfigMinimum">Minimo</sys:String>
     <sys:String x:Key="LOCSystemCheckerConfigRecommended">Consigliato</sys:String>
 
-    <sys:String x:Key="LOCSystemCheckerOS">Operating System</sys:String>
+    <sys:String x:Key="LOCSystemCheckerOS">Sistema operativo</sys:String>
     <sys:String x:Key="LOCSystemCheckerCpu">Processore</sys:String>
     <sys:String x:Key="LOCSystemCheckerRam">Memoria</sys:String>
     <sys:String x:Key="LOCSystemCheckerGpu">Grafica</sys:String>
     <sys:String x:Key="LOCSystemCheckerDisk">Archiviazione</sys:String>
 
     <!-- Notifications -->
-    <sys:String x:Key="LOCSystemCheckerTryRefresh">Try to refresh plugin data for {0}</sys:String>
+    <sys:String x:Key="LOCSystemCheckerTryRefresh">Prova ad aggiornare i dati del plugin per {0}</sys:String>
     <sys:String x:Key="LOCSystemCheckerAddTagError">Si è verificato un errore durante l'aggiunta di tag. Per favore riprova.</sys:String>
     <sys:String x:Key="LOCSystemCheckerRemoveTagError">Si è verificato un errore durante la rimozione dei tag. Per favore riprova.</sys:String>
     <sys:String x:Key="LOCSystemCheckerClearAllError">Si è verificato un errore durante la cancellazione dei dati del plugin. Per favore riprova.</sys:String>
 
     <!-- Search -->
-    <sys:String x:Key="LOCSystemCheckerSearchDescription">Search System Checker data</sys:String>
+    <sys:String x:Key="LOCSystemCheckerSearchDescription">Cerca dati del Controllo di sistema</sys:String>
     <sys:String x:Key="LOCSystemCheckerSearchHint" xml:space="preserve">Parameters:
     -min		Matches minimum requirements
     -rec		Matches recommended requirements
