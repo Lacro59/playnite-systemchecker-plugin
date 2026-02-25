@@ -28,12 +28,12 @@ namespace SystemChecker.Services
 		private const string StoresPrefix = "-stores=";
 		private const string StatusPrefix = "-status=";
 
-		// Pre-compiled regex for performance optimization
+		// Pre-compiled regex for performance
 		private static readonly Regex StoresRegex = new Regex(StoresPattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
 		private static readonly Regex StatusRegex = new Regex(StatusPattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
 		private static readonly Regex FlagsRegex = new Regex(FlagsPattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-		// Cached split characters to avoid repeated allocations
+		// Cached split chars to avoid repeated allocations
 		private static readonly char[] SplitChars = new char[] { ' ' };
 		private static readonly char[] CommaSplitChars = new char[] { ',' };
 
@@ -53,6 +53,7 @@ namespace SystemChecker.Services
 
 		/// <summary>
 		/// Gets search results based on the provided search term and filters.
+		/// Optimized: PLINQ parallelism + single SystemApi.CheckConfig() evaluation pass per game.
 		/// </summary>
 		/// <param name="args">Search arguments containing the search term, filters, and cancellation token.</param>
 		/// <returns>A collection of search items matching the criteria, or an empty collection if no matches found.</returns>
@@ -73,38 +74,84 @@ namespace SystemChecker.Services
 				return Enumerable.Empty<SearchItem>();
 			}
 
-			List<SearchItem> searchItems = new List<SearchItem>();
-
 			try
 			{
 				SearchParameters searchParams = ParseSearchParameters(args.SearchTerm);
 				SystemConfiguration systemConfiguration = _pluginDatabase.PC;
 				GameSearchFilterSettings filterSettings = args.GameFilterSettings;
 
-				IEnumerable<PluginGameRequirements> filteredGames = _pluginDatabase.GetGamesList()
-					.Select(game => _pluginDatabase.GetOnlyCache(game.Id))
-					.Where(x => x != null && MatchesSearchCriteria(x, searchParams, filterSettings));
-
-				foreach (PluginGameRequirements gameReq in filteredGames)
-				{
-					if (args.CancelToken.IsCancellationRequested)
-					{
-						break;
-					}
-
-					if (IsGameValid(gameReq, searchParams, systemConfiguration, out Game game, out string requirementStatus))
-					{
-						searchItems.Add(CreateSearchItem(game, requirementStatus));
-					}
-				}
+				return _pluginDatabase.GetAllCache()
+							.AsParallel()
+							.WithCancellation(args.CancelToken)
+							.Where(x => x != null && MatchesSearchCriteria(x, searchParams, filterSettings))
+							.Select(gameReq => BuildValidatedSearchItem(gameReq, searchParams, systemConfiguration))
+							.Where(item => item != null)
+							.ToList();
+			}
+			catch (OperationCanceledException)
+			{
+				return Enumerable.Empty<SearchItem>();
 			}
 			catch (Exception ex)
 			{
 				Common.LogError(ex, false);
 				return Enumerable.Empty<SearchItem>();
 			}
+		}
 
-			return searchItems;
+		/// <summary>
+		/// Evaluates requirements once and builds the search item if valid.
+		/// Core optimization: SystemApi.CheckConfig() est appelé au maximum 2x par jeu
+		/// au lieu de 4x dans l'implémentation originale.
+		/// </summary>
+		/// <param name="gameReq">Les données de requirements du jeu.</param>
+		/// <param name="searchParams">Les paramètres de recherche parsés.</param>
+		/// <param name="systemConfiguration">La configuration système actuelle.</param>
+		/// <returns>Un <see cref="SearchItem"/> configuré, ou null si le jeu ne passe pas les filtres.</returns>
+		private SearchItem BuildValidatedSearchItem(PluginGameRequirements gameReq, SearchParameters searchParams, SystemConfiguration systemConfiguration)
+		{
+			Game game = API.Instance.Database.Games.Get(gameReq.Id);
+			if (game == null)
+			{
+				return null;
+			}
+
+			// Évaluation unique des requirements — résultats réutilisés pour le filtre ET la description
+			RequirementCheckResult checkResult = EvaluateRequirements(
+				game,
+				gameReq.GetMinimum(),
+				gameReq.GetRecommended(),
+				systemConfiguration);
+
+			bool hasSystemFilters = searchParams.HasMin || searchParams.HasRec || searchParams.HasAny;
+			if (hasSystemFilters && !PassesSystemFilter(checkResult, searchParams))
+			{
+				return null;
+			}
+
+			string requirementStatus = BuildGameDescription(checkResult, gameReq, game);
+			return CreateSearchItem(game, requirementStatus);
+		}
+
+		/// <summary>
+		/// Checks if pre-computed requirement results satisfy the active system requirement flags.
+		/// </summary>
+		/// <param name="checkResult">Les résultats pré-calculés.</param>
+		/// <param name="searchParams">Les paramètres de recherche.</param>
+		/// <returns>True si le jeu satisfait au moins un des filtres actifs.</returns>
+		private bool PassesSystemFilter(RequirementCheckResult checkResult, SearchParameters searchParams)
+		{
+			if ((searchParams.HasMin || searchParams.HasAny) && checkResult.MeetsMinimum)
+			{
+				return true;
+			}
+
+			if ((searchParams.HasRec || searchParams.HasAny) && checkResult.MeetsRecommended)
+			{
+				return true;
+			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -115,7 +162,7 @@ namespace SystemChecker.Services
 		/// <returns>A configured <see cref="SearchItem"/> instance.</returns>
 		private SearchItem CreateSearchItem(Game game, string requirementStatus)
 		{
-			SearchItem searchItem = new SearchItem(
+			return new SearchItem(
 				game.Name,
 				new SearchItemAction(
 					ResourceProvider.GetString("LOCGameSearchItemActionSwitchTo"),
@@ -127,8 +174,6 @@ namespace SystemChecker.Services
 				Description = requirementStatus,
 				Icon = game.Icon
 			};
-
-			return searchItem;
 		}
 
 		/// <summary>
@@ -146,7 +191,6 @@ namespace SystemChecker.Services
 				ProcessSearchTerm(term, parameters);
 			}
 
-			// Remove all flags from search term to get the actual game name query
 			parameters.CleanSearchTerm = CleanSearchTerm(searchTerm);
 			return parameters;
 		}
@@ -154,9 +198,6 @@ namespace SystemChecker.Services
 		/// <summary>
 		/// Processes a single search term and updates parameters accordingly.
 		/// </summary>
-		/// <param name="term">The term to process.</param>
-		/// <param name="parameters">The parameters object to update.</param>
-		/// <returns>True if the term was processed as a flag or parameter; otherwise, false.</returns>
 		private bool ProcessSearchTerm(string term, SearchParameters parameters)
 		{
 			if (term.Length <= 1 || term[0] != '-')
@@ -182,9 +223,7 @@ namespace SystemChecker.Services
 		/// </summary>
 		private bool TryParseFlag(string term, SearchParameters parameters)
 		{
-			string flag = term.ToLowerInvariant();
-
-			switch (flag)
+			switch (term.ToLowerInvariant())
 			{
 				case "-min":
 					parameters.HasMin = true;
@@ -247,8 +286,6 @@ namespace SystemChecker.Services
 		/// <summary>
 		/// Removes all flags and parameters from the search term using regex replacements.
 		/// </summary>
-		/// <param name="searchTerm">The original search term.</param>
-		/// <returns>The cleaned search term containing only the game name query.</returns>
 		private string CleanSearchTerm(string searchTerm)
 		{
 			string cleaned = StoresRegex.Replace(searchTerm, string.Empty);
@@ -261,9 +298,9 @@ namespace SystemChecker.Services
 		/// Determines whether a game matches all specified search criteria.
 		/// Uses early exit pattern for optimal performance.
 		/// </summary>
-		private bool MatchesSearchCriteria(PluginGameRequirements game, SearchParameters searchParams, GameSearchFilterSettings filterSettings)
+		private bool MatchesSearchCriteria(PluginGameRequirements game, SearchParameters searchParams,
+			GameSearchFilterSettings filterSettings)
 		{
-			// Early exits ordered by likelihood of rejection for performance
 			if (game.IsDeleted)
 			{
 				return false;
@@ -360,7 +397,6 @@ namespace SystemChecker.Services
 
 		/// <summary>
 		/// Checks if the game's completion status matches any of the specified statuses.
-		/// Uses IndexOf for partial matching support.
 		/// </summary>
 		private bool MatchesStatusFilter(PluginGameRequirements game, SearchParameters searchParams)
 		{
@@ -380,137 +416,9 @@ namespace SystemChecker.Services
 		}
 
 		/// <summary>
-		/// Validates if a game meets the system requirement filters specified in the search.
-		/// </summary>
-		/// <param name="gameReq">The game requirements data.</param>
-		/// <param name="searchParams">The parsed search parameters.</param>
-		/// <param name="systemConfiguration">The current system configuration.</param>
-		/// <param name="game">Output parameter containing the game object if valid.</param>
-		/// <param name="requirementStatus">Output parameter containing the requirement status description.</param>
-		/// <returns>True if the game is valid and meets the requirement filters; otherwise, false.</returns>
-		private bool IsGameValid(PluginGameRequirements gameReq, SearchParameters searchParams,
-			SystemConfiguration systemConfiguration, out Game game, out string requirementStatus)
-		{
-			game = API.Instance.Database.Games.Get(gameReq.Id);
-			requirementStatus = string.Empty;
-
-			// If no system requirement filters specified, include all games
-			bool hasSystemFilters = searchParams.HasMin || searchParams.HasRec || searchParams.HasAny;
-			if (!hasSystemFilters)
-			{
-				requirementStatus = BuildGameDescription(gameReq, systemConfiguration, game);
-				return true;
-			}
-
-			RequirementEntry systemMinimum = gameReq.GetMinimum();
-			RequirementEntry systemRecommended = gameReq.GetRecommended();
-
-			// Check if game meets minimum requirements (when -min or -any flag is present)
-			if (CheckRequirementLevel(game, systemMinimum, systemConfiguration, searchParams.HasMin, searchParams.HasAny))
-			{
-				requirementStatus = BuildGameDescription(gameReq, systemConfiguration, game);
-				return true;
-			}
-
-			// Check if game meets recommended requirements (when -rec or -any flag is present)
-			if (CheckRequirementLevel(game, systemRecommended, systemConfiguration, searchParams.HasRec, searchParams.HasAny))
-			{
-				requirementStatus = BuildGameDescription(gameReq, systemConfiguration, game);
-				return true;
-			}
-
-			return false;
-		}
-
-		/// <summary>
-		/// Checks if the current system meets a specific requirement level.
-		/// </summary>
-		/// <param name="game">The game to check.</param>
-		/// <param name="requirement">The requirement entry (minimum or recommended).</param>
-		/// <param name="systemConfiguration">The current system configuration.</param>
-		/// <param name="checkLevel">Whether to check this specific level (e.g., minimum).</param>
-		/// <param name="checkAny">Whether the "any" flag is active (checks both levels).</param>
-		/// <returns>True if the system meets the requirement level; otherwise, false.</returns>
-		private bool CheckRequirementLevel(Game game, RequirementEntry requirement,
-			SystemConfiguration systemConfiguration, bool checkLevel, bool checkAny)
-		{
-			if (!requirement.HasData || (!checkLevel && !checkAny))
-			{
-				return false;
-			}
-
-			CheckSystem checkResult = SystemApi.CheckConfig(game, requirement, systemConfiguration, game.IsInstalled);
-			return (bool)checkResult.AllOk;
-		}
-
-		/// <summary>
-		/// Builds a comprehensive description of the game including requirements, install state, and play status.
-		/// </summary>
-		/// <returns>A formatted string with status information.</returns>
-		private string BuildGameDescription(PluginGameRequirements gameReq,
-			SystemConfiguration systemConfiguration, Game game)
-		{
-			List<string> parts = new List<string>();
-
-			// 1. Requirement Status
-			parts.Add(GetRequirementStatus(gameReq, systemConfiguration, game));
-
-			// 2. Installation Status
-			if (game.IsInstalled)
-			{
-				parts.Add(ResourceProvider.GetString("LOCGameIsGameInstalledTitle"));
-			}
-			else
-			{
-				parts.Add(ResourceProvider.GetString("LOCGameIsUnInstalledTitle"));
-			}
-
-			// 3. Play Status (Completion Status or Playtime)
-			if (game.CompletionStatus != null)
-			{
-				parts.Add(game.CompletionStatus.Name);
-			}
-			else if (game.Playtime > 0)
-			{
-				// Format playtime (e.g., "Played 5h 30m")
-				TimeSpan timePlayed = TimeSpan.FromSeconds(game.Playtime);
-				string timeString = timePlayed.TotalHours >= 1
-					? $"{(int)timePlayed.TotalHours}h {timePlayed.Minutes}m"
-					: $"{timePlayed.Minutes}m";
-
-				parts.Add($"{ResourceProvider.GetString("LOCTimePlayed")} ({timeString})");
-			}
-			else
-			{
-				parts.Add(ResourceProvider.GetString("LOCPlayedNone"));
-			}
-
-			return string.Join(" • ", parts);
-		}
-
-		/// <summary>
-		/// Gets determining status requirement message.
-		/// </summary>
-		private string GetRequirementStatus(PluginGameRequirements gameReq, SystemConfiguration systemConfiguration, Game game)
-		{
-			RequirementEntry systemMinimum = gameReq.GetMinimum();
-			RequirementEntry systemRecommended = gameReq.GetRecommended();
-
-			if (!systemMinimum.HasData && !systemRecommended.HasData)
-			{
-				return ResourceProvider.GetString("LOCSystemCheckerSearchNoData");
-			}
-
-			RequirementCheckResult checkResult = EvaluateRequirements(
-				game, systemMinimum, systemRecommended, systemConfiguration);
-
-			return GetStatusMessage(checkResult);
-		}
-
-		/// <summary>
 		/// Evaluates the current system against both minimum and recommended requirements.
+		/// Called at most once per game — résultats partagés entre filtrage et description.
 		/// </summary>
-		/// <returns>A <see cref="RequirementCheckResult"/> containing evaluation results.</returns>
 		private RequirementCheckResult EvaluateRequirements(Game game, RequirementEntry systemMinimum,
 			RequirementEntry systemRecommended, SystemConfiguration systemConfiguration)
 		{
@@ -536,17 +444,69 @@ namespace SystemChecker.Services
 		}
 
 		/// <summary>
+		/// Builds a comprehensive description of the game including requirements, install state, and play status.
+		/// Accepts pre-computed <see cref="RequirementCheckResult"/> — aucun appel supplémentaire à SystemApi.
+		/// </summary>
+		private string BuildGameDescription(RequirementCheckResult checkResult,
+			PluginGameRequirements gameReq, Game game)
+		{
+			// Capacité initiale connue = 4 éléments → évite les réallocations internes
+			List<string> parts = new List<string>(4);
+
+			parts.Add(PlayniteTools.GetSourceName(game));
+			parts.Add(GetStatusMessage(checkResult, gameReq));
+
+			parts.Add(game.IsInstalled
+				? ResourceProvider.GetString("LOCGameIsGameInstalledTitle")
+				: ResourceProvider.GetString("LOCGameIsUnInstalledTitle"));
+
+			if (game.CompletionStatus != null)
+			{
+				parts.Add(game.CompletionStatus.Name);
+			}
+			else if (game.Playtime > 0)
+			{
+				TimeSpan timePlayed = TimeSpan.FromSeconds(game.Playtime);
+				string timeString = timePlayed.TotalHours >= 1
+					? $"{(int)timePlayed.TotalHours}h {timePlayed.Minutes}m"
+					: $"{timePlayed.Minutes}m";
+
+				parts.Add($"{ResourceProvider.GetString("LOCTimePlayed")} ({timeString})");
+			}
+			else
+			{
+				parts.Add(ResourceProvider.GetString("LOCPlayedNone"));
+			}
+
+			return string.Join(" \u2022 ", parts);
+		}
+
+		/// <summary>
+		/// Resolves status message from pre-computed results.
+		/// Fallback vers "no data" si aucun requirement n'est disponible.
+		/// </summary>
+		private string GetStatusMessage(RequirementCheckResult checkResult, PluginGameRequirements gameReq)
+		{
+			if (!checkResult.HasMinimum && !checkResult.HasRecommended)
+			{
+				return ResourceProvider.GetString("LOCSystemCheckerSearchNoData");
+			}
+
+			return GetStatusMessage(checkResult);
+		}
+
+		/// <summary>
 		/// Gets the appropriate status message based on requirement check results.
 		/// Priority: Recommended > Minimum > Below Minimum.
 		/// </summary>
-		private string GetStatusMessage(RequirementCheckResult result)
+		private string GetStatusMessage(RequirementCheckResult checkResult)
 		{
-			if (result.MeetsRecommended)
+			if (checkResult.MeetsRecommended)
 			{
 				return ResourceProvider.GetString("LOCSystemCheckerSearchMeetsRecommended");
 			}
 
-			if (result.MeetsMinimum)
+			if (checkResult.MeetsMinimum)
 			{
 				return ResourceProvider.GetString("LOCSystemCheckerSearchMeetsMinimum");
 			}
@@ -556,6 +516,7 @@ namespace SystemChecker.Services
 
 		/// <summary>
 		/// Internal data structure for caching requirement check results.
+		/// Évite la ré-évaluation entre le filtrage et la construction de la description.
 		/// </summary>
 		private class RequirementCheckResult
 		{
