@@ -4,18 +4,13 @@ using AngleSharp.Parser.Html;
 using CommonPluginsShared;
 using CommonPluginsShared.Extensions;
 using CommonPluginsShared.IO;
-using CommonPluginsStores.Models;
 using FuzzySharp;
 using Playnite.SDK;
-using Playnite.SDK.Data;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
 using SystemChecker.Models;
 using SystemChecker.Services;
 
