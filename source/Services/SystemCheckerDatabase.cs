@@ -227,7 +227,8 @@ namespace SystemChecker.Services
 		#region Tag management
 
 		/// <inheritdoc/>
-		public override void AddTag(Game game)
+		/// <inheritdoc/>
+		protected override bool AppendPluginTag(Game game)
 		{
 			PluginGameRequirements item = Get(game, true);
 
@@ -239,45 +240,38 @@ namespace SystemChecker.Services
 					CheckSystem checkMinimum = SystemApi.CheckConfig(game, item.GetMinimum(), systemConfig, game.IsInstalled);
 					CheckSystem checkRecommended = SystemApi.CheckConfig(game, item.GetRecommended(), systemConfig, game.IsInstalled);
 
-					// Nothing to tag when the system does not meet even the minimum.
 					if (!(checkMinimum.AllOk ?? false) && !(checkRecommended.AllOk ?? false))
-					{
-						return;
-					}
+						return false;
 
 					Guid? tagId = ResolveSystemTag(checkMinimum, checkRecommended);
 					if (tagId != null)
 					{
 						AppendTagId(game, tagId.Value);
+						return true;
 					}
 				}
 				catch (Exception ex)
 				{
-					Common.LogError(ex, false, $"Tag insert error — {game.Name}", true, PluginName,
+					Common.LogError(ex, false, $"Tag insert error {game.Name}", true, PluginName,
 						string.Format(ResourceProvider.GetString("LOCCommonNotificationTagError"), game.Name));
-					return;
 				}
+				return false;
 			}
-			else if (TagMissing)
+
+			if (TagMissing)
 			{
 				Guid? noDataTagId = AddNoDataTag();
 				if (noDataTagId != null)
 				{
 					AppendTagId(game, noDataTagId.Value);
+					return true;
 				}
 			}
 
-			// Buffer the Games collection update to avoid triggering repeated UI redraws.
-			API.Instance.Database.Games.BeginBufferUpdate();
-			try
-			{
-				PersistGameUpdate(game);
-			}
-			finally
-			{
-				API.Instance.Database.Games.EndBufferUpdate();
-			}
+			return false;
 		}
+
+
 
 		/// <summary>
 		/// Returns the tag ID that best represents the system's compatibility:
