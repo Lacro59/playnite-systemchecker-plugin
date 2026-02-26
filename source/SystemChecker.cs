@@ -25,7 +25,7 @@ namespace SystemChecker
         public SystemChecker(IPlayniteAPI api) : base(api, "SystemChecker")
         {
             // Menus
-            _menus = new SystemCheckerMenus(PluginSettings.Settings, PluginDatabase);
+            _menus = new SystemCheckerMenus(PluginSettingsViewModel.Settings, PluginDatabase);
 
             // Custom theme button
             EventManager.RegisterClassHandler(typeof(Button), Button.ClickEvent, new RoutedEventHandler(OnCustomThemeButtonClick));
@@ -34,20 +34,20 @@ namespace SystemChecker
             AddCustomElementSupport(new AddCustomElementSupportArgs
             {
                 ElementList = new List<string> { "PluginButton", "PluginViewItem" },
-                SourceName = "SystemChecker"
-            });
+                SourceName = PluginName
+			});
 
             // Settings integration
             AddSettingsSupport(new AddSettingsSupportArgs
             {
-                SourceName = "SystemChecker",
-                SettingsRoot = $"{nameof(PluginSettings)}.{nameof(PluginSettings.Settings)}"
+                SourceName = PluginName,
+                SettingsRoot = $"{nameof(PluginSettingsViewModel)}.{nameof(PluginSettingsViewModel.Settings)}"
             });
 
             //Playnite search integration
             Searches = new List<SearchSupport>
             {
-                new SearchSupport("sc", "SystemChecker", new SystemCheckerSearch())
+                new SearchSupport("sc", PluginName, new SystemCheckerSearch())
             };
         }
 
@@ -179,7 +179,7 @@ namespace SystemChecker
             Task.Run(() =>
             {
                 Thread.Sleep(20000);
-				PluginSettings.Settings.PreventLibraryUpdatedOnStart = false;
+				PluginSettingsViewModel.Settings.PreventLibraryUpdatedOnStart = false;
             });
         }
 
@@ -193,10 +193,10 @@ namespace SystemChecker
 		/// <inheritdoc />
 		public override void OnLibraryUpdated(OnLibraryUpdatedEventArgs args)
         {
-            if (PluginSettings.Settings.AutoImport && !PluginSettings.Settings.PreventLibraryUpdatedOnStart)
+            if (PluginSettingsViewModel.Settings.AutoImport && !PluginSettingsViewModel.Settings.PreventLibraryUpdatedOnStart)
             {
                 var playniteDb = PlayniteApi.Database.Games
-                        .Where(x => x.Added != null && x.Added > PluginSettings.Settings.LastAutoLibUpdateAssetsDownload);
+                        .Where(x => x.Added != null && x.Added > PluginSettingsViewModel.Settings.LastAutoLibUpdateAssetsDownload);
 
                 GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions($"SystemChecker - {ResourceProvider.GetString("LOCCommonGettingData")}")
                 {
@@ -239,8 +239,8 @@ namespace SystemChecker
                     }
                 }, globalProgressOptions);
 
-                PluginSettings.Settings.LastAutoLibUpdateAssetsDownload = DateTime.Now;
-                SavePluginSettings(PluginSettings.Settings);
+                PluginSettingsViewModel.Settings.LastAutoLibUpdateAssetsDownload = DateTime.Now;
+                SavePluginSettings(PluginSettingsViewModel.Settings);
             }
         }
 
@@ -249,7 +249,7 @@ namespace SystemChecker
 		/// <inheritdoc />
 		public override ISettings GetSettings(bool firstRunSettings)
         {
-            return PluginSettings;
+            return PluginSettingsViewModel;
         }
 
 		/// <inheritdoc />

@@ -29,8 +29,8 @@ namespace SystemChecker.Services
 		private SteamRequirements _steamRequirements;
 		private SteamApi _steamApi;
 
-		public SystemCheckerDatabase(SystemCheckerSettingsViewModel pluginSettings, string pluginUserDataPath)
-			: base(pluginSettings, "SystemChecker", pluginUserDataPath)
+		public SystemCheckerDatabase(SystemCheckerSettingsViewModel pluginSettingsViewModel, string pluginUserDataPath)
+			: base(pluginSettingsViewModel, "SystemChecker", pluginUserDataPath)
 		{
 			TagBefore = "[SC]";
 			PluginWindows = new SystemCheckWindows(PluginName, this);
