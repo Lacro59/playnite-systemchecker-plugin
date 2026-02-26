@@ -15,7 +15,7 @@ using SystemChecker.Models;
 
 namespace SystemChecker.Services
 {
-	public class SystemCheckerDatabase : PluginDatabaseObject<SystemCheckerSettingsViewModel, PluginGameRequirements, RequirementEntry>
+	public class SystemCheckerDatabase : PluginDatabaseObject<SystemCheckerSettings, PluginGameRequirements, RequirementEntry>
 	{
 		/// <summary>
 		/// Exposes the active system configuration manager for external consumers
@@ -29,8 +29,8 @@ namespace SystemChecker.Services
 		private SteamRequirements _steamRequirements;
 		private SteamApi _steamApi;
 
-		public SystemCheckerDatabase(SystemCheckerSettingsViewModel pluginSettingsViewModel, string pluginUserDataPath)
-			: base(pluginSettingsViewModel, "SystemChecker", pluginUserDataPath)
+		public SystemCheckerDatabase(SystemCheckerSettings pluginSettings, string pluginUserDataPath)
+			: base(pluginSettings, "SystemChecker", pluginUserDataPath)
 		{
 			TagBefore = "[SC]";
 			PluginWindows = new SystemCheckWindows(PluginName, this);
@@ -312,37 +312,37 @@ namespace SystemChecker.Services
 			CheckSystem checkMinimum = SystemApi.CheckConfig(game, requirements.GetMinimum(), systemConfig, game.IsInstalled);
 			CheckSystem checkRecommended = SystemApi.CheckConfig(game, requirements.GetRecommended(), systemConfig, game.IsInstalled);
 
-			PluginSettings.Settings.HasData = requirements.HasData;
-			PluginSettings.Settings.IsMinimumOK = false;
-			PluginSettings.Settings.IsRecommendedOK = false;
-			PluginSettings.Settings.IsAllOK = false;
-			PluginSettings.Settings.RecommendedStorage = string.Empty;
+			PluginSettings.HasData = requirements.HasData;
+			PluginSettings.IsMinimumOK = false;
+			PluginSettings.IsRecommendedOK = false;
+			PluginSettings.IsAllOK = false;
+			PluginSettings.RecommendedStorage = string.Empty;
 
 			RequirementEntry minimum = requirements.GetMinimum();
 			if (minimum.HasData)
 			{
-				PluginSettings.Settings.IsMinimumOK = checkMinimum.AllOk ?? false;
-				PluginSettings.Settings.IsAllOK = checkMinimum.AllOk ?? false;
-				PluginSettings.Settings.RecommendedStorage = FormatStorage(minimum.Storage);
+				PluginSettings.IsMinimumOK = checkMinimum.AllOk ?? false;
+				PluginSettings.IsAllOK = checkMinimum.AllOk ?? false;
+				PluginSettings.RecommendedStorage = FormatStorage(minimum.Storage);
 			}
 
 			RequirementEntry recommended = requirements.GetRecommended();
 			if (recommended.HasData && (checkRecommended.AllOk ?? false))
 			{
-				PluginSettings.Settings.IsRecommendedOK = true;
-				PluginSettings.Settings.IsAllOK = true;
-				PluginSettings.Settings.RecommendedStorage = FormatStorage(recommended.Storage);
+				PluginSettings.IsRecommendedOK = true;
+				PluginSettings.IsAllOK = true;
+				PluginSettings.RecommendedStorage = FormatStorage(recommended.Storage);
 			}
 		}
 
 		/// <summary>Resets all theme-bound settings properties to their default (no data) state.</summary>
 		private void ResetThemeSettings()
 		{
-			PluginSettings.Settings.HasData = false;
-			PluginSettings.Settings.IsMinimumOK = false;
-			PluginSettings.Settings.IsRecommendedOK = false;
-			PluginSettings.Settings.IsAllOK = false;
-			PluginSettings.Settings.RecommendedStorage = string.Empty;
+			PluginSettings.HasData = false;
+			PluginSettings.IsMinimumOK = false;
+			PluginSettings.IsRecommendedOK = false;
+			PluginSettings.IsAllOK = false;
+			PluginSettings.RecommendedStorage = string.Empty;
 		}
 
 		#endregion

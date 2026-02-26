@@ -1,4 +1,5 @@
-﻿using CommonPluginsShared.Plugins;
+﻿using CommonPluginsShared.Interfaces;
+using CommonPluginsShared.Plugins;
 using CommonPluginsShared.UI;
 using Playnite.SDK;
 using Playnite.SDK.Data;
@@ -63,19 +64,21 @@ namespace SystemChecker
     }
 
 
-    public class SystemCheckerSettingsViewModel : PluginSettingsViewModel, ISettings
+    public class SystemCheckerSettingsViewModel : PluginSettingsViewModel, IPluginSettingsViewModel
 	{
         private readonly SystemChecker Plugin;
         private SystemCheckerSettings EditingClone { get; set; }
 
-        private SystemCheckerSettings _settings;
+		IPluginSettings IPluginSettingsViewModel.Settings => Settings;
+
+		private SystemCheckerSettings _settings;
         public SystemCheckerSettings Settings
         {
             get => _settings;
             set => SetValue(ref _settings, value);
         }
 
-        public SystemCheckerSettingsViewModel(SystemChecker plugin)
+		public SystemCheckerSettingsViewModel(SystemChecker plugin)
 		{
             // Injecting the plugin instance is required for Save/Load because Playnite
             // saves data to a location determined by the requesting plugin.
@@ -103,7 +106,7 @@ namespace SystemChecker
         public void EndEdit()
         {
             Plugin.SavePluginSettings(Settings);
-            SystemChecker.PluginDatabase.PluginSettings = this;
+            SystemChecker.PluginDatabase.PluginSettings = Settings;
             this.OnPropertyChanged();
         }
 

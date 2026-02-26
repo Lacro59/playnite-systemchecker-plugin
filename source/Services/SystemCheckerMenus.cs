@@ -18,7 +18,7 @@ namespace SystemChecker.Services
 	/// </summary>
 	public class SystemCheckerMenus : PluginMenus
 	{
-		public SystemCheckerMenus(PluginSettings settings, IPluginDatabase database) : base(settings, database)
+		public SystemCheckerMenus(IPluginSettings settings, IPluginDatabase database) : base(settings, database)
 		{
 		}
 

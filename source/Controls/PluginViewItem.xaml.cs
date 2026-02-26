@@ -85,7 +85,7 @@ namespace SystemChecker.Controls
 			var timer = new DebugTimer("PluginViewItem.SetDefaultDataContext");
 #endif
 
-			ControlDataContext.IsActivated = PluginDatabase.PluginSettings.Settings.EnableIntegrationViewItem;
+			ControlDataContext.IsActivated = PluginDatabase.PluginSettings.EnableIntegrationViewItem;
 			ControlDataContext.Text = PluginControlHelper.IconEmpty;
 			ControlDataContext.Foreground = (SolidColorBrush)ResourceProvider.GetResource("GlyphBrush");
 

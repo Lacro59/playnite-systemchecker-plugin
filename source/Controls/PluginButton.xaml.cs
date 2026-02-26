@@ -84,8 +84,8 @@ namespace SystemChecker.Controls
 			var timer = new DebugTimer("PluginButton.SetDefaultDataContext");
 #endif
 
-			ControlDataContext.IsActivated = PluginDatabase.PluginSettings.Settings.EnableIntegrationButton;
-			ControlDataContext.DisplayDetails = PluginDatabase.PluginSettings.Settings.EnableIntegrationButtonDetails;
+			ControlDataContext.IsActivated = PluginDatabase.PluginSettings.EnableIntegrationButton;
+			ControlDataContext.DisplayDetails = PluginDatabase.PluginSettings.EnableIntegrationButtonDetails;
 			ControlDataContext.Text = PluginControlHelper.IconEmpty;
 
 #if DEBUG
