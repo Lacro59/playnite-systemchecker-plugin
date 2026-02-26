@@ -98,7 +98,7 @@ namespace SystemChecker.Controls
 		/// Updates the view item icon based on the game's system requirements.
 		/// At this point the game context has already been validated by <see cref="PluginUserControlExtend.UpdateDataAsync"/>.
 		/// </summary>
-		public override void SetData(Game newContext, PluginDataBaseGameBase pluginGameData)
+		public override void SetData(Game newContext, PluginGameEntry pluginGameData)
 		{
 #if DEBUG
 			var timer = new DebugTimer(string.Format("PluginViewItem.SetData(game='{0}')", newContext?.Name ?? "null"));

@@ -30,7 +30,7 @@ namespace SystemChecker.Services
 			List<Guid> ids = args.Games.Select(x => x.Id).ToList();
 
 			// Retrieve cached requirements data for the selected game
-			PluginDataBaseGameBase pluginGameRequirements = _database.Get(gameMenu, true);
+			PluginGameEntry pluginGameRequirements = _database.Get(gameMenu, true);
 
 			List<GameMenuItem> gameMenuItems = new List<GameMenuItem>();
 

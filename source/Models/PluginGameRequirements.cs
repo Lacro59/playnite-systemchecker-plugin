@@ -1,5 +1,4 @@
 ﻿using CommonPluginsShared.Collections;
-using CommonPluginsShared.Models;
 using CommonPluginsStores.Models;
 using LiteDB;
 using Playnite.SDK.Data;
@@ -8,13 +7,13 @@ namespace SystemChecker.Models
 {
 	/// <summary>
 	/// Stores system requirements for a single game (minimum and recommended entries).
-	/// Extends <see cref="PluginDataBaseGame{T}"/> with requirement-specific accessors.
+	/// Extends <see cref="PluginGameCollection{T}"/> with requirement-specific accessors.
 	/// </summary>
-	public class PluginGameRequirements : PluginDataBaseGame<RequirementEntry>
+	public class PluginGameRequirements : PluginGameCollection<RequirementEntry>
 	{
 		/// <summary>
 		/// Returns <c>true</c> when at least one requirement entry contains data.
-		/// Cached until Items changes via <see cref="RefreshCachedValues"/>.
+		/// Cached until Items changes via <see cref="PluginGameEntry.RefreshCachedValues"/>.
 		/// </summary>
 		[DontSerialize]
 		[BsonIgnore]
@@ -35,7 +34,7 @@ namespace SystemChecker.Models
 
 		/// <summary>
 		/// Returns the number of requirement entries that actually contain data (0, 1 or 2).
-		/// Cached until Items changes via <see cref="RefreshCachedValues"/>.
+		/// Cached until Items changes via <see cref="PluginGameEntry.RefreshCachedValues"/>.
 		/// </summary>
 		[DontSerialize]
 		[BsonIgnore]
@@ -73,7 +72,7 @@ namespace SystemChecker.Models
 		#region Private helpers
 
 		/// <summary>
-		/// Searches <see cref="PluginDataBaseGame{T}.Items"/> for a <see cref="RequirementEntry"/>
+		/// Searches <see cref="PluginGameCollection{T}.Items"/> for a <see cref="RequirementEntry"/>
 		/// whose <see cref="RequirementEntry.IsMinimum"/> flag matches <paramref name="isMinimum"/>.
 		/// </summary>
 		private RequirementEntry FindRequirementByType(bool isMinimum)
