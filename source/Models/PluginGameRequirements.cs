@@ -13,8 +13,8 @@ namespace SystemChecker.Models
 	public class PluginGameRequirements : PluginDataBaseGame<RequirementEntry>
 	{
 		/// <summary>
-		/// Returns <c>true</c> when at least one requirement entry (minimum or recommended) contains data.
-		/// Not serialised — recomputed on each access.
+		/// Returns <c>true</c> when at least one requirement entry contains data.
+		/// Cached until Items changes via <see cref="RefreshCachedValues"/>.
 		/// </summary>
 		[DontSerialize]
 		[BsonIgnore]
@@ -22,24 +22,43 @@ namespace SystemChecker.Models
 		{
 			get
 			{
-				if (Items == null || Items.Count == 0)
+				if (!_hasData.HasValue)
 				{
-					return false;
+					_hasData = Items != null
+						&& Items.Count > 0
+						&& ((GetMinimum()?.HasData ?? false)
+							|| (GetRecommended()?.HasData ?? false));
 				}
-
-				return (GetMinimum()?.HasData ?? false)
-					|| (GetRecommended()?.HasData ?? false);
+				return _hasData.Value;
 			}
 		}
 
-		/// <summary>Gets or sets the URL from which the requirements data was scraped.</summary>
-		public SourceLink SourcesLink { get; set; }
+		/// <summary>
+		/// Returns the number of requirement entries that actually contain data (0, 1 or 2).
+		/// Cached until Items changes via <see cref="RefreshCachedValues"/>.
+		/// </summary>
+		[DontSerialize]
+		[BsonIgnore]
+		public override ulong Count
+		{
+			get
+			{
+				if (!_count.HasValue)
+				{
+					ulong count = 0;
+					if (GetMinimum()?.HasData ?? false) count++;
+					if (GetRecommended()?.HasData ?? false) count++;
+					_count = count;
+				}
+				return _count.Value;
+			}
+		}
 
 		#region Accessors
 
 		/// <summary>
 		/// Returns the minimum requirements entry, or a new empty <see cref="RequirementEntry"/>
-		/// when none exists (so callers can always dereference the result safely).
+		/// when none exists.
 		/// </summary>
 		public RequirementEntry GetMinimum() => FindRequirementByType(isMinimum: true);
 
