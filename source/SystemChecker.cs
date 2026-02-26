@@ -178,8 +178,8 @@ namespace SystemChecker
         {
             Task.Run(() =>
             {
-                Thread.Sleep(30000);
-                _preventLibraryUpdatedOnStart = false;
+                Thread.Sleep(20000);
+				PluginSettings.Settings.PreventLibraryUpdatedOnStart = false;
             });
         }
 
@@ -193,11 +193,10 @@ namespace SystemChecker
 		/// <inheritdoc />
 		public override void OnLibraryUpdated(OnLibraryUpdatedEventArgs args)
         {
-            if (PluginSettings.Settings.AutoImport && !_preventLibraryUpdatedOnStart)
+            if (PluginSettings.Settings.AutoImport && !PluginSettings.Settings.PreventLibraryUpdatedOnStart)
             {
                 var playniteDb = PlayniteApi.Database.Games
-                        .Where(x => x.Added != null && x.Added > PluginSettings.Settings.LastAutoLibUpdateAssetsDownload)
-                        .ToList();
+                        .Where(x => x.Added != null && x.Added > PluginSettings.Settings.LastAutoLibUpdateAssetsDownload);
 
                 GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions($"SystemChecker - {ResourceProvider.GetString("LOCCommonGettingData")}")
                 {
