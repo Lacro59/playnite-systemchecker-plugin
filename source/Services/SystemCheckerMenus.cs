@@ -53,13 +53,13 @@ namespace SystemChecker.Services
 						}
 					}
 				});
-			}
 
-			gameMenuItems.Add(new GameMenuItem
-			{
-				MenuSection = ResourceProvider.GetString("LOCSystemChecker"),
-				Description = "-"
-			});
+				gameMenuItems.Add(new GameMenuItem
+				{
+					MenuSection = ResourceProvider.GetString("LOCSystemChecker"),
+					Description = "-"
+				});
+			}
 
 			gameMenuItems.Add(new GameMenuItem
 			{
