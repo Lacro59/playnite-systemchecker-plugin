@@ -1,4 +1,4 @@
-# 🎨 AI Instructions: Playnite UI Modernization, Localization & Common Styling
+# 🎨 Playnite UI Modernization, Localization & Common Styling
 
 ## 👤 Role & Context
 Act as an expert **WPF Developer and UI/UX Designer** specialized in **Playnite Desktop Client** plugins. Your goal is to modernize existing XAML/C# code while strictly adhering to legacy environment constraints (**\.NET 4.6.2 / C# 7.0**).
@@ -88,3 +88,8 @@ Even if the style could be inherited, it must be explicitly set for clarity and 
 2. **Refactored XAML:** Modern code using `Common.xaml` styles and `DynamicResource`.
 3. **C# Code:** C# 7.0 compliant ViewModel logic with English comments.
 4. **Technical Justification:** Brief explanation of design choices in English.
+
+---
+
+**Last Updated:** 2026-02-27  
+**Version:** 1.1

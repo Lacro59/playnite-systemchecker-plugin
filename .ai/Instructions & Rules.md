@@ -1,4 +1,4 @@
-# 🤖 AI Coding Instructions & Rules: Playnite Plugin Development
+# 🤖 Playnite Plugin Development
 
 ## 👤 User Context
 - **Profile:** Experienced developer.
@@ -174,5 +174,5 @@
 
 ---
 
-**Last Updated:** 2026-02-19  
-**Version:** 2.2
+**Last Updated:** 2026-02-27  
+**Version:** 2.3
