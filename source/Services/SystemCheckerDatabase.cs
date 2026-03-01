@@ -102,9 +102,15 @@ namespace SystemChecker.Services
 
                 // Search datas
                 Logger.Info($"Try find with PCGamingWikiRequierements for {game.Name}");
+                GameRequierements oldData = Get(game.Id, true);
                 gameRequierements = PCGamingWikiRequierements.GetRequirements(game);
+                if (!gameRequierements.HasData && oldData != null && oldData.HasData)
+                {
+                    gameRequierements = oldData;
+                    logger.Warn($"PCGamingWikiRequierements failed to fetch new data for {game.Name}. Keeping old data.");
+                }
 
-                if (!PCGamingWikiRequierements.IsFind())
+                if (!gameRequierements.HasData || !PCGamingWikiRequierements.IsFind())
                 {
                     Logger.Info($"Try find with SteamRequierements for {game.Name}");
                     switch (SourceName.ToLower())

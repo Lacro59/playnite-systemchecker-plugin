@@ -38,15 +38,30 @@ namespace SystemChecker.Clients
         {
             GameRequierements = SystemChecker.PluginDatabase.GetDefault(GameContext);
 
+            string UrlPCGamingWiki = string.Empty;
+            int retryCount = 3;
+            while (retryCount > 0 && string.IsNullOrEmpty(UrlPCGamingWiki))
+            {
+                UrlPCGamingWiki = PcGamingWikiApi.FindGoodUrl(GameContext, SteamId);
+                if (string.IsNullOrEmpty(UrlPCGamingWiki))
+                {
+                    retryCount--;
+                    if (retryCount > 0)
+                    {
+                        Thread.Sleep(1000); // Wait 1 second before retrying
+                    }
+                }
+            }
             string UrlPCGamingWiki = PcGamingWikiApi.FindGoodUrl(GameContext, SteamId);
 
+            if (!string.IsNullOrEmpty(UrlPCGamingWiki))
             if (!UrlPCGamingWiki.IsNullOrEmpty())
             {
                 GameRequierements = GetRequirements(UrlPCGamingWiki);
             }
             else
             {
-                logger.Warn($"PCGamingWikiRequierements - Not find for {GameContext.Name}");
+                logger.Warn($"PCGamingWikiRequierements - Not found for {GameContext.Name} after {3 - retryCount} attempts");
             }
 
             return GameRequierements;
@@ -79,11 +94,12 @@ namespace SystemChecker.Clients
                 string ResultWeb = string.Empty;
                 try
                 {
+                    ResultWeb = Web.DownloadStringData(url, new System.Threading.CancellationToken(), 3).GetAwaiter().GetResult();
                     ResultWeb = Web.DownloadStringData(url).GetAwaiter().GetResult();
                 }
                 catch (Exception ex)
                 {
-                    Common.LogError(ex, false, $"Failed to download {url}", true, PluginDatabase.PluginName);
+                    Common.LogError(ex, false, $"Failed to download {url} after 3 attempts", true, PluginDatabase.PluginName);
                 }
 
 
