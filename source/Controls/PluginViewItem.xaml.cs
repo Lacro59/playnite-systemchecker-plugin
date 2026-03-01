@@ -1,9 +1,10 @@
-﻿using CommonPluginsShared;
+using CommonPluginsShared;
 using CommonPluginsShared.Collections;
 using CommonPluginsShared.Controls;
 using CommonPluginsShared.Interfaces;
 using Playnite.SDK;
 using Playnite.SDK.Models;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.Windows.Media;
 using SystemChecker.Models;
@@ -77,6 +78,20 @@ namespace SystemChecker.Controls
 #if DEBUG
 			timer.Stop();
 #endif
+		}
+
+		/// <summary>
+		/// Only reacts to <see cref="SystemCheckerSettings.EnableIntegrationViewItem"/>.
+		/// Ignores theme-bound properties (HasData, IsMinimumOK, etc.) updated by
+		/// <see cref="SystemCheckerDatabase.SetThemesResources"/> on selection change,
+		/// avoiding unnecessary refresh of every list item when only the detail view should update.
+		/// </summary>
+		protected override void PluginSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			if (e?.PropertyName == nameof(SystemCheckerSettings.EnableIntegrationViewItem))
+			{
+				base.PluginSettings_PropertyChanged(sender, e);
+			}
 		}
 
 		public override void SetDefaultDataContext()
