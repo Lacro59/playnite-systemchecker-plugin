@@ -100,11 +100,16 @@ namespace SystemChecker.Models
 				return PluginGameRequirements;
 			}
 
-			PluginGameRequirements.Items = new List<RequirementEntry>
+			var items = new List<RequirementEntry>(2);
+			if (apiResult.Minimum != null)
 			{
-				apiResult.Minimum,
-				apiResult.Recommended
-			};
+				items.Add(apiResult.Minimum);
+			}
+			if (apiResult.Recommended != null)
+			{
+				items.Add(apiResult.Recommended);
+			}
+			PluginGameRequirements.Items = items;
 			PluginGameRequirements.SourcesLink = apiResult.SourceLink;
 
 			return PluginGameRequirements;
