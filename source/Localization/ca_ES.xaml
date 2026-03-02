@@ -1,43 +1,42 @@
 ﻿<?xml version="1.0"?>
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-    <!-- MainView -->
+	<!-- General -->
+	<sys:String x:Key="LOCSystemChecker">SystemChecker</sys:String>
+	<sys:String x:Key="LOCSystemCheckerCheckConfig">Check System Requirements</sys:String>
+	<sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Refresh System Information</sys:String>
 
-    <sys:String x:Key="LOCSystemChecker">SystemChecker</sys:String>
+	<!-- Game Details View -->
+	<sys:String x:Key="LOCSystemCheckerConfigMinimum">Mínim</sys:String>
+	<sys:String x:Key="LOCSystemCheckerConfigRecommended">Recommended</sys:String>
+	<sys:String x:Key="LOCSystemCheckerOS">Operating System</sys:String>
+	<sys:String x:Key="LOCSystemCheckerCpu">Processador</sys:String>
+	<sys:String x:Key="LOCSystemCheckerRam">Memòria</sys:String>
+	<sys:String x:Key="LOCSystemCheckerGpu">Gràfics</sys:String>
+	<sys:String x:Key="LOCSystemCheckerDisk">Emmagatzematge</sys:String>
 
-    <sys:String x:Key="LOCSystemCheckerCheckConfig">Comprovar la configuració</sys:String>
-    
-    <sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Actualitzar la configuració del sistema</sys:String>
+	<!-- Search -->
+	<sys:String x:Key="LOCSystemCheckerSearchDescription">Search System Checker data</sys:String>
+	<sys:String x:Key="LOCSystemCheckerSearchHint" xml:space="preserve">Parameters:
+    -min		Matches minimum requirements
+    -rec		Matches recommended requirements
+    -any		Matches minimum or recommended requirements
+    -np		Never played
+    -fav		Favorites only
+    -stores={n}	Filter by store (e.g. -stores=steam / -stores=steam,epic)
+    -status={n}	Filter by play status (e.g. -status=played / -status=played,playing)</sys:String>
 
-    <!-- SystemCheckerSettingsView -->
+	<!-- Search Results -->
+	<sys:String x:Key="LOCSystemCheckerSearchMeetsMinimum">✅ Meets minimum requirements</sys:String>
+	<sys:String x:Key="LOCSystemCheckerSearchMeetsRecommended">✅ Meets recommended requirements</sys:String>
+	<sys:String x:Key="LOCSystemCheckerSearchBelowMinimum">⚠️ Below minimum requirements</sys:String>
+	<sys:String x:Key="LOCSystemCheckerSearchNoData">ℹ️ No requirements data available</sys:String>
+	<sys:String x:Key="LOCSystemCheckerSearchSecondaryAction">View Details</sys:String>
 
-    <sys:String x:Key="LOCSystemCheckerAddTag">Afegir una etiqueta per indicar quina configuració ha tingut èxit</sys:String>
-
-    <!-- SystemCheckerGameView -->
-
-    <sys:String x:Key="LOCSystemCheckerConfigMinimum">Mínim</sys:String>
-    <sys:String x:Key="LOCSystemCheckerConfigRecommended">Recomanat</sys:String>
-
-    <sys:String x:Key="LOCSystemCheckerOS">Sistema operatiu</sys:String>
-    <sys:String x:Key="LOCSystemCheckerCpu">Processador</sys:String>
-    <sys:String x:Key="LOCSystemCheckerRam">Memòria</sys:String>
-    <sys:String x:Key="LOCSystemCheckerGpu">Gràfics</sys:String>
-    <sys:String x:Key="LOCSystemCheckerDisk">Emmagatzematge</sys:String>
-
-    <!-- SystemCheckerNotifications -->
-
-    <sys:String x:Key="LOCSystemCheckerTryRefresh">Intenta actualitzar les dades del complement {0}</sys:String>
-
-    <!-- SystemCheckerSearch -->
-
-    <sys:String x:Key="LOCSystemCheckerSearchDescription">Cercar a les dades de SystemChecker</sys:String>
-    <sys:String x:Key="LOCSystemCheckerSearchHint" xml:space="preserve">Paràmetres:
-    -min		El teu ordinador té els requeriments mínims
-    -rec		El teu ordinador té els requeriments recomanats
-    -any		El teu ordinador té els requeriments mínims o recomanats
-    -np		No has jugat al joc
-    -fav		El joc es troba a preferits
-    -stores={n}	Filter per botiga (p.e.:-stores=steam / -stores=steam,epic)
-    -status={n}	Filter per estat (p.e.:-status=played / -status=played,playing)</sys:String>
+	<!-- Notifications -->
+	<sys:String x:Key="LOCSystemCheckerTryRefresh">Try to refresh plugin data for {0}</sys:String>
+	<sys:String x:Key="LOCSystemCheckerAddTagError">An error occurred while adding tags. Please try again.</sys:String>
+	<sys:String x:Key="LOCSystemCheckerRemoveTagError">An error occurred while removing tags. Please try again.</sys:String>
+	<sys:String x:Key="LOCSystemCheckerClearAllError">An error occurred while clearing plugin data. Please try again.</sys:String>
 
 </ResourceDictionary>

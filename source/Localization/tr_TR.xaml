@@ -1,43 +1,42 @@
 ﻿<?xml version="1.0"?>
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-    <!-- MainView -->
+	<!-- General -->
+	<sys:String x:Key="LOCSystemChecker">SystemChecker</sys:String>
+	<sys:String x:Key="LOCSystemCheckerCheckConfig">Sistem Gereksinimlerini Kontrol Et</sys:String>
+	<sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Refresh System Information</sys:String>
 
-    <sys:String x:Key="LOCSystemChecker">SistemDenetleyici</sys:String>
+	<!-- Game Details View -->
+	<sys:String x:Key="LOCSystemCheckerConfigMinimum">En düşük</sys:String>
+	<sys:String x:Key="LOCSystemCheckerConfigRecommended">Recommended</sys:String>
+	<sys:String x:Key="LOCSystemCheckerOS">İşletim Sistemi</sys:String>
+	<sys:String x:Key="LOCSystemCheckerCpu">İşlemci</sys:String>
+	<sys:String x:Key="LOCSystemCheckerRam">Bellek</sys:String>
+	<sys:String x:Key="LOCSystemCheckerGpu">Grafik Kartı</sys:String>
+	<sys:String x:Key="LOCSystemCheckerDisk">Depolama</sys:String>
 
-    <sys:String x:Key="LOCSystemCheckerCheckConfig">Yapılandırmayı denetle</sys:String>
-    
-    <sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Sistem yapılandırmanızı yenileyin</sys:String>
+	<!-- Search -->
+	<sys:String x:Key="LOCSystemCheckerSearchDescription">Search System Checker data</sys:String>
+	<sys:String x:Key="LOCSystemCheckerSearchHint" xml:space="preserve">Parameters:
+    -min		Matches minimum requirements
+    -rec		Matches recommended requirements
+    -any		Matches minimum or recommended requirements
+    -np		Never played
+    -fav		Favorites only
+    -stores={n}	Filter by store (e.g. -stores=steam / -stores=steam,epic)
+    -status={n}	Filter by play status (e.g. -status=played / -status=played,playing)</sys:String>
 
-    <!-- SystemCheckerSettingsView -->
+	<!-- Search Results -->
+	<sys:String x:Key="LOCSystemCheckerSearchMeetsMinimum">Asgari gereksinimleri karşılar</sys:String>
+	<sys:String x:Key="LOCSystemCheckerSearchMeetsRecommended">✅ Meets recommended requirements</sys:String>
+	<sys:String x:Key="LOCSystemCheckerSearchBelowMinimum">Minimum gereksinimlerin altında</sys:String>
+	<sys:String x:Key="LOCSystemCheckerSearchNoData">ℹ️ No requirements data available</sys:String>
+	<sys:String x:Key="LOCSystemCheckerSearchSecondaryAction">View Details</sys:String>
 
-    <sys:String x:Key="LOCSystemCheckerAddTag">Hangi yapılandırmanın başarılı olduğuna dair bir etiket ekle</sys:String>
-
-    <!-- SystemCheckerGameView -->
-
-    <sys:String x:Key="LOCSystemCheckerConfigMinimum">En düşük</sys:String>
-    <sys:String x:Key="LOCSystemCheckerConfigRecommended">Önerilen</sys:String>
-
-    <sys:String x:Key="LOCSystemCheckerOS">İşletim sistemi</sys:String>
-    <sys:String x:Key="LOCSystemCheckerCpu">İşlemci</sys:String>
-    <sys:String x:Key="LOCSystemCheckerRam">Bellek</sys:String>
-    <sys:String x:Key="LOCSystemCheckerGpu">Grafik Kartı</sys:String>
-    <sys:String x:Key="LOCSystemCheckerDisk">Depolama</sys:String>
-
-    <!-- SystemCheckerNotifications -->
-
-    <sys:String x:Key="LOCSystemCheckerTryRefresh">{0} için eklenti verisini güncellemeyi dene</sys:String>
-
-    <!-- SystemCheckerSearch -->
-
-    <sys:String x:Key="LOCSystemCheckerSearchDescription">SistemDenetleyici verisinde ara</sys:String>
-    <sys:String x:Key="LOCSystemCheckerSearchHint" xml:space="preserve">Parameters:
-    -min		Bilgisayarınız asgari gereksinimleri karşılıyor
-    -rec		Bilgisayarınız önerilen gereksinimleri karşılıyor
-    -any		Bilgisayarınız önerilen yada asgari gereksinimleri karşılıyor
-    -np		Oyunu henüz oynamadınız
-    -fav		Oyun favori olmalı
-    -stores={n}	Mağaza adına göre filtrele (ör:-stores=steam / -stores=steam,epic)
-    -status={n}	Durum adına göre filtrele (ör:-status=played / -status=played,playing)</sys:String>
+	<!-- Notifications -->
+	<sys:String x:Key="LOCSystemCheckerTryRefresh">Try to refresh plugin data for {0}</sys:String>
+	<sys:String x:Key="LOCSystemCheckerAddTagError">An error occurred while adding tags. Please try again.</sys:String>
+	<sys:String x:Key="LOCSystemCheckerRemoveTagError">An error occurred while removing tags. Please try again.</sys:String>
+	<sys:String x:Key="LOCSystemCheckerClearAllError">Eklenti verileri temizlenirken bir hata oluştu. Lütfen tekrar deneyin.</sys:String>
 
 </ResourceDictionary>
