@@ -1,122 +1,150 @@
-﻿using CommonPluginsShared;
+using CommonPluginsShared;
 using CommonPluginsShared.Collections;
 using CommonPluginsShared.Controls;
 using CommonPluginsShared.Interfaces;
 using Playnite.SDK;
 using Playnite.SDK.Models;
-using System;
+using System.ComponentModel;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Windows.Media;
 using SystemChecker.Models;
 using SystemChecker.Services;
 
 namespace SystemChecker.Controls
 {
-    /// <summary>
-    /// Logique d'interaction pour PluginViewItem.xaml
-    /// </summary>
-    public partial class PluginViewItem : PluginUserControlExtend
-    {
-        private SystemCheckerDatabase PluginDatabase = SystemChecker.PluginDatabase;
-        internal override IPluginDatabase pluginDatabase => PluginDatabase;
+	/// <summary>
+	/// Interaction logic for PluginViewItem.xaml
+	/// </summary>
+	public partial class PluginViewItem : PluginUserControlExtend
+	{
+		private SystemCheckerDatabase PluginDatabase => SystemChecker.PluginDatabase;
+		protected override IPluginDatabase pluginDatabase => PluginDatabase;
 
-        private PluginViewItemDataContext ControlDataContext = new PluginViewItemDataContext();
-        internal override IDataContext controlDataContext
-        {
-            get => ControlDataContext;           
-            set => ControlDataContext = (PluginViewItemDataContext)controlDataContext;
-        }
+		private PluginViewItemDataContext ControlDataContext = new PluginViewItemDataContext();
+		protected override IDataContext controlDataContext
+		{
+			get => ControlDataContext;
+			set => ControlDataContext = (PluginViewItemDataContext)value;
+		}
 
-        private readonly string IconOk = "\uea50";
-        private readonly string IconKo = "\uea52";
-        private readonly string IconMinimum = "\uea51";
-        private readonly string IconEmpty = "\uea53";
+		public PluginViewItem()
+		{
+#if DEBUG
+			var timer = new DebugTimer("PluginViewItem.ctor");
+#endif
 
+			InitializeComponent();
 
-        public PluginViewItem()
-        {
-            InitializeComponent();
-            this.DataContext = ControlDataContext;
+#if DEBUG
+			timer.Step("InitializeComponent done");
+#endif
 
-            Task.Run(() =>
-            {
-                // Wait extension database are loaded
-                _ = System.Threading.SpinWait.SpinUntil(() => PluginDatabase.IsLoaded, -1);
+			DataContext = ControlDataContext;
+			Loaded += OnLoaded;
 
-                this.Dispatcher.BeginInvoke((Action)delegate
-                {
-                    PluginDatabase.PluginSettings.PropertyChanged += PluginSettings_PropertyChanged;
-                    PluginDatabase.Database.ItemUpdated += Database_ItemUpdated;
-                    PluginDatabase.Database.ItemCollectionChanged += Database_ItemCollectionChanged;
-                    API.Instance.Database.Games.ItemUpdated += Games_ItemUpdated;
+#if DEBUG
+			timer.Stop();
+#endif
+		}
 
-                    // Apply settings
-                    PluginSettings_PropertyChanged(null, null);
-                });
-            });
-        }
+		/// <summary>
+		/// Attaches static event handlers for the SystemChecker plugin.
+		/// Shares the same plugin key as <see cref="PluginButton"/>, so
+		/// <see cref="PluginUserControlExtendBase.AttachPluginEvents"/> will no-op for whichever control type loads second — preventing duplicate subscriptions.
+		/// </summary>
+		protected override void AttachStaticEvents()
+		{
+#if DEBUG
+			var timer = new DebugTimer("PluginViewItem.AttachStaticEvents");
+#endif
 
+			base.AttachStaticEvents();
 
-        public override void SetDefaultDataContext()
-        {
-            ControlDataContext.IsActivated = PluginDatabase.PluginSettings.Settings.EnableIntegrationViewItem;
+#if DEBUG
+			timer.Step("base done");
+#endif
 
-            ControlDataContext.Text = IconEmpty;
-            ControlDataContext.Foreground = (SolidColorBrush)ResourceProvider.GetResource("GlyphBrush");
-        }
+			AttachPluginEvents(PluginDatabase.PluginName, () =>
+			{
+#if DEBUG
+				timer.Step("registering plugin-specific handlers");
+#endif
 
+				PluginDatabase.PluginSettings.PropertyChanged += CreatePluginSettingsHandler();
+				PluginDatabase.DatabaseItemUpdated += CreateDatabaseItemUpdatedHandler<PluginGameRequirements>();
+				PluginDatabase.DatabaseItemCollectionChanged += CreateDatabaseCollectionChangedHandler<PluginGameRequirements>();
+			});
 
-        public override void SetData(Game newContext, PluginDataBaseGameBase PluginGameData)
-        {
-            GameRequierements gameRequierements = (GameRequierements)PluginGameData;
+#if DEBUG
+			timer.Stop();
+#endif
+		}
 
-            SystemConfiguration systemConfiguration = PluginDatabase.Database.PC;
-            Requirement systemMinimum = gameRequierements.GetMinimum();
-            Requirement systemRecommanded = gameRequierements.GetRecommanded();
+		/// <summary>
+		/// Only reacts to <see cref="SystemCheckerSettings.EnableIntegrationViewItem"/>.
+		/// Ignores theme-bound properties (HasData, IsMinimumOK, etc.) updated by
+		/// <see cref="SystemCheckerDatabase.SetThemesResources"/> on selection change,
+		/// avoiding unnecessary refresh of every list item when only the detail view should update.
+		/// </summary>
+		protected override void PluginSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			if (e?.PropertyName == nameof(SystemCheckerSettings.EnableIntegrationViewItem))
+			{
+				base.PluginSettings_PropertyChanged(sender, e);
+			}
+		}
 
-            CheckSystem CheckMinimum = SystemApi.CheckConfig(newContext, systemMinimum, systemConfiguration, newContext.IsInstalled);
-            CheckSystem CheckRecommanded = SystemApi.CheckConfig(newContext, systemRecommanded, systemConfiguration, newContext.IsInstalled);
+		public override void SetDefaultDataContext()
+		{
+#if DEBUG
+			var timer = new DebugTimer("PluginViewItem.SetDefaultDataContext");
+#endif
 
-            if (systemMinimum.HasData)
-            {
-                if (!(bool)CheckMinimum.AllOk)
-                {
-                    ControlDataContext.Text = IconKo;
-                }
-                else if ((bool)CheckMinimum.AllOk)
-                {
-                    ControlDataContext.Text = IconMinimum;
+			ControlDataContext.IsActivated = PluginDatabase.PluginSettings.EnableIntegrationViewItem;
+			ControlDataContext.Text = PluginControlHelper.IconEmpty;
+			ControlDataContext.Foreground = (SolidColorBrush)ResourceProvider.GetResource("GlyphBrush");
 
-                    if (!systemRecommanded.HasData)
-                    {
-                        ControlDataContext.Text = IconOk;
-                    }
-                }
-            }
+#if DEBUG
+			timer.Stop(string.Format("IsActivated={0}", ControlDataContext.IsActivated));
+#endif
+		}
 
-            if (systemRecommanded.HasData && (bool)CheckRecommanded.AllOk)
-            {
-                ControlDataContext.Text = IconOk;
-            }
+		/// <summary>
+		/// Updates the view item icon based on the game's system requirements.
+		/// At this point the game context has already been validated by <see cref="PluginUserControlExtend.UpdateDataAsync"/>.
+		/// </summary>
+		public override void SetData(Game newContext, PluginGameEntry pluginGameData)
+		{
+#if DEBUG
+			var timer = new DebugTimer(string.Format("PluginViewItem.SetData(game='{0}')", newContext?.Name ?? "null"));
+#endif
 
-            if (!systemMinimum.HasData && systemRecommanded.HasData && !(bool)CheckRecommanded?.AllOk)
-            {
-                ControlDataContext.Text = IconKo;
-            }
-        }
-    }
+			string newIcon = PluginControlHelper.ResolveIcon(newContext, pluginGameData, PluginDatabase);
 
+#if DEBUG
+			timer.Step(string.Format("ResolveIcon done, icon='{0}'", newIcon));
+#endif
 
-    public class PluginViewItemDataContext : ObservableObject, IDataContext
-    {
-        private bool _isActivated;
-        public bool IsActivated { get => _isActivated; set => SetValue(ref _isActivated, value); }
+			if (newIcon != null && ControlDataContext.Text != newIcon)
+			{
+				ControlDataContext.Text = newIcon;
+			}
 
-        public string _text;
-        public string Text { get => _text; set => SetValue(ref _text, value); }
+#if DEBUG
+			timer.Stop();
+#endif
+		}
+	}
 
-        public SolidColorBrush _foreground;
-        public SolidColorBrush Foreground { get => _foreground; set => SetValue(ref _foreground, value); }
-    }
+	public class PluginViewItemDataContext : ObservableObject, IDataContext
+	{
+		private bool _isActivated;
+		public bool IsActivated { get => _isActivated; set => SetValue(ref _isActivated, value); }
+
+		private string _text;
+		public string Text { get => _text; set => SetValue(ref _text, value); }
+
+		private SolidColorBrush _foreground;
+		public SolidColorBrush Foreground { get => _foreground; set => SetValue(ref _foreground, value); }
+	}
 }

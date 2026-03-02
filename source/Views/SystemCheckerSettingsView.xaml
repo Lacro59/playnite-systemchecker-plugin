@@ -4,119 +4,214 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:AttachedProperties="clr-namespace:CommonPluginsShared.Controls"
-             xmlns:pcmd="clr-namespace:CommonPluginsShared"
+             xmlns:uiServices="clr-namespace:CommonPluginsShared.Commands"
              xmlns:SystemChecker="clr-namespace:SystemChecker"
              mc:Ignorable="d" d:DesignWidth="650"
              d:DataContext="{d:DesignInstance SystemChecker:SystemCheckerSettingsViewModel}">
 
     <TabControl Margin="20">
+
+        <!-- ═══════════════════════════════════════════════════════════
+             TAB 1: General plugin settings
+             ═══════════════════════════════════════════════════════════ -->
         <TabItem Header="{DynamicResource LOCSystemChecker}">
-            <StackPanel Margin="0,10,0,0">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition Height="10"/>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition Height="10"/>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition Height="30"/>
-                        <RowDefinition Height="auto"/>
-                    </Grid.RowDefinitions>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,10,4,0">
+                <StackPanel>
 
-                    <CheckBox Grid.Column="0" Grid.Row="0" IsChecked="{Binding Settings.MenuInExtensions}" VerticalAlignment="Center"
-                              Command="{x:Static pcmd:Commands.RestartRequired}" 
-                              CommandParameter="{Binding RelativeSource={RelativeSource Self}}">
-                        <Label Content="{DynamicResource LOCCommonMenuInExtensions}" />
-                    </CheckBox>
+                    <!-- SECTION: Plugin menu placement -->
+                    <Border Style="{StaticResource SectionBorder}">
+                        <StackPanel>
+                            <TextBlock Style="{DynamicResource SectionHeaderText}"
+                                       Text="{DynamicResource LOCCommonMisc}" />
 
-                    <Grid Grid.Row="2">                        
-                        <CheckBox Name="cbEnableTag" IsChecked="{Binding Settings.EnableTag}" VerticalAlignment="Center" Grid.Column="0">
-                            <Label Content="{DynamicResource LOCSystemCheckerAddTag}" />
-                        </CheckBox>
-
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="2">
-                            <Button Content="{DynamicResource LOCAddTitle}" Margin="0,0,10,0" VerticalAlignment="Center" Click="ButtonAddTag_Click" />
-                            <Button Content="{DynamicResource LOCRemoveTitle}" VerticalAlignment="Bottom" Click="ButtonRemoveTag_Click" />
+                            <!-- Menu placement toggle — requires restart -->
+                            <CheckBox Style="{StaticResource ModernCheckBox}"
+                                      IsChecked="{Binding Settings.MenuInExtensions}"
+                                      Command="{x:Static uiServices:CommandsPlugin.CmdRestartRequired}"
+                                      CommandParameter="{Binding RelativeSource={RelativeSource Self}}">
+                                <TextBlock Style="{DynamicResource BaseTextBlockStyle}"
+                                           Text="{DynamicResource LOCCommonMenuInExtensions}" />
+                            </CheckBox>
                         </StackPanel>
-                    </Grid>
+                    </Border>
 
-                    <CheckBox Name="cbAutoImport" Grid.Row="4" IsChecked="{Binding Settings.AutoImport}">
-                        <Label Content="{DynamicResource LOCCommonAutoImport}" />
-                    </CheckBox>
+                    <!-- SECTION: Tag management -->
+                    <Border Style="{StaticResource SectionBorder}">
+                        <StackPanel>
+                            <TextBlock Style="{DynamicResource SectionHeaderText}"
+                                       Text="{DynamicResource LOCCommonTagSectionTitle}" />
 
-                    <Button Grid.Column="0" Grid.Row="6" Content="{DynamicResource LOCClearAll}" Click="Button_Click" Width="200" 
-                            HorizontalAlignment="Left" VerticalAlignment="Center" />
-                </Grid>
-            </StackPanel>
+                            <!--
+                                DockPanel replaces the former broken Grid with Grid.Column="2" on a Grid
+                                that had no ColumnDefinitions. DockPanel cleanly separates the checkbox
+                                (left) from the action buttons (right) without column index errors.
+                            -->
+                            <DockPanel LastChildFill="True" Margin="0,0,0,4">
+
+                                <!-- Add / Remove tag buttons docked to the right -->
+                                <StackPanel DockPanel.Dock="Right"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+                                    <Button Style="{StaticResource PrimaryButton}"
+                                            Content="{DynamicResource LOCAddTitle}"
+                                            Margin="0,0,8,0"
+                                            Command="{Binding CmdAddTag}" />
+                                    <Button Style="{StaticResource WarningButton}"
+                                            Content="{DynamicResource LOCRemoveTitle}"
+                                            Command="{Binding CmdRemoveTag}" />
+                                </StackPanel>
+
+                                <!-- Enable tag checkbox fills remaining space on the left -->
+                                <CheckBox Style="{StaticResource ModernCheckBox}"
+                                          IsChecked="{Binding Settings.EnableTag}"
+                                          VerticalAlignment="Center">
+                                    <TextBlock Style="{DynamicResource BaseTextBlockStyle}"
+                                               Text="{DynamicResource LOCCommonAddTag}" />
+                                </CheckBox>
+                            </DockPanel>
+
+                            <!-- Auto-import on library update -->
+                            <CheckBox Style="{StaticResource ModernCheckBox}"
+                                      IsChecked="{Binding Settings.AutoImport}">
+                                <TextBlock Style="{DynamicResource BaseTextBlockStyle}"
+                                           Text="{DynamicResource LOCCommonAutoImport}" />
+                            </CheckBox>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- SECTION: Data management — destructive action isolated in its own card -->
+                    <Border Style="{StaticResource SectionBorder}">
+                        <StackPanel>
+                            <TextBlock Style="{DynamicResource SectionHeaderText}"
+                                       Text="{DynamicResource LOCCommonDataSectionTitle}" />
+
+                            <TextBlock Style="{DynamicResource BaseTextBlockStyle}"
+                                       Foreground="{DynamicResource TextBrushDarker}"
+                                       TextWrapping="Wrap"
+                                       Margin="0,0,0,10"
+                                       Text="{DynamicResource LOCCommonClearAllDescription}" />
+
+                            <!-- Clear all data — WarningButton signals destructive intent -->
+                            <Button Style="{StaticResource WarningButton}"
+                                    Content="{DynamicResource LOCClearAll}"
+                                    HorizontalAlignment="Right"
+                                    Command="{Binding CmdClearAll}" />
+                        </StackPanel>
+                    </Border>
+
+					<!-- SECTION: Cache management — non-destructive, no data loss -->
+					<Border Style="{StaticResource SectionBorder}">
+						<StackPanel>
+							<TextBlock Style="{DynamicResource SectionHeaderText}"
+                                Text="{DynamicResource LOCCommonCacheSectionTitle}" />
+
+							<TextBlock Style="{DynamicResource BaseTextBlockStyle}"
+                               Foreground="{DynamicResource TextBrushDarker}"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,10"
+                               Text="{DynamicResource LOCCommonClearCacheDescription}" />
+
+							<Button Style="{StaticResource WarningButton}"
+                                Content="{DynamicResource LOCCommonClearCache}"
+                                HorizontalAlignment="Right"
+                                Command="{Binding CmdClearCache}" />
+						</StackPanel>
+					</Border>
+
+				</StackPanel>
+            </ScrollViewer>
         </TabItem>
 
+        <!-- ═══════════════════════════════════════════════════════════
+             TAB 2: UI integration / appearance settings
+             ═══════════════════════════════════════════════════════════ -->
         <TabItem Header="{DynamicResource LOCCommonIntegration}">
-            <StackPanel Margin="0,10,0,0">
-                <Label Content="{DynamicResource LOCCommonControlsAvailable}" />
-                <Separator Margin="0,0,0,10" />
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="10" />
-                        <RowDefinition Height="auto" />
-                    </Grid.RowDefinitions>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,10,4,0">
+                <StackPanel>
 
-                    <Expander Grid.Row="0">
-                        <Expander.Style>
-                            <Style TargetType="{x:Type Expander}" BasedOn="{StaticResource {x:Type Expander}}">
-                                <Setter Property="Background" Value="Transparent" />
-                            </Style>
-                        </Expander.Style>
+                    <!-- Section header with description -->
+                    <Border Style="{StaticResource SectionBorder}">
+                        <StackPanel>
+                            <TextBlock Style="{DynamicResource SectionHeaderText}"
+                                       Text="{DynamicResource LOCCommonControlsAvailable}" />
 
-                        <Expander.Header>
-                            <CheckBox IsChecked="{Binding Settings.EnableIntegrationButton}" Name="PART_IntegrationButton">
-                                <Label Content="{DynamicResource LOCCommonControlsPluginButtonShow}" />
-                            </CheckBox>
-                        </Expander.Header>
+                            <!-- ─── EXPANDER: Plugin button in game details ─── -->
+                            <Expander Margin="0,0,0,8">
+                                <Expander.Style>
+                                    <Style TargetType="{x:Type Expander}"
+                                           BasedOn="{StaticResource {x:Type Expander}}">
+                                        <Setter Property="Background" Value="Transparent" />
+                                    </Style>
+                                </Expander.Style>
 
-                        <Expander.Content>
-                            <Border IsEnabled="{Binding ElementName=PART_IntegrationButton, Path=IsChecked}"
-				                    Margin="5" Padding="10"
-				                    BorderBrush="{DynamicResource PopupBorderBrush}"
-				                    BorderThickness="{DynamicResource PopupBorderThickness}">
-                                <Grid>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="10" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="auto" />
-                                        </Grid.RowDefinitions>
+                                <Expander.Header>
+                                    <!--
+                                        Named element PART_IntegrationButton is referenced below
+                                        via ElementName binding to enable/disable sub-options
+                                        when the parent checkbox is unchecked.
+                                    -->
+                                    <CheckBox Style="{StaticResource ModernCheckBox}"
+                                              IsChecked="{Binding Settings.EnableIntegrationButton}"
+                                              Name="PART_IntegrationButton">
+                                        <TextBlock Style="{DynamicResource BaseTextBlockStyle}"
+                                                   Text="{DynamicResource LOCCommonControlsPluginButtonShow}" />
+                                    </CheckBox>
+                                </Expander.Header>
 
-                                        <CheckBox Grid.Column="0" Grid.Row="0" IsChecked="{Binding Settings.EnableIntegrationButtonDetails}">
-                                            <Label Content="{DynamicResource LOCCommonIntegrationButtonDetails}" />
-                                        </CheckBox>
-                                    </Grid>
-                                </Grid>
-                            </Border>
-                        </Expander.Content>
-                    </Expander>
+                                <Expander.Content>
+                                    <!--
+                                        Sub-options are disabled when the parent checkbox is unchecked.
+                                        FilterCardBorder provides visual indentation and separation
+                                        from the Common.xaml shared style library.
+                                    -->
+                                    <Border Style="{StaticResource FilterCardBorder}"
+                                            IsEnabled="{Binding ElementName=PART_IntegrationButton, Path=IsChecked}"
+                                            Margin="24,4,0,0">
+                                        <StackPanel>
+                                            <TextBlock Style="{DynamicResource BaseTextBlockStyle}"
+                                                       Foreground="{DynamicResource TextBrushDarker}"
+                                                       Margin="0,0,0,6"
+                                                       Text="{DynamicResource LOCCommonIntegrationButtonOptions}" />
 
-                    <Expander Grid.Row="2" AttachedProperties:ExpanderAttachedProperties.HideExpanderArrow="True">
-                        <Expander.Style>
-                            <Style TargetType="{x:Type Expander}" BasedOn="{StaticResource {x:Type Expander}}">
-                                <Setter Property="Background" Value="Transparent" />
-                            </Style>
-                        </Expander.Style>
+                                            <!-- Show details alongside button -->
+                                            <CheckBox Style="{StaticResource ModernCheckBox}"
+                                                      IsChecked="{Binding Settings.EnableIntegrationButtonDetails}">
+                                                <TextBlock Style="{DynamicResource BaseTextBlockStyle}"
+                                                           Text="{DynamicResource LOCCommonIntegrationButtonDetails}" />
+                                            </CheckBox>
+                                        </StackPanel>
+                                    </Border>
+                                </Expander.Content>
+                            </Expander>
 
-                        <Expander.Header>
-                            <CheckBox IsChecked="{Binding Settings.EnableIntegrationViewItem}" Name="PART_IntegrationViewItem">
-                                <Label Content="{DynamicResource LOCCommonControlsPluginViewItemShow}" />
-                            </CheckBox>
-                        </Expander.Header>
-                    </Expander>
-                </Grid>
-            </StackPanel>
+                            <!-- ─── EXPANDER: Plugin item in games list view ─── -->
+                            <!--
+                                HideExpanderArrow="True" because this expander has no sub-options to reveal.
+                                The arrow is visually misleading when there is no collapsible content.
+                            -->
+                            <Expander AttachedProperties:ExpanderAttachedProperties.HideExpanderArrow="True">
+                                <Expander.Style>
+                                    <Style TargetType="{x:Type Expander}"
+                                           BasedOn="{StaticResource {x:Type Expander}}">
+                                        <Setter Property="Background" Value="Transparent" />
+                                    </Style>
+                                </Expander.Style>
+
+                                <Expander.Header>
+                                    <CheckBox Style="{StaticResource ModernCheckBox}"
+                                              IsChecked="{Binding Settings.EnableIntegrationViewItem}">
+                                        <TextBlock Style="{DynamicResource BaseTextBlockStyle}"
+                                                   Text="{DynamicResource LOCCommonControlsPluginViewItemShow}" />
+                                    </CheckBox>
+                                </Expander.Header>
+                            </Expander>
+
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+            </ScrollViewer>
         </TabItem>
+
     </TabControl>
 </UserControl>

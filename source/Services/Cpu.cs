@@ -1,382 +1,416 @@
 ﻿using CommonPluginsShared;
-using Playnite.SDK;
+using CommonPluginsShared.SystemInfo;
 using Playnite.SDK.Data;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
-using SystemChecker.Clients;
 using SystemChecker.Models;
 
 namespace SystemChecker.Services
 {
-    public class Cpu
-    {
-        private static readonly ILogger logger = LogManager.GetLogger();
+	public class Cpu : HardwareChecker
+	{
+		private static readonly Regex IntelTypeRegex = new Regex(@"i[0-9]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private static readonly Regex IntelVersionRegex = new Regex(@"i[0-9]-[0-9]*", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private static readonly Regex FourDigitsRegex = new Regex(@"\d{4}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private static readonly Regex ThreeDigitsRegex = new Regex(@"\d{3}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private static readonly Regex RyzenTypeRegex = new Regex(@"Ryzen[ ][0-9]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private static readonly Regex RyzenGRegex = new Regex(@"[0-9]+G", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private static readonly Regex RyzenXTRegex = new Regex(@"[0-9]+XT", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private static readonly Regex RyzenXRegex = new Regex(@"[0-9]+X", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private static readonly Regex RyzenURegex = new Regex(@"[0-9]+U", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private static readonly Regex ClockGhzRegex = new Regex(@"[0-9]*[.][0-9]*[ GHz]*", RegexOptions.Compiled);
+		private static readonly Regex ClockGhzRegex2 = new Regex(@"[0-9]*[.][0-9]*[GHz]*", RegexOptions.Compiled);
+		private static readonly Regex ClockMhzRegex = new Regex(@"[0-9]*[.][0-9]*[ MHz]*", RegexOptions.Compiled);
+		private static readonly Regex ClockMhzRegex2 = new Regex(@"[0-9]*[.][0-9]*[MHz]*", RegexOptions.Compiled);
+		private static readonly Regex SingleDigitRegex = new Regex(@"\d", RegexOptions.Compiled);
 
-        private CpuObject ProcessorPc { get; set; }
-        private CpuObject ProcessorRequierement { get; set; }
+		protected override string CheckType => "CPU";
+		protected override string ComponentPcName => ProcessorPc.Name;
+		protected override string ComponentRequirementName => ProcessorRequirement.Name;
 
+		private CpuObject ProcessorPc { get; set; }
+		private CpuObject ProcessorRequirement { get; set; }
 
-        public Cpu(SystemConfiguration systemConfiguration, string CpuRequierement)
-        {
-            ProcessorPc = SetProcessor(systemConfiguration.Cpu);
-            ProcessorRequierement = SetProcessor(CpuRequierement);
-        }
+		public Cpu(SystemConfiguration systemConfiguration, string cpuRequirement)
+		{
+			ProcessorPc = SetProcessor(systemConfiguration.Cpu);
+			ProcessorPc = SetProcessor(systemConfiguration.Cpu);
+			ProcessorRequirement = SetProcessor(cpuRequirement);
 
-        public CheckResult IsBetter()
-        {
-            Common.LogDebug(true, $"Cpu.IsBetter - ProcessorPc: {Serialization.ToJson(ProcessorPc)}");
-            Common.LogDebug(true, $"Cpu.IsBetter - ProcessorRequierement: {Serialization.ToJson(ProcessorRequierement)}");
+			PerformCheck();
+		}
 
-            // Old Processor
-            if (!ProcessorPc.IsOld && ProcessorRequierement.IsOld)
-            {
-                return new CheckResult { Result = true };
-            }
-            if (ProcessorPc.IsOld && !ProcessorRequierement.IsOld)
-            {
-                return new CheckResult();
-            }
-            if (ProcessorPc.IsOld && ProcessorRequierement.IsOld)
-            {
-                // TODO: CPU old vs old
-                logger.Warn($"No CPU treatment for {Serialization.ToJson(ProcessorPc)} & {Serialization.ToJson(ProcessorRequierement)}");
-                return new CheckResult();
-            }
+		protected override CheckResult PerformCheck()
+		{
+			Common.LogDebug(true, $"Cpu.PerformCheck - ProcessorPc: {Serialization.ToJson(ProcessorPc)}");
+			Common.LogDebug(true, $"Cpu.PerformCheck - ProcessorRequirement: {Serialization.ToJson(ProcessorRequirement)}");
 
-            if (!ProcessorRequierement.IsIntel && !ProcessorRequierement.IsAmd)
-            {
-                // Clock
-                if (ProcessorRequierement.Clock == 0)
-                {
-                    return new CheckResult { Result = true };
-                }
-                else
-                {
-                    if (ProcessorPc.Clock == 0)
-                    {
-                        logger.Warn($"ProcessorPc.Clock is 0");
-                        return new CheckResult { Result = true };
-                    }
+			if (!ProcessorPc.IsOld && ProcessorRequirement.IsOld)
+			{
+				return new CheckResult { Result = true };
+			}
 
-                    return new CheckResult { Result = true };
-                    //return ProcessorPc.Clock >= ProcessorRequierement.Clock;
-                }
-            }
+			if (ProcessorPc.IsOld && !ProcessorRequirement.IsOld)
+			{
+				return new CheckResult();
+			}
 
+			if (ProcessorPc.IsOld && ProcessorRequirement.IsOld)
+			{
+				Logger.Warn($"No CPU treatment for {Serialization.ToJson(ProcessorPc)} & {Serialization.ToJson(ProcessorRequirement)}");
+				return new CheckResult();
+			}
 
-            Benchmark benchmark = new Benchmark();
-            bool? isBetter = benchmark.IsBetterCpu(ProcessorPc.Name, ProcessorRequierement.Name);
-            if (isBetter != null)
-            {
-                return new CheckResult
-                {
-                    Result = (bool)isBetter,
-                    SameConstructor = true
-                };
-            }
+			if (!ProcessorRequirement.IsIntel && !ProcessorRequirement.IsAmd)
+			{
+				if (ProcessorRequirement.Clock == 0 || ProcessorPc.Clock == 0)
+				{
+					return new CheckResult { Result = true };
+				}
 
+				return new CheckResult { Result = true };
+			}
 
-            // Intel vs Intel
-            if (ProcessorPc.IsIntel && ProcessorRequierement.IsIntel)
-            {
-                if (ProcessorPc.Type == ProcessorRequierement.Type)
-                {
-                    return new CheckResult { SameConstructor = true, Result = ProcessorPc.Version >= ProcessorRequierement.Version };
-                }
-                if (int.Parse(Regex.Match(ProcessorPc.Type, @"\d").Value) > int.Parse(Regex.Match(ProcessorRequierement.Type, @"\d").Value))
-                {
-                    return new CheckResult { Result = true };
-                }
-                else
-                {
-                    if (ProcessorPc.Type == "i3" && ProcessorRequierement.Type == "i5" || ProcessorPc.Type == "i5" && ProcessorRequierement.Type == "i7")
-                    {
-                        return new CheckResult { SameConstructor = true, Result = (ProcessorPc.Version + 1000) >= ProcessorRequierement.Version };
-                    }
+			bool? isBetter = CallBenchmark(ProcessorPc.Name, ProcessorRequirement.Name, false);
+			if (isBetter != null)
+			{
+				return new CheckResult
+				{
+					Result = (bool)isBetter,
+					SameConstructor = true
+				};
+			}
 
-                    if (ProcessorPc.Type == "i3" && ProcessorRequierement.Type == "i7")
-                    {
-                        return new CheckResult { SameConstructor = true, Result = (ProcessorPc.Version + 500) >= ProcessorRequierement.Version };
-                    }
-                }
-            }
+			if (ProcessorPc.IsIntel && ProcessorRequirement.IsIntel)
+			{
+				if (ProcessorPc.Type == ProcessorRequirement.Type)
+				{
+					return new CheckResult { SameConstructor = true, Result = ProcessorPc.Version >= ProcessorRequirement.Version };
+				}
 
-            // Amd vs Amd
-            if (ProcessorPc.IsAmd && ProcessorRequierement.IsAmd)
-            {
-                if (Regex.Match(ProcessorPc.Type, @"Ryzen[ ][0-9]", RegexOptions.IgnoreCase).Value == Regex.Match(ProcessorRequierement.Type, @"Ryzen[ ][0-9]", RegexOptions.IgnoreCase).Value)
-                {
-                    return new CheckResult { SameConstructor = true, Result = ProcessorPc.Version >= ProcessorRequierement.Version };
-                }
-                if (ProcessorPc.Type.ToLower().IndexOf("ryzen") > -1 && ProcessorRequierement.Type.ToLower().IndexOf("athlon") > -1)
-                {
-                    return new CheckResult { SameConstructor = true, Result = true };
-                }
-                if (ProcessorPc.Type.ToLower().IndexOf("ryzen") > -1 && ProcessorRequierement.Type.ToLower().IndexOf("ryzen") > -1)
-                {
-                    if (int.Parse(Regex.Match(ProcessorPc.Type, @"\d").Value) > int.Parse(Regex.Match(ProcessorRequierement.Type, @"\d").Value))
-                    {
-                        return new CheckResult { SameConstructor = true, Result = true };
-                    }
-                    else
-                    {
-                        return new CheckResult { SameConstructor = true, Result = (ProcessorPc.Version + 1500) >= ProcessorRequierement.Version };
-                    }
-                }
-            }
+				Match pcMatch = SingleDigitRegex.Match(ProcessorPc.Type);
+				Match reqMatch = SingleDigitRegex.Match(ProcessorRequirement.Type);
 
+				if (pcMatch.Success && reqMatch.Success)
+				{
+					int pcDigit = int.Parse(pcMatch.Value);
+					int reqDigit = int.Parse(reqMatch.Value);
 
-            // Amd vs Intel
-            if (ProcessorPc.IsAmd && ProcessorRequierement.IsIntel)
-            {
-                if (ProcessorPc.Type.ToLower().Contains("ryzen 3") && ProcessorRequierement.Type.ToLower().Contains("i3"))
-                {
-                    return new CheckResult { Result = (ProcessorPc.Version + 4000) >= ProcessorRequierement.Version };
-                }
-                if (ProcessorPc.Type.ToLower().Contains("ryzen 3") && ProcessorRequierement.Type.ToLower().Contains("i5"))
-                {
-                    return new CheckResult { Result = (ProcessorPc.Version + 3000) >= ProcessorRequierement.Version };
-                }
-                if (ProcessorPc.Type.ToLower().Contains("ryzen 3") && ProcessorRequierement.Type.ToLower().Contains("i7"))
-                {
-                    return new CheckResult { Result = (ProcessorPc.Version + 2000) >= ProcessorRequierement.Version };
-                }
+					if (pcDigit > reqDigit)
+					{
+						return new CheckResult { Result = true };
+					}
+				}
 
-                if (ProcessorPc.Type.ToLower().Contains("ryzen 5") && ProcessorRequierement.Type.ToLower().Contains("i3"))
-                {
-                    return new CheckResult { Result = (ProcessorPc.Version + 5000) >= ProcessorRequierement.Version };
-                }
-                if (ProcessorPc.Type.ToLower().Contains("ryzen 5") && ProcessorRequierement.Type.ToLower().Contains("i5"))
-                {
-                    return new CheckResult { Result = (ProcessorPc.Version + 4000) >= ProcessorRequierement.Version };
-                }
-                if (ProcessorPc.Type.ToLower().Contains("ryzen 5") && ProcessorRequierement.Type.ToLower().Contains("i7"))
-                {
-                    return new CheckResult { Result = (ProcessorPc.Version + 3000) >= ProcessorRequierement.Version };
-                }
+				if (ProcessorPc.Type == "i3" && ProcessorRequirement.Type == "i5"
+					|| ProcessorPc.Type == "i5" && ProcessorRequirement.Type == "i7")
+				{
+					return new CheckResult { SameConstructor = true, Result = (ProcessorPc.Version + 1000) >= ProcessorRequirement.Version };
+				}
 
-                if (ProcessorPc.Type.ToLower().Contains("ryzen 7") && ProcessorRequierement.Type.ToLower().Contains("i3"))
-                {
-                    return new CheckResult { Result = (ProcessorPc.Version + 6000) >= ProcessorRequierement.Version };
-                }
-                if (ProcessorPc.Type.ToLower().Contains("ryzen 7") && ProcessorRequierement.Type.ToLower().Contains("i5"))
-                {
-                    return new CheckResult { Result = (ProcessorPc.Version + 5000) >= ProcessorRequierement.Version };
-                }
-                if (ProcessorPc.Type.ToLower().Contains("ryzen 7") && ProcessorRequierement.Type.ToLower().Contains("i7"))
-                {
-                    return new CheckResult { Result = (ProcessorPc.Version + 4000) >= ProcessorRequierement.Version };
-                }
-            }
+				if (ProcessorPc.Type == "i3" && ProcessorRequirement.Type == "i7")
+				{
+					return new CheckResult { SameConstructor = true, Result = (ProcessorPc.Version + 500) >= ProcessorRequirement.Version };
+				}
+			}
 
-            // Intel vs Amd
-            if (ProcessorPc.IsIntel && ProcessorRequierement.IsAmd)
-            {
-                if (ProcessorRequierement.Type.ToLower().Contains("ryzen 3") && ProcessorPc.Type.ToLower().Contains("i3"))
-                {
-                    return new CheckResult { Result = (ProcessorRequierement.Version + 4000) >= ProcessorPc.Version };
-                }
-                if (ProcessorRequierement.Type.ToLower().Contains("ryzen 3") && ProcessorPc.Type.ToLower().Contains("i5"))
-                {
-                    return new CheckResult { Result = (ProcessorRequierement.Version + 3000) >= ProcessorPc.Version };
-                }
-                if (ProcessorRequierement.Type.ToLower().Contains("ryzen 3") && ProcessorPc.Type.ToLower().Contains("i7"))
-                {
-                    return new CheckResult { Result = (ProcessorRequierement.Version + 2000) >= ProcessorPc.Version };
-                }
+			if (ProcessorPc.IsAmd && ProcessorRequirement.IsAmd)
+			{
+				Match pcRyzenMatch = RyzenTypeRegex.Match(ProcessorPc.Type);
+				Match reqRyzenMatch = RyzenTypeRegex.Match(ProcessorRequirement.Type);
 
-                if (ProcessorRequierement.Type.ToLower().Contains("ryzen 5") && ProcessorPc.Type.ToLower().Contains("i3"))
-                {
-                    return new CheckResult { Result = (ProcessorRequierement.Version + 5000) >= ProcessorPc.Version };
-                }
-                if (ProcessorRequierement.Type.ToLower().Contains("ryzen 5") && ProcessorPc.Type.ToLower().Contains("i5"))
-                {
-                    return new CheckResult { Result = (ProcessorRequierement.Version + 4000) >= ProcessorPc.Version };
-                }
-                if (ProcessorRequierement.Type.ToLower().Contains("ryzen 5") && ProcessorPc.Type.ToLower().Contains("i7"))
-                {
-                    return new CheckResult { Result = (ProcessorRequierement.Version + 3000) >= ProcessorPc.Version };
-                }
+				if (pcRyzenMatch.Success && reqRyzenMatch.Success && pcRyzenMatch.Value == reqRyzenMatch.Value)
+				{
+					return new CheckResult { SameConstructor = true, Result = ProcessorPc.Version >= ProcessorRequirement.Version };
+				}
 
-                if (ProcessorRequierement.Type.ToLower().Contains("ryzen 7") && ProcessorPc.Type.ToLower().Contains("i3"))
-                {
-                    return new CheckResult { Result = (ProcessorRequierement.Version + 6000) >= ProcessorPc.Version };
-                }
-                if (ProcessorRequierement.Type.ToLower().Contains("ryzen 7") && ProcessorPc.Type.ToLower().Contains("i5"))
-                {
-                    return new CheckResult { Result = (ProcessorRequierement.Version + 5000) >= ProcessorPc.Version };
-                }
-                if (ProcessorRequierement.Type.ToLower().Contains("ryzen 7") && ProcessorPc.Type.ToLower().Contains("i7"))
-                {
-                    return new CheckResult { Result = (ProcessorRequierement.Version + 4000) >= ProcessorPc.Version };
-                }
-            }
+				bool pcHasRyzen = ProcessorPc.Type.IndexOf("ryzen", StringComparison.OrdinalIgnoreCase) > -1;
+				bool reqHasRyzen = ProcessorRequirement.Type.IndexOf("ryzen", StringComparison.OrdinalIgnoreCase) > -1;
+				bool reqHasAthlon = ProcessorRequirement.Type.IndexOf("athlon", StringComparison.OrdinalIgnoreCase) > -1;
 
+				if (pcHasRyzen && reqHasAthlon)
+				{
+					return new CheckResult { SameConstructor = true, Result = true };
+				}
 
-            logger.Warn($"No CPU treatment for {Serialization.ToJson(ProcessorPc)} & {Serialization.ToJson(ProcessorRequierement)}");
-            return new CheckResult();
-        }
+				if (pcHasRyzen && reqHasRyzen)
+				{
+					Match pcDigitMatch = SingleDigitRegex.Match(ProcessorPc.Type);
+					Match reqDigitMatch = SingleDigitRegex.Match(ProcessorRequirement.Type);
 
-        public static bool CallIsIntel(string CpuName)
-        {
-            return CpuName.ToLower().IndexOf("intel") > -1 || Regex.IsMatch(CpuName, "i[0-9]");
-        }
-        public static bool CallIsAmd(string CpuName)
-        {
-            return CpuName.ToLower().IndexOf("amd") > -1 || CpuName.ToLower().IndexOf("ryzen") > -1;
-        }
+					if (pcDigitMatch.Success && reqDigitMatch.Success)
+					{
+						int pcDigit = int.Parse(pcDigitMatch.Value);
+						int reqDigit = int.Parse(reqDigitMatch.Value);
 
-        private CpuObject SetProcessor(string CpuName)
-        {
-            bool IsIntel = CallIsIntel(CpuName);
-            bool IsAmd = CallIsAmd(CpuName);
-            bool IsOld = false;
+						if (pcDigit > reqDigit)
+						{
+							return new CheckResult { SameConstructor = true, Result = true };
+						}
+						else
+						{
+							return new CheckResult { SameConstructor = true, Result = (ProcessorPc.Version + 1500) >= ProcessorRequirement.Version };
+						}
+					}
+				}
+			}
 
-            string Type = string.Empty;
-            int Version = 0;
-            double Clock = 0;
+			if (ProcessorPc.IsAmd && ProcessorRequirement.IsIntel)
+			{
+				return CompareAmdVsIntel(ProcessorPc, ProcessorRequirement);
+			}
 
+			if (ProcessorPc.IsIntel && ProcessorRequirement.IsAmd)
+			{
+				return CompareIntelVsAmd(ProcessorPc, ProcessorRequirement);
+			}
 
-            // Type & Version & IsOld
-            if (IsIntel)
-            {
-                Type = Regex.Match(CpuName, "i[0-9]", RegexOptions.IgnoreCase).Value.Trim();   
-                int.TryParse(Regex.Match(CpuName, "i[0-9]-[0-9]*", RegexOptions.IgnoreCase).Value.Replace(Type + "-", string.Empty).Trim(), out Version);
+			Logger.Warn($"No CPU treatment for {Serialization.ToJson(ProcessorPc)} & {Serialization.ToJson(ProcessorRequirement)}");
+			return new CheckResult();
+		}
 
-                if (Version == 0)
-                {
-                    int.TryParse(Regex.Match(CpuName, @"\d{4}", RegexOptions.IgnoreCase).Value.Trim(), out Version);
-                }
+		private CheckResult CompareAmdVsIntel(CpuObject amd, CpuObject intel)
+		{
+			bool amdHasRyzen3 = amd.Type.IndexOf("ryzen 3", StringComparison.OrdinalIgnoreCase) > -1;
+			bool amdHasRyzen5 = amd.Type.IndexOf("ryzen 5", StringComparison.OrdinalIgnoreCase) > -1;
+			bool amdHasRyzen7 = amd.Type.IndexOf("ryzen 7", StringComparison.OrdinalIgnoreCase) > -1;
 
-                IsOld = !Regex.IsMatch(CpuName, "i[0-9]", RegexOptions.IgnoreCase);
-            }
-            if (IsAmd)
-            {
-                if (CpuName.ToLower().IndexOf("ryzen") > -1)
-                {
-                    Type = Regex.Match(CpuName, "Ryzen[ ][0-9]", RegexOptions.IgnoreCase).Value.Trim();
+			bool intelHasI3 = intel.Type.IndexOf("i3", StringComparison.OrdinalIgnoreCase) > -1;
+			bool intelHasI5 = intel.Type.IndexOf("i5", StringComparison.OrdinalIgnoreCase) > -1;
+			bool intelHasI7 = intel.Type.IndexOf("i7", StringComparison.OrdinalIgnoreCase) > -1;
 
-                    if (Regex.IsMatch(CpuName, "[0-9]+G", RegexOptions.IgnoreCase))
-                    {
-                        Type += " G";
-                    }
-                    if (Regex.IsMatch(CpuName, "[0-9]+XT", RegexOptions.IgnoreCase))
-                    {
-                        Type += " XT";
-                    }
-                    if (Regex.IsMatch(CpuName, "[0-9]+X", RegexOptions.IgnoreCase))
-                    {
-                        Type += " X";
-                    }
-                    if (Regex.IsMatch(CpuName, "[0-9]+U", RegexOptions.IgnoreCase))
-                    {
-                        Type += " U";
-                    }
-                }
-                if (CpuName.ToLower().IndexOf("athlon") > -1)
-                {
-                    Type = "Athlon";
+			if (amdHasRyzen3)
+			{
+				if (intelHasI3) return new CheckResult { Result = (amd.Version + 4000) >= intel.Version };
+				if (intelHasI5) return new CheckResult { Result = (amd.Version + 3000) >= intel.Version };
+				if (intelHasI7) return new CheckResult { Result = (amd.Version + 2000) >= intel.Version };
+			}
+			else if (amdHasRyzen5)
+			{
+				if (intelHasI3) return new CheckResult { Result = (amd.Version + 5000) >= intel.Version };
+				if (intelHasI5) return new CheckResult { Result = (amd.Version + 4000) >= intel.Version };
+				if (intelHasI7) return new CheckResult { Result = (amd.Version + 3000) >= intel.Version };
+			}
+			else if (amdHasRyzen7)
+			{
+				if (intelHasI3) return new CheckResult { Result = (amd.Version + 6000) >= intel.Version };
+				if (intelHasI5) return new CheckResult { Result = (amd.Version + 5000) >= intel.Version };
+				if (intelHasI7) return new CheckResult { Result = (amd.Version + 4000) >= intel.Version };
+			}
 
+			return new CheckResult();
+		}
 
-                    if (CpuName.ToLower().IndexOf("ge") > -1)
-                    {
-                        Type += " GE";
-                    }
-                    else if (CpuName.ToLower().IndexOf("g") > -1)
-                    {
-                        Type += " G";
-                    }
-                }
+		private CheckResult CompareIntelVsAmd(CpuObject intel, CpuObject amd)
+		{
+			bool amdHasRyzen3 = amd.Type.IndexOf("ryzen 3", StringComparison.OrdinalIgnoreCase) > -1;
+			bool amdHasRyzen5 = amd.Type.IndexOf("ryzen 5", StringComparison.OrdinalIgnoreCase) > -1;
+			bool amdHasRyzen7 = amd.Type.IndexOf("ryzen 7", StringComparison.OrdinalIgnoreCase) > -1;
 
-                if (Regex.IsMatch(CpuName, "\\d{4}"))
-                {
-                    int.TryParse(Regex.Match(CpuName, "\\d{4}").Value.Trim(), out Version);
-                }
-                else if (Regex.IsMatch(CpuName, "\\d{3}"))
-                {
-                    int.TryParse(Regex.Match(CpuName, "\\d{3}").Value.Trim(), out Version);
-                }
+			bool intelHasI3 = intel.Type.IndexOf("i3", StringComparison.OrdinalIgnoreCase) > -1;
+			bool intelHasI5 = intel.Type.IndexOf("i5", StringComparison.OrdinalIgnoreCase) > -1;
+			bool intelHasI7 = intel.Type.IndexOf("i7", StringComparison.OrdinalIgnoreCase) > -1;
 
-                IsOld = CpuName.ToLower().IndexOf("ryzen") == -1;
-            }
+			if (amdHasRyzen3)
+			{
+				if (intelHasI3) return new CheckResult { Result = (amd.Version + 4000) >= intel.Version };
+				if (intelHasI5) return new CheckResult { Result = (amd.Version + 3000) >= intel.Version };
+				if (intelHasI7) return new CheckResult { Result = (amd.Version + 2000) >= intel.Version };
+			}
+			else if (amdHasRyzen5)
+			{
+				if (intelHasI3) return new CheckResult { Result = (amd.Version + 5000) >= intel.Version };
+				if (intelHasI5) return new CheckResult { Result = (amd.Version + 4000) >= intel.Version };
+				if (intelHasI7) return new CheckResult { Result = (amd.Version + 3000) >= intel.Version };
+			}
+			else if (amdHasRyzen7)
+			{
+				if (intelHasI3) return new CheckResult { Result = (amd.Version + 6000) >= intel.Version };
+				if (intelHasI5) return new CheckResult { Result = (amd.Version + 5000) >= intel.Version };
+				if (intelHasI7) return new CheckResult { Result = (amd.Version + 4000) >= intel.Version };
+			}
 
+			return new CheckResult();
+		}
 
-            // Clock GHz
-            Double.TryParse(Regex.Match(CpuName, "[0-9]*[.][0-9]*[ GHz]*").Value.Replace("GHz", string.Empty)
-                .Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim()
-                .Replace(",", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim(), out Clock);
-            if (Clock == 0)
-            {
-                Double.TryParse(Regex.Match(CpuName, "[0-9]*[.][0-9]*[GHz]*").Value.Replace("GHz", string.Empty)
-                    .Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim()
-                    .Replace(",", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim(), out Clock);
-            }
+		public static bool CallIsIntel(string cpuName)
+		{
+			return cpuName.IndexOf("intel", StringComparison.OrdinalIgnoreCase) > -1
+				|| IntelTypeRegex.IsMatch(cpuName);
+		}
 
-            // Clock MHz
-            if (Clock == 0)
-            {
-                Double.TryParse(Regex.Match(CpuName, "[0-9]*[.][0-9]*[ MHz]*").Value.Replace("MHz", string.Empty)
-                    .Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim()
-                    .Replace(",", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim(), out Clock);
+		public static bool CallIsAmd(string cpuName)
+		{
+			return cpuName.IndexOf("amd", StringComparison.OrdinalIgnoreCase) > -1
+				|| cpuName.IndexOf("ryzen", StringComparison.OrdinalIgnoreCase) > -1;
+		}
 
-                if (Clock == 0)
-                {
-                    Double.TryParse(Regex.Match(CpuName, "[0-9]*[.][0-9]*[MHz]*").Value.Replace("MHz", string.Empty)
-                        .Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim()
-                        .Replace(",", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Trim(), out Clock);
-                }
+		private CpuObject SetProcessor(string cpuName)
+		{
+			bool isIntel = CallIsIntel(cpuName);
+			bool isAmd = CallIsAmd(cpuName);
+			bool isOld = false;
+			string type = string.Empty;
+			int version = 0;
+			double clock = 0;
 
-                if (Clock != 0)
-                {
-                    Clock = Clock / 1000;
-                }
-            }
+			string cpuLower = cpuName.ToLower();
 
-            if (CpuName.ToLower().IndexOf("single core") > -1)
-            {
-                IsOld = true;
-            }
-            if (CpuName.ToLower().IndexOf("dual core") > -1)
-            {
-                IsOld = true;
-            }
-            if (CpuName.ToLower().IndexOf("quad core") > -1)
-            {
-                IsOld = true;
-            }
+			if (isIntel)
+			{
+				Match typeMatch = IntelTypeRegex.Match(cpuName);
+				if (typeMatch.Success)
+				{
+					type = typeMatch.Value.Trim();
 
-            // No Version
-            if (Version == 0)
-            {
-                IsOld = true;
-            }
+					Match versionMatch = IntelVersionRegex.Match(cpuName);
+					if (versionMatch.Success)
+					{
+						int.TryParse(versionMatch.Value.Replace(type + "-", string.Empty).Trim(), out version);
+					}
 
+					if (version == 0)
+					{
+						Match fourDigitsMatch = FourDigitsRegex.Match(cpuName);
+						if (fourDigitsMatch.Success)
+						{
+							int.TryParse(fourDigitsMatch.Value.Trim(), out version);
+						}
+					}
+				}
 
-            return new CpuObject
-            {
-                Name = CpuName,
-                IsIntel = IsIntel,
-                IsAmd = IsAmd,
-                IsOld = IsOld,
-                Type = Type,
-                Version = Version,
-                Clock = Clock
-            };
-        }
-    }
+				isOld = !IntelTypeRegex.IsMatch(cpuName);
+			}
 
+			if (isAmd)
+			{
+				if (cpuLower.IndexOf("ryzen") > -1)
+				{
+					Match ryzenMatch = RyzenTypeRegex.Match(cpuName);
+					if (ryzenMatch.Success)
+					{
+						type = ryzenMatch.Value.Trim();
 
-    public class CpuObject
-    {
-        public string Name { get; set; }
-        public bool IsIntel { get; set; }
-        public bool IsAmd { get; set; }
-        public bool IsOld { get; set; }
+						if (RyzenGRegex.IsMatch(cpuName)) type += " G";
+						else if (RyzenXTRegex.IsMatch(cpuName)) type += " XT";
+						else if (RyzenXRegex.IsMatch(cpuName)) type += " X";
+						else if (RyzenURegex.IsMatch(cpuName)) type += " U";
+					}
+				}
+				else if (cpuLower.IndexOf("athlon") > -1)
+				{
+					type = "Athlon";
 
-        public string Type { get; set; }
-        public int Version { get; set; }
-        public double Clock { get; set; }
-    }
+					if (cpuLower.IndexOf("ge") > -1) type += " GE";
+					else if (cpuLower.IndexOf("g") > -1) type += " G";
+				}
+
+				Match fourDigitsMatch = FourDigitsRegex.Match(cpuName);
+				if (fourDigitsMatch.Success)
+				{
+					int.TryParse(fourDigitsMatch.Value.Trim(), out version);
+				}
+				else
+				{
+					Match threeDigitsMatch = ThreeDigitsRegex.Match(cpuName);
+					if (threeDigitsMatch.Success)
+					{
+						int.TryParse(threeDigitsMatch.Value.Trim(), out version);
+					}
+				}
+
+				isOld = cpuLower.IndexOf("ryzen") == -1;
+			}
+
+			Match clockMatch = ClockGhzRegex.Match(cpuName);
+			if (clockMatch.Success)
+			{
+				string clockStr = clockMatch.Value.Replace("GHz", string.Empty)
+					.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)
+					.Replace(",", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)
+					.Trim();
+				double.TryParse(clockStr, out clock);
+			}
+
+			if (clock == 0)
+			{
+				clockMatch = ClockGhzRegex2.Match(cpuName);
+				if (clockMatch.Success)
+				{
+					string clockStr = clockMatch.Value.Replace("GHz", string.Empty)
+						.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)
+						.Replace(",", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)
+						.Trim();
+					double.TryParse(clockStr, out clock);
+				}
+			}
+
+			if (clock == 0)
+			{
+				clockMatch = ClockMhzRegex.Match(cpuName);
+				if (clockMatch.Success)
+				{
+					string clockStr = clockMatch.Value.Replace("MHz", string.Empty)
+						.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)
+						.Replace(",", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)
+						.Trim();
+					if (double.TryParse(clockStr, out clock) && clock != 0)
+					{
+						clock /= 1000;
+					}
+				}
+			}
+
+			if (clock == 0)
+			{
+				clockMatch = ClockMhzRegex2.Match(cpuName);
+				if (clockMatch.Success)
+				{
+					string clockStr = clockMatch.Value.Replace("MHz", string.Empty)
+						.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)
+						.Replace(",", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)
+						.Trim();
+					if (double.TryParse(clockStr, out clock) && clock != 0)
+					{
+						clock /= 1000;
+					}
+				}
+			}
+
+			if (cpuLower.IndexOf("single core") > -1
+				|| cpuLower.IndexOf("dual core") > -1
+				|| cpuLower.IndexOf("quad core") > -1)
+			{
+				isOld = true;
+			}
+
+			if (version == 0)
+			{
+				isOld = true;
+			}
+
+			return new CpuObject
+			{
+				Name = cpuName,
+				IsIntel = isIntel,
+				IsAmd = isAmd,
+				IsOld = isOld,
+				Type = type,
+				Version = version,
+				Clock = clock
+			};
+		}
+	}
+
+	public class CpuObject
+	{
+		public string Name { get; set; }
+		public bool IsIntel { get; set; }
+		public bool IsAmd { get; set; }
+		public bool IsOld { get; set; }
+		public string Type { get; set; }
+		public int Version { get; set; }
+		public double Clock { get; set; }
+	}
 }

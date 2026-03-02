@@ -7,10 +7,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         xmlns:local="clr-namespace:SystemChecker.Controls"
         mc:Ignorable="d"
+        d:DesignHeight="40" d:DesignWidth="40"
         d:DataContext="{d:DesignInstance local:PluginViewItemDataContext, IsDesignTimeCreatable=True}">
 
     <TextBlock Text="{Binding Text, Mode=OneWay}" 
                FontFamily="{DynamicResource CommonFont}"
                Foreground="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=Foreground}"
                FontSize="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=FontSize}" />
+    
 </controls:PluginUserControlExtend>

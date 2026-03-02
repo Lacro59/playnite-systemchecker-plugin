@@ -1,512 +1,461 @@
-﻿using Playnite.SDK;
-using Playnite.SDK.Data;
+﻿using Playnite.SDK.Data;
 using System;
-using System.Linq;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Globalization;
 using CommonPluginsShared;
 using SystemChecker.Models;
-using SystemChecker.Clients;
+using CommonPluginsShared.SystemInfo;
 
 namespace SystemChecker.Services
 {
-    public class Gpu
-    {
-        private static readonly ILogger logger = LogManager.GetLogger();
+	public class Gpu : HardwareChecker
+	{
+		private static readonly Regex VramRegex = new Regex(@"vram", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private static readonly Regex MbRegex = new Regex(@"mb", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private static readonly Regex GbRegex = new Regex(@"gb", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private static readonly Regex NumbersOnlyRegex = new Regex(@"[^.0-9]", RegexOptions.Compiled);
+		private static readonly Regex DigitMRegex = new Regex(@"[0-9]m", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private static readonly Regex MDigitRegex = new Regex(@"m[0-9]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private static readonly Regex DxRegex = new Regex(@"dx[0-9]*", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private static readonly Regex NonDigitsRegex = new Regex(@"[^\d]", RegexOptions.Compiled);
+		private static readonly Regex GeforceDigitRegex = new Regex(@"geforce[0-9]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private static readonly Regex RadeonDigitRegex = new Regex(@"radeon [0-9]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		private static readonly Regex SingleDigitRegex = new Regex(@"\d", RegexOptions.Compiled);
 
-        private string CardPcName { get; set; }
-        private GpuObject CardPc { get; set; }
-        private string CardRequierementName { get; set; }
-        private GpuObject CardRequierement { get; set; }
+		protected override string CheckType => "GPU";
+		protected override string ComponentPcName => _cardPcName;
+		protected override string ComponentRequirementName => _cardRequirementName;
 
-        public bool IsWithNoCard = false;
-        public bool IsIntegrate => CardPc.IsIntegrate;
-        public bool CardRequierementIsOld => CardRequierement.IsOld;
+		private string _cardPcName;
+		private GpuObject CardPc { get; set; }
+		private string _cardRequirementName;
+		private GpuObject CardRequirement { get; set; }
 
-        public Gpu(SystemConfiguration systemConfiguration, string GpuRequierement)
-        {
-            CardPcName = DeleteInfo(systemConfiguration.GpuName);
-            CardRequierementName = DeleteInfo(GpuRequierement);
+		public bool IsWithNoCard = false;
+		public bool IsIntegrate => CardPc.IsIntegrate;
+		public bool CardRequirementIsOld => CardRequirement.IsOld;
 
+		public Gpu(SystemConfiguration systemConfiguration, string gpuRequirement)
+		{
+			_cardPcName = DeleteInfo(systemConfiguration.GpuName);
+			_cardRequirementName = DeleteInfo(gpuRequirement);
 
-            // VRAM only
-            double vram = 0;
-            string tempVram = string.Empty;
-            if (GpuRequierement.ToLower().IndexOf("vram") > -1 && !CallIsNvidia(GpuRequierement) && !CallIsAmd(GpuRequierement))
-            {
-                tempVram = GpuRequierement.Replace(".", CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator);
-                tempVram = Regex.Replace(tempVram, "vram", string.Empty, RegexOptions.IgnoreCase);
+			string gpuLower = gpuRequirement.ToLower();
 
-                if (tempVram.ToLower().IndexOf("mb") > -1 && !CallIsNvidia(GpuRequierement) && !CallIsAmd(GpuRequierement))
-                {
-                    _ = double.TryParse(Regex.Replace(tempVram, "mb", string.Empty, RegexOptions.IgnoreCase).Trim(), out vram);
-                    if (vram > 0)
-                    {
-                        vram = vram * 1024;
-                    }
-                }
-                if (tempVram.ToLower().IndexOf("gb") > -1 && !CallIsNvidia(GpuRequierement) && !CallIsAmd(GpuRequierement))
-                {
-                    _ = double.TryParse(Regex.Replace(tempVram, "gb", string.Empty, RegexOptions.IgnoreCase).Trim(), out vram);
-                    if (vram > 0)
-                    {
-                        vram = vram * 1024 * 1024;
-                    }
-                }
-            }
+			double vram = 0;
+			if (gpuLower.IndexOf("vram") > -1 && !CallIsNvidia(gpuRequirement) && !CallIsAmd(gpuRequirement))
+			{
+				string tempVram = gpuRequirement.Replace(".", CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator);
+				tempVram = VramRegex.Replace(tempVram, string.Empty);
 
-            // Rezolution only
-            int ResolutionHorizontal = 0;
-            if (GpuRequierement.ToLower().IndexOf("1280×720") > -1 || GpuRequierement.ToLower().IndexOf("1280 × 720") > -1)
-            {
-                ResolutionHorizontal = 1280;
-            }
-            if (GpuRequierement.ToLower().IndexOf("1368×") > -1 || GpuRequierement.ToLower().IndexOf("1368 ×") > -1)
-            {
-                ResolutionHorizontal = 1368;
-            }
-            if (GpuRequierement.ToLower().IndexOf("1600×") > -1 || GpuRequierement.ToLower().IndexOf("1600 ×") > -1)
-            {
-                ResolutionHorizontal = 1600;
-            }
-            if (GpuRequierement.ToLower().IndexOf("1920×") > -1 || GpuRequierement.ToLower().IndexOf("1920 ×") > -1)
-            {
-                ResolutionHorizontal = 1920;
-            }
+				if (gpuLower.IndexOf("mb") > -1)
+				{
+					if (double.TryParse(MbRegex.Replace(tempVram, string.Empty).Trim(), out vram) && vram > 0)
+					{
+						vram *= 1024;
+					}
+				}
+				else if (gpuLower.IndexOf("gb") > -1)
+				{
+					if (double.TryParse(GbRegex.Replace(tempVram, string.Empty).Trim(), out vram) && vram > 0)
+					{
+						vram *= 1024 * 1024;
+					}
+				}
+			}
 
+			int resolutionHorizontal = 0;
+			if (gpuLower.IndexOf("1280") > -1 && (gpuLower.IndexOf("×720") > -1 || gpuLower.IndexOf("× 720") > -1))
+			{
+				resolutionHorizontal = 1280;
+			}
+			else if (gpuLower.IndexOf("1368×") > -1 || gpuLower.IndexOf("1368 ×") > -1)
+			{
+				resolutionHorizontal = 1368;
+			}
+			else if (gpuLower.IndexOf("1600×") > -1 || gpuLower.IndexOf("1600 ×") > -1)
+			{
+				resolutionHorizontal = 1600;
+			}
+			else if (gpuLower.IndexOf("1920×") > -1 || gpuLower.IndexOf("1920 ×") > -1)
+			{
+				resolutionHorizontal = 1920;
+			}
 
-            CardPc = SetCard(DeleteInfo(systemConfiguration.GpuName));
-            CardRequierement = SetCard(DeleteInfo(GpuRequierement));
+			CardPc = SetCard(DeleteInfo(systemConfiguration.GpuName));
+			CardRequirement = SetCard(DeleteInfo(gpuRequirement));
 
+			CardPc.Vram = systemConfiguration.GpuRam;
+			CardRequirement.Vram = (long)vram;
+			CardPc.ResolutionHorizontal = (int)systemConfiguration.CurrentHorizontalResolution;
+			CardRequirement.ResolutionHorizontal = resolutionHorizontal;
+		}
 
-            CardPc.Vram = systemConfiguration.GpuRam;
-            CardRequierement.Vram = (long)vram;
+		protected override CheckResult PerformCheck()
+		{
+			Common.LogDebug(true, $"Gpu.PerformCheck - CardPc({_cardPcName}): {Serialization.ToJson(CardPc)}");
+			Common.LogDebug(true, $"Gpu.PerformCheck - CardRequirement({_cardRequirementName}): {Serialization.ToJson(CardRequirement)}");
 
-            CardPc.ResolutionHorizontal = (int)systemConfiguration.CurrentHorizontalResolution;
-            CardRequierement.ResolutionHorizontal = ResolutionHorizontal;
-        }
+			if (CardRequirement.IsDx)
+			{
+				if (CardPc.IsIntegrate)
+				{
+					if (CardRequirement.DxVersion < 12)
+					{
+						IsWithNoCard = true;
+						return new CheckResult { Result = true };
+					}
+					else
+					{
+						IsWithNoCard = true;
+						return new CheckResult { Result = true };
+					}
+				}
+				else
+				{
+					IsWithNoCard = true;
+					return new CheckResult { Result = true };
+				}
+			}
 
-        public CheckResult IsBetter()
-        {
-            Common.LogDebug(true, $"Gpu.IsBetter - CardPc({CardPcName}): {Serialization.ToJson(CardPc)}");
-            Common.LogDebug(true, $"Gpu.IsBetter - CardRequierement({CardRequierementName}): {Serialization.ToJson(CardRequierement)}");
+			if (CardRequirement.IsOGL && CardRequirement.OglVersion < 4)
+			{
+				IsWithNoCard = true;
+				return new CheckResult { Result = true };
+			}
 
-            // DirectX
-            if (CardRequierement.IsDx)
-            {
-                if (CardPc.IsIntegrate)
-                {
-                    if (CardRequierement.DxVersion < 12)
-                    {
-                        IsWithNoCard = true;
-                        return new CheckResult { Result = true };
-                    }
-                }
-                else
-                {
-                    IsWithNoCard = true;
-                    return new CheckResult { Result = true };
-                }
-            }
+			if (!CardRequirement.IsIntegrate && !CardRequirement.IsNvidia && !CardRequirement.IsAmd)
+			{
+				if (CardRequirement.Vram != 0 && CardRequirement.Vram <= CardPc.Vram)
+				{
+					IsWithNoCard = true;
+					return new CheckResult { Result = true };
+				}
 
-            // OpenGL
-            if (CardRequierement.IsOGL && CardRequierement.OglVersion < 4)
-            {
-                IsWithNoCard = true;
-                return new CheckResult { Result = true };
-            }
+				if (CardRequirement.ResolutionHorizontal != 0 && CardRequirement.ResolutionHorizontal <= CardPc.ResolutionHorizontal)
+				{
+					IsWithNoCard = true;
+					return new CheckResult { Result = true };
+				}
+			}
 
-            // No card defined
-            if (!CardRequierement.IsIntegrate && !CardRequierement.IsNvidia && !CardRequierement.IsAmd)
-            {
-                if (CardRequierement.Vram != 0 && CardRequierement.Vram <= CardPc.Vram)
-                {
-                    IsWithNoCard = true;
-                    return new CheckResult { Result = true };
-                }
-                if (CardRequierement.ResolutionHorizontal != 0 && CardRequierement.ResolutionHorizontal <= CardPc.ResolutionHorizontal)
-                {
-                    IsWithNoCard = true;
-                    return new CheckResult { Result = true };
-                }
-            }
+			if (CardRequirement.IsOld && !CardPc.IsOld)
+			{
+				return new CheckResult { Result = true };
+			}
 
-            // Old card requiered
-            if (CardRequierement.IsOld && !CardPc.IsOld)
-            {
-                return new CheckResult { Result = true };
-            }
+			if (CardRequirement.IsIntegrate && (CardPc.IsNvidia || CardPc.IsAmd) && !CardPc.IsOld)
+			{
+				return new CheckResult { Result = true };
+			}
 
-            // Integrate
-            if (CardRequierement.IsIntegrate && (CardPc.IsNvidia || CardPc.IsAmd) && !CardPc.IsOld)
-            {
-                return new CheckResult { Result = true };
-            }
-            if (CardRequierement.IsIntegrate && CardPc.IsIntegrate)
-            {
-                if (CardRequierement.Type == CardPc.Type)
-                {
-                    return new CheckResult { Result = CardRequierement.Number <= CardPc.Number };
-                }
+			if (CardRequirement.IsIntegrate && CardPc.IsIntegrate)
+			{
+				if (CardRequirement.Type == CardPc.Type)
+				{
+					return new CheckResult { Result = CardRequirement.Number <= CardPc.Number };
+				}
 
-                if (CardRequierement.Type == "HD" && CardPc.Type == "UHD")
-                {
-                    return new CheckResult { Result = true };
-                }
+				if (CardRequirement.Type == "HD" && CardPc.Type == "UHD")
+				{
+					return new CheckResult { Result = true };
+				}
 
-                if (CardRequierement.Number != 0 && CardPc.Number != 0)
-                {
-                    if (CardRequierement.Number > 999 && CardPc.Number < 1000)
-                    {
-                        return new CheckResult { Result = true };
-                    }
-                    if (CardRequierement.Number > 999 && CardPc.Number > 999)
-                    {
-                        return new CheckResult { Result = CardRequierement.Number < CardPc.Number };
-                    }
-                    if (CardRequierement.Number < 1000 && CardPc.Number < 1000)
-                    {
-                        return new CheckResult { Result = CardRequierement.Number < CardPc.Number };
-                    }
-                }
-                else
-                {
-                    logger.Warn($"No GPU treatment for {CardPcName}: {Serialization.ToJson(CardPc)} & {CardRequierementName}: {Serialization.ToJson(CardRequierement)}");
-                    return new CheckResult { Result = true, SameConstructor = true };
-                }
-            }
+				if (CardRequirement.Number != 0 && CardPc.Number != 0)
+				{
+					if (CardRequirement.Number > 999 && CardPc.Number < 1000)
+					{
+						return new CheckResult { Result = true };
+					}
 
+					if (CardRequirement.Number > 999 && CardPc.Number > 999)
+					{
+						return new CheckResult { Result = CardRequirement.Number < CardPc.Number };
+					}
 
-            Benchmark benchmark = new Benchmark();
-            bool? isBetter = benchmark.IsBetterGpu(CardPcName, CardRequierementName);
-            if (isBetter != null)
-            {
-                return new CheckResult
-                {
-                    Result = (bool)isBetter,
-                    SameConstructor = true
-                };
-            }
+					if (CardRequirement.Number < 1000 && CardPc.Number < 1000)
+					{
+						return new CheckResult { Result = CardRequirement.Number < CardPc.Number };
+					}
+				}
+				else
+				{
+					Logger.Warn($"No GPU treatment for {_cardPcName}: {Serialization.ToJson(CardPc)} & {_cardRequirementName}: {Serialization.ToJson(CardRequirement)}");
+					return new CheckResult { Result = true, SameConstructor = true };
+				}
+			}
 
+			bool? isBetter = CallBenchmark(_cardPcName, _cardRequirementName, true);
+			if (isBetter != null)
+			{
+				return new CheckResult
+				{
+					Result = (bool)isBetter,
+					SameConstructor = true
+				};
+			}
 
-            // Nvidia vs Nvidia
-            if (CardRequierement.IsNvidia && CardPc.IsNvidia)
-            {
-                return new CheckResult { SameConstructor = true, Result = CardRequierement.Number <= CardPc.Number };
-            }
+			if (CardRequirement.IsNvidia && CardPc.IsNvidia)
+			{
+				return new CheckResult { SameConstructor = true, Result = CardRequirement.Number <= CardPc.Number };
+			}
 
-            // Amd vs Amd
-            if (CardRequierement.IsAmd && CardPc.IsAmd)
-            {
-                if (CardRequierement.Type == CardPc.Type)
-                {
-                    return new CheckResult { SameConstructor = true, Result = CardRequierement.Number <= CardPc.Number };
-                }
+			if (CardRequirement.IsAmd && CardPc.IsAmd)
+			{
+				if (CardRequirement.Type == CardPc.Type)
+				{
+					return new CheckResult { SameConstructor = true, Result = CardRequirement.Number <= CardPc.Number };
+				}
 
-                if (CardRequierement.Type == "Radeon HD" && CardRequierement.Type != CardPc.Type)
-                {
-                    return new CheckResult { SameConstructor = true, Result = true };
-                }
+				if (CardRequirement.Type == "Radeon HD" && CardRequirement.Type != CardPc.Type)
+				{
+					return new CheckResult { SameConstructor = true, Result = true };
+				}
 
-                switch (CardRequierement.Type + CardPc.Type)
-                {
-                    case "R5R7":
-                        return new CheckResult { SameConstructor = true, Result = true };
-                    case "R5R9":
-                        return new CheckResult { SameConstructor = true, Result = true };
-                    case "R5RX":
-                        return new CheckResult { SameConstructor = true, Result = true };
-                    case "R7R9":
-                        return new CheckResult { SameConstructor = true, Result = true };
-                    case "R7RX":
-                        return new CheckResult { SameConstructor = true, Result = true };
-                    case "R9RX":
-                        return new CheckResult { SameConstructor = true, Result = true };
-                }
-            }
+				switch (CardRequirement.Type + CardPc.Type)
+				{
+					case "R5R7":
+					case "R5R9":
+					case "R5RX":
+					case "R7R9":
+					case "R7RX":
+					case "R9RX":
+						return new CheckResult { SameConstructor = true, Result = true };
+				}
+			}
 
-            // Nvidia vs Amd
-            if (CardRequierement.IsNvidia && CardPc.IsAmd)
-            {
+			Logger.Warn($"No GPU treatment for {_cardPcName}: {Serialization.ToJson(CardPc)} & {_cardRequirementName}: {Serialization.ToJson(CardRequirement)}");
+			return new CheckResult();
+		}
 
-            }
+		public static bool CallIsNvidia(string gpuName)
+		{
+			return gpuName.IndexOf("nvidia", StringComparison.OrdinalIgnoreCase) > -1
+				|| gpuName.IndexOf("geforce", StringComparison.OrdinalIgnoreCase) > -1
+				|| gpuName.IndexOf("gtx", StringComparison.OrdinalIgnoreCase) > -1
+				|| gpuName.IndexOf("rtx", StringComparison.OrdinalIgnoreCase) > -1;
+		}
 
-            // Amd vs Nvidia
-            if (CardRequierement.IsAmd && CardPc.IsNvidia)
-            {
+		public static bool CallIsAmd(string gpuName)
+		{
+			return gpuName.IndexOf("amd", StringComparison.OrdinalIgnoreCase) > -1
+				|| gpuName.IndexOf("ati", StringComparison.OrdinalIgnoreCase) > -1
+				|| gpuName.IndexOf("radeon", StringComparison.OrdinalIgnoreCase) > -1;
+		}
 
-            }
+		public static bool CallIsIntel(string gpuName)
+		{
+			return gpuName.IndexOf("intel", StringComparison.OrdinalIgnoreCase) > -1;
+		}
 
-            logger.Warn($"No GPU treatment for {CardPcName}: {Serialization.ToJson(CardPc)} & {CardRequierementName}: {Serialization.ToJson(CardRequierement)}");
-            return new CheckResult();
-        }
+		private static string DeleteInfo(string gpuName)
+		{
+			return gpuName
+				.Replace("(R)", string.Empty, StringComparison.OrdinalIgnoreCase)
+				.Replace("(TM)", string.Empty, StringComparison.OrdinalIgnoreCase)
+				.Replace("(tm)", string.Empty, StringComparison.OrdinalIgnoreCase)
+				.Replace("Graphics", string.Empty, StringComparison.OrdinalIgnoreCase)
+				.Trim();
+		}
 
-        private string DeleteInfo(string GpuName)
-        {
-            return GpuName.Replace("™", string.Empty)
-                .Replace("(1024 MB)", string.Empty)
-                .Replace("(256 MB)", string.Empty)
-                .Replace("(512 MB)", string.Empty)
-                .Replace("(1792 MB)", string.Empty)
-                .Replace("(1 GB)", string.Empty)
-                .Replace("(2 GB)", string.Empty)
-                .Replace("(3 GB)", string.Empty)
-                .Replace("(4 GB)", string.Empty)
-                .Replace("(6 GB)", string.Empty)
-                .Replace("(8 GB)", string.Empty)
-                .Trim();
-        }
+		private GpuObject SetCard(string gpuName)
+		{
+			bool isIntegrate = gpuName.IndexOf("Intel", StringComparison.OrdinalIgnoreCase) > -1;
+			bool isNvidia = CallIsNvidia(gpuName);
+			bool isAmd = CallIsAmd(gpuName);
+			bool isOld = false;
+			bool isM = false;
+			bool isOgl = false;
+			bool isDx = false;
+			int dxVersion = 0;
+			int oglVersion = 0;
+			string type = string.Empty;
 
-        public static bool CallIsNvidia(string GpuName)
-        {
-            return Regex.IsMatch(GpuName, @"nvidia", RegexOptions.IgnoreCase)
-                || Regex.IsMatch(GpuName, @"geforce", RegexOptions.IgnoreCase)
-                || Regex.IsMatch(GpuName, @"rtx", RegexOptions.IgnoreCase)
-                || Regex.IsMatch(GpuName, @"gts", RegexOptions.IgnoreCase)
-                || Regex.IsMatch(GpuName, @"gtx", RegexOptions.IgnoreCase);
-        }
-        public static bool CallIsAmd(string GpuName)
-        {
-            return ((GpuName.ToLower().IndexOf("amd") > -1 || GpuName.ToLower().IndexOf("radeon") > -1 || GpuName.ToLower().IndexOf("ati ") > -1)
-                && GpuName.ToLower().IndexOf("(amd)") == -1);
-        }
-        public static bool CallIsIntel(string GpuName)
-        {
-            return GpuName.ToLower().IndexOf("intel") > -1;
-        }
+			int.TryParse(NumbersOnlyRegex.Replace(
+				gpuName.Replace("R5", string.Empty).Replace("R7", string.Empty).Replace("R9", string.Empty),
+				string.Empty).Trim(),
+				out int Number);
 
-        private GpuObject SetCard(string GpuName)
-        {
-            bool isIntegrate = false;
-            bool isNvidia = false;
-            bool isAmd = false;
-            bool isOld = false;
-            bool isM = false;
+			if (DigitMRegex.IsMatch(gpuName) || MDigitRegex.IsMatch(gpuName))
+			{
+				isM = true;
+			}
 
-            bool isOgl = false;
-            bool isDx = false;
-            int dxVersion = 0;
-            int oglVersion = 0;
+			string gpuLower = gpuName.ToLower();
 
-            string type = string.Empty;
+			if (gpuLower.IndexOf("directx") > -1 || DxRegex.IsMatch(gpuLower))
+			{
+				isDx = true;
+				if (int.TryParse(NonDigitsRegex.Replace(gpuName, string.Empty).Trim(), out dxVersion) && dxVersion > 50)
+				{
+					dxVersion = int.Parse(dxVersion.ToString().Substring(0, dxVersion.ToString().Length - 1));
+				}
+				else if (dxVersion == 0)
+				{
+					dxVersion = 8;
+				}
+			}
 
-            isIntegrate = GpuName.Contains("intel", StringComparison.InvariantCultureIgnoreCase) || GpuName.Contains("vega", StringComparison.InvariantCultureIgnoreCase);
-            isNvidia = CallIsNvidia(GpuName);
-            isAmd = CallIsAmd(GpuName);
+			if (gpuLower.IndexOf("pretty much any 3d graphics card") > -1
+				|| gpuLower.IndexOf("integrat") > -1
+				|| gpuLower.IndexOf("svga") > -1
+				|| gpuLower.IndexOf("direct3d") > -1)
+			{
+				isOld = true;
+			}
 
-            _ = int.TryParse(Regex.Replace(GpuName.Replace("R5", string.Empty).Replace("R7", string.Empty).Replace("R9", string.Empty), "[^.0-9]", string.Empty).Trim(), out int Number);
+			if (gpuLower.IndexOf("opengl") > -1 || gpuLower.IndexOf("open gl") > -1)
+			{
+				isOgl = true;
+				string temp = gpuLower.Replace("opengl", string.Empty).Replace("open gl", string.Empty).Replace(".0", string.Empty).Trim();
+				int.TryParse(temp, out oglVersion);
+			}
 
-            #region Check is mobile version
-            if (Regex.IsMatch(GpuName.ToLower(), "[0-9]m", RegexOptions.IgnoreCase))
-            {
-                isM = true;
-            }
-            if (Regex.IsMatch(GpuName.ToLower(), "m[0-9]", RegexOptions.IgnoreCase))
-            {
-                isM = true;
-            }
-            #endregion
+			if (isNvidia)
+			{
+				if (gpuLower.IndexOf("geforce gt") > -1 && gpuLower.IndexOf("gtx") == -1)
+				{
+					isOld = true;
+				}
 
+				if (Number >= 5000 && gpuLower.IndexOf("rtx") == -1)
+				{
+					isOld = true;
+				}
 
-            #region Check old & other
-            // Other
-            if (GpuName.ToLower().IndexOf("directx") > -1 || Regex.IsMatch(GpuName.ToLower(), "dx[0-9]*"))
-            {
-                isDx = true;
-                _ = int.TryParse(Regex.Replace(GpuName, @"[^\d]", string.Empty).Trim(), out dxVersion);
-                if (dxVersion > 0)
-                {
-                    if (dxVersion > 50)
-                    {
-                        dxVersion = int.Parse(dxVersion.ToString().Substring(0, dxVersion.ToString().Length - 1));
-                    }
-                }
-                else
-                {
-                    dxVersion = 8;
-                }
-            }
-            if (GpuName.ToLower().IndexOf("pretty much any 3d graphics card") > -1 || GpuName.ToLower().IndexOf("integrat") > -1)
-            {
-                isOld = true;
-            }
-            if (GpuName.ToLower().IndexOf("svga") > -1)
-            {
-                isOld = true;
-            }
-            if (GpuName.ToLower().IndexOf("opengl") > -1 || GpuName.ToLower().IndexOf("open gl") > -1)
-            {
-                isOgl = true;
-                int.TryParse(
-                    GpuName.ToLower().Replace("opengl", string.Empty).Replace("open gl", string.Empty)
-                    .Replace(".0", string.Empty).Trim(),
-                    out oglVersion
-                );
-            }
-            if (GpuName.ToLower().IndexOf("direct3d") > -1)
-            {
-                isOld = true;
-            }
+				if (Number == 4200 || Number == 4400 || Number == 4600 || Number == 4800 || Number < 450)
+				{
+					isOld = true;
+				}
 
-            if (isNvidia)
-            {
-                if (GpuName.ToLower().IndexOf("geforce gt") > -1 && GpuName.ToLower().IndexOf("gtx") == -1)
-                {
-                    isOld = true;
-                }
-                if (Number >= 5000 && GpuName.ToLower().IndexOf("rtx") == -1)
-                {
-                    isOld = true;
-                }
-                if (Number == 4200 || Number == 4400 || Number == 4600 || Number == 4800)
-                {
-                    isOld = true;
-                }
-                if (Number < 450)
-                {
-                    isOld = true;
-                }
-                if (Regex.IsMatch(GpuName.ToLower(), "geforce[0-9]"))
-                {
-                    isOld = true;
-                }
-                if (GpuName.ToLower().IndexOf("geforce fx") > -1)
-                {
-                    isOld = true;
-                }
-            }
+				if (GeforceDigitRegex.IsMatch(gpuLower) || gpuLower.IndexOf("geforce fx") > -1)
+				{
+					isOld = true;
+				}
+			}
 
-            if (isAmd)
-            {
-                if (GpuName.ToLower().IndexOf("radeon x") > -1)
-                {
-                    isOld = true;
-                }
-                if (GpuName.ToLower().IndexOf("radeon hd") > -1 && Number < 7000)
-                {
-                    isOld = true;
-                }
-                if (GpuName.ToLower().IndexOf("radeon r") > -1 && Number < 300)
-                {
-                    isOld = true;
-                }
-                if (Regex.IsMatch(GpuName.ToLower(), "radeon [0-9]"))
-                {
-                    isOld = true;
-                }
-            }
-            #endregion
+			if (isAmd)
+			{
+				if (gpuLower.IndexOf("radeon x") > -1)
+				{
+					isOld = true;
+				}
 
+				if (gpuLower.IndexOf("radeon hd") > -1 && Number < 7000)
+				{
+					isOld = true;
+				}
 
-            #region Type
-            if (!isOld)
-            {
-                if (isIntegrate)
-                {
-                    if (GpuName.ToLower().IndexOf("uhd") > -1)
-                    {
-                        type = "UHD";
-                    }
-                    if (GpuName.ToLower().IndexOf(" hd") > -1)
-                    {
-                        type = "HD";
-                    }
-                }
+				if (gpuLower.IndexOf("radeon r") > -1 && Number < 300)
+				{
+					isOld = true;
+				}
 
-                if (isNvidia)
-                {
-                    if (GpuName.ToLower().IndexOf("gts") > -1)
-                    {
-                        type = "gts";
-                    }
-                    if (GpuName.ToLower().IndexOf("gtx") > -1)
-                    {
-                        type = "GTX";
-                    }
-                    if (GpuName.ToLower().IndexOf("rtx") > -1)
-                    {
-                        type = "RTX";
-                    }
-                }
+				if (RadeonDigitRegex.IsMatch(gpuLower))
+				{
+					isOld = true;
+				}
+			}
 
-                if (isAmd)
-                {
-                    if (GpuName.ToLower().IndexOf("radeon hd") > -1)
-                    {
-                        type = "Radeon HD";
-                    }
-                    if (GpuName.ToLower().IndexOf("r5") > -1)
-                    {
-                        type = "R5";
-                    }
-                    if (GpuName.ToLower().IndexOf("r7") > -1)
-                    {
-                        type = "R7";
-                    }
-                    if (GpuName.ToLower().IndexOf("r9") > -1)
-                    {
-                        type = "R9";
-                    }
-                    if (GpuName.ToLower().IndexOf("rx") > -1)
-                    {
-                        type = "RX";
-                    }
-                }
-            }
-            #endregion
+			if (!isOld)
+			{
+				if (isIntegrate)
+				{
+					if (gpuLower.IndexOf("uhd") > -1)
+					{
+						type = "UHD";
+					}
+					else if (gpuLower.IndexOf(" hd") > -1)
+					{
+						type = "HD";
+					}
+				}
 
+				if (isNvidia)
+				{
+					if (gpuLower.IndexOf("rtx") > -1)
+					{
+						type = "RTX";
+					}
+					else if (gpuLower.IndexOf("gtx") > -1)
+					{
+						type = "GTX";
+					}
+					else if (gpuLower.IndexOf("gts") > -1)
+					{
+						type = "gts";
+					}
+				}
 
-            if (!isAmd && !isNvidia && !isIntegrate && !isDx)
-            {
-                isOld = true;
-            }
+				if (isAmd)
+				{
+					if (gpuLower.IndexOf("rx") > -1)
+					{
+						type = "RX";
+					}
+					else if (gpuLower.IndexOf("r9") > -1)
+					{
+						type = "R9";
+					}
+					else if (gpuLower.IndexOf("r7") > -1)
+					{
+						type = "R7";
+					}
+					else if (gpuLower.IndexOf("r5") > -1)
+					{
+						type = "R5";
+					}
+					else if (gpuLower.IndexOf("radeon hd") > -1)
+					{
+						type = "Radeon HD";
+					}
+				}
+			}
 
+			if (!isAmd && !isNvidia && !isIntegrate && !isDx)
+			{
+				isOld = true;
+			}
 
-            if (GpuName.Contains("(nvidia)", StringComparison.OrdinalIgnoreCase) && GpuName.Contains("(amd)", StringComparison.OrdinalIgnoreCase))
-            {
-                isOld = false;
-            }
+			if (gpuName.IndexOf("(nvidia)", StringComparison.OrdinalIgnoreCase) > -1
+				&& gpuName.IndexOf("(amd)", StringComparison.OrdinalIgnoreCase) > -1)
+			{
+				isOld = false;
+			}
 
+			return new GpuObject
+			{
+				IsIntegrate = isIntegrate,
+				IsNvidia = isNvidia,
+				IsAmd = isAmd,
+				IsOld = isOld,
+				IsM = isM,
+				IsOGL = isOgl,
+				IsDx = isDx,
+				DxVersion = dxVersion,
+				OglVersion = oglVersion,
+				Type = type,
+				Number = Number,
+				Vram = 0,
+				ResolutionHorizontal = 0,
+			};
+		}
+	}
 
-            return new GpuObject
-            {
-                IsIntegrate = isIntegrate,
-                IsNvidia = isNvidia,
-                IsAmd = isAmd,
-                IsOld = isOld,
-                IsM = isM,
-
-                IsOGL = isOgl,
-                IsDx = isDx,
-                DxVersion = dxVersion,
-                OglVersion = oglVersion,
-
-                Type = type,
-                Number = Number,
-                Vram = 0,
-                ResolutionHorizontal = 0,
-            };
-        }
-    }
-
-
-    public class GpuObject
-    {
-        public bool IsIntegrate { get; set; }
-        public bool IsNvidia { get; set; }
-        public bool IsAmd { get; set; }
-        public bool IsOld { get; set; }
-        public bool IsM { get; set; }
-
-        public bool IsOGL { get; set; }
-        public bool IsDx { get; set; }
-        public int DxVersion { get; set; }
-        public int OglVersion { get; set; }
-
-        public string Type { get; set; }
-        public int Number { get; set; }
-        public long Vram { get; set; }
-        public int ResolutionHorizontal { get; set; }
-    }
+	public class GpuObject
+	{
+		public bool IsIntegrate { get; set; }
+		public bool IsNvidia { get; set; }
+		public bool IsAmd { get; set; }
+		public bool IsOld { get; set; }
+		public bool IsM { get; set; }
+		public bool IsOGL { get; set; }
+		public bool IsDx { get; set; }
+		public int DxVersion { get; set; }
+		public int OglVersion { get; set; }
+		public string Type { get; set; }
+		public int Number { get; set; }
+		public long Vram { get; set; }
+		public int ResolutionHorizontal { get; set; }
+	}
 }
