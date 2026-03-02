@@ -59,9 +59,9 @@
     <Reference Include="FuzzySharp, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\FuzzySharp.2.0.2\lib\net461\FuzzySharp.dll</HintPath>
     </Reference>
-    <Reference Include="LiteDB, Version=4.1.4.0, Culture=neutral, PublicKeyToken=4ee40123013c9f27, processorArchitecture=MSIL">
-      <HintPath>packages\LiteDB.4.1.4\lib\net40\LiteDB.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="LiteDB, Version=5.0.13.0, Culture=neutral, PublicKeyToken=4ee40123013c9f27">
+      <HintPath>packages\LiteDB.5.0.13\lib\net45\LiteDB.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Playnite.SDK, Version=6.15.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\PlayniteSDK.6.15.0\lib\net462\Playnite.SDK.dll</HintPath>
