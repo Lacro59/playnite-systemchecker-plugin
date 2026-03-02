@@ -103,7 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Clients\Benchmark.cs" />
-    <Compile Include="Clients\EpicRequirements .cs" />
+    <Compile Include="Clients\EpicRequirements.cs" />
     <Compile Include="Controls\PluginButton.xaml.cs">
       <DependentUpon>PluginButton.xaml</DependentUpon>
     </Compile>
