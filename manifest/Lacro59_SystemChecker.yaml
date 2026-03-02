@@ -86,3 +86,13 @@ Packages:
       - 'Updated: Localizations'
       - 'Optimized: Parser data'
       - 'Fixed: Some errors and bad messages'
+  - Version: 3.2
+    RequiredApiVersion: 6.15.0
+    ReleaseDate: 2026-03-02
+    PackageUrl: https://github.com/Lacro59/playnite-systemchecker-plugin/releases/download/v3.2/playnite-systemchecker-plugin_3_2.pext
+    Changelog:
+      - 'Updated: Localizations'
+      - 'Improved: Settings management and architecture'
+      - 'Optimized: Search and data caching'
+      - 'Refreshed: UI design'
+      - 'Fixed: Various errors and stability issues'

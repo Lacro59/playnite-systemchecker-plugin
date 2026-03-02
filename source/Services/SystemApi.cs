@@ -589,7 +589,7 @@ namespace SystemChecker.Services
 
 		private static bool CheckOS(string systemOs, List<string> requirementOs)
 		{
-			if (requirementOs.Count == 0)
+			if (requirementOs == null || requirementOs.Count == 0)
 			{
 				return true;
 			}
@@ -643,7 +643,7 @@ namespace SystemChecker.Services
 
 		private static bool CheckCpu(SystemConfiguration systemConfiguration, List<string> requirementCpu)
 		{
-			if (requirementCpu.Count == 0)
+			if (requirementCpu == null || requirementCpu.Count == 0)
 			{
 				return true;
 			}
@@ -685,7 +685,7 @@ namespace SystemChecker.Services
 
 		private static bool CheckGpu(SystemConfiguration systemConfiguration, List<string> requirementGpu)
 		{
-			if (requirementGpu.Count == 0)
+			if (requirementGpu == null || requirementGpu.Count == 0)
 			{
 				return true;
 			}
