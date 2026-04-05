@@ -3,12 +3,12 @@
 
 	<!-- General -->
 	<sys:String x:Key="LOCSystemChecker">SystemChecker</sys:String>
-	<sys:String x:Key="LOCSystemCheckerCheckConfig">Check System Requirements</sys:String>
-	<sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Refresh System Information</sys:String>
+	<sys:String x:Key="LOCSystemCheckerCheckConfig">システム要件を確認</sys:String>
+	<sys:String x:Key="LOCSystemCheckerRefreshPcInfo">システム情報を更新</sys:String>
 
 	<!-- Game Details View -->
-	<sys:String x:Key="LOCSystemCheckerConfigMinimum">最低要件</sys:String>
-	<sys:String x:Key="LOCSystemCheckerConfigRecommended">推奨要件</sys:String>
+	<sys:String x:Key="LOCSystemCheckerConfigMinimum">最小</sys:String>
+	<sys:String x:Key="LOCSystemCheckerConfigRecommended">推奨</sys:String>
 	<sys:String x:Key="LOCSystemCheckerOS">OS</sys:String>
 	<sys:String x:Key="LOCSystemCheckerCpu">プロセッサー</sys:String>
 	<sys:String x:Key="LOCSystemCheckerRam">メモリ</sys:String>
