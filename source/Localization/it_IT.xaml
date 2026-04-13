@@ -7,13 +7,13 @@
 	<sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Aggiorna Informazioni Di Sistema</sys:String>
 
 	<!-- Game Details View -->
-	<sys:String x:Key="LOCSystemCheckerConfigMinimum">Minimo</sys:String>
+	<sys:String x:Key="LOCSystemCheckerConfigMinimum">Minimum</sys:String>
 	<sys:String x:Key="LOCSystemCheckerConfigRecommended">Consigliato</sys:String>
 	<sys:String x:Key="LOCSystemCheckerOS">Sistema operativo</sys:String>
-	<sys:String x:Key="LOCSystemCheckerCpu">Processore</sys:String>
-	<sys:String x:Key="LOCSystemCheckerRam">Memoria</sys:String>
-	<sys:String x:Key="LOCSystemCheckerGpu">Grafica</sys:String>
-	<sys:String x:Key="LOCSystemCheckerDisk">Archiviazione</sys:String>
+	<sys:String x:Key="LOCSystemCheckerCpu">Processor</sys:String>
+	<sys:String x:Key="LOCSystemCheckerRam">Memory</sys:String>
+	<sys:String x:Key="LOCSystemCheckerGpu">Graphics</sys:String>
+	<sys:String x:Key="LOCSystemCheckerDisk">Storage</sys:String>
 
 	<!-- Search -->
 	<sys:String x:Key="LOCSystemCheckerSearchDescription">Cerca dati del Controllo di sistema</sys:String>
