@@ -10,10 +10,10 @@
 	<sys:String x:Key="LOCSystemCheckerConfigMinimum">最小</sys:String>
 	<sys:String x:Key="LOCSystemCheckerConfigRecommended">推奨</sys:String>
 	<sys:String x:Key="LOCSystemCheckerOS">OS</sys:String>
-	<sys:String x:Key="LOCSystemCheckerCpu">Processor</sys:String>
-	<sys:String x:Key="LOCSystemCheckerRam">Memory</sys:String>
-	<sys:String x:Key="LOCSystemCheckerGpu">Graphics</sys:String>
-	<sys:String x:Key="LOCSystemCheckerDisk">Storage</sys:String>
+	<sys:String x:Key="LOCSystemCheckerCpu">プロセッサー</sys:String>
+	<sys:String x:Key="LOCSystemCheckerRam">メモリ</sys:String>
+	<sys:String x:Key="LOCSystemCheckerGpu">グラフィック</sys:String>
+	<sys:String x:Key="LOCSystemCheckerDisk">ストレージ</sys:String>
 
 	<!-- Search -->
 	<sys:String x:Key="LOCSystemCheckerSearchDescription">Search System Checker data</sys:String>
@@ -35,8 +35,8 @@
 
 	<!-- Notifications -->
 	<sys:String x:Key="LOCSystemCheckerTryRefresh">Try to refresh plugin data for {0}</sys:String>
-	<sys:String x:Key="LOCSystemCheckerAddTagError">An error occurred while adding tags. Please try again.</sys:String>
-	<sys:String x:Key="LOCSystemCheckerRemoveTagError">An error occurred while removing tags. Please try again.</sys:String>
-	<sys:String x:Key="LOCSystemCheckerClearAllError">An error occurred while clearing plugin data. Please try again.</sys:String>
+	<sys:String x:Key="LOCSystemCheckerAddTagError">タグの追加中にエラーが発生しました。もう一度やり直してください。</sys:String>
+	<sys:String x:Key="LOCSystemCheckerRemoveTagError">タグの削除中にエラーが発生しました。もう一度やり直してください。</sys:String>
+	<sys:String x:Key="LOCSystemCheckerClearAllError">プラグインデータの消去中にエラーが発生しました。もう一度やり直してください。</sys:String>
 
 </ResourceDictionary>
