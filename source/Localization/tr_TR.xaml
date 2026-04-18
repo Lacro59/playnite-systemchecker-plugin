@@ -7,13 +7,13 @@
 	<sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Refresh System Information</sys:String>
 
 	<!-- Game Details View -->
-	<sys:String x:Key="LOCSystemCheckerConfigMinimum">En düşük</sys:String>
+	<sys:String x:Key="LOCSystemCheckerConfigMinimum">Minimum</sys:String>
 	<sys:String x:Key="LOCSystemCheckerConfigRecommended">Recommended</sys:String>
 	<sys:String x:Key="LOCSystemCheckerOS">İşletim Sistemi</sys:String>
-	<sys:String x:Key="LOCSystemCheckerCpu">İşlemci</sys:String>
-	<sys:String x:Key="LOCSystemCheckerRam">Bellek</sys:String>
-	<sys:String x:Key="LOCSystemCheckerGpu">Grafik Kartı</sys:String>
-	<sys:String x:Key="LOCSystemCheckerDisk">Depolama</sys:String>
+	<sys:String x:Key="LOCSystemCheckerCpu">Processor</sys:String>
+	<sys:String x:Key="LOCSystemCheckerRam">Memory</sys:String>
+	<sys:String x:Key="LOCSystemCheckerGpu">Graphics</sys:String>
+	<sys:String x:Key="LOCSystemCheckerDisk">Storage</sys:String>
 
 	<!-- Search -->
 	<sys:String x:Key="LOCSystemCheckerSearchDescription">Search System Checker data</sys:String>

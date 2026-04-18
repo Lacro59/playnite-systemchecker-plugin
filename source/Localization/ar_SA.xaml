@@ -7,13 +7,13 @@
 	<sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Refresh System Information</sys:String>
 
 	<!-- Game Details View -->
-	<sys:String x:Key="LOCSystemCheckerConfigMinimum">الحد الا</sys:String>
+	<sys:String x:Key="LOCSystemCheckerConfigMinimum">Minimum</sys:String>
 	<sys:String x:Key="LOCSystemCheckerConfigRecommended">Recommended</sys:String>
 	<sys:String x:Key="LOCSystemCheckerOS">Operating System</sys:String>
-	<sys:String x:Key="LOCSystemCheckerCpu">المعالج</sys:String>
-	<sys:String x:Key="LOCSystemCheckerRam">الذاكر</sys:String>
-	<sys:String x:Key="LOCSystemCheckerGpu">الجرا</sys:String>
-	<sys:String x:Key="LOCSystemCheckerDisk">التخز</sys:String>
+	<sys:String x:Key="LOCSystemCheckerCpu">Processor</sys:String>
+	<sys:String x:Key="LOCSystemCheckerRam">Memory</sys:String>
+	<sys:String x:Key="LOCSystemCheckerGpu">Graphics</sys:String>
+	<sys:String x:Key="LOCSystemCheckerDisk">Storage</sys:String>
 
 	<!-- Search -->
 	<sys:String x:Key="LOCSystemCheckerSearchDescription">Search System Checker data</sys:String>
