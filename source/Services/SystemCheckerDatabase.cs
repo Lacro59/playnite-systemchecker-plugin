@@ -240,9 +240,6 @@ namespace SystemChecker.Services
 					CheckSystem checkMinimum = SystemApi.CheckConfig(game, item.GetMinimum(), systemConfig, game.IsInstalled);
 					CheckSystem checkRecommended = SystemApi.CheckConfig(game, item.GetRecommended(), systemConfig, game.IsInstalled);
 
-					if (!(checkMinimum.AllOk ?? false) && !(checkRecommended.AllOk ?? false))
-						return false;
-
 					Guid? tagId = ResolveSystemTag(checkMinimum, checkRecommended);
 					if (tagId != null)
 					{
@@ -275,8 +272,8 @@ namespace SystemChecker.Services
 
 		/// <summary>
 		/// Returns the tag ID that best represents the system's compatibility:
-		/// recommended takes priority over minimum.
-		/// Returns <c>null</c> when neither check passes (guard already handled by caller).
+		/// recommended takes priority over minimum, otherwise below minimum.
+		/// May return <c>null</c> if the required tag cannot be found or created.
 		/// </summary>
 		private Guid? ResolveSystemTag(CheckSystem checkMinimum, CheckSystem checkRecommended)
 		{
@@ -290,7 +287,7 @@ namespace SystemChecker.Services
 				return CheckTagExist(ResourceProvider.GetString("LOCSystemCheckerConfigMinimum"));
 			}
 
-			return null;
+			return CheckTagExist(ResourceProvider.GetString("LOCSystemCheckerConfigBelowMinimum"));
 		}
 
 		#endregion
