@@ -10,10 +10,10 @@
 	<sys:String x:Key="LOCSystemCheckerConfigMinimum">Minimum</sys:String>
 	<sys:String x:Key="LOCSystemCheckerConfigRecommended">Empfohlen</sys:String>
 	<sys:String x:Key="LOCSystemCheckerOS">Betriebssystem</sys:String>
-	<sys:String x:Key="LOCSystemCheckerCpu">Prozessor</sys:String>
-	<sys:String x:Key="LOCSystemCheckerRam">Arbeitsspeicher</sys:String>
-	<sys:String x:Key="LOCSystemCheckerGpu">Grafik</sys:String>
-	<sys:String x:Key="LOCSystemCheckerDisk">Speicherplatz</sys:String>
+	<sys:String x:Key="LOCSystemCheckerCpu">Processor</sys:String>
+	<sys:String x:Key="LOCSystemCheckerRam">Memory</sys:String>
+	<sys:String x:Key="LOCSystemCheckerGpu">Graphics</sys:String>
+	<sys:String x:Key="LOCSystemCheckerDisk">Storage</sys:String>
 
 	<!-- Search -->
 	<sys:String x:Key="LOCSystemCheckerSearchDescription">Systemprüfdaten durchsuchen</sys:String>

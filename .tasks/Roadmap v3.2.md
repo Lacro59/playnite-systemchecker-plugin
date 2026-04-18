@@ -1,15 +1,17 @@
-# Features
+# Roadmap
 
-* [ ] EpicRequirements
+## Features
 
-# UI Modernization & Optimizations
+- [ ] EpicRequirements
+
+## UI Modernization & Optimizations
 
 ### Views
 
-* [X] SystemCheckerGameView
-* [X] SystemCheckerSettingsView
+- [x] SystemCheckerGameView
+- [x] SystemCheckerSettingsView
 
 ### Components
 
-* [X] PluginButton
-* [X] PluginUserControlExtend
+- [x] PluginButton
+- [x] PluginUserControlExtend
