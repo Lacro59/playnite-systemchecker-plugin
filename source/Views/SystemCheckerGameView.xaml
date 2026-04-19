@@ -18,7 +18,7 @@
         <pconverters:NullOrEmptyToVisibilityConverter x:Key="NullOrEmptyToVisibilityConverter"/>
     </UserControl.Resources>
 
-    <Border Style="{StaticResource TopSeparatorBorder}">
+    <Border Style="{DynamicResource TopSeparatorBorder}">
 
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
             <Grid Margin="20">
