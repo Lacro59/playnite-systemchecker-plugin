@@ -94,5 +94,12 @@ Packages:
       - 'Updated: Localizations'
       - 'Improved: Settings management and architecture'
       - 'Optimized: Search and data caching'
-      - 'Refreshed: UI design'
+      - 'Improved: UI design'
       - 'Fixed: Various errors and stability issues'
+  - Version: 3.2.1
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-04-19
+    PackageUrl: https://github.com/Lacro59/playnite-systemchecker-plugin/releases/download/v3.2.1/playnite-systemchecker-plugin_3_2_1.pext
+    Changelog:
+      - 'Added: ''Below Minimum'' system tag when hardware does not meet minimum requirements (thanks to David Brett)'
+      - 'Updated: Localizations'
