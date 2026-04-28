@@ -3,40 +3,40 @@
 
 	<!-- General -->
 	<sys:String x:Key="LOCSystemChecker">SystemChecker</sys:String>
-	<sys:String x:Key="LOCSystemCheckerCheckConfig">Check System Requirements</sys:String>
-	<sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Refresh System Information</sys:String>
+	<sys:String x:Key="LOCSystemCheckerCheckConfig">Проверить системные требования</sys:String>
+	<sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Обновить информацию о системе</sys:String>
 
 	<!-- Game Details View -->
-	<sys:String x:Key="LOCSystemCheckerConfigMinimum">Minimum</sys:String>
-	<sys:String x:Key="LOCSystemCheckerConfigRecommended">Recommended</sys:String>
-	<sys:String x:Key="LOCSystemCheckerOS">Operating System</sys:String>
-	<sys:String x:Key="LOCSystemCheckerCpu">Processor</sys:String>
-	<sys:String x:Key="LOCSystemCheckerRam">Memory</sys:String>
-	<sys:String x:Key="LOCSystemCheckerGpu">Graphics</sys:String>
-	<sys:String x:Key="LOCSystemCheckerDisk">Storage</sys:String>
+	<sys:String x:Key="LOCSystemCheckerConfigMinimum">Минимальные</sys:String>
+	<sys:String x:Key="LOCSystemCheckerConfigRecommended">Рекомендуемые</sys:String>
+	<sys:String x:Key="LOCSystemCheckerOS">Операционная система</sys:String>
+	<sys:String x:Key="LOCSystemCheckerCpu">Процессор</sys:String>
+	<sys:String x:Key="LOCSystemCheckerRam">Оперативная память</sys:String>
+	<sys:String x:Key="LOCSystemCheckerGpu">Графика</sys:String>
+	<sys:String x:Key="LOCSystemCheckerDisk">Хранилище</sys:String>
 
 	<!-- Search -->
-	<sys:String x:Key="LOCSystemCheckerSearchDescription">Search System Checker data</sys:String>
-	<sys:String x:Key="LOCSystemCheckerSearchHint" xml:space="preserve">Parameters:
-    -min		Matches minimum requirements
-    -rec		Matches recommended requirements
-    -any		Matches minimum or recommended requirements
-    -np		Never played
-    -fav		Favorites only
-    -stores={n}	Filter by store (e.g. -stores=steam / -stores=steam,epic)
-    -status={n}	Filter by play status (e.g. -status=played / -status=played,playing)</sys:String>
+	<sys:String x:Key="LOCSystemCheckerSearchDescription">Поиск по данным SystemChecker</sys:String>
+	<sys:String x:Key="LOCSystemCheckerSearchHint" xml:space="preserve">Параметры:
+    -min		Соответствует минимальным требованиям
+    -rec		Соответствует рекомендованным требованиям
+    -any		Соответствует минимальным или рекомендованным требованиям
+    -np		Никогда не играл
+    -fav		Только избранные
+    -stores={n}	Фильтр по магазину (например -stores=steam / -stores=steam,epic)
+    -status={n}	Фильтр по игровому статусу (например -status=played / -status=played,playing)</sys:String>
 
 	<!-- Search Results -->
-	<sys:String x:Key="LOCSystemCheckerSearchMeetsMinimum">✅ Meets minimum requirements</sys:String>
-	<sys:String x:Key="LOCSystemCheckerSearchMeetsRecommended">✅ Meets recommended requirements</sys:String>
-	<sys:String x:Key="LOCSystemCheckerSearchBelowMinimum">⚠️ Below minimum requirements</sys:String>
-	<sys:String x:Key="LOCSystemCheckerSearchNoData">ℹ️ No requirements data available</sys:String>
-	<sys:String x:Key="LOCSystemCheckerSearchSecondaryAction">View Details</sys:String>
+	<sys:String x:Key="LOCSystemCheckerSearchMeetsMinimum">✅ Соответствует минимальным требованиям</sys:String>
+	<sys:String x:Key="LOCSystemCheckerSearchMeetsRecommended">✅ Соответствует рекомендуемым требованиям</sys:String>
+	<sys:String x:Key="LOCSystemCheckerSearchBelowMinimum">⚠️ Ниже минимальных требований</sys:String>
+	<sys:String x:Key="LOCSystemCheckerSearchNoData">ℹ️Данные о требованиях отсутствуют</sys:String>
+	<sys:String x:Key="LOCSystemCheckerSearchSecondaryAction">Посмотреть детали</sys:String>
 
 	<!-- Notifications -->
-	<sys:String x:Key="LOCSystemCheckerTryRefresh">Try to refresh plugin data for {0}</sys:String>
-	<sys:String x:Key="LOCSystemCheckerAddTagError">An error occurred while adding tags. Please try again.</sys:String>
-	<sys:String x:Key="LOCSystemCheckerRemoveTagError">An error occurred while removing tags. Please try again.</sys:String>
-	<sys:String x:Key="LOCSystemCheckerClearAllError">An error occurred while clearing plugin data. Please try again.</sys:String>
+	<sys:String x:Key="LOCSystemCheckerTryRefresh">Попробуйте обновить данные плагина для {0}</sys:String>
+	<sys:String x:Key="LOCSystemCheckerAddTagError">Произошла ошибка при добавлении тегов. Пожалуйста, попробуйте еще раз.</sys:String>
+	<sys:String x:Key="LOCSystemCheckerRemoveTagError">Произошла ошибка при удалении тегов. Пожалуйста, попробуйте еще раз.</sys:String>
+	<sys:String x:Key="LOCSystemCheckerClearAllError">Произошла ошибка при очистке данных плагина. Пожалуйста, попробуйте еще раз.</sys:String>
 
 </ResourceDictionary>
