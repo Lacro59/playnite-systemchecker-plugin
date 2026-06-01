@@ -7,6 +7,7 @@
 	<sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Rafraîchir les informations système</sys:String>
 
 	<!-- Game Details View -->
+	<sys:String x:Key="LOCSystemCheckerConfigBelowMinimum">Below Minimum</sys:String>
 	<sys:String x:Key="LOCSystemCheckerConfigMinimum">Minimum</sys:String>
 	<sys:String x:Key="LOCSystemCheckerConfigRecommended">Recommandé</sys:String>
 	<sys:String x:Key="LOCSystemCheckerOS">Système d'exploitation</sys:String>
