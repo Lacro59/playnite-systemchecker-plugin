@@ -7,7 +7,7 @@
 	<sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Обновить информацию о системе</sys:String>
 
 	<!-- Game Details View -->
-	<sys:String x:Key="LOCSystemCheckerConfigBelowMinimum">Below Minimum</sys:String>
+	<sys:String x:Key="LOCSystemCheckerConfigBelowMinimum">Ниже минимума</sys:String>
 	<sys:String x:Key="LOCSystemCheckerConfigMinimum">Минимальные</sys:String>
 	<sys:String x:Key="LOCSystemCheckerConfigRecommended">Рекомендуемые</sys:String>
 	<sys:String x:Key="LOCSystemCheckerOS">Операционная система</sys:String>
