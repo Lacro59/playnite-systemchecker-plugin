@@ -45,9 +45,9 @@ namespace SystemChecker.Services
 			{
 				Logger.Info("LoadMoreData started.");
 
-				_pcGamingWikiRequirements = new PCGamingWikiRequirements();
-				_steamRequirements = new SteamRequirements();
 				_steamApi = new SteamApi(PluginName, PlayniteTools.ExternalPlugin.SystemChecker);
+				_pcGamingWikiRequirements = new PCGamingWikiRequirements(_steamApi);
+				_steamRequirements = new SteamRequirements(_steamApi);
 
 				SystemConfigurationManager = new SystemConfigurationManager(
 					Path.Combine(Paths.PluginUserDataPath, "Configurations.json"));
@@ -119,12 +119,15 @@ namespace SystemChecker.Services
 
 			try
 			{
+				uint steamAppId = 0;
+				bool steamAppIdLookupAttempted = false;
+
 				Logger.Info($"GetWeb — trying PCGamingWiki for \"{game.Name}\".");
-				requirements = _pcGamingWikiRequirements.GetRequirements(game);
+				requirements = _pcGamingWikiRequirements.GetRequirements(game, ref steamAppId, ref steamAppIdLookupAttempted);
 
 				if (!_pcGamingWikiRequirements.IsFind())
 				{
-					requirements = FetchFromSteam(game);
+					requirements = FetchFromSteam(game, ref steamAppId, steamAppIdLookupAttempted);
 				}
 
 				requirements = NormalizeRecommended(requirements);
@@ -140,9 +143,9 @@ namespace SystemChecker.Services
 
 		/// <summary>
 		/// Attempts to fetch requirements from the Steam source.
-		/// For Steam games, uses the Steam app ID directly; for others, resolves the ID via the Steam API.
+		/// For Steam games, uses the Steam app ID directly; for others, reuses or resolves the AppId once.
 		/// </summary>
-		private PluginGameRequirements FetchFromSteam(Game game)
+		private PluginGameRequirements FetchFromSteam(Game game, ref uint steamAppId, bool steamAppIdLookupAttempted)
 		{
 			string sourceName = PlayniteTools.GetSourceName(game);
 			Logger.Info($"GetWeb — trying Steam for \"{game.Name}\" (source: {sourceName}).");
@@ -152,10 +155,20 @@ namespace SystemChecker.Services
 				return _steamRequirements.GetRequirements(game);
 			}
 
-			uint steamId = _steamApi.GetAppId(game);
+			if (steamAppId == 0)
+			{
+				if (steamAppIdLookupAttempted)
+				{
+					Common.LogDebug(true,
+						$"[SystemChecker] Skipping redundant Steam AppId lookup for \"{game.Name}\" — already unresolved during PCGW.");
+					return GetDefault(game);
+				}
 
-			return steamId != 0
-				? _steamRequirements.GetRequirements(game, steamId)
+				steamAppId = _steamApi.ResolveAppId(game);
+			}
+
+			return steamAppId != 0
+				? _steamRequirements.GetRequirements(game, steamAppId)
 				: GetDefault(game);
 		}
 
