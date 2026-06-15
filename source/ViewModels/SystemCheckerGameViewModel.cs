@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using SystemChecker.Models;
 using SystemChecker.Services;
+using SystemChecker.Services.Parser;
 
 namespace SystemChecker.ViewModels
 {
@@ -140,7 +141,7 @@ namespace SystemChecker.ViewModels
             SystemConfiguration systemConfiguration = PluginDatabase.PC;
 
             LocalOs = systemConfiguration.Os;
-            LocalCpu = systemConfiguration.Cpu;
+            LocalCpu = CpuRequirementParser.NormalizeName(systemConfiguration.Cpu);
             LocalRamUsage = systemConfiguration.RamUsage;
             LocalGpu = systemConfiguration.GpuName;
 
@@ -221,38 +222,34 @@ namespace SystemChecker.ViewModels
                 RecommendedStorage = recommended.StorageUsage;
             }
 
-            // Check system configuration
-            string isOk = "✓";
-            string isKo = "✗";
-
             CheckSystem checkMinimum = SystemApi.CheckConfig(_game, minimum, systemConfiguration, _game.IsInstalled);
             if (minimum.HasData)
             {
-                MinimumCheckOs = checkMinimum.CheckOs ? isOk : isKo;
+                MinimumCheckOs = checkMinimum.CheckOs.ToIcon();
                 if (minimum.Os.Count == 0)
                 {
                     MinimumCheckOs = string.Empty;
                 }
 
-                MinimumCheckCpu = checkMinimum.CheckCpu ? isOk : isKo;
+                MinimumCheckCpu = checkMinimum.CheckCpu.ToIcon();
                 if (minimum.Cpu.Count == 0)
                 {
                     MinimumCheckCpu = string.Empty;
                 }
 
-                MinimumCheckRam = checkMinimum.CheckRam ? isOk : isKo;
+                MinimumCheckRam = checkMinimum.CheckRam.ToIcon();
                 if (minimum.Ram == 0)
                 {
                     MinimumCheckRam = string.Empty;
                 }
 
-                MinimumCheckGpu = checkMinimum.CheckGpu ? isOk : isKo;
+                MinimumCheckGpu = checkMinimum.CheckGpu.ToIcon();
                 if (minimum.Gpu.Count == 0)
                 {
                     MinimumCheckGpu = string.Empty;
                 }
 
-                MinimumCheckStorage = checkMinimum.CheckStorage ? isOk : isKo;
+                MinimumCheckStorage = checkMinimum.CheckStorage.ToIcon();
                 if (minimum.Storage == 0)
                 {
                     MinimumCheckStorage = string.Empty;
@@ -262,31 +259,31 @@ namespace SystemChecker.ViewModels
             CheckSystem checkRecommended = SystemApi.CheckConfig(_game, recommended, systemConfiguration, _game.IsInstalled);
             if (recommended.HasData)
             {
-                RecommendedCheckOs = checkRecommended.CheckOs ? isOk : isKo;
+                RecommendedCheckOs = checkRecommended.CheckOs.ToIcon();
                 if (recommended.Os.Count == 0)
                 {
                     RecommendedCheckOs = string.Empty;
                 }
 
-                RecommendedCheckCpu = checkRecommended.CheckCpu ? isOk : isKo;
+                RecommendedCheckCpu = checkRecommended.CheckCpu.ToIcon();
                 if (recommended.Cpu.Count == 0)
                 {
                     RecommendedCheckCpu = string.Empty;
                 }
 
-                RecommendedCheckRam = checkRecommended.CheckRam ? isOk : isKo;
+                RecommendedCheckRam = checkRecommended.CheckRam.ToIcon();
                 if (recommended.Ram == 0)
                 {
                     RecommendedCheckRam = string.Empty;
                 }
 
-                RecommendedCheckGpu = checkRecommended.CheckGpu ? isOk : isKo;
+                RecommendedCheckGpu = checkRecommended.CheckGpu.ToIcon();
                 if (recommended.Gpu.Count == 0)
                 {
                     RecommendedCheckGpu = string.Empty;
                 }
 
-                RecommendedCheckStorage = checkRecommended.CheckStorage ? isOk : isKo;
+                RecommendedCheckStorage = checkRecommended.CheckStorage.ToIcon();
                 if (recommended.Storage == 0)
                 {
                     RecommendedCheckStorage = string.Empty;

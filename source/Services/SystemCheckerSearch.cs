@@ -431,13 +431,13 @@ namespace SystemChecker.Services
 			if (result.HasMinimum)
 			{
 				CheckSystem checkMinimum = SystemApi.CheckConfig(game, systemMinimum, systemConfiguration, game.IsInstalled);
-				result.MeetsMinimum = (bool)checkMinimum.AllOk;
+				result.MeetsMinimum = checkMinimum.AllOk == true;
 			}
 
 			if (result.HasRecommended)
 			{
 				CheckSystem checkRecommended = SystemApi.CheckConfig(game, systemRecommended, systemConfiguration, game.IsInstalled);
-				result.MeetsRecommended = (bool)checkRecommended.AllOk;
+				result.MeetsRecommended = checkRecommended.AllOk == true;
 			}
 
 			return result;

@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using SystemChecker.Models;
 using SystemChecker.Services;
+using SystemChecker.Services.Parser;
 
 namespace SystemChecker.Clients
 {
@@ -27,10 +28,20 @@ namespace SystemChecker.Clients
 		private const string UrlCpu = @"https://www.cpubenchmark.net/cpu-list/all";
 
 		private const int CacheExpirationMinutes = 43200; // 30 days
-		private const int FuzzyMatchThreshold = 95;
+		private const int FuzzyMatchThresholdPc = 95;
+		private const int FuzzyMatchThresholdRequirement = 85;
 
 		private const string VideoCardCacheFile = "VideoCardDataList.json";
 		private const string CpuCacheFile = "CpuDataList.json";
+
+		#endregion
+
+		#region PC benchmark cache
+
+		private static string _cachedPcCpuName;
+		private static BenchmarkData _cachedPcCpuData;
+		private static string _cachedPcGpuName;
+		private static BenchmarkData _cachedPcGpuData;
 
 		#endregion
 
@@ -114,7 +125,7 @@ namespace SystemChecker.Clients
 				return string.Empty;
 			}
 
-			bool isNvidia = Gpu.CallIsNvidia(gpu);
+			bool isNvidia = GpuRequirementParser.IsNvidia(gpu);
 
 			// Remove common prefixes and suffixes
 			gpu = RemoveCommonGpuTerms(gpu);
@@ -308,14 +319,12 @@ namespace SystemChecker.Clients
 				return string.Empty;
 			}
 
-			bool isIntel = Cpu.CallIsIntel(cpu);
+			bool isIntel = CpuRequirementParser.IsIntel(cpu);
+
+			cpu = CpuRequirementParser.NormalizeName(cpu);
 
 			// Remove common CPU-related terms and symbols
 			cpu = cpu.ToLower()
-				.Replace("(r)", string.Empty)
-				.Replace("(tm)", string.Empty)
-				.Replace("®", string.Empty)
-				.Replace("™", string.Empty)
 				.Replace("cpu @", "@")
 				.Replace(" cpu", string.Empty)
 				.Replace(" ghz", "ghz")
@@ -372,6 +381,13 @@ namespace SystemChecker.Clients
 		/// </summary>
 		private string NormalizeIntelCpuName(string cpu)
 		{
+			if (cpu.IndexOf("pentium", StringComparison.Ordinal) > -1
+				|| cpu.IndexOf("celeron", StringComparison.Ordinal) > -1
+				|| cpu.IndexOf("atom", StringComparison.Ordinal) > -1)
+			{
+				return cpu;
+			}
+
 			// Standardize "Intel i" to "Intel Core i"
 			if (cpu.IndexOf("intel i", StringComparison.Ordinal) > -1)
 			{
@@ -550,9 +566,11 @@ namespace SystemChecker.Clients
 					compare = PrepareCpuName(compare);
 				}
 
-				// Find best matches using fuzzy string matching
-				BenchmarkData foundPc = FindBestMatch(pc, benchmarkData);
-				BenchmarkData foundCompare = FindBestMatch(compare, benchmarkData);
+				// PC name is stable and well-formed; requirement text from stores often is not.
+				BenchmarkData foundPc = isGpu
+					? GetCachedPcGpuMatch(pc, benchmarkData)
+					: GetCachedPcCpuMatch(pc, benchmarkData);
+				BenchmarkData foundCompare = FindBestMatch(compare, benchmarkData, FuzzyMatchThresholdRequirement);
 
 				// Log matched components for debugging
 				Common.LogDebug(true, $"Benchmark - {pc} - {foundPc?.Name ?? string.Empty}");
@@ -576,6 +594,30 @@ namespace SystemChecker.Clients
 			}
 		}
 
+		private static BenchmarkData GetCachedPcCpuMatch(string normalizedPcName, List<BenchmarkData> benchmarkData)
+		{
+			if (normalizedPcName == _cachedPcCpuName && _cachedPcCpuData != null)
+			{
+				return _cachedPcCpuData;
+			}
+
+			_cachedPcCpuData = FindBestMatch(normalizedPcName, benchmarkData, FuzzyMatchThresholdPc);
+			_cachedPcCpuName = normalizedPcName;
+			return _cachedPcCpuData;
+		}
+
+		private static BenchmarkData GetCachedPcGpuMatch(string normalizedPcName, List<BenchmarkData> benchmarkData)
+		{
+			if (normalizedPcName == _cachedPcGpuName && _cachedPcGpuData != null)
+			{
+				return _cachedPcGpuData;
+			}
+
+			_cachedPcGpuData = FindBestMatch(normalizedPcName, benchmarkData, FuzzyMatchThresholdPc);
+			_cachedPcGpuName = normalizedPcName;
+			return _cachedPcGpuData;
+		}
+
 		/// <summary>
 		/// Finds the best matching benchmark data for a given component name.
 		/// Uses fuzzy string matching with a threshold, preferring exact matches when available.
@@ -583,7 +625,12 @@ namespace SystemChecker.Clients
 		/// <param name="componentName">Normalized component name to search for.</param>
 		/// <param name="benchmarkData">List of benchmark data to search through.</param>
 		/// <returns>Best matching BenchmarkData or null if no match found above threshold.</returns>
-		private BenchmarkData FindBestMatch(string componentName, List<BenchmarkData> benchmarkData)
+		private static BenchmarkData FindBestMatch(string componentName, List<BenchmarkData> benchmarkData)
+		{
+			return FindBestMatch(componentName, benchmarkData, FuzzyMatchThresholdPc);
+		}
+
+		private static BenchmarkData FindBestMatch(string componentName, List<BenchmarkData> benchmarkData, int threshold)
 		{
 			if (string.IsNullOrWhiteSpace(componentName) || benchmarkData == null || benchmarkData.Count == 0)
 			{
@@ -601,7 +648,7 @@ namespace SystemChecker.Clients
 				.ToList();
 
 			// Check if best match meets threshold
-			if (fuzzyMatches.Count == 0 || fuzzyMatches.First().MatchPercent < FuzzyMatchThreshold)
+			if (fuzzyMatches.Count == 0 || fuzzyMatches.First().MatchPercent < threshold)
 			{
 				return null;
 			}

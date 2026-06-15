@@ -115,6 +115,8 @@
     <Compile Include="Controls\StatusIcon.cs" />
     <Compile Include="Converters\StatusToColorConverter.cs" />
     <Compile Include="Models\BenchmarkData.cs" />
+    <Compile Include="Models\CheckStatus.cs" />
+    <Compile Include="Models\CheckStatusExtensions.cs" />
     <Compile Include="Models\CheckResult.cs" />
     <Compile Include="Models\CheckSystem.cs" />
     <Compile Include="Models\SearchParameters.cs" />
@@ -154,7 +156,13 @@
     <Compile Include="Services\CheckData\CheckData.cs" />
     <Compile Include="Services\CheckData\CheckDataCache.cs" />
     <Compile Include="Services\Cpu.cs" />
+    <Compile Include="Services\Parser\CpuRequirementParser.cs" />
     <Compile Include="Services\Gpu.cs" />
+    <Compile Include="Services\Parser\DirectXRequirementParser.cs" />
+    <Compile Include="Services\Parser\GpuRequirementParser.cs" />
+    <Compile Include="Services\Parser\OsRequirementParser.cs" />
+    <Compile Include="Services\Parser\RequirementSizeParser.cs" />
+    <Compile Include="Services\Parser\RequirementTextSanitizer.cs" />
     <Compile Include="Clients\PCGamingWikiRequirements.cs" />
     <Compile Include="Clients\SteamRequirements.cs" />
     <Compile Include="Services\CheckData\HardwareChecker.cs" />

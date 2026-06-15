@@ -25,6 +25,9 @@ namespace SystemChecker.Controls
 		/// <summary>System meets minimum but not recommended requirements.</summary>
 		public const string IconMinimum = "\uea51";
 
+		/// <summary>Comparison could not be performed reliably for at least one component.</summary>
+		public const string IconUnknown = "\uea53";
+
 		/// <summary>No requirement data available for this game.</summary>
 		public const string IconEmpty = "\uea53";
 
@@ -90,14 +93,29 @@ namespace SystemChecker.Controls
 		{
 			if (hasMinimum)
 			{
-				if (!(checkMinimum?.AllOk ?? false))
+				if (checkMinimum?.AllOk == false)
 				{
 					return IconKo;
 				}
 
+				if (checkMinimum?.AllOk == null)
+				{
+					return IconUnknown;
+				}
+
 				if (hasRecommended)
 				{
-					return (checkRecommended?.AllOk ?? false) ? IconOk : IconMinimum;
+					if (checkRecommended?.AllOk == false)
+					{
+						return IconMinimum;
+					}
+
+					if (checkRecommended?.AllOk == null)
+					{
+						return IconUnknown;
+					}
+
+					return IconOk;
 				}
 
 				return IconOk;
@@ -105,7 +123,17 @@ namespace SystemChecker.Controls
 
 			if (hasRecommended)
 			{
-				return (checkRecommended?.AllOk ?? false) ? IconOk : IconKo;
+				if (checkRecommended?.AllOk == false)
+				{
+					return IconKo;
+				}
+
+				if (checkRecommended?.AllOk == null)
+				{
+					return IconUnknown;
+				}
+
+				return IconOk;
 			}
 
 			return IconEmpty;

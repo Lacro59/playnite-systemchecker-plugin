@@ -112,7 +112,7 @@ namespace SystemChecker.Models
 			PluginGameRequirements.Items = items;
 			PluginGameRequirements.SourcesLink = apiResult.SourceLink;
 
-			return PluginGameRequirements;
+			return PluginDatabase.NormalizeRequirements(PluginGameRequirements);
 		}
 	}
 }

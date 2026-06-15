@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using SystemChecker.Clients;
 using SystemChecker.Models;
+using SystemChecker.Services.Parser;
 
 namespace SystemChecker.Services
 {
@@ -88,7 +89,7 @@ namespace SystemChecker.Services
 				}
 			}
 
-			return cached;
+			return NormalizeRequirements(cached);
 		}
 
 		/// <inheritdoc/>
@@ -130,8 +131,7 @@ namespace SystemChecker.Services
 					requirements = FetchFromSteam(game, ref steamAppId, steamAppIdLookupAttempted);
 				}
 
-				requirements = NormalizeRecommended(requirements);
-				requirements = PurgeGraphicsCardData(requirements);
+				requirements = NormalizeRequirements(requirements);
 			}
 			catch (Exception ex)
 			{
@@ -177,6 +177,77 @@ namespace SystemChecker.Services
 		#region Data normalisation
 
 		/// <summary>
+		/// Applies the full post-import normalisation pipeline (sizes, recommended fill-in, GPU, OS, CPU).
+		/// Safe to call on freshly downloaded or cached data.
+		/// </summary>
+		public PluginGameRequirements NormalizeRequirements(PluginGameRequirements requirements)
+		{
+			if (requirements == null)
+			{
+				return null;
+			}
+
+			SanitizeRequirementText(requirements);
+			requirements = PurgeSizeData(requirements);
+			requirements = NormalizeRecommended(requirements);
+			requirements = PurgeGraphicsCardData(requirements);
+			requirements = PurgeOsData(requirements);
+			requirements = PurgeCpuData(requirements);
+			return requirements;
+		}
+
+		/// <summary>
+		/// Strips emoji and other decorative Unicode from all requirement strings and the source link label.
+		/// </summary>
+		private static void SanitizeRequirementText(PluginGameRequirements requirements)
+		{
+			if (requirements.SourcesLink != null)
+			{
+				requirements.SourcesLink.GameName = RequirementTextSanitizer.StripDecorativeCharacters(requirements.SourcesLink.GameName);
+				requirements.SourcesLink.Name = RequirementTextSanitizer.StripDecorativeCharacters(requirements.SourcesLink.Name);
+			}
+
+			SanitizeRequirementEntry(requirements.GetMinimum());
+			SanitizeRequirementEntry(requirements.GetRecommended());
+		}
+
+		private static void SanitizeRequirementEntry(RequirementEntry entry)
+		{
+			if (entry == null)
+			{
+				return;
+			}
+
+			RequirementTextSanitizer.SanitizeStringList(entry.Os);
+			RequirementTextSanitizer.SanitizeStringList(entry.Cpu);
+			RequirementTextSanitizer.SanitizeStringList(entry.Gpu);
+
+			if (!entry.RamSource.IsNullOrEmpty())
+			{
+				entry.RamSource = RequirementTextSanitizer.StripDecorativeCharacters(entry.RamSource);
+			}
+
+			if (!entry.StorageSource.IsNullOrEmpty())
+			{
+				entry.StorageSource = RequirementTextSanitizer.StripDecorativeCharacters(entry.StorageSource);
+			}
+		}
+
+		/// <summary>
+		/// Parses <see cref="RequirementEntry.RamSource"/> and <see cref="RequirementEntry.StorageSource"/> into byte values.
+		/// </summary>
+		public PluginGameRequirements PurgeSizeData(PluginGameRequirements requirements)
+		{
+			RequirementSizeParser.NormalizeEntrySizes(requirements.GetMinimum());
+			RequirementSizeParser.NormalizeEntrySizes(requirements.GetRecommended());
+
+			RequirementEntry minimum = requirements.GetMinimum();
+			RequirementEntry recommended = requirements.GetRecommended();
+			requirements.Items = new List<RequirementEntry> { minimum, recommended };
+			return requirements;
+		}
+
+		/// <summary>
 		/// Copies minimum fields into the recommended entry wherever recommended fields are absent,
 		/// ensuring the recommended entry is always at least as complete as minimum.
 		/// </summary>
@@ -217,21 +288,83 @@ namespace SystemChecker.Services
 		}
 
 		/// <summary>
+		/// Splits combined CPU alternatives and removes unrecognised tokens.
+		/// </summary>
+		public PluginGameRequirements PurgeCpuData(PluginGameRequirements requirements)
+		{
+			RequirementEntry minimum = requirements.GetMinimum();
+			RequirementEntry recommended = requirements.GetRecommended();
+
+			FilterCpuList(minimum);
+			FilterCpuList(recommended);
+
+			requirements.Items = new List<RequirementEntry> { minimum, recommended };
+			return requirements;
+		}
+
+		private static void FilterCpuList(RequirementEntry entry)
+		{
+			if (!entry.HasData || entry.Cpu.Count == 0)
+			{
+				return;
+			}
+
+			entry.Cpu = CpuRequirementParser.ExpandCpuList(entry.Cpu);
+		}
+
+		/// <summary>
+		/// Removes unrecognised OS tokens from minimum and recommended entries.
+		/// </summary>
+		public PluginGameRequirements PurgeOsData(PluginGameRequirements requirements)
+		{
+			RequirementEntry minimum = requirements.GetMinimum();
+			RequirementEntry recommended = requirements.GetRecommended();
+
+			FilterOsList(minimum);
+			FilterOsList(recommended);
+
+			requirements.Items = new List<RequirementEntry> { minimum, recommended };
+			return requirements;
+		}
+
+		private static void FilterOsList(RequirementEntry entry)
+		{
+			if (!entry.HasData || entry.Os.Count == 0)
+			{
+				return;
+			}
+
+			entry.Os = OsRequirementParser.FilterList(entry.Os);
+		}
+
+		/// <summary>
 		/// Filters <paramref name="entry"/>'s GPU list to known-vendor cards only,
 		/// but only when the list has more than one entry and at least one known-vendor card exists.
 		/// </summary>
 		private static void FilterGpuList(RequirementEntry entry)
 		{
-			if (!entry.HasData || entry.Gpu.Count <= 1)
+			if (!entry.HasData || entry.Gpu.Count == 0)
 			{
 				return;
 			}
 
-			List<string> knownVendor = entry.Gpu.FindAll(IsKnownGpuVendor);
+			entry.Gpu = GpuRequirementParser.NormalizeGpuList(entry.Gpu);
+
+			if (entry.Gpu.Count <= 1)
+			{
+				return;
+			}
+
+			List<string> knownVendor = entry.Gpu.FindAll(IsRetainedGpuToken);
 			if (knownVendor.Count > 0)
 			{
 				entry.Gpu = knownVendor;
 			}
+		}
+
+		private static bool IsRetainedGpuToken(string gpuName)
+		{
+			return IsKnownGpuVendor(gpuName) || DirectXRequirementParser.TryNormalize(gpuName, out _);
 		}
 
 		/// <summary>
@@ -239,7 +372,7 @@ namespace SystemChecker.Services
 		/// </summary>
 		private static bool IsKnownGpuVendor(string gpuName)
 		{
-			return Gpu.CallIsNvidia(gpuName) || Gpu.CallIsAmd(gpuName) || Gpu.CallIsIntel(gpuName);
+			return GpuRequirementParser.IsNvidia(gpuName) || GpuRequirementParser.IsAmd(gpuName) || GpuRequirementParser.IsIntel(gpuName);
 		}
 
 		#endregion
@@ -304,17 +437,22 @@ namespace SystemChecker.Services
 		/// </summary>
 		private Guid? ResolveSystemTag(CheckSystem checkMinimum, CheckSystem checkRecommended)
 		{
-			if (checkRecommended.AllOk ?? false)
+			if (checkRecommended.AllOk == true)
 			{
 				return CheckTagExist(ResourceProvider.GetString("LOCSystemCheckerConfigRecommended"));
 			}
 
-			if (checkMinimum.AllOk ?? false)
+			if (checkMinimum.AllOk == true)
 			{
 				return CheckTagExist(ResourceProvider.GetString("LOCSystemCheckerConfigMinimum"));
 			}
 
-			return CheckTagExist(ResourceProvider.GetString("LOCSystemCheckerConfigBelowMinimum"));
+			if (checkMinimum.AllOk == false || checkRecommended.AllOk == false)
+			{
+				return CheckTagExist(ResourceProvider.GetString("LOCSystemCheckerConfigBelowMinimum"));
+			}
+
+			return null;
 		}
 
 		#endregion
