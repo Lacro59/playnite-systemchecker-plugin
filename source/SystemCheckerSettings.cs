@@ -1,18 +1,45 @@
-﻿using CommonPluginsShared.Interfaces;
+﻿using CommonPluginsShared;
+using CommonPluginsShared.Interfaces;
 using CommonPluginsShared.Plugins;
 using CommonPluginsShared.UI;
 using Playnite.SDK;
 using Playnite.SDK.Data;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
 
 namespace SystemChecker
 {
     public class SystemCheckerSettings : PluginSettings
     {
+        /// <summary>
+        /// Normalized source names excluded from SystemChecker operations (see <see cref="PlayniteTools.GetSourceName"/>).
+        /// Fixed plugin policy — not exposed in the settings UI.
+        /// </summary>
+        private static readonly IReadOnlyList<string> FixedExcludedSources = new List<string>
+        {
+            "Android",
+            "Playstation",
+            "Nintendo",
+            "EmuLibrary",
+            "RetroAchievements",
+            "Rpcs3"
+        };
+
+        public SystemCheckerSettings()
+        {
+            ApplyFixedLibraryFilterPolicy();
+        }
+
+        /// <summary>
+        /// Applies fixed library filter values for this plugin (not user-configurable).
+        /// </summary>
+        public void ApplyFixedLibraryFilterPolicy()
+        {
+            IncludeEmulatedGames = false;
+            LibrarySourceFilterMode = SourceFilterMode.Blacklist;
+            EnabledSources = new List<string>();
+            ExcludedSources = new List<string>(FixedExcludedSources);
+        }
+
         #region PluginViewItem
 
         private bool _enableIntegrationViewItem = true;
@@ -80,37 +107,32 @@ namespace SystemChecker
 
 		public SystemCheckerSettingsViewModel(SystemChecker plugin)
 		{
-            // Injecting the plugin instance is required for Save/Load because Playnite
-            // saves data to a location determined by the requesting plugin.
             Plugin = plugin;
 
-            // Load previously saved settings, or use defaults if none exist.
             SystemCheckerSettings savedSettings = plugin.LoadPluginSettings<SystemCheckerSettings>();
             Settings = savedSettings ?? new SystemCheckerSettings();
+            Settings.ApplyFixedLibraryFilterPolicy();
         }
 
-        // Called when the settings dialog is opened and the user begins editing.
         public void BeginEdit()
         {
             EditingClone = Serialization.GetClone(Settings);
             InitializeCommands(SystemChecker.PluginName, SystemChecker.PluginDatabase);
         }
 
-        // Called when the user cancels: restores the pre-edit snapshot.
         public void CancelEdit()
         {
             Settings = EditingClone;
 		}
 
-        // Called when the user confirms: persists the new values.
         public void EndEdit()
         {
+            Settings.ApplyFixedLibraryFilterPolicy();
             Plugin.SavePluginSettings(Settings);
             SystemChecker.PluginDatabase.PluginSettings = Settings;
             this.OnPropertyChanged();
         }
 
-        // Called before EndEdit; returning false with errors prevents saving.
         public bool VerifySettings(out List<string> errors)
         {
             errors = new List<string>();

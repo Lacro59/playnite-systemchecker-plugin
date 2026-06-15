@@ -111,7 +111,7 @@ namespace SystemChecker.Services
 		private SearchItem BuildValidatedSearchItem(PluginGameRequirements gameReq, SearchParameters searchParams, SystemConfiguration systemConfiguration)
 		{
 			Game game = API.Instance.Database.Games.Get(gameReq.Id);
-			if (game == null)
+			if (game == null || PlayniteTools.GetLibraryFilterExclusionReason(game, _pluginDatabase.FilterSettings) != null)
 			{
 				return null;
 			}

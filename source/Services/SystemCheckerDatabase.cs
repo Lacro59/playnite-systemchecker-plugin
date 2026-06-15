@@ -108,6 +108,13 @@ namespace SystemChecker.Services
 		public override PluginGameRequirements GetWeb(Guid id)
 		{
 			Game game = API.Instance.Database.Games.Get(id);
+			string exclusionReason = PlayniteTools.GetLibraryFilterExclusionReason(game, PluginSettings);
+			if (exclusionReason != null)
+			{
+				PlayniteTools.LogLibraryFilterExclusion("SystemChecker.GetWeb", game, exclusionReason);
+				return GetDefault(game);
+			}
+
 			PluginGameRequirements requirements = GetDefault(game);
 
 			try
@@ -230,6 +237,13 @@ namespace SystemChecker.Services
 		/// <inheritdoc/>
 		protected override bool AppendPluginTag(Game game)
 		{
+			string exclusionReason = PlayniteTools.GetLibraryFilterExclusionReason(game, PluginSettings);
+			if (exclusionReason != null)
+			{
+				PlayniteTools.LogLibraryFilterExclusion("SystemChecker.AppendPluginTag", game, exclusionReason);
+				return false;
+			}
+
 			PluginGameRequirements item = Get(game, true);
 
 			if (item.HasData)
@@ -297,6 +311,14 @@ namespace SystemChecker.Services
 		/// <inheritdoc/>
 		public override void SetThemesResources(Game game)
 		{
+			string exclusionReason = PlayniteTools.GetLibraryFilterExclusionReason(game, PluginSettings);
+			if (exclusionReason != null)
+			{
+				PlayniteTools.LogLibraryFilterExclusion("SystemChecker.SetThemesResources", game, exclusionReason);
+				ResetThemeSettings();
+				return;
+			}
+
 			PluginGameRequirements requirements = Get(game, true);
 
 			if (requirements == null)
