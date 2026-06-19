@@ -176,7 +176,12 @@
     <Compile Include="Services\SystemCheckWindows.cs" />
     <Compile Include="SystemChecker.cs" />
     <Compile Include="SystemCheckerSettings.cs" />
+    <Compile Include="Services\BenchmarkPickerDialog.cs" />
+    <Compile Include="ViewModels\BenchmarkPickerViewModel.cs" />
     <Compile Include="ViewModels\SystemCheckerGameViewModel.cs" />
+    <Compile Include="Views\BenchmarkPickerView.xaml.cs">
+      <DependentUpon>BenchmarkPickerView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\SystemCheckerGameView.xaml.cs">
       <DependentUpon>SystemCheckerGameView.xaml</DependentUpon>
     </Compile>
@@ -431,6 +436,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="playnite-plugincommon\CommonPluginsControls\Views\TransfertData.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\BenchmarkPickerView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

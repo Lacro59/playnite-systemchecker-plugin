@@ -123,7 +123,162 @@
         </TabItem>
 
         <!-- ═══════════════════════════════════════════════════════════
-             TAB 2: UI integration / appearance settings
+             TAB 2: PC hardware configuration
+             ═══════════════════════════════════════════════════════════ -->
+        <TabItem Header="{DynamicResource LOCMenuConfigurationTitle}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,10,4,0">
+                <StackPanel>
+
+                    <Border Style="{StaticResource SectionBorder}">
+                        <TextBlock Style="{DynamicResource BaseTextBlockStyle}"
+                                   Foreground="{DynamicResource TextBrushDarker}"
+                                   TextWrapping="Wrap"
+                                   Text="{DynamicResource LOCSystemCheckerPcConfigDescription}" />
+                    </Border>
+
+                    <!-- SECTION: WMI-detected hardware (read-only) -->
+                    <Border Style="{StaticResource SectionBorder}">
+                        <StackPanel>
+                            <TextBlock Style="{DynamicResource SectionHeaderText}"
+                                       Text="{DynamicResource LOCSystemCheckerDetectedHardware}"
+                                       Margin="0,0,0,10" />
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="140" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0"
+                                           Text="{DynamicResource LOCSystemCheckerOS}"
+                                           Style="{DynamicResource ViewColumnLabelText}" />
+                                <TextBlock Grid.Row="0" Grid.Column="1"
+                                           Text="{Binding DetectedOs}"
+                                           Style="{DynamicResource ViewColumnValueText}" />
+
+                                <TextBlock Grid.Row="1" Grid.Column="0"
+                                           Text="{DynamicResource LOCSystemCheckerCpu}"
+                                           Style="{DynamicResource ViewColumnLabelText}" />
+                                <TextBlock Grid.Row="1" Grid.Column="1"
+                                           Text="{Binding DetectedCpu}"
+                                           Style="{DynamicResource ViewColumnValueText}"
+                                           TextWrapping="Wrap" />
+
+                                <TextBlock Grid.Row="2" Grid.Column="0"
+                                           Text="{DynamicResource LOCSystemCheckerGpu}"
+                                           Style="{DynamicResource ViewColumnLabelText}" />
+                                <TextBlock Grid.Row="2" Grid.Column="1"
+                                           Text="{Binding DetectedGpu}"
+                                           Style="{DynamicResource ViewColumnValueText}"
+                                           TextWrapping="Wrap" />
+
+                                <TextBlock Grid.Row="3" Grid.Column="0"
+                                           Text="{DynamicResource LOCSystemCheckerRam}"
+                                           Style="{DynamicResource ViewColumnLabelText}" />
+                                <TextBlock Grid.Row="3" Grid.Column="1"
+                                           Text="{Binding DetectedRam}"
+                                           Style="{DynamicResource ViewColumnValueText}" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- SECTION: Manual CPU / GPU overrides -->
+                    <Border Style="{StaticResource SectionBorder}">
+                        <StackPanel>
+                            <TextBlock Style="{DynamicResource SectionHeaderText}"
+                                       Text="{DynamicResource LOCSystemCheckerManualOverrides}"
+                                       Margin="0,0,0,6" />
+
+                            <TextBlock Style="{DynamicResource BaseTextBlockStyle}"
+                                       Foreground="{DynamicResource TextBrushDarker}"
+                                       TextWrapping="Wrap"
+                                       Margin="0,0,0,12"
+                                       Text="{DynamicResource LOCSystemCheckerManualOverrideHint}" />
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="140" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0"
+                                           Text="{DynamicResource LOCSystemCheckerCpu}"
+                                           Style="{DynamicResource ViewColumnLabelText}"
+                                           VerticalAlignment="Center" />
+                                <Grid Grid.Row="0" Grid.Column="1" Margin="0,0,0,8" VerticalAlignment="Center">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0"
+                                             Text="{Binding Settings.ManualCpu, UpdateSourceTrigger=PropertyChanged}"
+                                             VerticalAlignment="Center"
+                                             VerticalContentAlignment="Center"
+                                             MinHeight="34"
+                                             Margin="0,0,8,0" />
+                                    <Button Grid.Column="1"
+                                            Style="{StaticResource PrimaryButton}"
+                                            Content="{DynamicResource LOCSystemCheckerPickBenchmark}"
+                                            Command="{Binding CmdPickCpu}"
+                                            VerticalAlignment="Center"
+                                            Margin="0"
+                                            Padding="12,6"
+                                            MinHeight="34" />
+                                </Grid>
+
+                                <TextBlock Grid.Row="1" Grid.Column="0"
+                                           Text="{DynamicResource LOCSystemCheckerGpu}"
+                                           Style="{DynamicResource ViewColumnLabelText}"
+                                           VerticalAlignment="Center" />
+                                <Grid Grid.Row="1" Grid.Column="1" VerticalAlignment="Center">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0"
+                                             Text="{Binding Settings.ManualGpu, UpdateSourceTrigger=PropertyChanged}"
+                                             VerticalAlignment="Center"
+                                             VerticalContentAlignment="Center"
+                                             MinHeight="34"
+                                             Margin="0,0,8,0" />
+                                    <Button Grid.Column="1"
+                                            Style="{StaticResource PrimaryButton}"
+                                            Content="{DynamicResource LOCSystemCheckerPickBenchmark}"
+                                            Command="{Binding CmdPickGpu}"
+                                            VerticalAlignment="Center"
+                                            Margin="0"
+                                            Padding="12,6"
+                                            MinHeight="34" />
+                                </Grid>
+                            </Grid>
+
+                            <CheckBox Style="{StaticResource ModernCheckBox}"
+                                      Margin="0,12,0,0"
+                                      IsChecked="{Binding Settings.RetagOnManualConfigChange}"
+                                      IsEnabled="{Binding Settings.EnableTag}">
+                                <TextBlock Style="{DynamicResource BaseTextBlockStyle}"
+                                           TextWrapping="Wrap"
+                                           Text="{DynamicResource LOCSystemCheckerRetagOnManualConfigChange}" />
+                            </CheckBox>
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+            </ScrollViewer>
+        </TabItem>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             TAB 3: UI integration / appearance settings
              ═══════════════════════════════════════════════════════════ -->
         <TabItem Header="{DynamicResource LOCCommonIntegration}">
             <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,10,4,0">

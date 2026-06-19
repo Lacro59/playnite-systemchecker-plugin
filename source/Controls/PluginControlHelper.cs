@@ -34,7 +34,8 @@ namespace SystemChecker.Controls
 		// ── Core logic ────────────────────────────────────────────────────────
 
 		/// <summary>
-		/// Evaluates the game's system requirements against the current PC configuration
+		/// Evaluates the game's system requirements against the effective PC configuration
+		/// (WMI-detected values with optional manual CPU/GPU overrides from plugin settings)
 		/// and returns the appropriate icon glyph to display.
 		/// Returns <c>null</c> if the evaluation cannot proceed (missing PC config or no data).
 		/// </summary>
@@ -47,7 +48,7 @@ namespace SystemChecker.Controls
 		/// </returns>
 		public static string ResolveIcon(Game game, PluginGameEntry pluginGameData, SystemCheckerDatabase pluginDatabase)
 		{
-			SystemConfiguration systemConfiguration = pluginDatabase.PC;
+			SystemConfiguration systemConfiguration = pluginDatabase.GetEffectiveConfiguration();
 			if (systemConfiguration == null)
 			{
 				return null;

@@ -659,5 +659,55 @@ namespace SystemChecker.Clients
 		}
 
 		#endregion
+
+		#region Benchmark list API
+
+		/// <summary>
+		/// Returns the cached CPU benchmark catalog used for comparisons and manual selection.
+		/// </summary>
+		public IReadOnlyList<BenchmarkData> GetCpuBenchmarkEntries()
+		{
+			return CpuDataList ?? new List<BenchmarkData>();
+		}
+
+		/// <summary>
+		/// Returns the cached GPU benchmark catalog used for comparisons and manual selection.
+		/// </summary>
+		public IReadOnlyList<BenchmarkData> GetGpuBenchmarkEntries()
+		{
+			return VideoCardDataList ?? new List<BenchmarkData>();
+		}
+
+		/// <summary>
+		/// Suggests the best PassMark CPU match for a raw hardware name (e.g. WMI-detected label).
+		/// </summary>
+		/// <param name="rawName">Raw CPU name from detection or user input.</param>
+		/// <returns>Matching <see cref="BenchmarkData"/> or <c>null</c> when no match meets the PC threshold.</returns>
+		public BenchmarkData SuggestCpuMatch(string rawName)
+		{
+			if (string.IsNullOrWhiteSpace(rawName))
+			{
+				return null;
+			}
+
+			return FindBestMatch(PrepareCpuName(rawName), CpuDataList, FuzzyMatchThresholdPc);
+		}
+
+		/// <summary>
+		/// Suggests the best PassMark GPU match for a raw hardware name (e.g. WMI-detected label).
+		/// </summary>
+		/// <param name="rawName">Raw GPU name from detection or user input.</param>
+		/// <returns>Matching <see cref="BenchmarkData"/> or <c>null</c> when no match meets the PC threshold.</returns>
+		public BenchmarkData SuggestGpuMatch(string rawName)
+		{
+			if (string.IsNullOrWhiteSpace(rawName))
+			{
+				return null;
+			}
+
+			return FindBestMatch(PrepareGpuName(rawName), VideoCardDataList, FuzzyMatchThresholdPc);
+		}
+
+		#endregion
 	}
 }

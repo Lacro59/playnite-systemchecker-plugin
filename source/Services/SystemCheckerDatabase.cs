@@ -6,6 +6,7 @@ using CommonPluginsShared.Utilities;
 using CommonPluginsStores.Models;
 using CommonPluginsStores.Steam;
 using Playnite.SDK;
+using Playnite.SDK.Data;
 using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
@@ -64,6 +65,40 @@ namespace SystemChecker.Services
 				Logger.Error(ex, "Error in LoadMoreData.");
 				throw; // Propagate so LoadDatabase returns false.
 			}
+		}
+
+		#endregion
+
+		#region System configuration
+
+		/// <summary>
+		/// Returns the WMI-detected configuration with optional manual CPU and GPU overrides from plugin settings.
+		/// Non-empty <see cref="SystemCheckerSettings.ManualCpu"/> and <see cref="SystemCheckerSettings.ManualGpu"/>
+		/// replace the corresponding detected values; all other fields (RAM, OS, disks, resolution) come from <see cref="PC"/>.
+		/// </summary>
+		/// <returns>A cloned <see cref="SystemConfiguration"/> for comparisons, or <c>null</c> when <see cref="PC"/> is unavailable.</returns>
+		public SystemConfiguration GetEffectiveConfiguration()
+		{
+			if (PC == null)
+			{
+				return null;
+			}
+
+			SystemConfiguration effective = Serialization.GetClone(PC);
+
+			string manualCpu = PluginSettings?.ManualCpu?.Trim();
+			if (!string.IsNullOrEmpty(manualCpu))
+			{
+				effective.Cpu = manualCpu;
+			}
+
+			string manualGpu = PluginSettings?.ManualGpu?.Trim();
+			if (!string.IsNullOrEmpty(manualGpu))
+			{
+				effective.GpuName = manualGpu;
+			}
+
+			return effective;
 		}
 
 		#endregion
@@ -398,7 +433,7 @@ namespace SystemChecker.Services
 			{
 				try
 				{
-					SystemConfiguration systemConfig = PC;
+					SystemConfiguration systemConfig = GetEffectiveConfiguration();
 					CheckSystem checkMinimum = SystemApi.CheckConfig(game, item.GetMinimum(), systemConfig, game.IsInstalled);
 					CheckSystem checkRecommended = SystemApi.CheckConfig(game, item.GetRecommended(), systemConfig, game.IsInstalled);
 
@@ -480,7 +515,7 @@ namespace SystemChecker.Services
 				return;
 			}
 
-			SystemConfiguration systemConfig = PC;
+			SystemConfiguration systemConfig = GetEffectiveConfiguration();
 			CheckSystem checkMinimum = SystemApi.CheckConfig(game, requirements.GetMinimum(), systemConfig, game.IsInstalled);
 			CheckSystem checkRecommended = SystemApi.CheckConfig(game, requirements.GetRecommended(), systemConfig, game.IsInstalled);
 

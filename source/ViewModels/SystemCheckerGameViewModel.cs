@@ -137,8 +137,8 @@ namespace SystemChecker.ViewModels
                 return;
             }
 
-            // Load local system configuration
-            SystemConfiguration systemConfiguration = PluginDatabase.PC;
+            // Load effective system configuration (WMI + optional manual CPU/GPU overrides)
+            SystemConfiguration systemConfiguration = PluginDatabase.GetEffectiveConfiguration();
 
             LocalOs = systemConfiguration.Os;
             LocalCpu = CpuRequirementParser.NormalizeName(systemConfiguration.Cpu);

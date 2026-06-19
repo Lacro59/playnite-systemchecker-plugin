@@ -77,7 +77,7 @@ namespace SystemChecker.Services
 			try
 			{
 				SearchParameters searchParams = ParseSearchParameters(args.SearchTerm);
-				SystemConfiguration systemConfiguration = _pluginDatabase.PC;
+				SystemConfiguration systemConfiguration = _pluginDatabase.GetEffectiveConfiguration();
 				GameSearchFilterSettings filterSettings = args.GameFilterSettings;
 
 				return _pluginDatabase.GetAllCache()

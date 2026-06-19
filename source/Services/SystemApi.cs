@@ -191,7 +191,7 @@ namespace SystemChecker.Services
 		{
 			try
 			{
-				SystemConfiguration config = PluginDatabase.PC;
+				SystemConfiguration config = PluginDatabase.GetEffectiveConfiguration();
 				if (config == null)
 				{
 					return "unknown";
@@ -416,6 +416,30 @@ namespace SystemChecker.Services
 			ScheduleCacheSave();
 
 			Common.LogDebug(true, "SystemApi: Hardware check cache cleared");
+		}
+
+		/// <summary>
+		/// Clears CPU and GPU check caches and refreshes the system fingerprint
+		/// after manual processor or graphics overrides are saved in plugin settings.
+		/// OS and RAM caches are retained because manual overrides do not affect them.
+		/// </summary>
+		public static void InvalidateCpuAndGpuCache()
+		{
+			EnsureInitialized();
+
+			_cpuCache.Clear();
+			_gpuCache.Clear();
+
+			lock (_trackingLock)
+			{
+				_cpuCacheTracking.Clear();
+				_gpuCacheTracking.Clear();
+			}
+
+			_currentSystemFingerprint = GenerateSystemFingerprint();
+			ScheduleCacheSave();
+
+			Common.LogDebug(true, "SystemApi: CPU/GPU check cache invalidated after manual configuration change");
 		}
 
 		#endregion

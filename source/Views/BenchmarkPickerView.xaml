@@ -1,0 +1,73 @@
+<UserControl x:Class="SystemChecker.Views.BenchmarkPickerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:viewmodels="clr-namespace:SystemChecker.ViewModels"
+             xmlns:converters="clr-namespace:CommonPlayniteShared.Converters"
+             mc:Ignorable="d"
+             d:DesignHeight="560" d:DesignWidth="700"
+             d:DataContext="{d:DesignInstance Type=viewmodels:BenchmarkPickerViewModel}"
+             Background="{DynamicResource WindowBackgourndBrush}">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converters:InvertedBooleanToVisibilityConverter x:Key="InvertedBooleanToVisibilityConverter" />
+    </UserControl.Resources>
+
+    <Border Style="{DynamicResource TopSeparatorBorder}">
+        <Grid Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Margin="0,0,0,12">
+                <TextBlock Style="{DynamicResource BaseTextBlockStyle}"
+                           Foreground="{DynamicResource TextBrushDarker}"
+                           Text="{DynamicResource LOCSystemCheckerBenchmarkSearch}"
+                           Margin="0,0,0,6" />
+                <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+
+            <Grid Grid.Row="1">
+                <ListBox ItemsSource="{Binding FilteredItems}"
+                         SelectedItem="{Binding SelectedItem}"
+                         MouseDoubleClick="ListBox_MouseDoubleClick"
+                         Visibility="{Binding IsLoading, Converter={StaticResource InvertedBooleanToVisibilityConverter}}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="0,2">
+                                <TextBlock Text="{Binding Name}"
+                                           Style="{DynamicResource BaseTextBlockStyle}"
+                                           TextWrapping="Wrap" />
+                                <TextBlock Style="{DynamicResource BaseTextBlockStyle}"
+                                           Foreground="{DynamicResource TextBrushDarker}"
+                                           Text="{Binding Mark, StringFormat=PassMark score: {0:F0}}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <TextBlock Style="{DynamicResource BaseTextBlockStyle}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Text="{DynamicResource LOCSystemCheckerBenchmarkLoading}"
+                           Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}" />
+            </Grid>
+
+            <DockPanel Grid.Row="2" Margin="0,12,0,0" LastChildFill="False">
+                <Button DockPanel.Dock="Right"
+                        Style="{StaticResource PrimaryButton}"
+                        Content="{DynamicResource LOCOKLabel}"
+                        Margin="8,0,0,0"
+                        Command="{Binding CmdConfirm}" />
+                <Button DockPanel.Dock="Right"
+                        Style="{StaticResource ModernButton}"
+                        Content="{DynamicResource LOCCancelLabel}"
+                        Command="{Binding CmdCancel}" />
+            </DockPanel>
+        </Grid>
+    </Border>
+</UserControl>
