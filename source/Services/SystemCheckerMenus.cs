@@ -201,6 +201,13 @@ namespace SystemChecker.Services
 			mainMenuItems.Add(new MainMenuItem
 			{
 				MenuSection = menuInExtensions + ResourceProvider.GetString("LOCSystemChecker"),
+				Description = ResourceProvider.GetString("LOCCommonExtractToCsv"),
+				Action = mainMenuItem => _database.ExtractToCsv()
+			});
+
+			mainMenuItems.Add(new MainMenuItem
+			{
+				MenuSection = menuInExtensions + ResourceProvider.GetString("LOCSystemChecker"),
 				Description = "-"
 			});
 

@@ -1,5 +1,6 @@
 ﻿using CommonPluginsShared;
 using CommonPluginsShared.Collections;
+using CommonPluginsShared.Plugins;
 using CommonPluginsShared.SystemInfo;
 using CommonPluginsShared.Utilities;
 using CommonPluginsStores.Models;
@@ -34,6 +35,7 @@ namespace SystemChecker.Services
 			: base(pluginSettings, "SystemChecker", pluginUserDataPath)
 		{
 			TagBefore = "[SC]";
+			PluginExportCsv = new SystemCheckerExportCsv();
 			PluginWindows = new SystemCheckWindows(PluginName, this);
 		}
 
