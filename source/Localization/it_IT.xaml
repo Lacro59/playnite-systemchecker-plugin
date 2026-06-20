@@ -7,16 +7,16 @@
 	<sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Aggiorna Informazioni Di Sistema</sys:String>
 
 	<!-- Settings — PC configuration -->
-	<sys:String x:Key="LOCSystemCheckerPcConfigDescription">SystemChecker compares game requirements against your PC hardware. Values below are detected automatically; you can override the processor and graphics card names when detection is incorrect or not recognized by benchmarks.</sys:String>
-	<sys:String x:Key="LOCSystemCheckerDetectedHardware">Detected hardware</sys:String>
-	<sys:String x:Key="LOCSystemCheckerManualOverrides">Manual overrides</sys:String>
-	<sys:String x:Key="LOCSystemCheckerManualOverrideHint">Leave a field empty to use the detected value. Type a name or open the PassMark list to choose a benchmark entry.</sys:String>
-	<sys:String x:Key="LOCSystemCheckerPickBenchmark">PassMark list…</sys:String>
-	<sys:String x:Key="LOCSystemCheckerPickCpu">Select processor (PassMark)</sys:String>
-	<sys:String x:Key="LOCSystemCheckerPickGpu">Select graphics card (PassMark)</sys:String>
-	<sys:String x:Key="LOCSystemCheckerBenchmarkSearch">Search benchmarks</sys:String>
-	<sys:String x:Key="LOCSystemCheckerBenchmarkLoading">Loading benchmark list…</sys:String>
-	<sys:String x:Key="LOCSystemCheckerRetagOnManualConfigChange">Update compatibility tags when manual CPU or GPU settings change</sys:String>
+	<sys:String x:Key="LOCSystemCheckerPcConfigDescription">SystemChecker confronta i requisiti di gioco con l'hardware del PC. I valori sottostanti vengono rilevati automaticamente; puoi sovrascrivere i nomi dei processori e delle schede grafiche quando il rilevamento non è corretto o non è riconosciuto dai benchmark.</sys:String>
+	<sys:String x:Key="LOCSystemCheckerDetectedHardware">Hardware rilevato</sys:String>
+	<sys:String x:Key="LOCSystemCheckerManualOverrides">Sovrascrittura manuale</sys:String>
+	<sys:String x:Key="LOCSystemCheckerManualOverrideHint">Lascia un campo vuoto per usare il valore rilevato. Digita un nome o apri l'elenco PassMark per scegliere una voce di benchmark.</sys:String>
+	<sys:String x:Key="LOCSystemCheckerPickBenchmark">Lista di PassMark…</sys:String>
+	<sys:String x:Key="LOCSystemCheckerPickCpu">Seleziona processore (PassMark)</sys:String>
+	<sys:String x:Key="LOCSystemCheckerPickGpu">Seleziona scheda grafica (PassMark)</sys:String>
+	<sys:String x:Key="LOCSystemCheckerBenchmarkSearch">Cerca benchmark</sys:String>
+	<sys:String x:Key="LOCSystemCheckerBenchmarkLoading">Caricamento elenco benchmark…</sys:String>
+	<sys:String x:Key="LOCSystemCheckerRetagOnManualConfigChange">Aggiorna i tag di compatibilità quando le impostazioni manuali della CPU o della GPU cambiano</sys:String>
 
 	<!-- Game Details View -->
 	<sys:String x:Key="LOCSystemCheckerConfigBelowMinimum">Sotto il minimo</sys:String>
