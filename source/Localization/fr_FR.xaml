@@ -7,19 +7,19 @@
 	<sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Rafraîchir les informations système</sys:String>
 
 	<!-- Settings — PC configuration -->
-	<sys:String x:Key="LOCSystemCheckerPcConfigDescription">SystemChecker compares game requirements against your PC hardware. Values below are detected automatically; you can override the processor and graphics card names when detection is incorrect or not recognized by benchmarks.</sys:String>
-	<sys:String x:Key="LOCSystemCheckerDetectedHardware">Detected hardware</sys:String>
-	<sys:String x:Key="LOCSystemCheckerManualOverrides">Manual overrides</sys:String>
-	<sys:String x:Key="LOCSystemCheckerManualOverrideHint">Leave a field empty to use the detected value. Type a name or open the PassMark list to choose a benchmark entry.</sys:String>
-	<sys:String x:Key="LOCSystemCheckerPickBenchmark">PassMark list…</sys:String>
-	<sys:String x:Key="LOCSystemCheckerPickCpu">Select processor (PassMark)</sys:String>
-	<sys:String x:Key="LOCSystemCheckerPickGpu">Select graphics card (PassMark)</sys:String>
-	<sys:String x:Key="LOCSystemCheckerBenchmarkSearch">Search benchmarks</sys:String>
-	<sys:String x:Key="LOCSystemCheckerBenchmarkLoading">Loading benchmark list…</sys:String>
-	<sys:String x:Key="LOCSystemCheckerRetagOnManualConfigChange">Update compatibility tags when manual CPU or GPU settings change</sys:String>
+	<sys:String x:Key="LOCSystemCheckerPcConfigDescription">SystemChecker compare les exigences des jeux avec le matériel de votre PC. Les valeurs ci-dessous sont détectées automatiquement ; vous pouvez remplacer les noms du processeur et de la carte graphique lorsque la détection est incorrecte ou non reconnue par les benchmarks.</sys:String>
+	<sys:String x:Key="LOCSystemCheckerDetectedHardware">Matériel détecté</sys:String>
+	<sys:String x:Key="LOCSystemCheckerManualOverrides">Remplacements manuels</sys:String>
+	<sys:String x:Key="LOCSystemCheckerManualOverrideHint">Laissez un champ vide pour utiliser la valeur détectée. Saisissez un nom ou ouvrez la liste PassMark pour choisir une entrée de benchmark.</sys:String>
+	<sys:String x:Key="LOCSystemCheckerPickBenchmark">Liste PassMark…</sys:String>
+	<sys:String x:Key="LOCSystemCheckerPickCpu">Sélectionner le processeur (PassMark)</sys:String>
+	<sys:String x:Key="LOCSystemCheckerPickGpu">Sélectionner la carte graphique (PassMark)</sys:String>
+	<sys:String x:Key="LOCSystemCheckerBenchmarkSearch">Rechercher des benchmarks</sys:String>
+	<sys:String x:Key="LOCSystemCheckerBenchmarkLoading">Chargement de la liste des benchmarks…</sys:String>
+	<sys:String x:Key="LOCSystemCheckerRetagOnManualConfigChange">Mettre à jour les étiquettes de compatibilité lorsque les paramètres manuels du processeur ou de la carte graphique changent</sys:String>
 
 	<!-- Game Details View -->
-	<sys:String x:Key="LOCSystemCheckerConfigBelowMinimum">En dessous du minimum requis</sys:String>
+	<sys:String x:Key="LOCSystemCheckerConfigBelowMinimum">En dessous du minimum</sys:String>
 	<sys:String x:Key="LOCSystemCheckerConfigMinimum">Minimum</sys:String>
 	<sys:String x:Key="LOCSystemCheckerConfigRecommended">Recommandé</sys:String>
 	<sys:String x:Key="LOCSystemCheckerOS">Système d'exploitation</sys:String>
@@ -37,15 +37,13 @@
     -np		Jamais joué
     -fav		Favoris uniquement
     -stores={n}		Filtrer par boutique (par ex. -stores=steam / -stores=steam,epic)
-    -status={n}		Filtrer par statut de jeu (par ex. -status=played / -status=played,playing)
-
-Traduit avec DeepL.com (version gratuite)</sys:String>
+    -status={n}		Filtrer par statut de jeu (par ex. -status=played / -status=played,playing)</sys:String>
 
 	<!-- Search Results -->
 	<sys:String x:Key="LOCSystemCheckerSearchMeetsMinimum">✅ Remplit les exigences minimales</sys:String>
 	<sys:String x:Key="LOCSystemCheckerSearchMeetsRecommended">✅ Remplit les exigences recommandées</sys:String>
 	<sys:String x:Key="LOCSystemCheckerSearchBelowMinimum">⚠️ En-dessous des exigences minimales</sys:String>
-	<sys:String x:Key="LOCSystemCheckerSearchNoData">i Aucune donnée de pré-requis disponible</sys:String>
+	<sys:String x:Key="LOCSystemCheckerSearchNoData">ℹ️ Aucune donnée de prérequis disponible</sys:String>
 	<sys:String x:Key="LOCSystemCheckerSearchSecondaryAction">Afficher les détails</sys:String>
 
 	<!-- Notifications -->
