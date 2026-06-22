@@ -25,9 +25,34 @@ namespace SystemChecker.Services
 		/// <inheritdoc />
 		public override IEnumerable<GameMenuItem> GetGameMenuItems(GetGameMenuItemsArgs args)
 		{
-			// Only support single game selection for most features currently
-			Game gameMenu = args.Games.First();
-			List<Guid> ids = args.Games.Select(x => x.Id).ToList();
+			List<Game> includedGames = args.Games
+				.Where(game => PlayniteTools.ShouldIncludeLibraryGame(game, _settings))
+				.ToList();
+
+			if (includedGames.Count == 0)
+			{
+				Common.LogDebug(true, string.Format(
+					"[LibraryFilter] SystemCheckerMenus: game menu hidden — no eligible game in selection ({0} selected, IncludeEmulatedGames={1}, SourceFilter={2})",
+					args.Games.Count,
+					_settings.IncludeEmulatedGames,
+					PlayniteTools.FormatSourceFilterForLog(_settings)));
+
+				return Enumerable.Empty<GameMenuItem>();
+			}
+
+			int excludedCount = args.Games.Count - includedGames.Count;
+			if (excludedCount > 0)
+			{
+				Common.LogDebug(true, string.Format(
+					"[LibraryFilter] SystemCheckerMenus: {0}/{1} selected game(s) excluded from menu actions (IncludeEmulatedGames={2}, SourceFilter={3})",
+					excludedCount,
+					args.Games.Count,
+					_settings.IncludeEmulatedGames,
+					PlayniteTools.FormatSourceFilterForLog(_settings)));
+			}
+
+			Game gameMenu = includedGames.First();
+			List<Guid> ids = includedGames.Select(x => x.Id).ToList();
 
 			// Retrieve cached requirements data for the selected game
 			PluginGameEntry pluginGameRequirements = _database.Get(gameMenu, true);
@@ -172,6 +197,13 @@ namespace SystemChecker.Services
 					Action = mainMenuItem => _commands.CmdRemoveTag.Execute(null)
 				});
 			}
+
+			mainMenuItems.Add(new MainMenuItem
+			{
+				MenuSection = menuInExtensions + ResourceProvider.GetString("LOCSystemChecker"),
+				Description = ResourceProvider.GetString("LOCCommonExtractToCsv"),
+				Action = mainMenuItem => _database.ExtractToCsv()
+			});
 
 			mainMenuItems.Add(new MainMenuItem
 			{

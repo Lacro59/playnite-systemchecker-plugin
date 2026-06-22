@@ -15,7 +15,8 @@ A Playnite extension that automatically checks game system requirements against 
 - **Automatic Requirements Detection**: Retrieves game system requirements from [PCGamingWiki](https://www.pcgamingwiki.com/wiki/Home) and Steam
 - **Real-time Compatibility Check**: Compares your PC configuration against game requirements
 - **Visual Indicators**: See at a glance which games your system can run
-- **Auto-tagging**: Automatically tag games based on compatibility
+- **Manual PC Configuration**: Override detected CPU and GPU in settings; pick entries from the PassMark benchmark list when auto-detection is inaccurate
+- **Auto-Tagging**: Automatically tag games based on compatibility (`[SC]` prefix)
 - **Theme Integration**: Seamlessly integrate system checker data into custom Playnite themes
   - Display compatibility in Details View
   - Display compatibility in Grid View
@@ -77,19 +78,25 @@ You can use the following parameters to filter games:
 
 ### General Settings
 
-- **Enable Auto-Check**: Automatically check system requirements for new games
-- **Auto-Tagging**: Automatically add tags based on compatibility
+- **Menu in Extensions**: Move plugin menu entries under the Extensions submenu (requires restart)
+- **Auto-Tagging**: Add compatibility tags to your library (`[SC]` prefix); optional refresh when manual CPU/GPU settings change
+- **Auto-Import**: Download requirement data when the library is updated
 
 ### PC Configuration
 
-Configure your system specifications:
-- CPU
-- GPU
-- RAM
-- Storage
-- Operating System
+Open **Settings → Extensions → SystemChecker → Configuration**.
 
-> **Note**: The plugin can auto-detect most specifications, but manual configuration ensures accuracy.
+**Detected hardware** (read-only) shows values read from Windows (CPU, GPU, RAM, OS). The plugin uses them automatically for compatibility checks.
+
+**Manual overrides** let you replace the detected **CPU** and/or **GPU** when WMI labels are wrong or not recognized by benchmarks:
+
+1. Type a component name, or click **PassMark list…** to search and select an entry from the PassMark database
+2. Leave a field empty to use the detected value for that component
+3. Save settings — comparison results (game view, library icons, search, tags) use the effective configuration
+
+If **Auto-Tagging** is enabled, you can keep **Update compatibility tags when manual CPU or GPU settings change** checked (default) to refresh tags across the library after saving manual changes.
+
+> **Note**: RAM, storage, and OS are still taken from auto-detection. Only CPU and GPU can be overridden in this release.
 
 ## 📥 Installation
 

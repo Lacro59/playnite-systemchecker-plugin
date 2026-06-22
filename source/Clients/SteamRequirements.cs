@@ -17,9 +17,9 @@ namespace SystemChecker.Clients
 		private uint _appId;
 
 
-		public SteamRequirements()
+		public SteamRequirements(SteamApi steamApi = null)
 		{
-			_steamApi = new SteamApi(PluginDatabase.PluginName, PlayniteTools.ExternalPlugin.SystemChecker);
+			_steamApi = steamApi ?? new SteamApi(PluginDatabase.PluginName, PlayniteTools.ExternalPlugin.SystemChecker);
 		}
 
 

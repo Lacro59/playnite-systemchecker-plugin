@@ -1,37 +1,55 @@
-# Manifest
+# Manifest — release Playnite
 
-## Role
+Instructions pour mettre à jour le changelog YAML d'une release d'extension Playnite.
 
-You are an expert technical writer for open-source projects. Your task is to update a Playnite plugin changelog (YAML) with a new release entry.
+**Langue du livrable :** les entrées du changelog (`Added:`, `Fixed:`, etc.) et le texte utilisateur du manifest doivent être en **anglais**. Ce fichier d'instruction est en français.
 
-## Context
+## Rôle
 
-I am releasing a new version of my Playnite plugin. You must generate the next `Package` entry based on the current date, the technical git logs, and the existing file structure.
+Agir en rédacteur technique expert pour projets open source. Mettre à jour le changelog (YAML) du plugin avec une nouvelle entrée `Package`.
+
+## Contexte
+
+L'utilisateur publie une nouvelle version de son extension Playnite. Générer la prochaine entrée `Package` à partir de la date courante, des logs git techniques et de la structure YAML existante.
 
 ## Instructions
 
-1. **Dynamic Versioning**: Look at the last version in the provided YAML. Propose the next logical version number (e.g., if last was 3.10.1, the new one should be 3.10.2 or 3.11.0 depending on the importance of the commits).
-2. **Automated Date**: Use the current date for the `ReleaseDate` field: 2026-04-19.
-3. **NuGet SDK Sync**: Ensure the `RequiredApiVersion` matches the Playnite SDK version provided below. Do **not** add a changelog line for SDK or API bumps (e.g. avoid entries like `Updated: Playnite SDK target (API …)`).
-4. **User-Centric Changelog**:
-    - Translate technical git commits into clear, "non-dev" English.
-    - Categorize each line with: `Added:`, `Fixed:`, `Updated:`, `Optimized:`, or `Improved:`.
-    - Credit contributors with `(thanks to [Name])` if mentioned in the logs.
-    - Omit housekeeping that users do not care about: no changelog lines for Playnite SDK / NuGet reference updates, and no lines for shared plugin common (`playnite-plugincommon`) or similar internal dependency refreshes (e.g. avoid `Updated: Shared plugin common components`).
-    - **Opaque minor changes**: If the remaining diff is only small, low-impact edits and you cannot name a clear user-facing outcome (after the omissions above), do not invent vague per-file bullets. Add a single line instead, e.g. `'Updated: Various minor improvements'`.
-5. **YAML Formatting**:
-    - Maintain the exact indentation.
-    - Update the `PackageUrl` to match the new version number.
-    - Use single quotes for changelog strings to handle special characters.
+1. **Versionnement dynamique** : lire la dernière version dans le YAML fourni. Proposer le numéro logique suivant (ex. si la dernière était `3.10.1`, proposer `3.10.2` ou `3.11.0` selon l'importance des commits).
+2. **Date automatique** : utiliser la date du jour pour le champ `ReleaseDate`.
+3. **Tag de référence** : construire le changelog depuis le dernier tag accessible depuis la branche courante (`git describe --tags --abbrev=0`), pas depuis des tags non liés sur d'autres branches.
+4. **Sync SDK NuGet** : s'assurer que `RequiredApiVersion` correspond à la version Playnite SDK fournie. **Ne pas** ajouter de ligne changelog pour les bumps SDK/API (éviter `Updated: Playnite SDK target (API …)`).
+5. **Changelog orienté utilisateur** (texte en **anglais**) :
+   - Traduire les commits techniques en lignes claires pour un public non développeur.
+   - Catégoriser chaque ligne : `Added:`, `Fixed:`, `Updated:`, `Optimized:`, ou `Improved:`.
+   - Créditer les contributeurs avec `(thanks to [Name])` si mentionnés dans les logs.
+   - Omettre le housekeeping sans intérêt utilisateur : pas de ligne pour mises à jour SDK NuGet, ni pour rafraîchissements de `playnite-plugincommon` (éviter `Updated: Shared plugin common components`).
+   - **Changements mineurs opaques** : si le diff restant n'est que de petites retouches sans impact clair, ne pas inventer de puces vagues par fichier. Ajouter une seule ligne, ex. `'Updated: Various minor improvements'`.
+6. **Formatage YAML** :
+   - Conserver l'indentation exacte.
+   - Mettre à jour `PackageUrl` pour correspondre au nouveau numéro de version.
+   - Utiliser des guillemets simples pour les chaînes changelog (caractères spéciaux).
 
-## Inputs
+## Entrées attendues
 
-- **Playnite SDK Version (NuGet)**
-- **Git Commits**
+- **Version Playnite SDK (NuGet)**
+- **Commits Git**
+- **Dernier tag accessible**
 
-## Current YAML Content
+## Contenu YAML courant
 
----
+(Fourni par l'utilisateur au moment de la release.)
 
-**Last Updated:** 2026-04-19  
-**Version:** 1.1
+## Gestion de version
+
+| Métadonnée                | Valeur     |
+| ------------------------- | ---------- |
+| **Version**               | 1.4        |
+| **Créé le**               | 2026-04-19 |
+| **Dernière modification** | 2026-06-16 |
+
+### Historique des versions
+
+| Version | Date       | Changements                                      |
+| ------- | ---------- | ------------------------------------------------ |
+| 1.3     | 2026-06-16 | Renommage manifest.md ; table versions           |
+| 1.4     | 2026-06-16 | Mise en norme : instructions en français         |

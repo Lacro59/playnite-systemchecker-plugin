@@ -195,8 +195,18 @@ namespace SystemChecker
         {
             if (PluginSettingsViewModel.Settings.AutoImport && !PluginSettingsViewModel.Settings.PreventLibraryUpdatedOnStart)
             {
-                var playniteDb = PlayniteApi.Database.Games
-                        .Where(x => x.Added != null && x.Added > PluginSettingsViewModel.Settings.LastAutoLibUpdateAssetsDownload);
+                List<Game> newGames = PlayniteApi.Database.Games
+                    .Where(x => x.Added != null && x.Added > PluginSettingsViewModel.Settings.LastAutoLibUpdateAssetsDownload)
+                    .ToList();
+
+                List<Game> playniteDb = PlayniteTools.FilterLibraryGames(newGames, PluginSettingsViewModel.Settings).ToList();
+
+                Common.LogDebug(true, string.Format(
+                    "[LibraryFilter] OnLibraryUpdated: {0} new game(s) -> {1} after library filter (IncludeEmulatedGames={2}, SourceFilter={3})",
+                    newGames.Count,
+                    playniteDb.Count,
+                    PluginSettingsViewModel.Settings.IncludeEmulatedGames,
+                    PlayniteTools.FormatSourceFilterForLog(PluginSettingsViewModel.Settings)));
 
                 GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions($"SystemChecker - {ResourceProvider.GetString("LOCCommonGettingData")}")
                 {
@@ -211,8 +221,7 @@ namespace SystemChecker
                         Stopwatch stopWatch = new Stopwatch();
                         stopWatch.Start();
 
-                        a.ProgressMaxValue = (double)playniteDb.Count();
-
+                        a.ProgressMaxValue = (double)playniteDb.Count;
                         string cancelText = string.Empty;
 
                         foreach (Game game in playniteDb)
@@ -231,7 +240,7 @@ namespace SystemChecker
 
                         stopWatch.Stop();
                         TimeSpan ts = stopWatch.Elapsed;
-                        Logger.Info($"Task OnLibraryUpdated(){cancelText} - {string.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10)} for {a.CurrentProgressValue}/{(double)playniteDb.Count()} items");
+                        Logger.Info($"Task OnLibraryUpdated(){cancelText} - {string.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10)} for {a.CurrentProgressValue}/{playniteDb.Count} items");
                     }
                     catch (Exception ex)
                     {

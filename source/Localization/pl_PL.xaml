@@ -6,7 +6,20 @@
 	<sys:String x:Key="LOCSystemCheckerCheckConfig">Check System Requirements</sys:String>
 	<sys:String x:Key="LOCSystemCheckerRefreshPcInfo">Refresh System Information</sys:String>
 
+	<!-- Settings — PC configuration -->
+	<sys:String x:Key="LOCSystemCheckerPcConfigDescription">SystemChecker compares game requirements against your PC hardware. Values below are detected automatically; you can override the processor and graphics card names when detection is incorrect or not recognized by benchmarks.</sys:String>
+	<sys:String x:Key="LOCSystemCheckerDetectedHardware">Detected hardware</sys:String>
+	<sys:String x:Key="LOCSystemCheckerManualOverrides">Manual overrides</sys:String>
+	<sys:String x:Key="LOCSystemCheckerManualOverrideHint">Leave a field empty to use the detected value. Type a name or open the PassMark list to choose a benchmark entry.</sys:String>
+	<sys:String x:Key="LOCSystemCheckerPickBenchmark">PassMark list…</sys:String>
+	<sys:String x:Key="LOCSystemCheckerPickCpu">Select processor (PassMark)</sys:String>
+	<sys:String x:Key="LOCSystemCheckerPickGpu">Select graphics card (PassMark)</sys:String>
+	<sys:String x:Key="LOCSystemCheckerBenchmarkSearch">Search benchmarks</sys:String>
+	<sys:String x:Key="LOCSystemCheckerBenchmarkLoading">Loading benchmark list…</sys:String>
+	<sys:String x:Key="LOCSystemCheckerRetagOnManualConfigChange">Update compatibility tags when manual CPU or GPU settings change</sys:String>
+
 	<!-- Game Details View -->
+	<sys:String x:Key="LOCSystemCheckerConfigBelowMinimum">Below Minimum</sys:String>
 	<sys:String x:Key="LOCSystemCheckerConfigMinimum">Minimum</sys:String>
 	<sys:String x:Key="LOCSystemCheckerConfigRecommended">Recommended</sys:String>
 	<sys:String x:Key="LOCSystemCheckerOS">Operating System</sys:String>

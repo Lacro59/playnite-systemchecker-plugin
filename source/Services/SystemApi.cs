@@ -13,6 +13,7 @@ using CommonPluginsShared.IO;
 using Playnite.SDK.Models;
 using CommonPluginsStores.Models;
 using CommonPluginsShared.SystemInfo;
+using SystemChecker.Services.Parser;
 
 namespace SystemChecker.Services
 {
@@ -42,7 +43,7 @@ namespace SystemChecker.Services
 		/// </summary>
 		private class CachedCheckResult
 		{
-			public bool Result { get; set; }
+			public CheckStatus Status { get; set; }
 			public DateTime DateCreated { get; set; }
 			public string ComponentPcName { get; set; }
 			public string ComponentRequirementName { get; set; }
@@ -53,13 +54,20 @@ namespace SystemChecker.Services
 				DateCreated = DateTime.Now;
 			}
 
-			public CachedCheckResult(bool result, string componentPc, string componentRequirement, string checkType)
+			public CachedCheckResult(CheckStatus status, string componentPc, string componentRequirement, string checkType)
 			{
-				Result = result;
+				Status = status;
 				ComponentPcName = componentPc;
 				ComponentRequirementName = componentRequirement;
 				CheckType = checkType;
 				DateCreated = DateTime.Now;
+			}
+
+			/// <summary>Legacy accessor for cache files that stored a boolean result.</summary>
+			public bool Result
+			{
+				get { return Status == CheckStatus.Pass; }
+				set { Status = value ? CheckStatus.Pass : CheckStatus.Fail; }
 			}
 
 			public bool IsExpired(int expirationDays)
@@ -183,7 +191,7 @@ namespace SystemChecker.Services
 		{
 			try
 			{
-				SystemConfiguration config = PluginDatabase.PC;
+				SystemConfiguration config = PluginDatabase.GetEffectiveConfiguration();
 				if (config == null)
 				{
 					return "unknown";
@@ -410,6 +418,30 @@ namespace SystemChecker.Services
 			Common.LogDebug(true, "SystemApi: Hardware check cache cleared");
 		}
 
+		/// <summary>
+		/// Clears CPU and GPU check caches and refreshes the system fingerprint
+		/// after manual processor or graphics overrides are saved in plugin settings.
+		/// OS and RAM caches are retained because manual overrides do not affect them.
+		/// </summary>
+		public static void InvalidateCpuAndGpuCache()
+		{
+			EnsureInitialized();
+
+			_cpuCache.Clear();
+			_gpuCache.Clear();
+
+			lock (_trackingLock)
+			{
+				_cpuCacheTracking.Clear();
+				_gpuCacheTracking.Clear();
+			}
+
+			_currentSystemFingerprint = GenerateSystemFingerprint();
+			ScheduleCacheSave();
+
+			Common.LogDebug(true, "SystemApi: CPU/GPU check cache invalidated after manual configuration change");
+		}
+
 		#endregion
 
 		#region Cache key builders
@@ -483,12 +515,14 @@ namespace SystemChecker.Services
 				return new CheckSystem();
 			}
 
-			bool isCheckOs = CheckOSCached(systemConfiguration.Os, requirementEntry.Os);
-			bool isCheckCpu = CheckCpuCached(systemConfiguration, requirementEntry.Cpu);
-			bool isCheckRam = CheckRamCached(systemConfiguration.Ram, systemConfiguration.RamUsage,
+			CheckStatus isCheckOs = CheckOSCached(systemConfiguration.Os, requirementEntry.Os);
+			CheckStatus isCheckCpu = CheckCpuCached(systemConfiguration, requirementEntry.Cpu);
+			CheckStatus isCheckRam = CheckRamCached(systemConfiguration.Ram, systemConfiguration.RamUsage,
 												 requirementEntry.Ram, requirementEntry.RamUsage);
-			bool isCheckGpu = CheckGpuCached(systemConfiguration, requirementEntry.Gpu);
-			bool isCheckStorage = IsInstalled || CheckStorage(systemConfiguration.Disks, requirementEntry.Storage);
+			CheckStatus isCheckGpu = CheckGpuCached(systemConfiguration, requirementEntry.Gpu);
+			CheckStatus isCheckStorage = IsInstalled
+				? CheckStatus.Pass
+				: ToCheckStatus(CheckStorage(systemConfiguration.Disks, requirementEntry.Storage));
 
 			return new CheckSystem
 			{
@@ -497,7 +531,7 @@ namespace SystemChecker.Services
 				CheckRam = isCheckRam,
 				CheckGpu = isCheckGpu,
 				CheckStorage = isCheckStorage,
-				AllOk = isCheckOs && isCheckCpu && isCheckRam && isCheckGpu && isCheckStorage
+				AllOk = CheckStatusExtensions.ToAllOk(isCheckOs, isCheckCpu, isCheckRam, isCheckGpu, isCheckStorage)
 			};
 		}
 
@@ -505,7 +539,12 @@ namespace SystemChecker.Services
 
 		#region Cached check methods
 
-		private static bool CheckOSCached(string systemOs, List<string> requirementOs)
+		private static CheckStatus ToCheckStatus(bool passed)
+		{
+			return passed ? CheckStatus.Pass : CheckStatus.Fail;
+		}
+
+		private static CheckStatus CheckOSCached(string systemOs, List<string> requirementOs)
 		{
 			string cacheKey = BuildOsCacheKey(systemOs, requirementOs);
 			bool isNewEntry = false;
@@ -513,7 +552,7 @@ namespace SystemChecker.Services
 			CachedCheckResult cached = _osCache.GetOrSet(cacheKey, () =>
 			{
 				isNewEntry = true;
-				bool result = CheckOS(systemOs, requirementOs);
+				CheckStatus result = ToCheckStatus(CheckOS(systemOs, requirementOs));
 				string requirementKey = string.Join("|", requirementOs ?? new List<string>());
 				CachedCheckResult entry = new CachedCheckResult(result, systemOs, requirementKey, "OS");
 				lock (_trackingLock) { _osCacheTracking[cacheKey] = entry; }
@@ -521,10 +560,10 @@ namespace SystemChecker.Services
 			}, TimeSpan.FromDays(_cacheExpirationDays));
 
 			if (isNewEntry) { ScheduleCacheSave(); }
-			return cached.Result;
+			return cached.Status;
 		}
 
-		private static bool CheckCpuCached(SystemConfiguration systemConfiguration, List<string> requirementCpu)
+		private static CheckStatus CheckCpuCached(SystemConfiguration systemConfiguration, List<string> requirementCpu)
 		{
 			string cacheKey = BuildCpuCacheKey(systemConfiguration.Cpu, requirementCpu);
 			bool isNewEntry = false;
@@ -532,7 +571,7 @@ namespace SystemChecker.Services
 			CachedCheckResult cached = _cpuCache.GetOrSet(cacheKey, () =>
 			{
 				isNewEntry = true;
-				bool result = CheckCpu(systemConfiguration, requirementCpu);
+				CheckStatus result = CheckCpu(systemConfiguration, requirementCpu);
 				string requirementKey = string.Join("|", requirementCpu ?? new List<string>());
 				CachedCheckResult entry = new CachedCheckResult(result, systemConfiguration.Cpu, requirementKey, "CPU");
 				lock (_trackingLock) { _cpuCacheTracking[cacheKey] = entry; }
@@ -540,10 +579,10 @@ namespace SystemChecker.Services
 			}, TimeSpan.FromDays(_cacheExpirationDays));
 
 			if (isNewEntry) { ScheduleCacheSave(); }
-			return cached.Result;
+			return cached.Status;
 		}
 
-		private static bool CheckRamCached(long systemRam, string systemRamUsage,
+		private static CheckStatus CheckRamCached(long systemRam, string systemRamUsage,
 										   double requirementRam, string requirementRamUsage)
 		{
 			string cacheKey = BuildRamCacheKey(systemRam, systemRamUsage, requirementRam, requirementRamUsage);
@@ -552,7 +591,7 @@ namespace SystemChecker.Services
 			CachedCheckResult cached = _ramCache.GetOrSet(cacheKey, () =>
 			{
 				isNewEntry = true;
-				bool result = CheckRam(systemRam, systemRamUsage, requirementRam, requirementRamUsage);
+				CheckStatus result = ToCheckStatus(CheckRam(systemRam, systemRamUsage, requirementRam, requirementRamUsage));
 				CachedCheckResult entry = new CachedCheckResult(result,
 					string.Format("{0} {1}", systemRam, systemRamUsage),
 					string.Format("{0} {1}", requirementRam, requirementRamUsage), "RAM");
@@ -561,10 +600,10 @@ namespace SystemChecker.Services
 			}, TimeSpan.FromDays(_cacheExpirationDays));
 
 			if (isNewEntry) { ScheduleCacheSave(); }
-			return cached.Result;
+			return cached.Status;
 		}
 
-		private static bool CheckGpuCached(SystemConfiguration systemConfiguration, List<string> requirementGpu)
+		private static CheckStatus CheckGpuCached(SystemConfiguration systemConfiguration, List<string> requirementGpu)
 		{
 			string cacheKey = BuildGpuCacheKey(systemConfiguration.GpuName, requirementGpu);
 			bool isNewEntry = false;
@@ -572,7 +611,7 @@ namespace SystemChecker.Services
 			CachedCheckResult cached = _gpuCache.GetOrSet(cacheKey, () =>
 			{
 				isNewEntry = true;
-				bool result = CheckGpu(systemConfiguration, requirementGpu);
+				CheckStatus result = CheckGpu(systemConfiguration, requirementGpu);
 				string requirementKey = string.Join("|", requirementGpu ?? new List<string>());
 				CachedCheckResult entry = new CachedCheckResult(result, systemConfiguration.GpuName, requirementKey, "GPU");
 				lock (_trackingLock) { _gpuCacheTracking[cacheKey] = entry; }
@@ -580,7 +619,7 @@ namespace SystemChecker.Services
 			}, TimeSpan.FromDays(_cacheExpirationDays));
 
 			if (isNewEntry) { ScheduleCacheSave(); }
-			return cached.Result;
+			return cached.Status;
 		}
 
 		#endregion
@@ -641,32 +680,41 @@ namespace SystemChecker.Services
 			return false;
 		}
 
-		private static bool CheckCpu(SystemConfiguration systemConfiguration, List<string> requirementCpu)
+		private static CheckStatus CheckCpu(SystemConfiguration systemConfiguration, List<string> requirementCpu)
 		{
 			if (requirementCpu == null || requirementCpu.Count == 0)
 			{
-				return true;
+				return CheckStatus.Pass;
 			}
 
 			try
 			{
-				foreach (string cpu in requirementCpu)
+				bool foundUnknown = false;
+
+				foreach (string cpu in CpuRequirementParser.ExpandCpuList(requirementCpu))
 				{
 					Cpu cpuCheck = new Cpu(systemConfiguration, cpu);
 					CheckResult check = cpuCheck.IsBetter();
 
-					if (check.SameConstructor || check.Result)
+					if (check.Status == CheckStatus.Pass)
 					{
-						return check.Result;
+						return CheckStatus.Pass;
+					}
+
+					if (check.Status == CheckStatus.Unknown)
+					{
+						foundUnknown = true;
 					}
 				}
+
+				return foundUnknown ? CheckStatus.Unknown : CheckStatus.Fail;
 			}
 			catch (Exception ex)
 			{
 				LogError(ex, "CheckCpu");
 			}
 
-			return false;
+			return CheckStatus.Unknown;
 		}
 
 		private static bool CheckRam(long systemRam, string systemRamUsage,
@@ -683,39 +731,41 @@ namespace SystemChecker.Services
 			}
 		}
 
-		private static bool CheckGpu(SystemConfiguration systemConfiguration, List<string> requirementGpu)
+		private static CheckStatus CheckGpu(SystemConfiguration systemConfiguration, List<string> requirementGpu)
 		{
 			if (requirementGpu == null || requirementGpu.Count == 0)
 			{
-				return true;
+				return CheckStatus.Pass;
 			}
 
 			try
 			{
-				for (int i = 0; i < requirementGpu.Count; i++)
+				bool foundUnknown = false;
+
+				foreach (string gpu in requirementGpu)
 				{
-					Gpu gpuCheck = new Gpu(systemConfiguration, requirementGpu[i]);
+					Gpu gpuCheck = new Gpu(systemConfiguration, gpu);
 					CheckResult check = gpuCheck.IsBetter();
 
-					if (check.Result)
+					if (check.Status == CheckStatus.Pass)
 					{
-						return check.SameConstructor
-							|| (!gpuCheck.IsWithNoCard && gpuCheck.CardRequirementIsOld)
-							|| i == 0;
+						return CheckStatus.Pass;
 					}
 
-					if (check.SameConstructor)
+					if (check.Status == CheckStatus.Unknown)
 					{
-						return false;
+						foundUnknown = true;
 					}
 				}
+
+				return foundUnknown ? CheckStatus.Unknown : CheckStatus.Fail;
 			}
 			catch (Exception ex)
 			{
 				LogError(ex, "CheckGpu");
 			}
 
-			return false;
+			return CheckStatus.Unknown;
 		}
 
 		private static bool CheckStorage(List<SystemDisk> systemDisks, double storage)

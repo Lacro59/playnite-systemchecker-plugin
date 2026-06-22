@@ -1,10 +1,12 @@
 ﻿using CommonPluginsShared;
 using CommonPluginsShared.Collections;
+using CommonPluginsShared.Plugins;
 using CommonPluginsShared.SystemInfo;
 using CommonPluginsShared.Utilities;
 using CommonPluginsStores.Models;
 using CommonPluginsStores.Steam;
 using Playnite.SDK;
+using Playnite.SDK.Data;
 using Playnite.SDK.Models;
 using System;
 using System.Collections.Generic;
@@ -12,6 +14,7 @@ using System.IO;
 using System.Linq;
 using SystemChecker.Clients;
 using SystemChecker.Models;
+using SystemChecker.Services.Parser;
 
 namespace SystemChecker.Services
 {
@@ -33,6 +36,7 @@ namespace SystemChecker.Services
 			: base(pluginSettings, "SystemChecker", pluginUserDataPath)
 		{
 			TagBefore = "[SC]";
+			PluginExportCsv = new SystemCheckerExportCsv();
 			PluginWindows = new SystemCheckWindows(PluginName, this);
 		}
 
@@ -45,9 +49,9 @@ namespace SystemChecker.Services
 			{
 				Logger.Info("LoadMoreData started.");
 
-				_pcGamingWikiRequirements = new PCGamingWikiRequirements();
-				_steamRequirements = new SteamRequirements();
 				_steamApi = new SteamApi(PluginName, PlayniteTools.ExternalPlugin.SystemChecker);
+				_pcGamingWikiRequirements = new PCGamingWikiRequirements(_steamApi);
+				_steamRequirements = new SteamRequirements(_steamApi);
 
 				SystemConfigurationManager = new SystemConfigurationManager(
 					Path.Combine(Paths.PluginUserDataPath, "Configurations.json"));
@@ -61,6 +65,40 @@ namespace SystemChecker.Services
 				Logger.Error(ex, "Error in LoadMoreData.");
 				throw; // Propagate so LoadDatabase returns false.
 			}
+		}
+
+		#endregion
+
+		#region System configuration
+
+		/// <summary>
+		/// Returns the WMI-detected configuration with optional manual CPU and GPU overrides from plugin settings.
+		/// Non-empty <see cref="SystemCheckerSettings.ManualCpu"/> and <see cref="SystemCheckerSettings.ManualGpu"/>
+		/// replace the corresponding detected values; all other fields (RAM, OS, disks, resolution) come from <see cref="PC"/>.
+		/// </summary>
+		/// <returns>A cloned <see cref="SystemConfiguration"/> for comparisons, or <c>null</c> when <see cref="PC"/> is unavailable.</returns>
+		public SystemConfiguration GetEffectiveConfiguration()
+		{
+			if (PC == null)
+			{
+				return null;
+			}
+
+			SystemConfiguration effective = Serialization.GetClone(PC);
+
+			string manualCpu = PluginSettings?.ManualCpu?.Trim();
+			if (!string.IsNullOrEmpty(manualCpu))
+			{
+				effective.Cpu = manualCpu;
+			}
+
+			string manualGpu = PluginSettings?.ManualGpu?.Trim();
+			if (!string.IsNullOrEmpty(manualGpu))
+			{
+				effective.GpuName = manualGpu;
+			}
+
+			return effective;
 		}
 
 		#endregion
@@ -88,7 +126,7 @@ namespace SystemChecker.Services
 				}
 			}
 
-			return cached;
+			return NormalizeRequirements(cached);
 		}
 
 		/// <inheritdoc/>
@@ -108,20 +146,29 @@ namespace SystemChecker.Services
 		public override PluginGameRequirements GetWeb(Guid id)
 		{
 			Game game = API.Instance.Database.Games.Get(id);
+			string exclusionReason = PlayniteTools.GetLibraryFilterExclusionReason(game, PluginSettings);
+			if (exclusionReason != null)
+			{
+				PlayniteTools.LogLibraryFilterExclusion("SystemChecker.GetWeb", game, exclusionReason);
+				return GetDefault(game);
+			}
+
 			PluginGameRequirements requirements = GetDefault(game);
 
 			try
 			{
+				uint steamAppId = 0;
+				bool steamAppIdLookupAttempted = false;
+
 				Logger.Info($"GetWeb — trying PCGamingWiki for \"{game.Name}\".");
-				requirements = _pcGamingWikiRequirements.GetRequirements(game);
+				requirements = _pcGamingWikiRequirements.GetRequirements(game, ref steamAppId, ref steamAppIdLookupAttempted);
 
 				if (!_pcGamingWikiRequirements.IsFind())
 				{
-					requirements = FetchFromSteam(game);
+					requirements = FetchFromSteam(game, ref steamAppId, steamAppIdLookupAttempted);
 				}
 
-				requirements = NormalizeRecommended(requirements);
-				requirements = PurgeGraphicsCardData(requirements);
+				requirements = NormalizeRequirements(requirements);
 			}
 			catch (Exception ex)
 			{
@@ -133,9 +180,9 @@ namespace SystemChecker.Services
 
 		/// <summary>
 		/// Attempts to fetch requirements from the Steam source.
-		/// For Steam games, uses the Steam app ID directly; for others, resolves the ID via the Steam API.
+		/// For Steam games, uses the Steam app ID directly; for others, reuses or resolves the AppId once.
 		/// </summary>
-		private PluginGameRequirements FetchFromSteam(Game game)
+		private PluginGameRequirements FetchFromSteam(Game game, ref uint steamAppId, bool steamAppIdLookupAttempted)
 		{
 			string sourceName = PlayniteTools.GetSourceName(game);
 			Logger.Info($"GetWeb — trying Steam for \"{game.Name}\" (source: {sourceName}).");
@@ -145,16 +192,97 @@ namespace SystemChecker.Services
 				return _steamRequirements.GetRequirements(game);
 			}
 
-			uint steamId = _steamApi.GetAppId(game);
+			if (steamAppId == 0)
+			{
+				if (steamAppIdLookupAttempted)
+				{
+					Common.LogDebug(true,
+						$"[SystemChecker] Skipping redundant Steam AppId lookup for \"{game.Name}\" — already unresolved during PCGW.");
+					return GetDefault(game);
+				}
 
-			return steamId != 0
-				? _steamRequirements.GetRequirements(game, steamId)
+				steamAppId = _steamApi.ResolveAppId(game);
+			}
+
+			return steamAppId != 0
+				? _steamRequirements.GetRequirements(game, steamAppId)
 				: GetDefault(game);
 		}
 
 		#endregion
 
 		#region Data normalisation
+
+		/// <summary>
+		/// Applies the full post-import normalisation pipeline (sizes, recommended fill-in, GPU, OS, CPU).
+		/// Safe to call on freshly downloaded or cached data.
+		/// </summary>
+		public PluginGameRequirements NormalizeRequirements(PluginGameRequirements requirements)
+		{
+			if (requirements == null)
+			{
+				return null;
+			}
+
+			SanitizeRequirementText(requirements);
+			requirements = PurgeSizeData(requirements);
+			requirements = NormalizeRecommended(requirements);
+			requirements = PurgeGraphicsCardData(requirements);
+			requirements = PurgeOsData(requirements);
+			requirements = PurgeCpuData(requirements);
+			return requirements;
+		}
+
+		/// <summary>
+		/// Strips emoji and other decorative Unicode from all requirement strings and the source link label.
+		/// </summary>
+		private static void SanitizeRequirementText(PluginGameRequirements requirements)
+		{
+			if (requirements.SourcesLink != null)
+			{
+				requirements.SourcesLink.GameName = RequirementTextSanitizer.StripDecorativeCharacters(requirements.SourcesLink.GameName);
+				requirements.SourcesLink.Name = RequirementTextSanitizer.StripDecorativeCharacters(requirements.SourcesLink.Name);
+			}
+
+			SanitizeRequirementEntry(requirements.GetMinimum());
+			SanitizeRequirementEntry(requirements.GetRecommended());
+		}
+
+		private static void SanitizeRequirementEntry(RequirementEntry entry)
+		{
+			if (entry == null)
+			{
+				return;
+			}
+
+			RequirementTextSanitizer.SanitizeStringList(entry.Os);
+			RequirementTextSanitizer.SanitizeStringList(entry.Cpu);
+			RequirementTextSanitizer.SanitizeStringList(entry.Gpu);
+
+			if (!entry.RamSource.IsNullOrEmpty())
+			{
+				entry.RamSource = RequirementTextSanitizer.StripDecorativeCharacters(entry.RamSource);
+			}
+
+			if (!entry.StorageSource.IsNullOrEmpty())
+			{
+				entry.StorageSource = RequirementTextSanitizer.StripDecorativeCharacters(entry.StorageSource);
+			}
+		}
+
+		/// <summary>
+		/// Parses <see cref="RequirementEntry.RamSource"/> and <see cref="RequirementEntry.StorageSource"/> into byte values.
+		/// </summary>
+		public PluginGameRequirements PurgeSizeData(PluginGameRequirements requirements)
+		{
+			RequirementSizeParser.NormalizeEntrySizes(requirements.GetMinimum());
+			RequirementSizeParser.NormalizeEntrySizes(requirements.GetRecommended());
+
+			RequirementEntry minimum = requirements.GetMinimum();
+			RequirementEntry recommended = requirements.GetRecommended();
+			requirements.Items = new List<RequirementEntry> { minimum, recommended };
+			return requirements;
+		}
 
 		/// <summary>
 		/// Copies minimum fields into the recommended entry wherever recommended fields are absent,
@@ -197,21 +325,83 @@ namespace SystemChecker.Services
 		}
 
 		/// <summary>
+		/// Splits combined CPU alternatives and removes unrecognised tokens.
+		/// </summary>
+		public PluginGameRequirements PurgeCpuData(PluginGameRequirements requirements)
+		{
+			RequirementEntry minimum = requirements.GetMinimum();
+			RequirementEntry recommended = requirements.GetRecommended();
+
+			FilterCpuList(minimum);
+			FilterCpuList(recommended);
+
+			requirements.Items = new List<RequirementEntry> { minimum, recommended };
+			return requirements;
+		}
+
+		private static void FilterCpuList(RequirementEntry entry)
+		{
+			if (!entry.HasData || entry.Cpu.Count == 0)
+			{
+				return;
+			}
+
+			entry.Cpu = CpuRequirementParser.ExpandCpuList(entry.Cpu);
+		}
+
+		/// <summary>
+		/// Removes unrecognised OS tokens from minimum and recommended entries.
+		/// </summary>
+		public PluginGameRequirements PurgeOsData(PluginGameRequirements requirements)
+		{
+			RequirementEntry minimum = requirements.GetMinimum();
+			RequirementEntry recommended = requirements.GetRecommended();
+
+			FilterOsList(minimum);
+			FilterOsList(recommended);
+
+			requirements.Items = new List<RequirementEntry> { minimum, recommended };
+			return requirements;
+		}
+
+		private static void FilterOsList(RequirementEntry entry)
+		{
+			if (!entry.HasData || entry.Os.Count == 0)
+			{
+				return;
+			}
+
+			entry.Os = OsRequirementParser.FilterList(entry.Os);
+		}
+
+		/// <summary>
 		/// Filters <paramref name="entry"/>'s GPU list to known-vendor cards only,
 		/// but only when the list has more than one entry and at least one known-vendor card exists.
 		/// </summary>
 		private static void FilterGpuList(RequirementEntry entry)
 		{
-			if (!entry.HasData || entry.Gpu.Count <= 1)
+			if (!entry.HasData || entry.Gpu.Count == 0)
 			{
 				return;
 			}
 
-			List<string> knownVendor = entry.Gpu.FindAll(IsKnownGpuVendor);
+			entry.Gpu = GpuRequirementParser.NormalizeGpuList(entry.Gpu);
+
+			if (entry.Gpu.Count <= 1)
+			{
+				return;
+			}
+
+			List<string> knownVendor = entry.Gpu.FindAll(IsRetainedGpuToken);
 			if (knownVendor.Count > 0)
 			{
 				entry.Gpu = knownVendor;
 			}
+		}
+
+		private static bool IsRetainedGpuToken(string gpuName)
+		{
+			return IsKnownGpuVendor(gpuName) || DirectXRequirementParser.TryNormalize(gpuName, out _);
 		}
 
 		/// <summary>
@@ -219,7 +409,7 @@ namespace SystemChecker.Services
 		/// </summary>
 		private static bool IsKnownGpuVendor(string gpuName)
 		{
-			return Gpu.CallIsNvidia(gpuName) || Gpu.CallIsAmd(gpuName) || Gpu.CallIsIntel(gpuName);
+			return GpuRequirementParser.IsNvidia(gpuName) || GpuRequirementParser.IsAmd(gpuName) || GpuRequirementParser.IsIntel(gpuName);
 		}
 
 		#endregion
@@ -230,13 +420,20 @@ namespace SystemChecker.Services
 		/// <inheritdoc/>
 		protected override bool AppendPluginTag(Game game)
 		{
+			string exclusionReason = PlayniteTools.GetLibraryFilterExclusionReason(game, PluginSettings);
+			if (exclusionReason != null)
+			{
+				PlayniteTools.LogLibraryFilterExclusion("SystemChecker.AppendPluginTag", game, exclusionReason);
+				return false;
+			}
+
 			PluginGameRequirements item = Get(game, true);
 
 			if (item.HasData)
 			{
 				try
 				{
-					SystemConfiguration systemConfig = PC;
+					SystemConfiguration systemConfig = GetEffectiveConfiguration();
 					CheckSystem checkMinimum = SystemApi.CheckConfig(game, item.GetMinimum(), systemConfig, game.IsInstalled);
 					CheckSystem checkRecommended = SystemApi.CheckConfig(game, item.GetRecommended(), systemConfig, game.IsInstalled);
 
@@ -277,17 +474,22 @@ namespace SystemChecker.Services
 		/// </summary>
 		private Guid? ResolveSystemTag(CheckSystem checkMinimum, CheckSystem checkRecommended)
 		{
-			if (checkRecommended.AllOk ?? false)
+			if (checkRecommended.AllOk == true)
 			{
 				return CheckTagExist(ResourceProvider.GetString("LOCSystemCheckerConfigRecommended"));
 			}
 
-			if (checkMinimum.AllOk ?? false)
+			if (checkMinimum.AllOk == true)
 			{
 				return CheckTagExist(ResourceProvider.GetString("LOCSystemCheckerConfigMinimum"));
 			}
 
-			return CheckTagExist(ResourceProvider.GetString("LOCSystemCheckerConfigBelowMinimum"));
+			if (checkMinimum.AllOk == false || checkRecommended.AllOk == false)
+			{
+				return CheckTagExist(ResourceProvider.GetString("LOCSystemCheckerConfigBelowMinimum"));
+			}
+
+			return null;
 		}
 
 		#endregion
@@ -297,6 +499,14 @@ namespace SystemChecker.Services
 		/// <inheritdoc/>
 		public override void SetThemesResources(Game game)
 		{
+			string exclusionReason = PlayniteTools.GetLibraryFilterExclusionReason(game, PluginSettings);
+			if (exclusionReason != null)
+			{
+				PlayniteTools.LogLibraryFilterExclusion("SystemChecker.SetThemesResources", game, exclusionReason);
+				ResetThemeSettings();
+				return;
+			}
+
 			PluginGameRequirements requirements = Get(game, true);
 
 			if (requirements == null)
@@ -305,7 +515,7 @@ namespace SystemChecker.Services
 				return;
 			}
 
-			SystemConfiguration systemConfig = PC;
+			SystemConfiguration systemConfig = GetEffectiveConfiguration();
 			CheckSystem checkMinimum = SystemApi.CheckConfig(game, requirements.GetMinimum(), systemConfig, game.IsInstalled);
 			CheckSystem checkRecommended = SystemApi.CheckConfig(game, requirements.GetRecommended(), systemConfig, game.IsInstalled);
 

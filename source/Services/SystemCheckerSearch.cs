@@ -77,7 +77,7 @@ namespace SystemChecker.Services
 			try
 			{
 				SearchParameters searchParams = ParseSearchParameters(args.SearchTerm);
-				SystemConfiguration systemConfiguration = _pluginDatabase.PC;
+				SystemConfiguration systemConfiguration = _pluginDatabase.GetEffectiveConfiguration();
 				GameSearchFilterSettings filterSettings = args.GameFilterSettings;
 
 				return _pluginDatabase.GetAllCache()
@@ -111,7 +111,7 @@ namespace SystemChecker.Services
 		private SearchItem BuildValidatedSearchItem(PluginGameRequirements gameReq, SearchParameters searchParams, SystemConfiguration systemConfiguration)
 		{
 			Game game = API.Instance.Database.Games.Get(gameReq.Id);
-			if (game == null)
+			if (game == null || PlayniteTools.GetLibraryFilterExclusionReason(game, _pluginDatabase.FilterSettings) != null)
 			{
 				return null;
 			}
@@ -431,13 +431,13 @@ namespace SystemChecker.Services
 			if (result.HasMinimum)
 			{
 				CheckSystem checkMinimum = SystemApi.CheckConfig(game, systemMinimum, systemConfiguration, game.IsInstalled);
-				result.MeetsMinimum = (bool)checkMinimum.AllOk;
+				result.MeetsMinimum = checkMinimum.AllOk == true;
 			}
 
 			if (result.HasRecommended)
 			{
 				CheckSystem checkRecommended = SystemApi.CheckConfig(game, systemRecommended, systemConfiguration, game.IsInstalled);
-				result.MeetsRecommended = (bool)checkRecommended.AllOk;
+				result.MeetsRecommended = checkRecommended.AllOk == true;
 			}
 
 			return result;

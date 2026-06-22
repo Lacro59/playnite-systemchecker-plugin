@@ -1,6 +1,5 @@
 ﻿using CommonPluginsShared.Collections;
 using CommonPluginsStores.Models;
-using LiteDB;
 using Playnite.SDK.Data;
 
 namespace SystemChecker.Models
@@ -16,7 +15,6 @@ namespace SystemChecker.Models
 		/// Cached until Items changes via <see cref="PluginGameEntry.RefreshCachedValues"/>.
 		/// </summary>
 		[DontSerialize]
-		[BsonIgnore]
 		public override bool HasData
 		{
 			get
@@ -37,7 +35,6 @@ namespace SystemChecker.Models
 		/// Cached until Items changes via <see cref="PluginGameEntry.RefreshCachedValues"/>.
 		/// </summary>
 		[DontSerialize]
-		[BsonIgnore]
 		public override ulong Count
 		{
 			get
