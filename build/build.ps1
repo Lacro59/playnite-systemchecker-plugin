@@ -71,7 +71,6 @@ else {
 
                 $Result = & $ToolboxPath "verify" "installer" $Manifest
                 if ($Result -imatch "Installer manifest passed verification") {
-                    # Si n�cessaire, ajouter des actions ici en cas de r�ussite
                 } else {
                     Write-Host $Result
                 }
