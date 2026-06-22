@@ -6,7 +6,20 @@
 	<sys:String x:Key="LOCSystemCheckerCheckConfig">システム要件を確認</sys:String>
 	<sys:String x:Key="LOCSystemCheckerRefreshPcInfo">システム情報を更新</sys:String>
 
+	<!-- Settings — PC configuration -->
+	<sys:String x:Key="LOCSystemCheckerPcConfigDescription">SystemChecker は、ゲームの要件をお使いの PC ハードウェアと比較します。以下の値は自動的に検出されます。検出内容が正しくない場合や、ベンチマークで認識されない場合は、プロセッサー名とグラフィックカード名を上書きできます。</sys:String>
+	<sys:String x:Key="LOCSystemCheckerDetectedHardware">検出されたハードウェア</sys:String>
+	<sys:String x:Key="LOCSystemCheckerManualOverrides">手動上書き</sys:String>
+	<sys:String x:Key="LOCSystemCheckerManualOverrideHint">検出された値を使用するには、フィールドを空のままにしてください。名前を入力するか、PassMark リストを開いてベンチマーク項目を選択します。</sys:String>
+	<sys:String x:Key="LOCSystemCheckerPickBenchmark">PassMark リスト…</sys:String>
+	<sys:String x:Key="LOCSystemCheckerPickCpu">プロセッサーを選択（PassMark）</sys:String>
+	<sys:String x:Key="LOCSystemCheckerPickGpu">グラフィックカードを選択（PassMark）</sys:String>
+	<sys:String x:Key="LOCSystemCheckerBenchmarkSearch">ベンチマークを検索</sys:String>
+	<sys:String x:Key="LOCSystemCheckerBenchmarkLoading">ベンチマーク一覧を読み込み中…</sys:String>
+	<sys:String x:Key="LOCSystemCheckerRetagOnManualConfigChange">CPU/GPU の手動設定変更時に互換性タグを更新</sys:String>
+
 	<!-- Game Details View -->
+	<sys:String x:Key="LOCSystemCheckerConfigBelowMinimum">最小要件未満</sys:String>
 	<sys:String x:Key="LOCSystemCheckerConfigMinimum">最小</sys:String>
 	<sys:String x:Key="LOCSystemCheckerConfigRecommended">推奨</sys:String>
 	<sys:String x:Key="LOCSystemCheckerOS">OS</sys:String>
@@ -16,25 +29,25 @@
 	<sys:String x:Key="LOCSystemCheckerDisk">ストレージ</sys:String>
 
 	<!-- Search -->
-	<sys:String x:Key="LOCSystemCheckerSearchDescription">Search System Checker data</sys:String>
-	<sys:String x:Key="LOCSystemCheckerSearchHint" xml:space="preserve">Parameters:
-    -min		Matches minimum requirements
-    -rec		Matches recommended requirements
-    -any		Matches minimum or recommended requirements
-    -np		Never played
-    -fav		Favorites only
-    -stores={n}	Filter by store (e.g. -stores=steam / -stores=steam,epic)
-    -status={n}	Filter by play status (e.g. -status=played / -status=played,playing)</sys:String>
+	<sys:String x:Key="LOCSystemCheckerSearchDescription">System Checker のデータを検索</sys:String>
+	<sys:String x:Key="LOCSystemCheckerSearchHint" xml:space="preserve">パラメーター：
+    -min		最低要件を満たす
+    -rec		推奨要件を満たす
+    -any		最低要件または推奨要件を満たす
+    -np		未プレイ
+    -fav		お気に入りのみ
+    -stores={n}	ストアでフィルター（例：-stores=steam / -stores=steam,epic）
+    -status={n}	プレイ状態でフィルター（例：-status=played / -status=played,playing）</sys:String>
 
 	<!-- Search Results -->
-	<sys:String x:Key="LOCSystemCheckerSearchMeetsMinimum">✅ Meets minimum requirements</sys:String>
-	<sys:String x:Key="LOCSystemCheckerSearchMeetsRecommended">✅ Meets recommended requirements</sys:String>
-	<sys:String x:Key="LOCSystemCheckerSearchBelowMinimum">⚠️ Below minimum requirements</sys:String>
-	<sys:String x:Key="LOCSystemCheckerSearchNoData">ℹ️ No requirements data available</sys:String>
-	<sys:String x:Key="LOCSystemCheckerSearchSecondaryAction">View Details</sys:String>
+	<sys:String x:Key="LOCSystemCheckerSearchMeetsMinimum">✅ 最小要件を満たしています</sys:String>
+	<sys:String x:Key="LOCSystemCheckerSearchMeetsRecommended">✅ 推奨要件を満たしています</sys:String>
+	<sys:String x:Key="LOCSystemCheckerSearchBelowMinimum">⚠️ 最小要件を下回っています</sys:String>
+	<sys:String x:Key="LOCSystemCheckerSearchNoData">ℹ️ 利用可能な要件データがありません</sys:String>
+	<sys:String x:Key="LOCSystemCheckerSearchSecondaryAction">詳細を表示</sys:String>
 
 	<!-- Notifications -->
-	<sys:String x:Key="LOCSystemCheckerTryRefresh">Try to refresh plugin data for {0}</sys:String>
+	<sys:String x:Key="LOCSystemCheckerTryRefresh">{0} のプラグインデータを更新してみてください</sys:String>
 	<sys:String x:Key="LOCSystemCheckerAddTagError">タグの追加中にエラーが発生しました。もう一度やり直してください。</sys:String>
 	<sys:String x:Key="LOCSystemCheckerRemoveTagError">タグの削除中にエラーが発生しました。もう一度やり直してください。</sys:String>
 	<sys:String x:Key="LOCSystemCheckerClearAllError">プラグインデータの消去中にエラーが発生しました。もう一度やり直してください。</sys:String>
