@@ -103,3 +103,14 @@ Packages:
     Changelog:
       - 'Added: Below Minimum system tag when hardware does not meet minimum requirements (thanks to David Brett)'
       - 'Updated: Localizations'
+  - Version: 3.3.0
+    RequiredApiVersion: 6.16.0
+    ReleaseDate: 2026-06-22
+    PackageUrl: https://github.com/Lacro59/playnite-systemchecker-plugin/releases/download/v3.3.0/playnite-systemchecker-plugin_3_3_0.pext
+    Changelog:
+      - 'Added: Manual CPU and GPU override in settings with PassMark database picker'
+      - 'Added: CSV export of compatibility data from the main menu'
+      - 'Added: Library filter option to exclude emulated and console game sources'
+      - 'Optimized: Requirements retrieval and caching'
+      - 'Improved: Requirements name normalization for more reliable comparisons'
+      - 'Updated: Localizations'
