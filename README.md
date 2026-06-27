@@ -84,7 +84,7 @@ You can use the following parameters to filter games:
 
 ### PC Configuration
 
-Open **Settings → Extensions → SystemChecker → Configuration**.
+Open **Settings → Add-ons → Extensions settings → Generic → SystemChecker → Configuration**.
 
 **Detected hardware** (read-only) shows values read from Windows (CPU, GPU, RAM, OS). The plugin uses them automatically for compatibility checks.
 
